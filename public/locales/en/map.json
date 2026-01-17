@@ -1,0 +1,84 @@
+{
+  "helpPopup": {
+    "title": "Interactive Global Bitcoin Map",
+    "subtitle": "Find Bitcoin-Accepting Merchants Near You",
+    "description": "Browse thousands of businesses worldwide that accept Bitcoin payments. Search by location, filter by category, and discover places where you can spend your Bitcoin in the real world.",
+    "closeButton": "Got it"
+  },
+  "searchPlaceholder": "Search places or cities...",
+  "filter": {
+    "byCategory": "Filter by category"
+  },
+  "locationPrompt": {
+    "title": "See places near you?",
+    "description": "We can use your device location to show Bitcoin places around you. This data is only used locally and never stored or shared."
+  },
+  "venue-tooltip": {
+    "defaultCategory": "Bitcoin Location",
+    "paymentMethods": "Payment Methods",
+    "contactAndSocials": "Contact & Socials",
+    "getDirections": "Get Directions"
+  },
+  "venue-information": {
+    "various": "Various",
+    "paymentMethods": "Payment Methods",
+    "amenities": "Amenities",
+    "contactAndSocials": "Contact & Socials",
+    "getDirections": "Get Directions",
+    "tabs": {
+      "overview": "Overview",
+      "reviews": "Reviews",
+      "about": "About"
+    },
+    "noReviews": "No reviews yet."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions about our Bitcoin Map",
+    "questions": [
+      {
+        "question": "How do I add a new place?",
+        "answer": "Go to <link.create>add a place</link.create>, fill out the details and submit. Your place will be reviewed before going live."
+      },
+      {
+        "question": "Where can I learn more about the algorithm?",
+        "answer": "Learn about how places are scored, data is validated, updated, and protected at <link.process>how it works</link.process>."
+      },
+      {
+        "question": "How can I explore all places?",
+        "answer": "Visit <link.countries>our countries page</link.countries> to filter by region, category, or payment type."
+      },
+      {
+        "question": "Can I suggest updates to an existing place?",
+        "answer": "Yes—click the 'edit' or 'report' button on a place's page to suggest corrections or updates."
+      },
+      {
+        "question": "How often is place data updated?",
+        "answer": "We pull data every few hours and re-score and re-rank places daily for accuracy."
+      },
+      {
+        "question": "Can I filter places by Bitcoin payment method?",
+        "answer": "Yes—on <link.countries>the countries page</link.countries>, filter by on-chain, Lightning, or NFC."
+      },
+      {
+        "question": "Is it possible to export place data?",
+        "answer": "Yes—download CSV or JSON of the full place list via the 'Export data' link on <link.countries>countries page</link.countries>."
+      },
+      {
+        "question": "Who moderates the submitted places?",
+        "answer": "Our moderation team, along with community reviewers, verifies all new or updated places before approval."
+      },
+      {
+        "question": "How can I report a closed place or one that stopped accepting Bitcoin?",
+        "answer": "Use the 'report' button on the place page or reach out via the contact form. We'll verify and update the status."
+      },
+      {
+        "question": "Can my place appear on other maps or apps?",
+        "answer": "Yes—once approved, your place's OpenStreetMap tags are public and usable by third-party apps."
+      },
+      {
+        "question": "Where can I get help or leave feedback?",
+        "answer": "Visit our support page (linked in the footer), join our Discord, or send us a message through the contact form."
+      }
+    ]
+  }
+}

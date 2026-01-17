@@ -1,0 +1,132 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Cache npm registry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install --prefer-offline --no-audit
+
+      - name: Write .env from secret
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION }}" > .env
+
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: Upload build to temporary server folder
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".next/**,public,package.json,package-lock.json,next.config.js,.env,data/**,posts/**"
+          target: "/root/mappingbitcoin-temp"
+
+      - name: Install production dependencies on server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/mappingbitcoin-temp
+            echo "🧹 Cleaning previous node_modules (if any)"
+            rm -rf node_modules
+            echo "📦 Installing production dependencies..."
+            if ! npm install --no-audit; then
+              echo "❌ Dependency install failed. Aborting."
+              rm -rf /root/mappingbitcoin-temp
+              exit 1
+            fi
+
+      - name: Run test server and check health
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/mappingbitcoin-temp
+            echo "🚀 Starting test server on port 3467"
+            NODE_ENV=healthcheck PORT=3467 nohup npm run start > /tmp/test-log.out 2>&1 &
+            NEXT_PID=$!
+            
+            echo "⏳ Waiting for server to boot..."
+            sleep 5
+            
+            echo "🔍 Performing health check..."
+            if curl -fs http://localhost:3467/api/healthz > /dev/null; then
+              echo "✅ Health check passed"
+              kill $NEXT_PID || echo "Test server already stopped"
+              exit 0
+            else
+              echo "❌ Health check failed"
+              kill $NEXT_PID || echo "Test server already stopped"
+              rm -rf /***/mappingbitcoin-temp
+              exit 1
+            fi
+
+      - name: Replace old deployment with new version
+        uses: appleboy/ssh-action@v1.0.0
+        if: success()
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            
+            echo "♻️ Copying runtime data from /root/mappingbitcoin → /root/mappingbitcoin-temp"
+            for f in /root/mappingbitcoin/data/*.mmdb /root/mappingbitcoin/data/*.json /root/mappingbitcoin/data/*.state; do
+              [ -f "$f" ] && cp "$f" /root/mappingbitcoin-temp/data/ || true
+            done
+            
+            for d in queues google-places logs; do
+              if [ -d "/root/mappingbitcoin/data/$d" ]; then
+                mkdir -p "/root/mappingbitcoin-temp/data/$d"
+                cp -r "/root/mappingbitcoin/data/$d/"* "/root/mappingbitcoin-temp/data/$d/" || true
+              fi
+            done
+            
+            echo "📁 Backing up old version"
+            timestamp=$(date +"%Y%m%d_%H%M")
+            backup_dir="/root/mappingbitcoin_${timestamp}_bkp"
+            if [ -d "/root/mappingbitcoin" ]; then
+              mv /root/mappingbitcoin "$backup_dir"
+            fi
+            
+            echo "🚚 Promoting new version"
+            mv /root/mappingbitcoin-temp /root/mappingbitcoin
+            
+            echo "🔁 Restarting server"
+            cd /root/mappingbitcoin
+            pm2 delete mappingbitcoin || true
+            export PORT=4466
+            pm2 start "cd /root/mappingbitcoin && npm run start" --name mappingbitcoin
+            pm2 save
+            
+            echo "✅ Deployment complete with runtime data preserved"

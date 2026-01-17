@@ -1,0 +1,118 @@
+{
+  "totalVenues": 21538,
+  "countries": 152,
+  "continents": 6,
+  "regions": [
+    {
+      "name": "Europe",
+      "count": 7371
+    },
+    {
+      "name": "North America",
+      "count": 7027
+    },
+    {
+      "name": "South America",
+      "count": 3076
+    },
+    {
+      "name": "Africa",
+      "count": 2108
+    },
+    {
+      "name": "Asia",
+      "count": 1573
+    },
+    {
+      "name": "Oceania",
+      "count": 320
+    }
+  ],
+  "topCountries": [
+    {
+      "code": "US",
+      "name": "United States of America",
+      "flag": "🇺🇸",
+      "count": 3215,
+      "slug": "united-states-of-america"
+    },
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "flag": "🇧🇷",
+      "count": 2284,
+      "slug": "brazil"
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "flag": "🇿🇦",
+      "count": 1588,
+      "slug": "south-africa"
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "flag": "🇸🇻",
+      "count": 1515,
+      "slug": "el-salvador"
+    },
+    {
+      "code": "CZ",
+      "name": "Czech Republic",
+      "flag": "🇨🇿",
+      "count": 1133,
+      "slug": "czech-republic"
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "flag": "🇮🇹",
+      "count": 1111,
+      "slug": "italy"
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "flag": "🇨🇭",
+      "count": 837,
+      "slug": "switzerland"
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "flag": "🇩🇪",
+      "count": 671,
+      "slug": "germany"
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "flag": "🇨🇦",
+      "count": 599,
+      "slug": "canada"
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "flag": "🇲🇽",
+      "count": 574,
+      "slug": "mexico"
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "flag": "🇹🇭",
+      "count": 465,
+      "slug": "thailand"
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "flag": "🇪🇸",
+      "count": 446,
+      "slug": "spain"
+    }
+  ],
+  "generatedAt": "2026-01-17T19:56:57.194Z"
+}

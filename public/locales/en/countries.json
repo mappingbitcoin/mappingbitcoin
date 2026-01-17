@@ -1,0 +1,162 @@
+{
+  "title": "Countries with Bitcoin Places",
+  "description": "Explore countries around the world where places accept Bitcoin. Choose a region below to view available places.",
+  "breadcrumb": {
+    "home": "Countries",
+    "inCountry": "Bitcoin in {country}",
+    "inCity": "{city}",
+    "inCategory": "{category}"
+  },
+  "fallback": {
+    "slug": {
+      "warning": "<strong>URL typo?</strong>, showing results for <strong>{cityAndOrCountry}</strong> instead."
+    }
+  },
+  "seoParagraph": {
+    "countryOnly": "Discover Bitcoin-friendly places in {country}. Browse a curated list of verified places that accept Bitcoin for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence.",
+    "countryAndCity": "Discover Bitcoin-friendly places in {city}, {country}. Browse a curated list of verified places that accept Bitcoin for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence.",
+    "countryAndCategory": "Discover {category} in {country} that accept Bitcoin. Browse a curated list of verified places for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence.",
+    "countryCityCategory": "Discover {category} in {city}, {country} that accept Bitcoin. Browse a curated list of verified places for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence."
+  },
+  "headings": {
+    "countryOnly": "Bitcoin Places in {country}",
+    "countryAndCategory": "{category} in {country}",
+    "countryCityCategory": "{category} in {city}, {country}",
+    "countryAndCity": "Bitcoin Places in {city}, {country}"
+  },
+  "descriptions": {
+    "countryOnly": "Discover shops, cafes, and businesses in {country} that accept Bitcoin. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
+    "countryAndCategory": "Discover {category} in {country}. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
+    "countryCityCategory": "Discover {category} in {city}, {country}. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
+    "countryAndCity": "Discover shops, cafes, and businesses in {city}, {country} that accept Bitcoin. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase."
+  },
+  "keywords": {
+    "countryOnly": "bitcoin map {country}, bitcoin in {country}, bitcoin shops in {country}, accept bitcoin in {country}, bitcoin-friendly {country}, spend bitcoin in {country}",
+    "countryAndCity": "bitcoin map {city} {country}, bitcoin in {city} {country}, buy with bitcoin in {city} {country}, bitcoin shops in {city} {country}, places that accept bitcoin in {city} {country}, spend bitcoin in {city} {country}, bitcoin-friendly places in {city} {country}, where to use bitcoin in {city} {country}, spend bitcoin in {city}",
+    "countryAndCategory": "bitcoin map {category} in {country}, bitcoin {category} in {country}, {category} accept bitcoin in {country}, bitcoin-friendly {category} {country}, where {category} {country} bitcoin",
+    "countryCityCategory": "bitcoin map {category} in {city} {country}, bitcoin {category} in {city} {country}, {category} accept bitcoin in {city} {country}, bitcoin-friendly {category} {city} {country}, where {category} {city} {country}"
+  },
+  "faq": {
+    "title": "Common Questions",
+    "moreCities": " and others",
+    "moreCategories": " and more",
+    "questions": [
+      {
+        "question": "Where can I pay with Bitcoin in {locationWithCountry}?",
+        "answer": "You can pay with Bitcoin in many places in {locationWithCountry}."
+      },
+      {
+        "question": "Are there any {category} places in {locationWithCountry} that accept Bitcoin?",
+        "answer": "Yes, several {category} businesses in {locationWithCountry} accept Bitcoin.",
+        "showIfCategory": true
+      },
+      {
+        "question": "Where can I find places that accept Bitcoin in {locationWithCountry}?",
+        "answer": "There are many locations across {locationWithCountry} that accept Bitcoin, especially in cities like {otherCities}{moreCities}. <a href='https://mappingbitcoin.com/{countrySlug}' target='_blank' rel='noopener noreferrer'>Discover them here</a>."
+      },
+      {
+        "question": "What types of places accept Bitcoin in {locationWithCountry}?",
+        "answer": "{otherCategories}{moreCategories}, there are many places accept Bitcoin in {locationWithCountry}. <a href='https://mappingbitcoin.com/{countrySlug}' target='_blank' rel='noopener noreferrer'>Check the map</a>.",
+        "showIfCity": true
+      },
+      {
+        "question": "Which cities in {country} accept Bitcoin?",
+        "answer": "Top cities in {country} where Bitcoin is accepted include {otherCities}{moreCities}. <a href='https://mappingbitcoin.com/{countrySlug}' target='_blank' rel='noopener noreferrer'>Explore them on the map</a>."
+      },
+      {
+        "question": "What other types of places accept Bitcoin in {locationWithCountry}?",
+        "answer": "In addition to {category}, Bitcoin is accepted in categories like {otherCategories}{moreCategories} in {locationWithCountry}.",
+        "showIfCategory": true
+      },
+      {
+        "question": "What types of places accept Bitcoin in {locationWithCountry}?",
+        "answer": "Bitcoin is accepted in a wide range of categories in {locationWithCountry}, such as {otherCategories}{moreCategories}."
+      },
+      {
+        "question": "Can I spend Bitcoin as a tourist in {country}?",
+        "answer": "Yes, there are many tourist-friendly places in {country} that accept Bitcoin."
+      },
+      {
+        "question": "How common is Bitcoin usage in {country}?",
+        "answer": "Bitcoin usage is growing in {country}, especially in categories like {category}.",
+        "showIfCategory": true
+      },
+      {
+        "question": "What types of places accept Bitcoin in {country}?",
+        "answer": "From coffee {otherCategories}{moreCategories}, there are many places accept Bitcoin in {country}. <a href='https://mappingbitcoin.com/{countrySlug}' target='_blank' rel='noopener noreferrer'>Check the map</a>.",
+        "showIfCity": true
+      }
+    ]
+  },
+  "countriesFaq": {
+    "title": "Frequently Asked Questions",
+    "description": "Learn how places are added, how the data is managed, and how you can contribute to the Bitcoin map.",
+    "questions": [
+      {
+        "question": "How are places added to the map?",
+        "answer": "We use public data from OpenStreetMap and direct contributions from the community. If you know a place that accepts Bitcoin but isn't listed, you can <a href=\"/places/create\" target=\"_blank\" rel=\"noopener\">add it manually</a>."
+      },
+      {
+        "question": "What is OpenStreetMap?",
+        "answer": "<a href=\"https://www.openstreetmap.org\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> is a collaborative project that creates open, editable maps. We use their data as a primary source to identify Bitcoin-accepting places."
+      },
+      {
+        "question": "How can I see all available places?",
+        "answer": "Explore our <a href=\"/map\" target=\"_blank\" rel=\"noopener\">interactive map</a> to find places by city, country, category, or features like Lightning support."
+      },
+      {
+        "question": "How do you ensure the data is accurate?",
+        "answer": "We filter and enrich OpenStreetMap data, and allow users to suggest changes or leave reviews. Every new place goes through a moderation process before it appears on the map."
+      },
+      {
+        "question": "Where can I find the code for this project?",
+        "answer": "The entire project is open source. We'll publish the repository soon. <a href=\"https://github.com/we-are-bitcoin\" target=\"_blank\" rel=\"noopener\">View the repository</a>."
+      }
+    ]
+  },
+  "actions": {
+    "addPlace": "Add Place",
+    "goToMap": "Go to Map"
+  },
+  "stats": {
+    "totalPlaces": "places",
+    "newThisWeek": "new this week",
+    "new": "New",
+    "showingPage": "Showing {start}-{end} of {total}",
+    "filtered": "{count} results"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "table": {
+    "place": "Place",
+    "payment": "Payment",
+    "category": "Category"
+  },
+  "search": {
+    "placeholder": "Search places...",
+    "noResults": "No places found",
+    "noResultsDescription": "No places match \"{query}\". Try a different search term.",
+    "clearSearch": "Clear search"
+  },
+  "perPage": {
+    "label": "Per page:"
+  },
+  "filters": {
+    "label": "Filters",
+    "applyFilters": "Apply Filters",
+    "paymentLabel": "Payment",
+    "categories": "Categories",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "goToCategory": "Go to category page",
+    "searchCities": "Search cities...",
+    "showMore": "Show more",
+    "noCitiesFound": "No cities found"
+  },
+  "suggestions": {
+    "otherCategories": "Categories",
+    "otherCities": "Other cities in {country}"
+  }
+}
