@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* Custom theme configuration for Tailwind v4 */
+@theme {
+  /* Colors - Dark theme matching landing page */
+  --color-primary: #0D0D0D;
+  --color-primary-light: #111111;
+  --color-secondary: #1A1A1A;
+  --color-surface: #1A1A1A;
+  --color-surface-light: #222222;
+  --color-accent: #f7931a;
+  --color-accent-light: #ffab40;
+  --color-accent-subtle: rgba(247, 147, 26, 0.1);
+  --color-success: #10b981;
+  --color-success-light: #34d399;
+  --color-success-subtle: rgba(16, 185, 129, 0.1);
+  --color-failure: #ef4444;
+  --color-background: #0D0D0D;
+  --color-background-secondary: #111111;
+  --color-text: #ffffff;
+  --color-text-dark: #ffffff;
+  --color-text-light: #9CA3AF;
+  --color-text-muted: #6b7280;
+  --color-border: #2A2A2A;
+  --color-border-light: rgba(255, 255, 255, 0.1);
+  --color-glass-bg: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Font families */
+  --font-family-oswald: var(--font-oswald), 'Oswald', sans-serif;
+
+  /* Font sizes */
+  --font-size-xxs: 0.75rem;
+  --font-size-xs: 0.875rem;
+  --font-size-sm: 0.9rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.2rem;
+  --font-size-lg: 1.5rem;
+  --font-size-xl: 2rem;
+  --font-size-2xl: 2.5rem;
+  --font-size-3xl: 3.1rem;
+
+  /* Spacing / sizing */
+  --width-container: 1200px;
+
+  /* Border radius */
+  --radius-btn: 10px;
+  --radius-card: 16px;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-accent: 0 4px 15px rgba(247, 147, 26, 0.25);
+  --shadow-accent-hover: 0 6px 20px rgba(247, 147, 26, 0.35);
+  --shadow-glass: 0 10px 40px rgba(0, 0, 0, 0.3);
+
+  /* Animations */
+  --animate-slide-up: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Import datepicker styles */
+@import 'react-datepicker/dist/react-datepicker.css';
+
+/* Base styles - wrapped in @layer base so Tailwind utilities can override them */
+@layer base {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    touch-action: pan-x pan-y;
+  }
+
+  :root {
+    --vh: 100%;
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --vh: 100vh;
+    }
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-family-oswald);
+  }
+
+  /* Dark scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-primary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  a {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+  }
+
+  p {
+    font-size: var(--font-size-md);
+    font-weight: 300;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: var(--font-size-xl);
+    }
+    p {
+      font-size: 1.2rem;
+      line-height: 1.625;
+    }
+  }
+}
+
+/* Component/utility styles */
+@layer utilities {
+  .max-w-container {
+    max-width: var(--width-container);
+  }
+
+  .rounded-btn {
+    border-radius: var(--radius-btn);
+  }
+
+  .rounded-card {
+    border-radius: var(--radius-card);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-accent {
+    box-shadow: var(--shadow-accent);
+  }
+
+  .shadow-accent-hover {
+    box-shadow: var(--shadow-accent-hover);
+  }
+
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-success {
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
+  }
+
+  .shadow-success {
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+  }
+
+  .shadow-success-hover {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+  }
+
+  .border-success-glow {
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .border-accent-glow {
+    border: 1px solid rgba(247, 147, 26, 0.3);
+  }
+
+  .animate-slide-up {
+    animation: var(--animate-slide-up);
+  }
+
+  .font-oswald {
+    font-family: var(--font-family-oswald);
+  }
+}

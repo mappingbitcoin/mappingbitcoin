@@ -1,0 +1,44 @@
+{
+  "breadcrumb": {
+    "home": "Countries",
+    "inCountry": "Bitcoin in {country}",
+    "inCity": "{city}",
+    "inCategory": "{category}"
+  },
+  "form": {
+    "fields": {
+      "name": "Place Name",
+      "about": "About",
+      "openingHours": "Opening Hours",
+      "paymentMethods": "Payment Methods",
+      "contact": "Contact",
+      "notes": "Notes"
+    },
+    "basicInformation": "Basic Information",
+    "searchPlaceName": "Search place name",
+    "searchVenueName": "Search venue by name",
+    "selectCategory": "Select category",
+    "selectSubcategory": "Select subcategory",
+    "additionalDetails": "Additional Details",
+    "submitPlace": "Submit Place",
+    "submitVenue": "Submit Venue",
+    "contactSection": "Contact",
+    "resetButton": "Reset",
+    "nextButton": "Next",
+    "backButton": "Back",
+    "locationSection": "Location",
+    "searchAddress": "Search address",
+    "notesSection": "Notes",
+    "notesPlaceholder": "Notes",
+    "openingHours": "Opening Hours",
+    "separateWithSemicolon": "Enter a value...",
+    "paymentMethods": "Payment Methods",
+    "roleQuestion": "Who are you to this place?",
+    "roleOptions": {
+      "": "Select your role",
+      "owner": "Business Owner",
+      "customer": "Visited as Customer",
+      "other": "Other"
+    }
+  }
+}

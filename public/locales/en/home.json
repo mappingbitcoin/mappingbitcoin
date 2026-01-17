@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "title": "Discover the <span>Bitcoin Economy</span>",
+    "description": "Find Bitcoin-friendly merchants, learn about sound money, and explore stories from the global Bitcoin community.",
+    "cta": {
+      "primary": "Explore Directory",
+      "secondary": "Go to Map"
+    }
+  },
+  "stats": {
+    "title": "Bitcoin Adoption is Growing",
+    "description": "Real-time data from our global network of Bitcoin merchants and community contributors.",
+    "totalVenues": "Total Venues",
+    "newThisMonth": "New This Month",
+    "countries": "Countries",
+    "growth": "Monthly Growth"
+  },
+  "content": {
+    "title": "Explore Bitcoin Knowledge",
+    "description": "From inspiring stories to the latest news, stay connected with the Bitcoin ecosystem.",
+    "stories": {
+      "badge": "Stories",
+      "title": "Community Stories",
+      "description": "Real experiences from Bitcoin users around the world.",
+      "story1": {
+        "title": "How Bitcoin Changed My Business",
+        "description": "A merchant's journey to accepting Bitcoin in El Salvador."
+      },
+      "story2": {
+        "title": "Freedom Through Sound Money",
+        "description": "Personal accounts of financial sovereignty."
+      },
+      "cta": "Read All Stories"
+    },
+    "news": {
+      "badge": "News",
+      "title": "Latest Updates",
+      "description": "Stay informed about Bitcoin developments worldwide.",
+      "news1": {
+        "title": "Global Bitcoin Adoption Rises",
+        "description": "New data shows increasing merchant acceptance globally."
+      },
+      "news2": {
+        "title": "Lightning Network Growth",
+        "description": "Payment network capacity reaches new milestones."
+      },
+      "cta": "View All News"
+    }
+  },
+  "ecosystem": {
+    "title": "Explore the <span>Global Network</span>",
+    "titleAlt": "Explore the Global Network",
+    "description": "Our interactive map connects you with thousands of Bitcoin-accepting merchants worldwide. Find places to spend, learn, and connect with the Bitcoin community.",
+    "cta": "Explore the Map"
+  },
+  "education": {
+    "title": "Education Categories",
+    "subtitle": "Expert perspectives on Bitcoin self-custody, strategies, and long-term preservation.",
+    "readMore": "Read Article",
+    "viewAll": "View All Articles",
+    "minRead": "min read",
+    "category": {
+      "Bitcoin Basics": "Basics",
+      "Cryptographic Security": "Security",
+      "Economic Series": "Economy",
+      "Economic Truths": "Truths"
+    }
+  },
+  "map": {
+    "title": "Bitcoin Map Explorer",
+    "description": "Find Bitcoin-friendly places around the world. Our map helps connect users and merchants using Bitcoin.",
+    "localMerchants": {
+      "title": "Local Merchants",
+      "description": "Shops, restaurants, and services that accept Bitcoin."
+    },
+    "bitcoinAtms": {
+      "title": "Bitcoin ATMs",
+      "description": "Find nearby ATMs to buy or sell Bitcoin."
+    },
+    "reviewsRatings": {
+      "title": "Reviews & Ratings",
+      "description": "Read feedback from real users."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Get notified when new places are added nearby."
+    },
+    "button": "Explore Bitcoin Map",
+    "badge": {
+      "count": "15000+",
+      "label": "Locations Worldwide"
+    }
+  }
+}

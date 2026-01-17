@@ -1,0 +1,43 @@
+{
+  "menu": {
+    "map": "Map",
+    "addPlace": "Add Place",
+    "countries": "Countries",
+    "events": "Events",
+    "learn": "Learn",
+    "tools": "Tools",
+    "contact": "Contact"
+  },
+  "footer": {
+    "allRightsReserved": "All Rights Reserved.",
+    "menu": {
+      "map": "Map",
+      "countries": "Countries",
+      "learn": "Learn",
+      "contact": "Contact",
+      "privacy-policy": "Privacy Policy",
+      "terms": "Terms"
+    }
+  },
+  "subscribe": {
+    "title": "Stay Updated",
+    "description": "Join our newsletter to receive the latest insights on Bitcoin and cyber-security.",
+    "placeholder": "Enter your email",
+    "button": "Subscribe",
+    "sending": "Sending...",
+    "success": "Thank you for subscribing!",
+    "invalidEmail": "Please enter a valid email address."
+  },
+  "search": {
+    "placeholder": "Search posts..."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "We couldn't find the page you were looking for.",
+    "cta": "Return Home"
+  },
+  "learn": {
+    "headerTitle": "Learn Bitcoin by Doing",
+    "headerDescription": "Understand how Bitcoin works through practical guides, useful tools, and real-world applications."
+  }
+}

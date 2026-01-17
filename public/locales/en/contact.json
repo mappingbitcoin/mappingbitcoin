@@ -1,0 +1,32 @@
+{
+  "heading": "Get in Touch",
+  "subheading": "Have a question, partnership proposal, or media inquiry? Reach out to the right team below.",
+  "form": {
+    "title": "Send us a Message",
+    "subtitle": "Fill out the form and we'll get back to you as soon as possible.",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us how we can help...",
+    "sendButton": "Send Message",
+    "sendingButton": "Sending...",
+    "successMessage": "Message sent successfully! We'll get back to you soon.",
+    "errorMessage": "Failed to send message. Please try again."
+  },
+  "cards": {
+    "partners": {
+      "title": "Partnerships & Sponsorships",
+      "description": "Interested in collaborating with MappingBitcoin? Let's explore opportunities together."
+    },
+    "media": {
+      "title": "Media & Press",
+      "description": "For press inquiries, interviews, or media resources, reach out to our media team."
+    },
+    "general": {
+      "title": "General Inquiries",
+      "description": "Have a question or feedback? We're here to help with anything Bitcoin-related."
+    }
+  }
+}

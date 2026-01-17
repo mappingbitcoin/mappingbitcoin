@@ -1,0 +1,75 @@
+<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7931a"/>
+      <stop offset="100%" style="stop-color:#ffab40"/>
+    </linearGradient>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#34d399"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Connection lines -->
+  <g stroke="rgba(247, 147, 26, 0.3)" stroke-width="2" fill="none">
+    <line x1="250" y1="200" x2="120" y2="100"/>
+    <line x1="250" y1="200" x2="380" y2="100"/>
+    <line x1="250" y1="200" x2="100" y2="280"/>
+    <line x1="250" y1="200" x2="400" y2="280"/>
+    <line x1="250" y1="200" x2="180" y2="320"/>
+    <line x1="250" y1="200" x2="320" y2="320"/>
+    <line x1="120" y1="100" x2="180" y2="60"/>
+    <line x1="380" y1="100" x2="320" y2="60"/>
+    <line x1="100" y1="280" x2="60" y2="220"/>
+    <line x1="400" y1="280" x2="440" y2="220"/>
+  </g>
+
+  <!-- Secondary connection lines -->
+  <g stroke="rgba(16, 185, 129, 0.2)" stroke-width="1" fill="none">
+    <line x1="120" y1="100" x2="100" y2="280"/>
+    <line x1="380" y1="100" x2="400" y2="280"/>
+    <line x1="180" y1="320" x2="320" y2="320"/>
+    <line x1="180" y1="60" x2="320" y2="60"/>
+  </g>
+
+  <!-- Central Bitcoin node -->
+  <g filter="url(#glow)">
+    <circle cx="250" cy="200" r="45" fill="url(#orangeGradient)"/>
+    <text x="250" y="208" font-size="36" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">&#8383;</text>
+  </g>
+
+  <!-- Primary nodes (orange) -->
+  <g filter="url(#glow)">
+    <circle cx="120" cy="100" r="20" fill="url(#orangeGradient)" opacity="0.9"/>
+    <circle cx="380" cy="100" r="20" fill="url(#orangeGradient)" opacity="0.9"/>
+    <circle cx="100" cy="280" r="18" fill="url(#orangeGradient)" opacity="0.8"/>
+    <circle cx="400" cy="280" r="18" fill="url(#orangeGradient)" opacity="0.8"/>
+  </g>
+
+  <!-- Secondary nodes (green) -->
+  <g>
+    <circle cx="180" cy="320" r="14" fill="url(#greenGradient)" opacity="0.8"/>
+    <circle cx="320" cy="320" r="14" fill="url(#greenGradient)" opacity="0.8"/>
+    <circle cx="180" cy="60" r="12" fill="url(#greenGradient)" opacity="0.7"/>
+    <circle cx="320" cy="60" r="12" fill="url(#greenGradient)" opacity="0.7"/>
+    <circle cx="60" cy="220" r="10" fill="url(#greenGradient)" opacity="0.6"/>
+    <circle cx="440" cy="220" r="10" fill="url(#greenGradient)" opacity="0.6"/>
+  </g>
+
+  <!-- Decorative small nodes -->
+  <g fill="rgba(247, 147, 26, 0.5)">
+    <circle cx="150" cy="180" r="4"/>
+    <circle cx="350" cy="180" r="4"/>
+    <circle cx="200" cy="140" r="3"/>
+    <circle cx="300" cy="140" r="3"/>
+    <circle cx="200" cy="260" r="3"/>
+    <circle cx="300" cy="260" r="3"/>
+  </g>
+</svg>
