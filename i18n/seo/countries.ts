@@ -25,7 +25,7 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Bitcoin Places by Country | MappingBitcoin.com"
@@ -36,7 +36,7 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 card: "summary_large_image",
                 title: "Bitcoin Places by Country | MappingBitcoin.com",
                 description: "Explore Bitcoin-accepting locations around the world — sorted by continent and country.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },
@@ -59,7 +59,7 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "- MappingBitcoin.com"
@@ -70,7 +70,7 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 card: "summary_large_image",
                 title: "– MappingBitcoin.com",
                 description: "Explore Bitcoin-accepting locations near you and around the world.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             },
         },
     },
