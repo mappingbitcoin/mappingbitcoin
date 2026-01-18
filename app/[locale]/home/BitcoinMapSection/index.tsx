@@ -66,7 +66,7 @@ const BitcoinMapSection = () => {
                         transition={{ type: "spring", stiffness: 300 }}
                     >
                         <Image
-                            src="/assets/home/mock-map-preview.webp"
+                            src="/assets/opengraph/mapping-bitcoin-preview.webp"
                             alt={t("title")}
                             width={600}
                             height={400}

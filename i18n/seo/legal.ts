@@ -24,7 +24,7 @@ const legalSeo: SEOModule<LegalPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/wab-home.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Privacy Policy | MappingBitcoin.com"
@@ -35,7 +35,7 @@ const legalSeo: SEOModule<LegalPageKey> = {
                 card: "summary_large_image",
                 title: "Privacy Policy | MappingBitcoin.com",
                 description: "MappingBitcoin.com explains how data is handled: minimal cookies, IP geolocation, and public sources.",
-                images: [`${env.siteUrl}/assets/opengraph/wab-home.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },
@@ -57,7 +57,7 @@ const legalSeo: SEOModule<LegalPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/wab-home.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Terms and Conditions | MappingBitcoin.com"
@@ -68,7 +68,7 @@ const legalSeo: SEOModule<LegalPageKey> = {
                 card: "summary_large_image",
                 title: "Terms and Conditions | MappingBitcoin.com",
                 description: "Terms of service for using MappingBitcoin.com's Bitcoin resources, maps, and educational content.",
-                images: [`${env.siteUrl}/assets/opengraph/wab-home.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },

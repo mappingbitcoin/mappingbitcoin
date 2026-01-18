@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
                     alt: `${name} @ MappingBitcoin.com`
                 }] : []),
                 {
-                    url: `${env.siteUrl}/assets/opengraph/wab-place.webp`,
+                    url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                     width: 1200,
                     height: 630,
                     alt: `${name} @ MappingBitcoin.com`
@@ -101,7 +101,7 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
             description: fullDescription,
             images: [
                 ...(venue.tags.image ? [venue.tags.image] : []),
-                `${env.siteUrl}/assets/opengraph/wab-place.webp`
+                `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`
             ]
         }
     } as Metadata;

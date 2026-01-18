@@ -23,7 +23,7 @@ const contactSeo: SEOModule<ContactPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/wab-contact.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Contact | MappingBitcoin.com",
@@ -34,7 +34,7 @@ const contactSeo: SEOModule<ContactPageKey> = {
                 card: "summary_large_image",
                 title: "Contact | MappingBitcoin.com",
                 description: "MappingBitcoin.com is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
-                images: [`${env.siteUrl}/assets/opengraph/wab-contact.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },

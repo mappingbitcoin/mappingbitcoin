@@ -23,7 +23,7 @@ const mapSeo: SEOModule<MapPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Bitcoin Map | MappingBitcoin.com",
@@ -34,7 +34,7 @@ const mapSeo: SEOModule<MapPageKey> = {
                 card: "summary_large_image",
                 title: "Bitcoin Map | MappingBitcoin.com",
                 description: "Find cafés, shops, ATMs, and venues that accept Bitcoin — near you or around the world.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`],
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },
     },

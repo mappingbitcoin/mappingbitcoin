@@ -17,7 +17,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Bitcoin Place | MappingBitcoin.com"
@@ -28,7 +28,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 card: "summary_large_image",
                 title: "{{name}} in {{city}} | MappingBitcoin.com",
                 description: "Discover {{name}}, a place in {{city}} where you can use Bitcoin.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },
@@ -50,7 +50,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Submit a Bitcoin Place | MappingBitcoin.com"
@@ -61,7 +61,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 card: "summary_large_image",
                 title: "Submit a Bitcoin-Friendly Place | MappingBitcoin.com",
                 description: "Help others find places to spend Bitcoin by submitting a trusted place.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },
@@ -83,7 +83,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/bitcoin-map.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Bitcoin Merchants | MappingBitcoin.com"
@@ -94,7 +94,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 card: "summary_large_image",
                 title: "Bitcoin {{category}} in {{location}} | MappingBitcoin.com",
                 description: "Find Bitcoin-friendly {{category}} in {{location}}.",
-                images: [`${env.siteUrl}/assets/opengraph/bitcoin-map.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },

@@ -24,7 +24,7 @@ const counterSeo: SEOModule<CounterPageKey> = {
                 type: "website",
                 images: [
                     {
-                        url: `${env.siteUrl}/assets/opengraph/wab-home.webp`,
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
                         alt: "Bitcoin Venues Counter | MappingBitcoin.com"
@@ -35,7 +35,7 @@ const counterSeo: SEOModule<CounterPageKey> = {
                 card: "summary_large_image",
                 title: "Bitcoin Venues Counter | MappingBitcoin.com",
                 description: "See how many businesses around the world accept Bitcoin. Real-time counter from MappingBitcoin.com.",
-                images: [`${env.siteUrl}/assets/opengraph/wab-home.webp`]
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
     },
