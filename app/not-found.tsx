@@ -14,13 +14,31 @@ export default async function NotFound({ params }: Localized) {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        name: metadata.title,
-        description: metadata.description,
-        isPartOf: {
+        "name": metadata.title,
+        "description": metadata.description,
+        "isPartOf": {
             "@type": "WebSite",
-            name: "MappingBitcoin.com",
-            url: env.siteUrl,
-        },
+            "name": "MappingBitcoin.com",
+            "url": env.siteUrl
+        }
+    };
+
+    const breadcrumbJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": env.siteUrl
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Page Not Found"
+            }
+        ]
     };
 
     const locale = 'en'
@@ -29,9 +47,14 @@ export default async function NotFound({ params }: Localized) {
     return (
         <>
             <Script
-                id="json-ld"
+                id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
             />
             <NextIntlClientProvider locale={locale} messages={allMessages}>
                 <NotFoundPage />

@@ -72,59 +72,45 @@ const HomePage = async ({ params }: Localized) => {
     const { locale } = await params;
     const stats = await getStats();
 
-    const getStructuredDataContent = () => {
-        return {
-            siteName: "MappingBitcoin.com",
-            mapName: "Bitcoin Map @ MappingBitcoin.com",
-            mapDescription: "Explore the interactive map of merchants accepting Bitcoin worldwide.",
-            sitelinks: [
-                {
-                    "@type": "SiteNavigationElement",
-                    "name": "Bitcoin Map",
-                    "url": "https://mappingbitcoin.com/map"
-                },
-                {
-                    "@type": "SiteNavigationElement",
-                    "name": "Countries",
-                    "url": "https://mappingbitcoin.com/countries"
-                }
-            ]
-        };
-    };
-
-    const content = getStructuredDataContent();
-
     return (
         <>
             <Script
-                id="json-ld"
+                id="website-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify([
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "WebSite",
-                            "url": "https://mappingbitcoin.com/",
-                            "name": content.siteName
-                        },
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "ItemList",
-                            "itemListElement": content.sitelinks
-                        },
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "Map",
-                            "name": content.mapName,
-                            "url": generateCanonical('map', locale),
-                            "description": content.mapDescription,
-                            "hasMap": {
-                                "@type": "Map",
-                                "url": generateCanonical('map', locale),
-                                "description": content.mapDescription
-                            }
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "name": "MappingBitcoin.com",
+                        "url": "https://mappingbitcoin.com/",
+                        "description": "Discover Bitcoin-accepting merchants worldwide. Interactive map with 21,000+ venues across 150+ countries.",
+                        "potentialAction": {
+                            "@type": "SearchAction",
+                            "target": {
+                                "@type": "EntryPoint",
+                                "urlTemplate": "https://mappingbitcoin.com/map?search={search_term_string}"
+                            },
+                            "query-input": "required name=search_term_string"
                         }
-                    ])
+                    })
+                }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://mappingbitcoin.com/"
+                            }
+                        ]
+                    })
                 }}
             />
 

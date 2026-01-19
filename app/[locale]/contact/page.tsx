@@ -8,38 +8,67 @@ import Script from "next/script";
 export const generateMetadata = buildGeneratePageMetadata('contact')
 
 const ContactPage = async ({params}: Localized) => {
-    const {metadata,locale} = await getPageSeo('contact')({params})
+    const {metadata, locale} = await getPageSeo('contact')({params})
+    const canonical = generateCanonical("contact", locale);
 
     return (
         <>
             <Script
-              id="json-ld"
+              id="contactpage-jsonld"
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify({
                   "@context": "https://schema.org",
                   "@type": "ContactPage",
-                  name: metadata.title,
-                  description: metadata.description,
-                  url: generateCanonical("contact", locale),
-                  contactPoint: [
+                  "name": metadata.title,
+                  "description": metadata.description,
+                  "url": canonical,
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "MappingBitcoin.com",
+                    "url": "https://mappingbitcoin.com/"
+                  },
+                  "contactPoint": [
                     {
                       "@type": "ContactPoint",
-                      contactType: "General Inquiries",
-                      email: "satoshi@mappingbitcoin.com",
-                      url: generateCanonical("contact", locale),
+                      "contactType": "General Inquiries",
+                      "email": "satoshi@mappingbitcoin.com"
                     },
                     {
                       "@type": "ContactPoint",
-                      contactType: "Partnerships",
-                      email: "partners@mappingbitcoin.com",
+                      "contactType": "Partnerships",
+                      "email": "partners@mappingbitcoin.com"
                     },
                     {
                       "@type": "ContactPoint",
-                      contactType: "Media & Press",
-                      email: "media@mappingbitcoin.com",
+                      "contactType": "Media & Press",
+                      "email": "media@mappingbitcoin.com"
+                    }
+                  ]
+                }),
+              }}
+            />
+            <Script
+              id="breadcrumb-jsonld"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": "https://mappingbitcoin.com/"
                     },
-                  ],
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Contact",
+                      "item": canonical
+                    }
+                  ]
                 }),
               }}
             />

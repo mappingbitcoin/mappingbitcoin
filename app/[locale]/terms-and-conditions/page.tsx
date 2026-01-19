@@ -9,18 +9,49 @@ export const generateMetadata = buildGeneratePageMetadata("terms-and-conditions"
 
 export default async function TermsAndConditionsPage({ params }: Localized) {
     const { metadata, locale } = await getPageSeo("terms-and-conditions")({ params });
+    const canonical = generateCanonical("terms-and-conditions", locale);
+
     return (
         <>
             <Script
-                id="json-ld"
+                id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
-                        "@type": "Website",
-                        name: metadata.title,
-                        description: metadata.description,
-                        url: generateCanonical("terms-and-conditions", locale)
+                        "@type": "WebPage",
+                        "name": metadata.title,
+                        "description": metadata.description,
+                        "url": canonical,
+                        "isPartOf": {
+                            "@type": "WebSite",
+                            "name": "MappingBitcoin.com",
+                            "url": "https://mappingbitcoin.com/"
+                        }
+                    })
+                }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://mappingbitcoin.com/"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Terms & Conditions",
+                                "item": canonical
+                            }
+                        ]
                     })
                 }}
             />
