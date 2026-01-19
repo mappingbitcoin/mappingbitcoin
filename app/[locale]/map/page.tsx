@@ -10,23 +10,56 @@ export const generateMetadata = buildGeneratePageMetadata('map');
 const MapPage = async ({ params }: Localized) => {
     const { metadata, locale } = await getPageSeo("map")({ params });
 
+    const canonical = generateCanonical('map', locale);
+
     return (
         <>
             <Script
-                id="jsonld-map"
+                id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
-                        "@type": "Map",
+                        "@type": "WebPage",
                         "name": metadata.title,
-                        "url": generateCanonical('map', locale),
+                        "url": canonical,
                         "description": metadata.description,
-                        "hasMap": {
+                        "isPartOf": {
+                            "@type": "WebSite",
+                            "name": "MappingBitcoin.com",
+                            "url": "https://mappingbitcoin.com/"
+                        },
+                        "mainEntity": {
                             "@type": "Map",
-                            "url": generateCanonical('map', locale),
-                            "description": metadata.description
+                            "name": metadata.title,
+                            "url": canonical,
+                            "description": metadata.description,
+                            "mapType": "https://schema.org/VenueMap"
                         }
+                    })
+                }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://mappingbitcoin.com/"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Map",
+                                "item": canonical
+                            }
+                        ]
                     })
                 }}
             />
