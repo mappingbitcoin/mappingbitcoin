@@ -6,6 +6,7 @@ import Script from "next/script";
 import Link from "next/link";
 import fs from "fs/promises";
 import path from "path";
+import TopographicPattern from "@/components/ui/TopographicPattern";
 
 export const generateMetadata = buildGeneratePageMetadata('home')
 
@@ -120,6 +121,9 @@ const HomePage = async ({ params }: Localized) => {
                     {/* Subtle gradient background */}
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] via-[#0D0D0D] to-[#0D0D0D]" />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-500/5 via-transparent to-transparent" />
+
+                    {/* Animated topographic pattern */}
+                    <TopographicPattern className="z-0" lineCount={14} baseColor="orange" />
 
                     <div className="relative z-10 text-center max-w-4xl mx-auto">
                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
