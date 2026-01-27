@@ -2,6 +2,7 @@ import React, { cache, Suspense } from "react";
 
 import { Footer, NavBar, PageTransition } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
+import { NostrAuthProvider } from "@/contexts/NostrAuthContext";
 
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -35,15 +36,17 @@ export default async function LocaleLayout({
 
         return (
           <NextIntlClientProvider locale={locale} messages={allMessages}>
-            <ClientOnlyAnalytics />
-            <NavBar />
-            <main id="main-content" className="w-full flex flex-col">
-              <Suspense>
-                <PageTransition>{children}</PageTransition>
-              </Suspense>
-            </main>
-            <Footer />
-            <CookieNotice />
+            <NostrAuthProvider>
+              <ClientOnlyAnalytics />
+              <NavBar />
+              <main id="main-content" className="w-full flex flex-col">
+                <Suspense>
+                  <PageTransition>{children}</PageTransition>
+                </Suspense>
+              </main>
+              <Footer />
+              <CookieNotice />
+            </NostrAuthProvider>
           </NextIntlClientProvider>
         );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

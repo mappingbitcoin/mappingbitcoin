@@ -6,7 +6,11 @@
     "events": "Events",
     "learn": "Learn",
     "tools": "Tools",
-    "contact": "Contact"
+    "contact": "Contact",
+    "login": "Log In",
+    "logout": "Log Out",
+    "signedInAs": "Signed in as",
+    "readOnly": "Read-only"
   },
   "footer": {
     "allRightsReserved": "All Rights Reserved.",
