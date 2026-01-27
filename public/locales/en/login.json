@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Login - MappingBitcoin",
+    "description": "Sign in to MappingBitcoin using your Nostr identity to add and manage Bitcoin-accepting locations."
+  },
+  "heading": "Sign In",
+  "subheading": "Use your Nostr identity to access MappingBitcoin",
+  "methods": {
+    "key": {
+      "title": "Login with Key",
+      "description": "Enter your nsec (full access) or npub (read-only) to sign in"
+    },
+    "extension": {
+      "title": "Browser Extension",
+      "description": "Connect using Alby, nos2x, or another NIP-07 extension",
+      "notFound": "No extension detected. Install Alby or nos2x to use this method"
+    },
+    "bunker": {
+      "title": "Remote Signer",
+      "description": "Connect to a Nostr bunker for secure remote signing (NIP-46)"
+    }
+  },
+  "keyInput": {
+    "label": "Enter your key",
+    "placeholder": "nsec1... or npub1...",
+    "hint": "nsec gives full write access. npub provides read-only access."
+  },
+  "bunkerInput": {
+    "label": "Bunker URL",
+    "placeholder": "bunker://...",
+    "hint": "Paste the bunker connection string from your remote signer"
+  },
+  "bunker": {
+    "scanQR": "Scan QR Code",
+    "pasteURL": "Paste URL",
+    "scanInstructions": "Scan this QR code with your Nostr signer app to connect",
+    "waiting": "Waiting for connection...",
+    "timeout": "Connection timed out. Please try again.",
+    "tryAgain": "Try Again",
+    "supportedApps": "Works with Amber, Nostrudel, nsec.app, and other NIP-46 signers"
+  },
+  "extension": {
+    "ready": "Extension detected! Click below to connect.",
+    "install": "Install a Nostr extension to use this sign-in method:"
+  },
+  "actions": {
+    "loginWithKey": "Sign In with Key",
+    "connectExtension": "Connect Extension",
+    "connectBunker": "Connect to Bunker",
+    "loggingIn": "Signing in...",
+    "connecting": "Connecting..."
+  },
+  "divider": "or",
+  "createAccount": {
+    "description": "New to Nostr? Create your identity in minutes.",
+    "button": "Create Nostr Account"
+  },
+  "info": {
+    "title": "What is Nostr?",
+    "description": "Nostr is a decentralized protocol for social networking and identity. Your Nostr keys let you own your identity across apps without relying on centralized services."
+  },
+  "loggedIn": {
+    "title": "You're signed in!",
+    "redirecting": "Redirecting..."
+  }
+}
