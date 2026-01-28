@@ -17,7 +17,7 @@ import {useLocale, useTranslations} from "next-intl";
 import {Locale} from "@/i18n/types";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
-import {SOCIAL_CONTACTS} from "@/constants/SocialIcons";
+import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import moment from 'moment';
@@ -472,22 +472,21 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 </div>
                                             )}
 
-                                            {/* Social & Contact */}
-                                            {contact && Object.keys(contact).length > 0 && (
+                                            {/* Socials */}
+                                            {contact && Object.entries(contact).some(([type]) => SOCIAL_ICONS[type]) && (
                                                 <div className="pt-4 border-t border-border-light">
-                                                    <h3 className="text-sm font-semibold text-white mb-3">{tMap('contactAndSocials')}</h3>
+                                                    <h3 className="text-sm font-semibold text-white mb-3">{tMap('socials')}</h3>
                                                     <div className="flex flex-wrap gap-2">
                                                         {Object.entries(contact).map(([type, value]) => {
-                                                            const info = SOCIAL_CONTACTS[type];
+                                                            const info = SOCIAL_ICONS[type];
                                                             if (!value || !info) return null;
-                                                            const href = type === "phone" ? `tel:${value}` : value;
                                                             return (
                                                                 <a
                                                                     key={type}
-                                                                    href={href}
+                                                                    href={value}
                                                                     target="_blank"
                                                                     rel="noreferrer"
-                                                                    className="w-10 h-10 rounded-full bg-primary-light hover:bg-surface-light flex items-center justify-center text-lg text-text-light hover:text-accent transition-colors no-underline border border-border-light"
+                                                                    className="w-10 h-10 rounded-full bg-primary-light hover:bg-surface-light flex items-center justify-center text-text-light hover:text-accent transition-colors no-underline border border-border-light"
                                                                     title={info.label}
                                                                 >
                                                                     {info.icon}
