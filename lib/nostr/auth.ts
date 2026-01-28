@@ -1,6 +1,9 @@
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
 import * as secp256k1 from "@noble/secp256k1";
+
+// Configure secp256k1 with sha256 (required in v3)
+secp256k1.hashes.sha256 = sha256;
 import {
     generatePrivateKey,
     getPublicKey,
@@ -24,14 +27,28 @@ interface BunkerSession {
     secret?: string;
 }
 
+export interface SignedChallengeResult {
+    signature: string;
+    // For extension/bunker, include the full signed event for verification
+    signedEvent?: {
+        id: string;
+        pubkey: string;
+        created_at: number;
+        kind: number;
+        tags: string[][];
+        content: string;
+        sig: string;
+    };
+}
+
 /**
  * Sign a challenge using the appropriate method
- * Returns the signature as a hex string
+ * Returns the signature and optionally the full signed event (for extension/bunker)
  */
 export async function signChallenge(
     challenge: string,
     method: SigningMethod
-): Promise<string> {
+): Promise<SignedChallengeResult> {
     switch (method) {
         case "nsec":
             return signWithNsec(challenge);
@@ -47,7 +64,7 @@ export async function signChallenge(
 /**
  * Sign challenge using a private key stored in session storage
  */
-async function signWithNsec(challenge: string): Promise<string> {
+async function signWithNsec(challenge: string): Promise<SignedChallengeResult> {
     const privateKey = sessionStorage.getItem("nostr_privkey");
     if (!privateKey) {
         throw new Error("Private key not found. Please log in again.");
@@ -59,60 +76,51 @@ async function signWithNsec(challenge: string): Promise<string> {
     // Create Schnorr signature
     const signature = await secp256k1.schnorr.sign(messageHash, hexToBytes(privateKey));
 
-    return bytesToHex(signature);
+    return { signature: bytesToHex(signature) };
 }
 
 /**
  * Sign challenge using a browser extension (NIP-07)
  */
-async function signWithExtension(challenge: string): Promise<string> {
+async function signWithExtension(challenge: string): Promise<SignedChallengeResult> {
     if (typeof window === "undefined" || !window.nostr) {
         throw new Error("No Nostr extension found. Please install Alby or nos2x.");
     }
 
-    // Create a Nostr event for signing
-    // We use kind 27235 (NIP-98 HTTP Auth) style event for challenge signing
     const pubkey = await window.nostr.getPublicKey();
     const created_at = Math.floor(Date.now() / 1000);
 
-    const event = {
-        kind: 27235, // NIP-98 HTTP Auth
-        pubkey,
-        created_at,
-        tags: [["challenge", challenge]],
-        content: "",
-    };
-
-    // The extension will return a signed event
-    const signedEvent = await window.nostr.signEvent(event);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!(signedEvent as any).sig) {
-        throw new Error("Extension did not return a signature");
-    }
-
-    // For NIP-07 extensions, we need to use a workaround:
-    // Sign a specially constructed event that embeds our challenge
+    // Create a Nostr event with the challenge as content
     const challengeEvent = {
         kind: 22242, // Custom kind for challenge response
         pubkey,
         created_at,
-        tags: [],
+        tags: [] as string[][],
         content: challenge,
     };
 
-    const signedChallengeEvent = await window.nostr.signEvent(challengeEvent);
-
-    // The signature in the event is over the event hash, not our challenge
-    // So we need to extract and return the event signature
-    // The server will need to verify this differently
-
-    // Actually, for simplicity, let's use the NIP-07 approach:
-    // Return the event signature - the server can verify the challenge
-    // was signed by checking the event content matches and signature is valid
+    // The extension will sign and return the full event
+    const signedEvent = await window.nostr.signEvent(challengeEvent);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (signedChallengeEvent as any).sig as string;
+    const event = signedEvent as any;
+
+    if (!event.sig) {
+        throw new Error("Extension did not return a signature");
+    }
+
+    return {
+        signature: event.sig,
+        signedEvent: {
+            id: event.id,
+            pubkey: event.pubkey,
+            created_at: event.created_at,
+            kind: event.kind,
+            tags: event.tags,
+            content: event.content,
+            sig: event.sig,
+        },
+    };
 }
 
 /**
@@ -184,7 +192,7 @@ function getBunkerSession(bunkerUrl: string): BunkerSession {
 /**
  * Sign challenge using a remote signer (NIP-46)
  */
-async function signWithBunker(challenge: string): Promise<string> {
+async function signWithBunker(challenge: string): Promise<SignedChallengeResult> {
     const bunkerUrl = sessionStorage.getItem("nostr_bunker");
     if (!bunkerUrl) {
         throw new Error("Bunker connection not found. Please reconnect.");
@@ -209,7 +217,18 @@ async function signWithBunker(challenge: string): Promise<string> {
         throw new Error("Remote signer did not return a signature");
     }
 
-    return signedEvent.sig;
+    return {
+        signature: signedEvent.sig,
+        signedEvent: {
+            id: signedEvent.id || "",
+            pubkey: signedEvent.pubkey,
+            created_at: signedEvent.created_at,
+            kind: signedEvent.kind,
+            tags: signedEvent.tags,
+            content: signedEvent.content,
+            sig: signedEvent.sig,
+        },
+    };
 }
 
 /**

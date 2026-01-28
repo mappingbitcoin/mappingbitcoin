@@ -1,6 +1,9 @@
 import * as secp256k1 from "@noble/secp256k1";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
+
+// Configure secp256k1 with sha256 (required in v3)
+secp256k1.hashes.sha256 = sha256;
 import * as nip44 from "nostr-tools/nip44";
 
 // Generate a random 32-byte private key

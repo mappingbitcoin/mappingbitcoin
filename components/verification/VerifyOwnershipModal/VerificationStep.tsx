@@ -19,14 +19,13 @@ interface VerificationStepProps {
 export default function VerificationStep({
     venue,
     venueName,
-    osmEmail,
     step,
     setStep,
     onError,
     onSuccess,
 }: VerificationStepProps) {
     const { authenticate, authToken } = useNostrAuth();
-    const [email, setEmail] = useState(osmEmail || "");
+    const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
     const [claimId, setClaimId] = useState<string | null>(null);
     const [code, setCode] = useState(["", "", "", "", "", ""]);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,17 +41,6 @@ export default function VerificationStep({
     }, [resendCooldown]);
 
     const handleInitiateVerification = async () => {
-        if (!email.trim()) {
-            onError("Please enter the email address registered with this venue on OpenStreetMap");
-            return;
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            onError("Please enter a valid email address");
-            return;
-        }
-
         setIsLoading(true);
         onError(null);
 
@@ -63,6 +51,7 @@ export default function VerificationStep({
                 token = await authenticate();
             }
 
+            // Backend fetches the email from venue cache - we don't send it
             const response = await fetch("/api/verify/initiate", {
                 method: "POST",
                 headers: {
@@ -71,7 +60,6 @@ export default function VerificationStep({
                 },
                 body: JSON.stringify({
                     osmId: `${venue.type}/${venue.id}`,
-                    email: email.trim(),
                     venueName,
                 }),
             });
@@ -83,6 +71,7 @@ export default function VerificationStep({
             }
 
             setClaimId(data.claimId);
+            setMaskedEmail(data.maskedEmail);
             setStep("code");
             setResendCooldown(60);
         } catch (err) {
@@ -154,7 +143,6 @@ export default function VerificationStep({
                 body: JSON.stringify({
                     claimId,
                     code: codeString,
-                    email: email.trim(),
                 }),
             });
 
@@ -177,7 +165,7 @@ export default function VerificationStep({
         await handleInitiateVerification();
     };
 
-    // Verifying step - enter email
+    // Verifying step - confirm to send code
     if (step === "verifying") {
         return (
             <motion.div
@@ -188,29 +176,19 @@ export default function VerificationStep({
             >
                 <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                     <p className="text-sm text-blue-300">
-                        To verify ownership, we&apos;ll send a verification code to the email address associated with this venue on OpenStreetMap.
+                        To verify ownership, we&apos;ll send a verification code to the email address registered with this venue on OpenStreetMap.
                     </p>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-white mb-2">
-                        OSM-registered Email Address
-                    </label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="business@example.com"
-                        className="w-full p-3 bg-primary-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
-                    />
-                    <p className="text-xs text-text-light mt-1">
-                        Enter the email that is registered with this venue on OpenStreetMap
+                <div className="p-4 bg-surface-light rounded-lg">
+                    <p className="text-sm text-text-light">
+                        The verification code will be sent to the email address stored in the venue&apos;s OpenStreetMap data. Make sure you have access to that email.
                     </p>
                 </div>
 
                 <button
                     onClick={handleInitiateVerification}
-                    disabled={isLoading || !email.trim()}
+                    disabled={isLoading}
                     className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {isLoading ? (
@@ -242,7 +220,8 @@ export default function VerificationStep({
             >
                 <div className="text-center">
                     <p className="text-text-light text-sm">
-                        We sent a 6-digit code to <span className="text-white font-medium">{email}</span>
+                        We sent a 6-digit code to{" "}
+                        <span className="text-white font-medium">{maskedEmail || "your email"}</span>
                     </p>
                 </div>
 
@@ -287,13 +266,6 @@ export default function VerificationStep({
                         {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
                     </button>
                 </div>
-
-                <button
-                    onClick={() => setStep("verifying")}
-                    className="w-full text-sm text-text-light hover:text-white transition-colors"
-                >
-                    Use a different email
-                </button>
             </motion.div>
         );
     }
