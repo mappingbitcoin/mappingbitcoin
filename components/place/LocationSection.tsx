@@ -4,10 +4,10 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { FormInput } from "@/components/forms";
 
-// Dynamically import the map component to avoid SSR issues
+// Dynamically import the MapLibre-based map component (free, open-source)
 const MapWithDraggableMarker = dynamic(
-    () => import("./MapWithDraggableMarker"),
-    { ssr: false, loading: () => <div className="h-[250px] bg-surface-light rounded-xl animate-pulse" /> }
+    () => import("./MapWithDraggableMarker/MapLibreMarker"),
+    { ssr: false, loading: () => <div className="h-[300px] bg-surface-light rounded-xl animate-pulse" /> }
 );
 
 interface LocationSectionProps {
