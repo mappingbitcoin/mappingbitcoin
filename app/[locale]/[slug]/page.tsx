@@ -145,19 +145,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         canonical = `${env.siteUrl}/${alternates[locale]}`;
     }
 
+    const siteSuffix = " | MappingBitcoin.com";
+
     return {
-        title: `${translatedTitle} ${baseMetadata.title ?? ''}`,
+        title: `${translatedTitle}${siteSuffix}`,
         description: translatedDescription,
         keywords: translatedKeywords,
+        alternates: {
+            languages,
+            canonical,
+        },
         openGraph: {
-            ...baseMetadata.openGraph,
-            title: `${translatedTitle} ${baseMetadata.openGraph?.title ?? ''}`,
+            type: "website",
+            images: baseMetadata.openGraph?.images,
+            title: `${translatedTitle}${siteSuffix}`,
             description: translatedDescription,
             url: canonical,
         },
         twitter: {
-            ...baseMetadata.twitter,
-            title: `${translatedTitle} ${baseMetadata.twitter?.title ?? ''}`,
+            card: "summary_large_image",
+            images: baseMetadata.twitter?.images,
+            title: `${translatedTitle}${siteSuffix}`,
             description: translatedDescription,
             site: canonical
         }
