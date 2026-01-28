@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Manage Subscriptions - MappingBitcoin",
+    "description": "Manage your email subscriptions and preferences"
+  },
+  "title": "Manage Your Subscriptions",
+  "description": "You are managing subscriptions for {email}",
+  "yourSubscriptions": "Your Subscriptions",
+  "subscribedSince": "Subscribed since {date}",
+  "unsubscribe": "Unsubscribe",
+  "unsubscribing": "Unsubscribing...",
+  "unsubscribeAll": "Unsubscribe from All",
+  "loading": "Loading your subscriptions...",
+  "success": {
+    "title": "Successfully Unsubscribed",
+    "description": "You have been unsubscribed from our mailing list. We're sorry to see you go!"
+  },
+  "noToken": {
+    "title": "Missing Unsubscribe Link",
+    "description": "This page requires a valid unsubscribe link from one of our emails."
+  },
+  "invalidToken": "This unsubscribe link is invalid or has expired.",
+  "error": "Something went wrong",
+  "backHome": "Back to Home"
+}

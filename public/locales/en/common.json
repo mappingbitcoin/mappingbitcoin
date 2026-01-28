@@ -28,9 +28,11 @@
     "description": "Join our newsletter to receive the latest insights on Bitcoin and cyber-security.",
     "placeholder": "Enter your email",
     "button": "Subscribe",
-    "sending": "Sending...",
-    "success": "Thank you for subscribing!",
-    "invalidEmail": "Please enter a valid email address."
+    "sending": "Subscribing...",
+    "success": "Thank you for subscribing! Check your email for confirmation.",
+    "alreadySubscribed": "You are already subscribed to this list.",
+    "invalidEmail": "Please enter a valid email address.",
+    "error": "Failed to subscribe. Please try again."
   },
   "search": {
     "placeholder": "Search posts..."

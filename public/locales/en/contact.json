@@ -5,15 +5,19 @@
     "title": "Send us a Message",
     "subtitle": "Fill out the form and we'll get back to you as soon as possible.",
     "nameLabel": "Full Name",
-    "namePlaceholder": "John Doe",
+    "namePlaceholder": "Satoshi Nakamoto",
     "emailLabel": "Email Address",
-    "emailPlaceholder": "john@example.com",
+    "emailPlaceholder": "satoshi@bitcoin.org",
     "messageLabel": "Message",
     "messagePlaceholder": "Tell us how we can help...",
     "sendButton": "Send Message",
     "sendingButton": "Sending...",
     "successMessage": "Message sent successfully! We'll get back to you soon.",
-    "errorMessage": "Failed to send message. Please try again."
+    "errorMessage": "Failed to send message. Please try again.",
+    "recaptchaError": "Security verification failed. Please refresh the page and try again.",
+    "rateLimitedMessage": "Too many requests. Please try again in {minutes} minutes.",
+    "rateLimitedGeneric": "Too many requests. Please try again later.",
+    "recaptchaNotice": "This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply."
   },
   "cards": {
     "partners": {
