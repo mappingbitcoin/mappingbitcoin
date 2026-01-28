@@ -167,7 +167,7 @@ export default function VenueSubmissionForm() {
         clearVenueSuggestions();
         setVenueValue(suggestion.name, false);
 
-        // Update form with basic venue info
+        // Update form with basic venue info from suggestion
         setForm((prev) => ({
             ...prev,
             name: suggestion.name,
@@ -184,27 +184,47 @@ export default function VenueSubmissionForm() {
             },
         }));
 
-        // Fetch additional details from OSM (opening hours, website, etc.)
+        // Update address search field with formatted address
+        setAddressValue(suggestion.label, false);
+
+        // Fetch additional details from OSM (opening hours, website, socials, etc.)
         try {
             const details = await fetchVenueDetails(suggestion.osmType, suggestion.osmId);
             if (details) {
-                setForm((prev) => ({
-                    ...prev,
-                    contact: {
-                        ...prev.contact,
-                        website: details.website || details["contact:website"] || prev.contact.website,
-                        phone: details.phone || details["contact:phone"] || prev.contact.phone,
-                        email: details.email || details["contact:email"] || prev.contact.email,
-                    },
-                    opening_hours: details.opening_hours || prev.opening_hours,
-                }));
+                setForm((prev) => {
+                    const updatedContact = { ...prev.contact };
+
+                    // Contact info
+                    if (details.website || details["contact:website"]) {
+                        updatedContact.website = details.website || details["contact:website"];
+                    }
+                    if (details.phone || details["contact:phone"]) {
+                        updatedContact.phone = details.phone || details["contact:phone"];
+                    }
+                    if (details.email || details["contact:email"]) {
+                        updatedContact.email = details.email || details["contact:email"];
+                    }
+                    // Social links
+                    if (details["contact:instagram"]) updatedContact.instagram = details["contact:instagram"];
+                    if (details["contact:facebook"]) updatedContact.facebook = details["contact:facebook"];
+                    if (details["contact:twitter"]) updatedContact.twitter = details["contact:twitter"];
+                    if (details["contact:telegram"]) updatedContact.telegram = details["contact:telegram"];
+                    if (details["contact:linkedin"]) updatedContact.linkedin = details["contact:linkedin"];
+                    if (details["contact:youtube"]) updatedContact.youtube = details["contact:youtube"];
+                    if (details["contact:tiktok"]) updatedContact.tiktok = details["contact:tiktok"];
+                    if (details["contact:whatsapp"]) updatedContact.whatsapp = details["contact:whatsapp"];
+
+                    return {
+                        ...prev,
+                        contact: updatedContact,
+                        opening_hours: details.opening_hours || prev.opening_hours,
+                        about: details.description || prev.about,
+                    };
+                });
             }
         } catch (err) {
             console.warn("Could not fetch venue details:", err);
         }
-
-        // Update address search field
-        setAddressValue(suggestion.label, false);
     }
 
     // Handle map marker drag - reverse geocode to get address
@@ -342,10 +362,12 @@ export default function VenueSubmissionForm() {
                                                 <div className="relative">
                                                     <input
                                                         placeholder={t('searchVenueName')}
-                                                        value={venueValue || form.name}
+                                                        value={form.name}
                                                         onChange={(e) => {
-                                                            setForm(prev => ({ ...prev, name: e.target.value }));
-                                                            setVenueValue(e.target.value);
+                                                            const newValue = e.target.value;
+                                                            setForm(prev => ({ ...prev, name: newValue }));
+                                                            // Trigger venue search for suggestions
+                                                            setVenueValue(newValue);
                                                         }}
                                                         autoComplete="off"
                                                         className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"

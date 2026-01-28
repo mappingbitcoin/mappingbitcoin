@@ -42,15 +42,17 @@ export function buildTagsFromForm(form: VenueForm): Record<string, string> {
     // Google PlaceId if any
     if (form.placeId?.trim()) tags['google:place_id'] = escape(form.placeId);
 
-    // Payment
+    // Bitcoin acceptance - REQUIRED tag for BTC Map
+    // See: https://gitea.btcmap.org/teambtcmap/btcmap-general/wiki/Tagging-Merchants
+    tags["currency:XBT"] = "yes";
+    tags["check_date:currency:XBT"] = new Date().toISOString().split('T')[0]; // yyyy-mm-dd format
+
+    // Payment methods
     Object.entries(form.payment).forEach(([key, val]) => {
         if (val) {
+            tags[`payment:${key}`] = "yes";
             if (key === "onchain" || key === "lightning") {
-                tags[`payment:${key}`] = "yes";
                 tags["payment:bitcoin"] = "yes";
-                tags["currency:XBT"] = "yes";
-            } else {
-                tags[`payment:${key}`] = "yes";
             }
         }
     });

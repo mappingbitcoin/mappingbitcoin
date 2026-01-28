@@ -44,6 +44,40 @@ const DEFAULT_VIEW_STATE = {
 
 const RESET_CATEGORIES = {}
 
+// Available map styles
+type MapStyleKey = 'dark' | 'light';
+const MAP_STYLES: Record<MapStyleKey, { url: string; label: string }> = {
+    dark: {
+        url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+        label: 'Dark',
+    },
+    light: {
+        url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+        label: 'Light',
+    },
+};
+
+// SVG icons for map style toggle
+const SunIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+);
+
+const MoonIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+);
+
 const isTouchDevice = typeof window !== 'undefined' && 'ontouchstart' in window;
 
 const MapPage = ({metadata}: {metadata: Metadata}) => {
@@ -98,6 +132,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
     const tooltipRef = useRef<HTMLDivElement>(null);
     const [isHoveringTooltip, setIsHoveringTooltip] = useState(false);
     const [relevantSubcategories, setRelevantSubcategories] = useState<Record<string, number>>()
+    const [mapStyle, setMapStyle] = useState<MapStyleKey>('dark');
     const [tooltipHeight, setTooltipHeight] = useState(0);
     const [disableSearch, setDisableSearch] = useState(false);
     const [showHelpPopup, setShowHelpPopup] = useState(false);
@@ -460,7 +495,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         </AnimatePresence>
     ), [selectedVenue])
 
-    const handleMapLoad = useCallback(() => {
+    const handleMapLoad = useCallback(async () => {
         if (!mapRef.current) return;
 
         const map = mapRef.current.getMap?.();
@@ -470,6 +505,51 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         if (map.getSource('clusters') && map.getLayer('venue-icons') && map.getLayer('cluster-circles')) {
             setMapReady(true)
             return;
+        }
+
+        const iconColor = '#ffffff'; // Always white icons for both themes
+
+        // Load custom icons for venue types
+        const iconNames = [...new Set(Object.values(PLACE_SUBTYPE_ICON))];
+        const MAKI_BASE_URL = 'https://raw.githubusercontent.com/mapbox/maki/main/icons';
+
+        await Promise.all(
+            iconNames.map(async (iconName) => {
+                if (map.hasImage(iconName)) return;
+                try {
+                    const response = await fetch(`${MAKI_BASE_URL}/${iconName}.svg`);
+                    if (!response.ok) return;
+                    const svgText = await response.text();
+                    const coloredSvg = svgText.replace(/<path/g, `<path fill="${iconColor}"`);
+                    const img = new Image(30, 30);
+                    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(coloredSvg);
+                    await new Promise<void>((resolve) => {
+                        img.onload = () => {
+                            if (!map.hasImage(iconName)) {
+                                map.addImage(iconName, img, { sdf: false });
+                            }
+                            resolve();
+                        };
+                        img.onerror = () => resolve();
+                    });
+                } catch {
+                    // Icon not available, will use fallback
+                }
+            })
+        );
+
+        // Add a default pin icon as fallback
+        if (!map.hasImage('pin')) {
+            const pinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${iconColor}"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>`;
+            const pinImg = new Image(24, 24);
+            pinImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pinSvg);
+            await new Promise<void>((resolve) => {
+                pinImg.onload = () => {
+                    if (!map.hasImage('pin')) map.addImage('pin', pinImg);
+                    resolve();
+                };
+                pinImg.onerror = () => resolve();
+            });
         }
 
         map.addSource('clusters', {
@@ -517,8 +597,8 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                 'icon-size': [
                     'case',
                     ['boolean', ['get', 'isSelected'], false],
-                    1.2,
-                    1
+                    0.7,
+                    0.5
                 ],
                 'icon-allow-overlap': true,
                 'text-field': [
@@ -532,13 +612,13 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                 'text-size': 16,
             },
             paint: {
-                'icon-color': '#fff',
-                'text-color': '#fff',
+                'icon-color': '#ffffff',
+                'text-color': '#ffffff',
             }
         });
 
         setMapReady(true);
-    }, []);
+    }, [mapStyle]);
 
     useEffect(() => {
         if (!mapReady) return; // ⛔️ skip until ready
@@ -848,14 +928,26 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                     <div className="absolute top-4 max-md:top-auto max-md:bottom-12 left-[calc(100%-2.5rem)] flex flex-col z-[100] gap-2">
                         <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom + 1)}>＋</button>
                         <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom - 1)}>－</button>
+                        {/* Map Style Toggle */}
+                        <button
+                            className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white flex items-center justify-center hover:bg-gray-500"
+                            onClick={() => {
+                                setMapStyle(mapStyle === 'dark' ? 'light' : 'dark');
+                                setMapReady(false);
+                            }}
+                            title={`Switch to ${mapStyle === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {mapStyle === 'dark' ? <SunIcon /> : <MoonIcon />}
+                        </button>
                     </div>
                     <MapGL
+                        key={mapStyle}
                         onLoad={handleMapLoad}
                         ref={mapRef}
                         initialViewState={viewState}
                         onMove={(evt) => setViewState(evt.viewState)}
-                        reuseMaps
-                        mapStyle="https://api.maptiler.com/maps/dataviz/style.json?key=qclrTTX77KVe3EgSJMQ6"
+                        reuseMaps={false}
+                        mapStyle={MAP_STYLES[mapStyle].url}
                         attributionControl={false}
                     />
                     {sideBar}
