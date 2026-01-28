@@ -1,7 +1,6 @@
 import React from "react";
 import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
-import { generateCanonical } from "@/i18n/seo";
 import Script from "next/script";
 import Link from "next/link";
 import fs from "fs/promises";

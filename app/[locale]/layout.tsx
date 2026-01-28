@@ -1,6 +1,6 @@
 import React, { cache, Suspense } from "react";
 
-import { Footer, NavBar, PageTransition } from "@/components/layout";
+import { Footer, NavBar, PageTransition, BodyLockManager } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
 import { NostrAuthProvider } from "@/contexts/NostrAuthContext";
 
@@ -38,6 +38,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider locale={locale} messages={allMessages}>
             <NostrAuthProvider>
               <ClientOnlyAnalytics />
+              <BodyLockManager />
               <NavBar />
               <main id="main-content" className="w-full flex flex-col">
                 <Suspense>
