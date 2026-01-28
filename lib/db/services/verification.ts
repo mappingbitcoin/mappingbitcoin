@@ -281,6 +281,22 @@ export function extractDomain(website: string): string | null {
 }
 
 /**
+ * Extract domain from an email address
+ */
+export function extractDomainFromEmail(email: string): string | null {
+    try {
+        const trimmed = email.trim().toLowerCase();
+        const atIndex = trimmed.lastIndexOf('@');
+        if (atIndex === -1 || atIndex === trimmed.length - 1) {
+            return null;
+        }
+        return trimmed.substring(atIndex + 1);
+    } catch {
+        return null;
+    }
+}
+
+/**
  * Initiate domain verification for a venue
  */
 export async function initiateDomainVerification(

@@ -295,7 +295,7 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     auto_parts_store: "car_repair", // fallback
     bicycle_store: "bicycle",
     book_store: "library", // closest match
-    butcher_shop: "butcher",
+    butcher_shop: "shop",
     cannabis: "pharmacy",
     cell_phone_store: "mobile_phone",
     clothing_store: "clothing_store",
@@ -304,7 +304,7 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     copyshop: "hardware",
     department_store: "shop", // fallback
     discount_store: "shop",
-    gardening_store: "garden_centre",
+    gardening_store: "garden",
     electronics_store: "mobile_phone", // fallback
     food_store: "grocery",
     furniture_store: "furniture",
@@ -315,15 +315,15 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     hardware_store: "hardware",
     home_goods_store: "furniture", // closest match
     home_improvement_store: "hardware",
-    jewelry_store: "jewelry",
-    liquor_store: "alcohol_shop",
+    jewelry_store: "shop",
+    liquor_store: "beer",
     market: "grocery", // general fallback
     music_store: "music",
     pet_store: "dog_park", // closest available, suggest custom
     optician: "optician",
     tobacco: "pharmacy",
     seafood_shop: "seafood",
-    shoe_store: "shoes",
+    shoe_store: "shop",
     shopping_mall: "shop",
     sporting_goods_store: "soccer", // fallback, suggest custom
     stationery_store: "shop" /* ← not in icon set, suggest "convenience" or custom */,
@@ -336,20 +336,20 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     arena: "stadium",
     athletic_field: "pitch",
     dojo: "stadium",
-    fishing_charter: "outdoor" /* ← not in icon set, suggest custom */,
-    fishing_pond: "outdoor" /* same */,
+    fishing_charter: "park",
+    fishing_pond: "park",
     fitness_center: "fitness_centre",
     golf_course: "golf",
     gym: "fitness_centre",
-    ice_skating_rink: "snow", // symbolic
+    ice_skating_rink: "skiing",
     playground: "playground",
-    ski_resort: "snow", // fallback
+    ski_resort: "skiing",
     sports_activity_location: "stadium", // fallback
     sports_club: "stadium", // fallback
     sports_coaching: "stadium", // fallback
     sports_complex: "stadium",
     stadium: "stadium",
-    swimming_pool: "swimming_pool",
+    swimming_pool: "swimming",
     water_sports: "swimming", // symbolic
     surf_school: "water", // best match from existing icons
 

@@ -134,6 +134,11 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
     const [relevantSubcategories, setRelevantSubcategories] = useState<Record<string, number>>()
     const [mapStyle, setMapStyle] = useState<MapStyleKey>('dark');
     const [tooltipHeight, setTooltipHeight] = useState(0);
+
+    // Clear attribution control ref when map style changes (map will remount)
+    useEffect(() => {
+        attributionControlRef.current = null;
+    }, [mapStyle]);
     const [disableSearch, setDisableSearch] = useState(false);
     const [showHelpPopup, setShowHelpPopup] = useState(false);
 
@@ -764,9 +769,17 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         const map = mapRef.current?.getMap?.();
         if (!map || !lastSyncTime) return;
 
-        // Remove previous control if it exists
+        // Remove previous control if it exists and map is still valid
         if (attributionControlRef.current) {
-            map.removeControl(attributionControlRef.current);
+            try {
+                // Check if map has the control before removing
+                if (map.hasControl && map.hasControl(attributionControlRef.current)) {
+                    map.removeControl(attributionControlRef.current);
+                }
+            } catch {
+                // Control may belong to a previous map instance, ignore
+            }
+            attributionControlRef.current = null;
         }
 
         const date = new Date(lastSyncTime);
@@ -780,7 +793,19 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
         map.addControl(newControl);
         attributionControlRef.current = newControl;
-    }, [lastSyncTime]);
+
+        // Cleanup when effect re-runs or component unmounts
+        return () => {
+            try {
+                if (attributionControlRef.current && map.hasControl && map.hasControl(attributionControlRef.current)) {
+                    map.removeControl(attributionControlRef.current);
+                }
+            } catch {
+                // Map may be destroyed, ignore
+            }
+            attributionControlRef.current = null;
+        };
+    }, [lastSyncTime, mapStyle]);
 
     useEffect(() => {
         // Save original values
