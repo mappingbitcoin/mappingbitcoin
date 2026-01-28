@@ -55,6 +55,9 @@ model Claim {
   verifiedAt           DateTime?   @map("verified_at")
   expiresAt            DateTime?   @map("expires_at")
   createdAt            DateTime    @default(now()) @map("created_at")
+  verifiedEmailHash    String?     @map("verified_email_hash") // SHA-256 hash of verified email
+  revokedAt            DateTime?   @map("revoked_at")
+  revokedReason        String?     @map("revoked_reason") // e.g., "email_changed"
 
   // Relations
   venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
@@ -64,6 +67,19 @@ model Claim {
   @@index([claimerPubkey])
   @@index([status])
   @@map("claims")
+}
+
+// Auth challenges for Nostr authentication
+model AuthChallenge {
+  id        String    @id @default(cuid())
+  pubkey    String
+  challenge String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([pubkey])
+  @@map("auth_challenges")
 }
 
 enum ClaimStatus {

@@ -95,3 +95,63 @@ export async function getClaimsByPubkey(pubkey: string) {
         orderBy: { createdAt: "desc" },
     });
 }
+
+/**
+ * Get an active (non-revoked) verified claim for a venue
+ */
+export async function getActiveVerifiedClaimByOsmId(osmId: string) {
+    const venue = await prisma.venue.findUnique({
+        where: { osmId },
+        include: {
+            claims: {
+                where: {
+                    status: "VERIFIED",
+                    revokedAt: null,
+                },
+                include: { claimer: true },
+                take: 1,
+            },
+        },
+    });
+
+    return venue?.claims[0] ?? null;
+}
+
+/**
+ * Revoke a claim with a reason
+ */
+export async function revokeClaim(claimId: string, reason: string) {
+    return prisma.claim.update({
+        where: { id: claimId },
+        data: {
+            status: "EXPIRED",
+            revokedAt: new Date(),
+            revokedReason: reason,
+        },
+    });
+}
+
+/**
+ * Update claim with verified email hash
+ */
+export async function setClaimEmailHash(claimId: string, emailHash: string) {
+    return prisma.claim.update({
+        where: { id: claimId },
+        data: {
+            verifiedEmailHash: emailHash,
+        },
+    });
+}
+
+/**
+ * Get claim by ID with claimer info
+ */
+export async function getClaimById(claimId: string) {
+    return prisma.claim.findUnique({
+        where: { id: claimId },
+        include: {
+            claimer: true,
+            venue: true,
+        },
+    });
+}
