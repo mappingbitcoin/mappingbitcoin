@@ -348,27 +348,29 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         const { challenge } = await challengeRes.json();
 
         // Sign the challenge based on auth method
-        let signature: string;
         const { signChallenge } = await import("@/lib/nostr/auth");
 
+        let signResult;
         if (user.method === "nsec") {
-            signature = await signChallenge(challenge, "nsec");
+            signResult = await signChallenge(challenge, "nsec");
         } else if (user.method === "extension") {
-            signature = await signChallenge(challenge, "extension");
+            signResult = await signChallenge(challenge, "extension");
         } else if (user.method === "bunker") {
-            signature = await signChallenge(challenge, "bunker");
+            signResult = await signChallenge(challenge, "bunker");
         } else {
             throw new Error("Cannot authenticate with read-only access");
         }
 
         // Verify signature and get token
+        // For extension/bunker, send the full signed event for proper verification
         const verifyRes = await fetch("/api/auth/nostr/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 pubkey: user.pubkey,
                 challenge,
-                signature,
+                signature: signResult.signature,
+                signedEvent: signResult.signedEvent,
             }),
         });
 

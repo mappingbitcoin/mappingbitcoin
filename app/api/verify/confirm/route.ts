@@ -2,17 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAuthToken } from "@/lib/db/services/auth";
 import { verifyEmailCode } from "@/lib/db/services/verification";
 import prisma from "@/lib/db/prisma";
+import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
+import { parseTags } from "@/utils/OsmHelpers";
 
 interface ConfirmRequest {
     claimId: string;
     code: string;
-    email: string;
 }
 
 function getAuthToken(request: NextRequest): string | null {
     const authHeader = request.headers.get("authorization");
     if (authHeader?.startsWith("Bearer ")) {
         return authHeader.slice(7);
+    }
+    return null;
+}
+
+/**
+ * Parse OSM ID and extract the numeric ID
+ */
+function parseOsmIdNumber(osmId: string): number | null {
+    const match = osmId.match(/^(?:node|way|relation)\/(\d+)$/);
+    if (match) {
+        return parseInt(match[1], 10);
     }
     return null;
 }
@@ -37,7 +49,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body: ConfirmRequest = await request.json();
-        const { claimId, code, email } = body;
+        const { claimId, code } = body;
 
         // Validate inputs
         if (!claimId || typeof claimId !== "string") {
@@ -54,16 +66,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!email || typeof email !== "string") {
-            return NextResponse.json(
-                { error: "Email required for verification" },
-                { status: 400 }
-            );
-        }
-
         // Verify the claim belongs to the authenticated user
         const claim = await prisma.claim.findUnique({
             where: { id: claimId },
+            include: { venue: true },
         });
 
         if (!claim) {
@@ -79,6 +85,41 @@ export async function POST(request: NextRequest) {
                 { status: 403 }
             );
         }
+
+        // Get the email from venue cache - NOT from client
+        const numericId = parseOsmIdNumber(claim.venue.osmId);
+        if (!numericId) {
+            return NextResponse.json(
+                { error: "Invalid venue ID" },
+                { status: 400 }
+            );
+        }
+
+        const venues = await getVenueCache();
+        const venueIndexMap = await getVenueIndexMap();
+        const venueIndex = venueIndexMap[numericId];
+
+        if (venueIndex === undefined) {
+            return NextResponse.json(
+                { error: "Venue not found in cache" },
+                { status: 404 }
+            );
+        }
+
+        const venue = venues[venueIndex];
+        const { contact } = parseTags(venue.tags);
+        const venueEmail = contact?.email;
+
+        if (!venueEmail) {
+            return NextResponse.json(
+                { error: "No email found for venue" },
+                { status: 400 }
+            );
+        }
+
+        // In development, use test email for hash verification
+        const isDev = process.env.NODE_ENV === "development";
+        const email = isDev ? "leon@dandelionlabs.io" : venueEmail;
 
         // Verify the code
         const result = await verifyEmailCode(claimId, code, email);

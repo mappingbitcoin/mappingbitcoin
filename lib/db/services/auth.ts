@@ -40,26 +40,26 @@ export async function createChallenge(pubkey: string): Promise<{ challenge: stri
 }
 
 /**
- * Verify and consume a challenge
- * Returns true if the challenge is valid and was consumed
+ * Verify a challenge exists and is valid (without consuming it)
+ * Returns the challenge record if valid, null otherwise
  */
-export async function verifyAndConsumeChallenge(challenge: string, pubkey: string): Promise<boolean> {
+export async function verifyChallenge(challenge: string, pubkey: string): Promise<{ id: string } | null> {
     const record = await prisma.authChallenge.findUnique({
         where: { challenge },
     });
 
     if (!record) {
-        return false;
+        return null;
     }
 
     // Check if challenge belongs to the claimed pubkey
     if (record.pubkey !== pubkey) {
-        return false;
+        return null;
     }
 
     // Check if challenge has already been used
     if (record.usedAt) {
-        return false;
+        return null;
     }
 
     // Check if challenge has expired
@@ -68,15 +68,34 @@ export async function verifyAndConsumeChallenge(challenge: string, pubkey: strin
         await prisma.authChallenge.delete({
             where: { id: record.id },
         });
-        return false;
+        return null;
     }
 
-    // Mark challenge as used
+    return { id: record.id };
+}
+
+/**
+ * Consume a challenge (mark it as used)
+ * Call this only after successful signature verification
+ */
+export async function consumeChallenge(challengeId: string): Promise<void> {
     await prisma.authChallenge.update({
-        where: { id: record.id },
+        where: { id: challengeId },
         data: { usedAt: new Date() },
     });
+}
 
+/**
+ * Verify and consume a challenge
+ * Returns true if the challenge is valid and was consumed
+ * @deprecated Use verifyChallenge + consumeChallenge for better control
+ */
+export async function verifyAndConsumeChallenge(challenge: string, pubkey: string): Promise<boolean> {
+    const record = await verifyChallenge(challenge, pubkey);
+    if (!record) {
+        return false;
+    }
+    await consumeChallenge(record.id);
     return true;
 }
 
