@@ -125,29 +125,11 @@ function hexToNpub(hex: string): string {
     return hrp + "1" + combined.map(v => ALPHABET[v]).join("");
 }
 
-// Derive pubkey from private key (simplified - uses SubtleCrypto)
+// Derive pubkey from private key using secp256k1
 async function derivePublicKey(privateKeyHex: string): Promise<string> {
-    // For secp256k1, we need to use a proper library
-    // This is a placeholder - in production, use @noble/secp256k1
-    // For now, we'll store the private key and derive pubkey client-side
-
-    // Try to use the nostr extension if available for key derivation
-    if (typeof window !== "undefined" && window.nostr) {
-        try {
-            const pubkey = await window.nostr.getPublicKey();
-            return pubkey;
-        } catch {
-            // Extension couldn't help
-        }
-    }
-
-    // Fallback: We'll need to use a crypto library
-    // For now, return a hash of the private key as placeholder
-    const encoder = new TextEncoder();
-    const data = encoder.encode(privateKeyHex);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    // Dynamically import to avoid SSR issues
+    const { getPublicKey } = await import("@/lib/nostr/crypto");
+    return getPublicKey(privateKeyHex);
 }
 
 declare global {
