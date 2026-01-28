@@ -103,6 +103,10 @@ export function startNostrConnect(
                 if (data[0] === "EVENT") {
                     const nostrEvent: NostrEvent = data[2];
 
+                    // Debug: log the content format
+                    console.log("Received NIP-46 event, content length:", nostrEvent.content.length);
+                    console.log("Content preview:", nostrEvent.content.substring(0, 100));
+
                     // Decrypt the content
                     const decrypted = await nip04Decrypt(
                         session.clientPrivateKey,
@@ -112,8 +116,16 @@ export function startNostrConnect(
 
                     const response = JSON.parse(decrypted);
 
-                    // Check if this is an ACK response with our secret
-                    if (response.result === "ack" || response.method === "connect") {
+                    console.log('[response]', response)
+
+                    // Check if this is a successful connect response
+                    // NIP-46: result can be "ack", the secret, or method can be "connect"
+                    const isConnectResponse =
+                        response.result === "ack" ||
+                        response.result === session.secret ||
+                        response.method === "connect";
+
+                    if (isConnectResponse) {
                         isConnected = true;
                         session.remotePubkey = nostrEvent.pubkey;
 
