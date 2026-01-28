@@ -13,22 +13,22 @@ import {getFormattedAddress} from "@/utils/AddressUtils";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {getSubcategoryLabel, matchPlaceSubcategory} from "@/constants/PlaceCategories";
 
-async function getVenueById(id: number, preview = false): Promise<EnrichedVenue | null> {
+async function getVenueBySlug(slug: string, preview = false): Promise<EnrichedVenue | null> {
     const base = env.siteUrl || "http://localhost:3000";
-    const url = `${base}/api/places/${id}${preview ? '?preview=true' : ''}`;
+    const url = `${base}/api/places/${slug}${preview ? '?preview=true' : ''}`;
     const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
 }
 
 interface PageProps {
-    params: Promise<{ id: number }>;
+    params: Promise<{ slug: string }>;
     searchParams?: Promise<Record<string, string>>
 }
 
 export async function generateMetadata({ params }: PageProps & Localized): Promise<Metadata> {
-    const { id, locale } = await params;
-    const venue = await getVenueById(id);
+    const { slug, locale } = await params;
+    const venue = await getVenueBySlug(slug);
     if (!venue) return { title: "Place Not Found" };
 
     const { metadata: baseMetadata } = await getPageSeo("place")({ params });
@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
             ...baseMetadata.openGraph,
             title: finalTitle,
             description: fullDescription,
-            url: generateCanonical(`places/${id}`, locale),
+            url: generateCanonical(`places/${venue.slug || slug}`, locale),
             images: [
                 ...(venue.tags.image ? [{
                     url: venue.tags.image,
@@ -108,11 +108,11 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
 }
 
 export default async function PlaceServerPage({ params, searchParams }: PageProps & Localized) {
-    const { id } = await params;
+    const { slug } = await params;
     const awaitedSearchParams = await searchParams;
     const isPreview = awaitedSearchParams?.preview === 'true'
 
-    const venue = await getVenueById(id, isPreview);
+    const venue = await getVenueBySlug(slug, isPreview);
 
     if (!venue) return notFound();
 

@@ -4,6 +4,7 @@ import { processOsmDiffs } from './ProcessOsmDiff';
 import {enrichGeoData} from "@/utils/sync/enrich/EnrichGeoData";
 import {initOsmReplicationState} from "@/utils/sync/ReplicationFetcher";
 import {generateMerchantSlugs} from "@/utils/sync/slugs/MerchantSlugs";
+import {generateVenueSlugs} from "@/utils/sync/slugs/VenueSlugs";
 import {generateStats} from "@/utils/sync/stats/GenerateStats";
 
 let started = false;
@@ -17,6 +18,8 @@ export async function startBitcoinVenueCron() {
     try {
         await startupSync();
         console.log('[Startup] Initial sync complete ✅');
+        await generateVenueSlugs();
+        console.log('[Startup] Generating venue slugs complete ✅');
         await generateMerchantSlugs()
         console.log('[Startup] Generating initial merchant slugs complete ✅');
         await generateStats()

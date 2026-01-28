@@ -69,9 +69,8 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         return searchParams.has('lat') && searchParams.has('lon') && searchParams.has('zoom');
     }, [searchParams]);
 
-    const initialVenueId = useMemo(() => {
-        const venueId = searchParams.get('venue');
-        return venueId ? parseInt(venueId, 10) : null;
+    const initialVenueSlug = useMemo(() => {
+        return searchParams.get('venue') || null;
     }, [searchParams]);
 
     const t = useTranslations('map')
@@ -142,11 +141,11 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
     // Fetch and select venue from URL param when map is ready
     useEffect(() => {
-        if (!mapReady || !initialVenueId || selectedVenue) return;
+        if (!mapReady || !initialVenueSlug || selectedVenue) return;
 
         const fetchVenue = async () => {
             try {
-                const res = await fetch(`/api/places/${initialVenueId}`);
+                const res = await fetch(`/api/places/${initialVenueSlug}`);
                 if (res.ok) {
                     const venue: EnrichedVenue = await res.json();
                     setSelectedVenue(venue);
@@ -157,7 +156,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         };
 
         fetchVenue();
-    }, [mapReady, initialVenueId, selectedVenue]);
+    }, [mapReady, initialVenueSlug, selectedVenue]);
 
     useEffect(() => {
         const navbar = document.querySelector('nav');
