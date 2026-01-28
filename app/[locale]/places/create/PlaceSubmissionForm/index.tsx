@@ -275,7 +275,7 @@ export default function VenueSubmissionForm() {
             if (res.ok && json.changesetId) {
                 sessionStorage.removeItem(STORAGE_KEY);
                 toast.success("Venue submitted!");
-                router.push(`/venues/${json.changesetId}?preview=true`);
+                router.push(`/places/${json.changesetId}?preview=true`);
             } else {
                 toast.error(json.error || "Submission failed");
             }
