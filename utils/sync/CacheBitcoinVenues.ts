@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { OverpassElement } from '@/models/Overpass';
-import { uploadToSpaces, downloadFromSpaces } from '@/utils/DigitalOceanSpacesHelper';
+import { uploadToStorage, downloadFromStorage, AssetType } from '@/lib/storage';
 
 const VENUE_CACHE = path.resolve(process.cwd(), 'data/BitcoinVenues.json');
 
@@ -13,10 +13,10 @@ function readExisting(): OverpassElement[] {
 export async function initVenueCache() {
     if (!fs.existsSync(VENUE_CACHE)) {
         try {
-            console.log('📦 BitcoinVenues.json not found. Downloading from Spaces...');
-            await downloadFromSpaces('BitcoinVenues.json', VENUE_CACHE);
+            console.log('📦 BitcoinVenues.json not found. Downloading from storage...');
+            await downloadFromStorage('BitcoinVenues.json', VENUE_CACHE, AssetType.VENUES);
         } catch (err) {
-            console.warn('⚠️ Could not download BitcoinVenues.json from Spaces:', err);
+            console.warn('⚠️ Could not download BitcoinVenues.json from storage:', err);
         }
     }
 }
@@ -49,9 +49,9 @@ export async function cacheVenues(newData: OverpassElement[]) {
         console.log('💾 BitcoinVenues.json updated.');
 
         try {
-            await uploadToSpaces(VENUE_CACHE, 'BitcoinVenues.json');
+            await uploadToStorage(VENUE_CACHE, 'BitcoinVenues.json', AssetType.VENUES);
         } catch (err) {
-            console.warn('⚠️ Failed to upload BitcoinVenues.json to Spaces:', err);
+            console.warn('⚠️ Failed to upload BitcoinVenues.json to storage:', err);
         }
     } else {
         console.log('✅ No changes detected — cache not updated.');
@@ -80,9 +80,9 @@ export async function writeVenueCache(data: OverpassElement[]) {
         console.log('💾 BitcoinVenues.json updated by writeVenueCache().');
 
         try {
-            await uploadToSpaces(VENUE_CACHE, 'BitcoinVenues.json');
+            await uploadToStorage(VENUE_CACHE, 'BitcoinVenues.json', AssetType.VENUES);
         } catch (err) {
-            console.warn('⚠️ Failed to upload BitcoinVenues.json to Spaces:', err);
+            console.warn('⚠️ Failed to upload BitcoinVenues.json to storage:', err);
         }
     } else {
         console.log('✅ No changes in writeVenueCache — skipped write.');

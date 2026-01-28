@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { mkdirSync, existsSync } from 'fs';
 import zlib from 'zlib';
-import { uploadToSpaces, downloadFromSpaces } from '@/utils/DigitalOceanSpacesHelper';
+import { uploadToStorage, downloadFromStorage, AssetType } from '@/lib/storage';
 
 const DATA_DIR = path.resolve('data');
 const STATE_FILE = path.join(DATA_DIR, 'osm-replication.state');
@@ -26,10 +26,10 @@ async function fetchWithTimeout(url: string, timeoutMs = DEFAULT_TIMEOUT_MS): Pr
 export async function initOsmReplicationState() {
     if (!existsSync(STATE_FILE)) {
         try {
-            console.log('📦 osm-replication.state not found. Downloading from Spaces...');
-            await downloadFromSpaces('osm-replication.state', STATE_FILE);
+            console.log('📦 osm-replication.state not found. Downloading from storage...');
+            await downloadFromStorage('osm-replication.state', STATE_FILE, AssetType.SYNC);
         } catch (err) {
-            console.warn('⚠️ Could not download osm-replication.state from Spaces:', err);
+            console.warn('⚠️ Could not download osm-replication.state from storage:', err);
         }
     }
 }
@@ -50,9 +50,9 @@ export async function updateState(sequenceNumber: number): Promise<void> {
     await fs.writeFile(STATE_FILE, content);
 
     try {
-        await uploadToSpaces(STATE_FILE, 'osm-replication.state');
+        await uploadToStorage(STATE_FILE, 'osm-replication.state', AssetType.SYNC);
     } catch (err) {
-        console.warn('⚠️ Failed to upload osm-replication.state to Spaces:', err);
+        console.warn('⚠️ Failed to upload osm-replication.state to storage:', err);
     }
 }
 

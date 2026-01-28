@@ -4,7 +4,7 @@ import { cacheVenues } from "./CacheBitcoinVenues";
 
 import fs from "fs";
 import path from "path";
-import {downloadFromSpaces, uploadToSpaces} from "@/utils/DigitalOceanSpacesHelper";
+import { downloadFromStorage, uploadToStorage, AssetType } from "@/lib/storage";
 
 const OVERPASS_API_URL = "https://overpass-api.de/api/interpreter";
 const BITCOIN_VENUES_PATH = path.resolve("data", "BitcoinVenues.json");
@@ -13,21 +13,21 @@ const ENRICHED_VENUES_PATH = path.resolve("data", "EnrichedVenues.json");
 async function isCachedVenueFileAvailable(): Promise<boolean> {
     if (!fs.existsSync(BITCOIN_VENUES_PATH)) {
         try {
-            console.log("📦 Local BitcoinVenues.json not found. Attempting to download from Spaces...");
-            await downloadFromSpaces("BitcoinVenues.json", BITCOIN_VENUES_PATH);
+            console.log("📦 Local BitcoinVenues.json not found. Attempting to download from storage...");
+            await downloadFromStorage("BitcoinVenues.json", BITCOIN_VENUES_PATH, AssetType.VENUES);
 
             if (!fs.existsSync(ENRICHED_VENUES_PATH)) {
                 try {
-                    console.log("📦 Local EnrichedVenues.json not found. Attempting to download from Spaces...");
-                    await downloadFromSpaces("EnrichedVenues.json", ENRICHED_VENUES_PATH);
+                    console.log("📦 Local EnrichedVenues.json not found. Attempting to download from storage...");
+                    await downloadFromStorage("EnrichedVenues.json", ENRICHED_VENUES_PATH, AssetType.VENUES);
                 } catch (err) {
-                    console.warn("⚠️ Could not download EnrichedVenues.json from Spaces:", err);
+                    console.warn("⚠️ Could not download EnrichedVenues.json from storage:", err);
                     return false;
                 }
             }
             return true;
         } catch (err) {
-            console.warn("⚠️ Could not download BitcoinVenues.json from Spaces:", err);
+            console.warn("⚠️ Could not download BitcoinVenues.json from storage:", err);
             return false;
         }
     }
@@ -95,7 +95,7 @@ export async function fetchBitcoinUpdates(): Promise<OverpassElement[]> {
 
                     const localPath = path.resolve("data", "BitcoinVenues.json");
                     if (fs.existsSync(localPath)) {
-                        await uploadToSpaces(localPath, "BitcoinVenues.json");
+                        await uploadToStorage(localPath, "BitcoinVenues.json", AssetType.VENUES);
                     }
                 }
 

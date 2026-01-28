@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { uploadToSpaces, downloadFromSpaces } from "@/utils/DigitalOceanSpacesHelper";
+import { uploadToStorage, downloadFromStorage, AssetType } from "@/lib/storage";
 
 const SYNC_FILE = path.resolve(process.cwd(), 'data/SyncData.json');
 
@@ -9,10 +9,10 @@ let syncData: Record<string, string> = {};
 export async function initSyncData() {
     if (!fs.existsSync(SYNC_FILE)) {
         try {
-            console.log("📦 SyncData.json not found. Downloading from Spaces...");
-            await downloadFromSpaces("SyncData.json", SYNC_FILE);
+            console.log("📦 SyncData.json not found. Downloading from storage...");
+            await downloadFromStorage("SyncData.json", SYNC_FILE, AssetType.SYNC);
         } catch (err) {
-            console.warn("⚠️ Could not download SyncData.json from Spaces:", err);
+            console.warn("⚠️ Could not download SyncData.json from storage:", err);
         }
     }
 
@@ -34,9 +34,9 @@ export async function setLastSyncData(key: string, value: string) {
     await fs.promises.writeFile(SYNC_FILE, JSON.stringify(syncData, null, 2), 'utf-8');
 
     try {
-        await uploadToSpaces(SYNC_FILE, "SyncData.json");
+        await uploadToStorage(SYNC_FILE, "SyncData.json", AssetType.SYNC);
     } catch (err) {
-        console.warn("⚠️ Failed to upload SyncData.json to Spaces:", err);
+        console.warn("⚠️ Failed to upload SyncData.json to storage:", err);
     }
 }
 
