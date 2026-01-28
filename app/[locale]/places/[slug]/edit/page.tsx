@@ -7,21 +7,21 @@ import {Localized} from "@/i18n/types";
 import {EnrichedVenue} from "@/models/Overpass";
 import {parseTags} from "@/utils/OsmHelpers";
 
-async function getVenueById(id: number): Promise<EnrichedVenue | null> {
+async function getVenueBySlug(slug: string): Promise<EnrichedVenue | null> {
     const base = env.siteUrl || "http://localhost:3000";
-    const url = `${base}/api/places/${id}`;
+    const url = `${base}/api/places/${slug}`;
     const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
 }
 
 interface PageProps {
-    params: Promise<{ id: number }>;
+    params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps & Localized): Promise<Metadata> {
-    const { id } = await params;
-    const venue = await getVenueById(id);
+    const { slug } = await params;
+    const venue = await getVenueBySlug(slug);
     if (!venue) return { title: "Place Not Found" };
 
     const { name } = parseTags(venue.tags);
@@ -33,9 +33,9 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
 }
 
 export default async function PlaceEditPage({ params }: PageProps & Localized) {
-    const { id } = await params;
+    const { slug } = await params;
 
-    const venue = await getVenueById(id);
+    const venue = await getVenueBySlug(slug);
 
     if (!venue) return notFound();
 
