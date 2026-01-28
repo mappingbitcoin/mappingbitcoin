@@ -138,8 +138,16 @@ export function useAddressAutocomplete(
 
                 const data: PhotonResponse = await response.json();
 
-                const formattedSuggestions: AddressSuggestion[] = data.features.map(
-                    (feature) => {
+                // Deduplicate by OSM ID
+                const seenIds = new Set<string>();
+                const formattedSuggestions: AddressSuggestion[] = data.features
+                    .filter((feature) => {
+                        const id = `${feature.properties.osm_type}-${feature.properties.osm_id}`;
+                        if (seenIds.has(id)) return false;
+                        seenIds.add(id);
+                        return true;
+                    })
+                    .map((feature, index) => {
                         const props = feature.properties;
                         const [lon, lat] = feature.geometry.coordinates;
 
@@ -158,7 +166,7 @@ export function useAddressAutocomplete(
                         const label = labelParts.filter(Boolean).join(", ");
 
                         return {
-                            id: `${props.osm_type}-${props.osm_id}`,
+                            id: `${props.osm_type}-${props.osm_id}-${index}`,
                             label: label || `${lat.toFixed(5)}, ${lon.toFixed(5)}`,
                             lat,
                             lon,
@@ -177,8 +185,7 @@ export function useAddressAutocomplete(
                             osmId: props.osm_id,
                             osmType: props.osm_type,
                         };
-                    }
-                );
+                    });
 
                 setSuggestions(formattedSuggestions);
             } catch (err) {

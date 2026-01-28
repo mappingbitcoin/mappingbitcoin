@@ -138,17 +138,23 @@ export function useVenueSearch(
 
                 const data = await response.json();
 
-                // Filter to establishments only and limit results
+                // Filter to establishments only, deduplicate, and limit results
+                const seenIds = new Set<string>();
                 const establishments = (data.features as PhotonFeature[])
                     .filter((feature) => {
                         const props = feature.properties;
                         // Must have a name to be considered a venue
                         if (!props.name) return false;
                         // Check if it's an establishment type
-                        return ESTABLISHMENT_KEYS.includes(props.osm_key);
+                        if (!ESTABLISHMENT_KEYS.includes(props.osm_key)) return false;
+                        // Deduplicate by OSM ID
+                        const id = `${props.osm_type}-${props.osm_id}`;
+                        if (seenIds.has(id)) return false;
+                        seenIds.add(id);
+                        return true;
                     })
                     .slice(0, limit)
-                    .map((feature): VenueSuggestion => {
+                    .map((feature, index): VenueSuggestion => {
                         const props = feature.properties;
                         const [lon, lat] = feature.geometry.coordinates;
 
@@ -163,7 +169,7 @@ export function useVenueSearch(
                             : props.name || "Unknown";
 
                         return {
-                            id: `${props.osm_type}-${props.osm_id}`,
+                            id: `${props.osm_type}-${props.osm_id}-${index}`,
                             name: props.name || "Unknown",
                             label,
                             lat,
