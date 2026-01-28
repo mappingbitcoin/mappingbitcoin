@@ -3,7 +3,7 @@ import fsSync from 'fs';
 import path from 'path';
 import slugify from 'slugify';
 import { EnrichedVenue } from '@/models/Overpass';
-import { uploadToSpaces } from '@/utils/DigitalOceanSpacesHelper';
+import { uploadToStorage, AssetType } from '@/lib/storage';
 import { refreshVenueCache } from '@/app/api/cache/VenueCache';
 
 const ENRICHED_FILE = path.resolve('data', 'EnrichedVenues.json');
@@ -77,7 +77,7 @@ export async function generateVenueSlugs(): Promise<number> {
 
     if (updated > 0) {
         await fs.writeFile(ENRICHED_FILE, JSON.stringify(venues, null, 2), 'utf8');
-        await uploadToSpaces(ENRICHED_FILE, 'EnrichedVenues.json');
+        await uploadToStorage(ENRICHED_FILE, 'EnrichedVenues.json', AssetType.VENUES);
         await refreshVenueCache();
         console.log(`[VenueSlugs] Generated slugs for ${updated} venues.`);
     } else {

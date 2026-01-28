@@ -8,7 +8,7 @@ import { TAG_CATEGORY_MAP } from "@/constants/PlaceOsmDictionary";
 import { refreshVenueCache } from "@/app/api/cache/VenueCache";
 import { refreshLocationCache } from "@/app/api/cache/LocationCache";
 import { refreshTileCache } from "@/app/api/cache/TileCache";
-import { uploadToSpaces, downloadFromSpaces } from "@/utils/DigitalOceanSpacesHelper";
+import { uploadToStorage, downloadFromStorage, AssetType } from "@/lib/storage";
 import { City } from "@/models/City";
 import KDBush from "kdbush";
 import { around } from "geokdbush";
@@ -105,7 +105,7 @@ async function enrichVenue(
 
 async function saveAndRefresh(venues: EnrichedVenue[], logs: string[]) {
     await fs.writeFile(ENRICHED_FILE, JSON.stringify(venues, null, 2), "utf8");
-    await uploadToSpaces(ENRICHED_FILE, "EnrichedVenues.json");
+    await uploadToStorage(ENRICHED_FILE, "EnrichedVenues.json", AssetType.VENUES);
     logGeoEnrichment(logs);
     await refreshVenueCache();
     await refreshLocationCache();
@@ -123,9 +123,9 @@ export async function enrichGeoData() {
 
     try {
       if (!fsSync.existsSync(ENRICHED_FILE))
-        await downloadFromSpaces("EnrichedVenues.json", ENRICHED_FILE);
+        await downloadFromStorage("EnrichedVenues.json", ENRICHED_FILE, AssetType.VENUES);
     } catch {
-      console.log("⚠️ EnrichedVenues.json not found in Spaces. Trying local or fallback...");
+      console.log("⚠️ EnrichedVenues.json not found in storage. Trying local or fallback...");
     }
 
     if (!fsSync.existsSync(ENRICHED_FILE)) {
