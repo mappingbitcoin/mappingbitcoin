@@ -4,14 +4,12 @@ import React, { useEffect, useMemo, useState, FormEvent, useRef } from "react";
 import toast from 'react-hot-toast';
 import Script from "next/script";
 import { useRouter } from '@/i18n/navigation';
-import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import {
     parseOpeningHours,
     stringifyOpeningHours,
     DayHours,
-    convertGooglePeriodsToDayHours
 } from "@/utils/OpeningHoursParser";
 import { Locale } from "@/i18n/types";
 import addressFormatter from "@fragaria/address-formatter";
@@ -20,8 +18,6 @@ import { useOsmUser } from "@/providers/OsmAuth";
 import { LoginWithOSM } from "@/components/auth";
 import { COMMON_TAG_TRANSLATIONS, CommonTag } from "@/constants/CommonOsmTags";
 import {
-    matchPlaceSubcategory,
-    PLACE_SUBTYPE_MAP,
     PlaceCategory
 } from "@/constants/PlaceCategories";
 import {
@@ -39,6 +35,8 @@ import {
     LocationSection,
     PlacePreview,
 } from "@/components/place-form";
+import { useAddressAutocomplete, reverseGeocode } from "@/hooks/useAddressAutocomplete";
+import { useVenueSearch, fetchVenueDetails } from "@/hooks/useVenueSearch";
 
 const OpeningHoursPicker = dynamic(
     () => import("@/components/forms/OpeningHoursPicker"),
@@ -112,8 +110,27 @@ export default function VenueSubmissionForm() {
     const venueSelectorRef = useRef<HTMLDivElement>(null);
     const addressSelectorRef = useRef<HTMLUListElement>(null);
 
-    useOnClickOutside([venueSelectorRef], () => clearSuggestionsVenue());
-    useOnClickOutside([addressSelectorRef], () => clearSuggestions());
+    // Address autocomplete using Photon (free, OpenStreetMap-based)
+    const {
+        value: addressValue,
+        setValue: setAddressValue,
+        suggestions: addressSuggestions,
+        isLoading: addressLoading,
+        clearSuggestions: clearAddressSuggestions,
+        selectSuggestion: selectAddressSuggestion,
+    } = useAddressAutocomplete({ debounceMs: 300, limit: 5 });
+
+    // Venue search using Photon (free, OpenStreetMap-based)
+    const {
+        value: venueValue,
+        setValue: setVenueValue,
+        suggestions: venueSuggestions,
+        isLoading: venueLoading,
+        clearSuggestions: clearVenueSuggestions,
+    } = useVenueSearch({ debounceMs: 300, limit: 6 });
+
+    useOnClickOutside([venueSelectorRef], () => clearVenueSuggestions());
+    useOnClickOutside([addressSelectorRef], () => clearAddressSuggestions());
 
     useEffect(() => {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(form));
@@ -121,52 +138,95 @@ export default function VenueSubmissionForm() {
 
     const parsedOpeningHours: DayHours[] = useMemo(() => parseOpeningHours(form.opening_hours), [form.opening_hours]);
 
-    const {
-        ready,
-        value,
-        suggestions: { status, data },
-        setValue,
-        clearSuggestions,
-    } = usePlacesAutocomplete();
-
-    const {
-        ready: readyVenue,
-        value: valueVenue,
-        suggestions: { status: statusVenue, data: dataVenue },
-        setValue: setValueVenue,
-        clearSuggestions: clearSuggestionsVenue,
-    } = usePlacesAutocomplete({
-        requestOptions: { types: ["establishment"] },
-    });
-
     function changeStep(newStep: number) {
         setStep(newStep);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function handleSelectAddress(description: string) {
-        setValue(description, false);
-        clearSuggestions();
-        getGeocode({ address: description }).then((results) => {
-            const { lat, lng } = getLatLng(results[0]);
-            const components = results[0].address_components;
-            const get = (type: string): string =>
-                components.find((c) => c.types.includes(type))?.long_name || "";
+    // Handle address selection from autocomplete (using Photon/OSM)
+    function handleSelectAddress(suggestion: typeof addressSuggestions[0]) {
+        selectAddressSuggestion(suggestion);
+        setForm((prev) => ({
+            ...prev,
+            lat: suggestion.lat.toString(),
+            lon: suggestion.lon.toString(),
+            address: {
+                street: suggestion.address.street || "",
+                city: suggestion.address.city || "",
+                country: suggestion.address.country || "",
+                housenumber: suggestion.address.housenumber || "",
+                district: suggestion.address.district || "",
+                state: suggestion.address.state || "",
+                postcode: suggestion.address.postcode || "",
+            },
+        }));
+    }
+
+    // Handle venue selection from search (using Photon/OSM)
+    async function handleSelectVenue(suggestion: typeof venueSuggestions[0]) {
+        clearVenueSuggestions();
+        setVenueValue(suggestion.name, false);
+
+        // Update form with basic venue info
+        setForm((prev) => ({
+            ...prev,
+            name: suggestion.name,
+            lat: suggestion.lat.toString(),
+            lon: suggestion.lon.toString(),
+            address: {
+                street: suggestion.address.street || prev.address.street,
+                city: suggestion.address.city || prev.address.city,
+                country: suggestion.address.country || prev.address.country,
+                housenumber: suggestion.address.housenumber || prev.address.housenumber,
+                district: suggestion.address.district || prev.address.district,
+                state: suggestion.address.state || prev.address.state,
+                postcode: suggestion.address.postcode || prev.address.postcode,
+            },
+        }));
+
+        // Fetch additional details from OSM (opening hours, website, etc.)
+        try {
+            const details = await fetchVenueDetails(suggestion.osmType, suggestion.osmId);
+            if (details) {
+                setForm((prev) => ({
+                    ...prev,
+                    contact: {
+                        ...prev.contact,
+                        website: details.website || details["contact:website"] || prev.contact.website,
+                        phone: details.phone || details["contact:phone"] || prev.contact.phone,
+                        email: details.email || details["contact:email"] || prev.contact.email,
+                    },
+                    opening_hours: details.opening_hours || prev.opening_hours,
+                }));
+            }
+        } catch (err) {
+            console.warn("Could not fetch venue details:", err);
+        }
+
+        // Update address search field
+        setAddressValue(suggestion.label, false);
+    }
+
+    // Handle map marker drag - reverse geocode to get address
+    async function handleMapMove(lat: number, lon: number) {
+        setForm((prev) => ({ ...prev, lat: String(lat), lon: String(lon) }));
+
+        // Reverse geocode to update address
+        const address = await reverseGeocode(lat, lon);
+        if (address) {
             setForm((prev) => ({
                 ...prev,
-                lat: lat.toString(),
-                lon: lng.toString(),
                 address: {
-                    street: get("route"),
-                    city: get("locality") || get("administrative_area_level_2"),
-                    country: get("country"),
-                    housenumber: get("street_number"),
-                    district: get("sublocality"),
-                    state: get("administrative_area_level_1"),
-                    postcode: get("postal_code"),
+                    street: address.street || prev.address.street,
+                    city: address.city || prev.address.city,
+                    country: address.country || prev.address.country,
+                    housenumber: address.housenumber || prev.address.housenumber,
+                    district: address.district || prev.address.district,
+                    state: address.state || prev.address.state,
+                    postcode: address.postcode || prev.address.postcode,
                 },
             }));
-        });
+        }
     }
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -208,8 +268,8 @@ export default function VenueSubmissionForm() {
 
     const handleReset = () => {
         setForm(EMPTY_FORM);
-        setValue("", false);
-        setValueVenue("", false);
+        setAddressValue("", false);
+        setVenueValue("", false);
         setSuggestedSubcategories([]);
         sessionStorage.removeItem(STORAGE_KEY);
         toast.success("Form reset");
@@ -224,7 +284,6 @@ export default function VenueSubmissionForm() {
 
     return (
         <>
-            <Script src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAP_API_KEY}&libraries=places`} strategy="beforeInteractive" />
             <Script src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`} strategy="afterInteractive" />
 
             {/* Hero Section */}
@@ -283,76 +342,40 @@ export default function VenueSubmissionForm() {
                                                 <div className="relative">
                                                     <input
                                                         placeholder={t('searchVenueName')}
-                                                        value={valueVenue || form.name}
+                                                        value={venueValue || form.name}
                                                         onChange={(e) => {
                                                             setForm(prev => ({ ...prev, name: e.target.value }));
-                                                            setValueVenue(e.target.value);
+                                                            setVenueValue(e.target.value);
                                                         }}
-                                                        disabled={!readyVenue}
                                                         autoComplete="off"
                                                         className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                                                     />
-                                                    <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                    </svg>
+                                                    {venueLoading ? (
+                                                        <svg className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                        </svg>
+                                                    )}
                                                 </div>
-                                                {statusVenue === "OK" && (
+                                                {venueSuggestions.length > 0 && (
                                                     <ul className="absolute z-50 w-full mt-1 bg-surface-light border border-border-light rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                                        {dataVenue.filter(item => item.types.includes("establishment")).map(({ place_id, description }) => (
+                                                        {venueSuggestions.map((suggestion) => (
                                                             <li
-                                                                key={place_id}
-                                                                onClick={() => {
-                                                                    clearSuggestionsVenue();
-                                                                    const service = new window.google.maps.places.PlacesService(document.createElement("div"));
-                                                                    service.getDetails({ placeId: place_id }, (place, status) => {
-                                                                        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-                                                                            const { geometry, address_components, name, website, formatted_phone_number } = place;
-                                                                            const get = (type: string): string => address_components?.find((c) => c.types.includes(type))?.long_name || "";
-                                                                            let category: PlaceCategory | "" = "";
-                                                                            let subcategory: (typeof PLACE_SUBTYPE_MAP)[PlaceCategory][number] | '' = "";
-                                                                            if (place.types) {
-                                                                                for (const currentType of place.types) {
-                                                                                    const match = matchPlaceSubcategory(currentType);
-                                                                                    if (match) {
-                                                                                        category = match.category as PlaceCategory;
-                                                                                        subcategory = match.subcategory;
-                                                                                        break;
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            setValue(place.formatted_address ?? '', false);
-                                                                            setValueVenue(name || description, false);
-                                                                            setForm((prev) => ({
-                                                                                ...prev,
-                                                                                placeId: place_id,
-                                                                                name: name || description,
-                                                                                lat: geometry?.location?.lat()?.toString() || "",
-                                                                                lon: geometry?.location?.lng()?.toString() || "",
-                                                                                category,
-                                                                                subcategory,
-                                                                                opening_hours: place.opening_hours?.periods ? stringifyOpeningHours(convertGooglePeriodsToDayHours(place.opening_hours.periods)) : "",
-                                                                                contact: { ...prev.contact, website: website || "", phone: formatted_phone_number || "" },
-                                                                                address: {
-                                                                                    street: get("route"),
-                                                                                    housenumber: get("street_number"),
-                                                                                    city: get("locality") || get("administrative_area_level_2"),
-                                                                                    district: get("sublocality"),
-                                                                                    state: get("administrative_area_level_1"),
-                                                                                    postcode: get("postal_code"),
-                                                                                    country: get("country"),
-                                                                                },
-                                                                            }));
-                                                                        }
-                                                                    });
-                                                                }}
+                                                                key={suggestion.id}
+                                                                onClick={() => handleSelectVenue(suggestion)}
                                                                 className="px-3 py-2.5 cursor-pointer hover:bg-surface text-sm text-white border-b border-border-light/50 last:border-b-0"
                                                             >
-                                                                {description}
+                                                                <div className="font-medium">{suggestion.name}</div>
+                                                                <div className="text-xs text-text-light mt-0.5">{suggestion.label}</div>
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 )}
-                                                <p className="text-xs text-text-light mt-1">Search to auto-fill or type manually</p>
+                                                <p className="text-xs text-text-light mt-1">Search existing venues or type a new name</p>
                                             </div>
 
                                             {/* Category */}
@@ -469,24 +492,30 @@ export default function VenueSubmissionForm() {
                                                 <label className="text-sm font-medium text-white block mb-1">{t('searchAddress')}</label>
                                                 <div className="relative">
                                                     <input
-                                                        value={value || addressFormatter.format({ ...form.address, country: findOne('countryCode', form.address.country)?.countryNameEn, countryCode: form.address.country }, { output: 'array' }).join(', ')}
+                                                        value={addressValue || addressFormatter.format({ ...form.address, country: findOne('countryCode', form.address.country)?.countryNameEn, countryCode: form.address.country }, { output: 'array' }).join(', ')}
                                                         onChange={(e) => {
                                                             setForm(prev => ({ ...prev, address: { street: e.target.value, housenumber: "", district: "", state: "", postcode: "", city: "", country: "" } }));
-                                                            setValue(e.target.value);
+                                                            setAddressValue(e.target.value);
                                                         }}
                                                         placeholder="Search address..."
-                                                        disabled={!ready}
                                                         className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                                                     />
-                                                    <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
+                                                    {addressLoading ? (
+                                                        <svg className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                    )}
                                                 </div>
-                                                {status === "OK" && (
+                                                {addressSuggestions.length > 0 && (
                                                     <ul ref={addressSelectorRef} className="absolute z-50 w-full mt-1 bg-surface-light border border-border-light rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                                        {data.map(({ place_id, description }) => (
-                                                            <li key={place_id} onClick={() => handleSelectAddress(description)} className="px-3 py-2.5 cursor-pointer hover:bg-surface text-sm text-white border-b border-border-light/50 last:border-b-0">{description}</li>
+                                                        {addressSuggestions.map((suggestion) => (
+                                                            <li key={suggestion.id} onClick={() => handleSelectAddress(suggestion)} className="px-3 py-2.5 cursor-pointer hover:bg-surface text-sm text-white border-b border-border-light/50 last:border-b-0">{suggestion.label}</li>
                                                         ))}
                                                     </ul>
                                                 )}
@@ -495,7 +524,7 @@ export default function VenueSubmissionForm() {
                                                 lat={form.lat}
                                                 lon={form.lon}
                                                 address={{ street: form.address.street, housenumber: form.address.housenumber, city: form.address.city, state: form.address.state, postcode: form.address.postcode, country: form.address.country }}
-                                                onMapMove={(lat, lon) => setForm(prev => ({ ...prev, lat: String(lat), lon: String(lon) }))}
+                                                onMapMove={handleMapMove}
                                                 onAddressChange={(field, val) => setForm(prev => ({ ...prev, address: { ...prev.address, [field]: val } }))}
                                                 showAllFields
                                             />
