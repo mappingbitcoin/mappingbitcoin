@@ -206,6 +206,20 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                         </p>
                                     </div>
                                 )}
+
+                                {(contact?.email) && (
+                                    <div className="flex justify-start gap-3 items-start flex-row">
+                                        <div className="w-6 h-6 rounded-full bg-surface-light flex items-center justify-center shrink-0 mt-0.5">
+                                            <svg className="w-3.5 h-3.5 text-text-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p className="mt-0.5">
+                                            <a href={`mailto:${contact.email}`} target="_blank"
+                                               rel="noreferrer" className="text-accent hover:text-accent/80 underline">{contact.email}</a>
+                                        </p>
+                                    </div>
+                                )}
                                 {(contact?.phone) && (
                                     <div className="flex justify-start gap-3 items-start flex-row">
                                         <div className="w-6 h-6 rounded-full bg-surface-light flex items-center justify-center shrink-0 mt-0.5">
