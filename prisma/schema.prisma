@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -123,4 +122,56 @@ model ReviewReply {
   @@index([reviewId])
   @@index([authorPubkey])
   @@map("review_replies")
+}
+
+// ============================================
+// Newsletter Subscription System
+// ============================================
+
+// Subscription lists (e.g., newsletter, updates, announcements)
+model SubscriptionList {
+  id          String   @id @default(cuid())
+  slug        String   @unique // e.g., "newsletter", "updates"
+  name        String   // Display name
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  subscribers SubscriberList[]
+
+  @@map("subscription_lists")
+}
+
+// Email subscribers
+model Subscriber {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  unsubscribeToken String    @unique @map("unsubscribe_token")
+  confirmedAt      DateTime? @map("confirmed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  lists SubscriberList[]
+
+  @@index([email])
+  @@index([unsubscribeToken])
+  @@map("subscribers")
+}
+
+// Many-to-many relation: subscribers to lists
+model SubscriberList {
+  id             String   @id @default(cuid())
+  subscriberId   String   @map("subscriber_id")
+  listId         String   @map("list_id")
+  subscribedAt   DateTime @default(now()) @map("subscribed_at")
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+
+  // Relations
+  subscriber Subscriber       @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  list       SubscriptionList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriberId, listId])
+  @@index([subscriberId])
+  @@index([listId])
+  @@map("subscriber_lists")
 }

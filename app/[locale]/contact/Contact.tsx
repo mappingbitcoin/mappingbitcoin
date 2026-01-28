@@ -1,9 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import emailjs from "@emailjs/browser";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { PageSection } from "@/components/layout";
+
+declare global {
+    interface Window {
+        grecaptcha: {
+            ready: (callback: () => void) => void;
+            execute: (siteKey: string, options: { action: string }) => Promise<string>;
+        };
+    }
+}
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 const ContactCard = ({
     icon,
@@ -41,7 +51,54 @@ const Contact: React.FC = () => {
         email: "",
         message: "",
     });
-    const [status, setStatus] = useState("idle");
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "rate-limited">("idle");
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+
+    // Load reCAPTCHA script
+    useEffect(() => {
+        if (!RECAPTCHA_SITE_KEY) {
+            console.warn("reCAPTCHA site key not configured");
+            return;
+        }
+
+        // Check if script already exists
+        if (document.querySelector(`script[src*="recaptcha"]`)) {
+            setRecaptchaLoaded(true);
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => setRecaptchaLoaded(true);
+        document.head.appendChild(script);
+
+        return () => {
+            // Cleanup on unmount (optional, usually not needed)
+        };
+    }, []);
+
+    const getRecaptchaToken = useCallback(async (): Promise<string | null> => {
+        if (!RECAPTCHA_SITE_KEY || !recaptchaLoaded) {
+            return null;
+        }
+
+        return new Promise((resolve) => {
+            window.grecaptcha.ready(async () => {
+                try {
+                    const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {
+                        action: "contact_form",
+                    });
+                    resolve(token);
+                } catch (error) {
+                    console.error("reCAPTCHA error:", error);
+                    resolve(null);
+                }
+            });
+        });
+    }, [recaptchaLoaded]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,23 +107,52 @@ const Contact: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setStatus("loading");
+        setErrorMessage("");
 
         try {
-            await emailjs.send(
-                process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-                process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-                {
-                    from_name: formData.name,
-                    from_email: formData.email,
-                    message: formData.message,
+            // Get reCAPTCHA token
+            const recaptchaToken = await getRecaptchaToken();
+
+            if (!recaptchaToken && RECAPTCHA_SITE_KEY) {
+                setStatus("error");
+                setErrorMessage(t("form.recaptchaError"));
+                return;
+            }
+
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-                process.env.NEXT_PUBLIC_EMAILJS_USER_ID!
-            );
+                body: JSON.stringify({
+                    ...formData,
+                    recaptchaToken,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 429) {
+                    setStatus("rate-limited");
+                    setErrorMessage(
+                        data.resetIn
+                            ? t("form.rateLimitedMessage", { minutes: data.resetIn })
+                            : t("form.rateLimitedGeneric")
+                    );
+                } else {
+                    setStatus("error");
+                    setErrorMessage(data.error || t("form.errorMessage"));
+                }
+                return;
+            }
+
             setStatus("success");
             setFormData({ name: "", email: "", message: "" });
         } catch (error) {
-            console.error("Error sending email: ", error);
+            console.error("Error sending message:", error);
             setStatus("error");
+            setErrorMessage(t("form.errorMessage"));
         }
     };
 
@@ -134,11 +220,14 @@ const Contact: React.FC = () => {
                                 {t("form.successMessage")}
                             </div>
                         )}
-                        {status === "error" && (
+                        {(status === "error" || status === "rate-limited") && (
                             <div className="bg-red-500/10 text-red-400 text-sm p-3 rounded-btn text-center border border-red-500/20">
-                                {t("form.errorMessage")}
+                                {errorMessage || t("form.errorMessage")}
                             </div>
                         )}
+                        <p className="text-xs text-text-light text-center mt-2">
+                            {t("form.recaptchaNotice")}
+                        </p>
                     </form>
                 </div>
 

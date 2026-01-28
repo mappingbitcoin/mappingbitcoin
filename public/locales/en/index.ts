@@ -6,6 +6,7 @@ import countries from './countries.json';
 import common from './common.json';
 import lessons from './lessons.json';
 import login from './login.json';
+import unsubscribe from './unsubscribe.json';
 
 const messages = {
     // Spread common keys at root level (menu, footer, subscribe, etc.)
@@ -15,6 +16,7 @@ const messages = {
     contact,
     map,
     login,
+    unsubscribe,
     // Places module - also keep 'venues' key for backward compatibility
     places,
     venues: {
