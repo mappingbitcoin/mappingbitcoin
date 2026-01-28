@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactFormLimiter } from "@/lib/rate-limiter";
+import { createContactNotificationEmail } from "@/lib/email/templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -128,60 +129,20 @@ export async function POST(request: NextRequest) {
         const sanitizedMessage = sanitizeInput(message);
 
         // Send email via Resend
+        const contactEmail = createContactNotificationEmail(
+            sanitizedName,
+            email,
+            sanitizedMessage,
+            { ip: clientIp, recaptchaScore: recaptchaResult.score }
+        );
+
         const { error } = await resend.emails.send({
             from: "Mapping Bitcoin Contact <contact@mappingbitcoin.com>",
             to: ["satoshi@mappingbitcoin.com"],
             replyTo: email,
             subject: `Contact Form: ${sanitizedName}`,
-            text: `
-Name: ${sanitizedName}
-Email: ${email}
-IP: ${clientIp}
-reCAPTCHA Score: ${recaptchaResult.score ?? "N/A"}
-
-Message:
-${sanitizedMessage}
-            `.trim(),
-            html: `
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #f7931a; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-        .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
-        .field { margin-bottom: 15px; }
-        .label { font-weight: bold; color: #666; }
-        .message { background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #f7931a; margin-top: 10px; }
-        .meta { font-size: 12px; color: #999; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2 style="margin: 0;">New Contact Form Submission</h2>
-        </div>
-        <div class="content">
-            <div class="field">
-                <span class="label">Name:</span> ${sanitizedName}
-            </div>
-            <div class="field">
-                <span class="label">Email:</span> <a href="mailto:${email}">${email}</a>
-            </div>
-            <div class="field">
-                <span class="label">Message:</span>
-                <div class="message">${sanitizedMessage.replace(/\n/g, "<br>")}</div>
-            </div>
-            <div class="meta">
-                IP Address: ${clientIp}<br>
-                reCAPTCHA Score: ${recaptchaResult.score ?? "N/A"}
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-            `.trim(),
+            text: contactEmail.text,
+            html: contactEmail.html,
         });
 
         if (error) {

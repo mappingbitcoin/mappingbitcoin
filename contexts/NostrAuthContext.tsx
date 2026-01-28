@@ -14,16 +14,20 @@ interface NostrAuthContextType {
     user: NostrUser | null;
     isLoading: boolean;
     error: string | null;
+    authToken: string | null;
+    isAuthenticated: boolean;
     loginWithKey: (key: string) => Promise<void>;
     loginWithExtension: () => Promise<void>;
     loginWithBunker: (bunkerUrl: string) => Promise<void>;
     logout: () => void;
     clearError: () => void;
+    authenticate: () => Promise<string>;
 }
 
 const NostrAuthContext = createContext<NostrAuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = "nostr_auth";
+const AUTH_TOKEN_KEY = "nostr_auth_token";
 
 // Helper to decode bech32 (nsec/npub) to hex
 function bech32ToHex(bech32: string): { type: "nsec" | "npub"; hex: string } | null {
@@ -149,14 +153,29 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<NostrUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [authToken, setAuthToken] = useState<string | null>(null);
 
-    // Load user from storage on mount
+    // Load user and auth token from storage on mount
     useEffect(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 const parsed = JSON.parse(stored);
                 setUser(parsed);
+            }
+            const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+            if (storedToken) {
+                // Check if token is expired by decoding JWT
+                try {
+                    const payload = JSON.parse(atob(storedToken.split(".")[1]));
+                    if (payload.exp * 1000 > Date.now()) {
+                        setAuthToken(storedToken);
+                    } else {
+                        localStorage.removeItem(AUTH_TOKEN_KEY);
+                    }
+                } catch {
+                    localStorage.removeItem(AUTH_TOKEN_KEY);
+                }
             }
         } catch (e) {
             console.error("Failed to load auth state:", e);
@@ -281,14 +300,93 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
 
     const logout = useCallback(() => {
         setUser(null);
+        setAuthToken(null);
         sessionStorage.removeItem("nostr_privkey");
         sessionStorage.removeItem("nostr_bunker");
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
     }, []);
 
     const clearError = useCallback(() => {
         setError(null);
     }, []);
+
+    // Authenticate: perform challenge-response flow to get JWT
+    const authenticate = useCallback(async (): Promise<string> => {
+        if (!user) {
+            throw new Error("Must be logged in to authenticate");
+        }
+
+        if (user.mode !== "write") {
+            throw new Error("Write mode required for authentication");
+        }
+
+        // Check if we already have a valid token
+        if (authToken) {
+            try {
+                const payload = JSON.parse(atob(authToken.split(".")[1]));
+                if (payload.exp * 1000 > Date.now()) {
+                    return authToken;
+                }
+            } catch {
+                // Token invalid, continue to get new one
+            }
+        }
+
+        // Request challenge
+        const challengeRes = await fetch("/api/auth/nostr/challenge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pubkey: user.pubkey }),
+        });
+
+        if (!challengeRes.ok) {
+            const error = await challengeRes.json();
+            throw new Error(error.error || "Failed to get challenge");
+        }
+
+        const { challenge } = await challengeRes.json();
+
+        // Sign the challenge based on auth method
+        let signature: string;
+        const { signChallenge } = await import("@/lib/nostr/auth");
+
+        if (user.method === "nsec") {
+            signature = await signChallenge(challenge, "nsec");
+        } else if (user.method === "extension") {
+            signature = await signChallenge(challenge, "extension");
+        } else if (user.method === "bunker") {
+            signature = await signChallenge(challenge, "bunker");
+        } else {
+            throw new Error("Cannot authenticate with read-only access");
+        }
+
+        // Verify signature and get token
+        const verifyRes = await fetch("/api/auth/nostr/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                pubkey: user.pubkey,
+                challenge,
+                signature,
+            }),
+        });
+
+        if (!verifyRes.ok) {
+            const error = await verifyRes.json();
+            throw new Error(error.error || "Authentication failed");
+        }
+
+        const { token } = await verifyRes.json();
+
+        // Store token
+        setAuthToken(token);
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+
+        return token;
+    }, [user, authToken]);
+
+    const isAuthenticated = authToken !== null;
 
     return (
         <NostrAuthContext.Provider
@@ -296,11 +394,14 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
                 user,
                 isLoading,
                 error,
+                authToken,
+                isAuthenticated,
                 loginWithKey,
                 loginWithExtension,
                 loginWithBunker,
                 logout,
                 clearError,
+                authenticate,
             }}
         >
             {children}

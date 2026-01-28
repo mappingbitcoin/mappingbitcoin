@@ -660,10 +660,10 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                 </Link>
                             </div>
 
-                            {/* Newsletter */}
-                            <NewsletterCTA />
                         </div>
                     </div>
+                    {/* Newsletter */}
+                    <NewsletterCTA />
                 </div>
             </div>
         </section>
