@@ -12,6 +12,7 @@ import { uploadToSpaces, downloadFromSpaces } from "@/utils/DigitalOceanSpacesHe
 import { City } from "@/models/City";
 import KDBush from "kdbush";
 import { around } from "geokdbush";
+import { assignSlugToVenue } from "@/utils/sync/slugs/VenueSlugs";
 
 const ENRICHED_FILE = path.resolve("data", "EnrichedVenues.json");
 const FALLBACK_FILE = path.resolve("data", "BitcoinVenues.json");
@@ -116,6 +117,7 @@ export async function enrichGeoData() {
     const cities = await getCitiesCache();
     const findNearestCity = buildNearestCityFinder(cities);
     const _venueIndexMap: Record<string, number> = {};
+    const existingSlugs = new Set<string>();
 
     let fromFallback = false;
 
@@ -137,7 +139,10 @@ export async function enrichGeoData() {
         venues = JSON.parse(raw);
     }
 
-    venues.forEach((v, i) => _venueIndexMap[v.id] = i);
+    venues.forEach((v, i) => {
+        _venueIndexMap[v.id] = i;
+        if (v.slug) existingSlugs.add(v.slug);
+    });
     const logs: string[] = [];
     let enrichedCount = 0;
 
@@ -146,8 +151,9 @@ export async function enrichGeoData() {
         for (const v of venues) {
             const enriched = await enrichVenue(v, venues, _venueIndexMap, findNearestCity);
             if (enriched) {
+                assignSlugToVenue(enriched, existingSlugs);
                 byId.set(v.id, enriched);
-                logs.push(`✅ Enriched ${v.id} — ${enriched.city}, ${enriched.state}, ${enriched.country}`);
+                logs.push(`✅ Enriched ${v.id} — ${enriched.city}, ${enriched.state}, ${enriched.country} [slug: ${enriched.slug}]`);
                 enrichedCount++;
             }
         }
@@ -172,8 +178,9 @@ export async function enrichGeoData() {
         for (const queued of queue) {
             const enriched = await enrichVenue(queued, venues, _venueIndexMap, findNearestCity, byId.get(queued.id));
             if (enriched) {
+                assignSlugToVenue(enriched, existingSlugs);
                 byId.set(queued.id, enriched);
-                logs.push(`✅ Enriched ${queued.id} — ${enriched.city}, ${enriched.state}, ${enriched.country}`);
+                logs.push(`✅ Enriched ${queued.id} — ${enriched.city}, ${enriched.state}, ${enriched.country} [slug: ${enriched.slug}]`);
                 enrichedCount++;
                 enrichedInFile++;
             }

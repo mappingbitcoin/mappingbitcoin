@@ -227,7 +227,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                         <div className="relative w-[320px] max-md:w-full shrink-0 space-y-3">
                             {/* Map - Clickable to open full map */}
                             <Link
-                                href={`/map?lat=${venue.lat}&lon=${venue.lon}&zoom=16&venue=${venue.id}`}
+                                href={`/map?lat=${venue.lat}&lon=${venue.lon}&zoom=16&venue=${venue.slug || venue.id}`}
                                 className="relative block group"
                             >
                                 <div className="relative overflow-hidden rounded-card shadow-medium h-[160px]">
@@ -612,7 +612,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                             <div className="bg-surface rounded-card border border-border-light p-4 text-center">
                                 <p className="text-xs text-text-light mb-2">See something wrong?</p>
                                 <Link
-                                    href={`/places/${venue.id}/edit`}
+                                    href={`/places/${venue.slug || venue.id}/edit`}
                                     className="text-sm text-accent hover:text-accent-dark no-underline"
                                 >
                                     Suggest an edit →

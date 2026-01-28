@@ -741,7 +741,7 @@ export default function VenueRegionPage({ venues, city, country, categoryAndSubc
                                                     onMouseLeave={() => setHoveredVenueId(null)}
                                                 >
                                                 <Link
-                                                    href={`/places/${venue.id}`}
+                                                    href={`/places/${venue.slug || venue.id}`}
                                                     className="relative grid grid-cols-[1fr_auto] gap-2 md:gap-3 items-center bg-surface rounded-btn border border-border-light transition-all duration-200 py-2 px-3 text-inherit no-underline hover:border-accent/50 hover:bg-surface-light"
                                                 >
                                                     {/* Name, Category & Address Column */}

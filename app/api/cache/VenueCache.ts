@@ -5,6 +5,7 @@ import {tokenizeAndNormalize} from "@/utils/StringUtils";
 
 let _venueCache: EnrichedVenue[] | null = null;
 let _venueIndexMap: Record<number, number> | null = null;
+let _venueSlugIndexMap: Record<string, number> | null = null;
 let _venueSearchIndexMap: Record<number, string[]> | null = null;
 
 export async function getVenueCache(): Promise<EnrichedVenue[]> {
@@ -16,12 +17,17 @@ export async function getVenueCache(): Promise<EnrichedVenue[]> {
 
     _venueCache = venues;
     _venueIndexMap = {};
+    _venueSlugIndexMap = {};
     _venueSearchIndexMap = {};
 
     for (let i = 0; i < venues.length; i++) {
         const v = venues[i]
 
         _venueIndexMap[v.id] = i;
+
+        if (v.slug) {
+            _venueSlugIndexMap[v.slug] = i;
+        }
 
         if (!v?.tags?.name || v?.tags?.name === '') {
             continue;
@@ -42,6 +48,12 @@ export async function getVenueIndexMap(): Promise<Record<number, number>> {
     return _venueIndexMap!;
 }
 
+export async function getVenueSlugIndexMap(): Promise<Record<string, number>> {
+    if (_venueSlugIndexMap) return _venueSlugIndexMap;
+    await getVenueCache(); // populates _venueSlugIndexMap
+    return _venueSlugIndexMap!;
+}
+
 export async function getVenueSearchIndexMap(): Promise<Record<number, string[]>> {
     if (_venueSearchIndexMap) return _venueSearchIndexMap;
     await getVenueCache(); // populates both _venueCache and _venueIndexMap
@@ -51,6 +63,7 @@ export async function getVenueSearchIndexMap(): Promise<Record<number, string[]>
 export async function refreshVenueCache(): Promise<void> {
     _venueCache = null;
     _venueIndexMap = null;
+    _venueSlugIndexMap = null;
     _venueSearchIndexMap = null;
     await getVenueCache();
 }

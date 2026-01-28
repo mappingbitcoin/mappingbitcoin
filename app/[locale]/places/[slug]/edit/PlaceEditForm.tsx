@@ -106,7 +106,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
         try {
             const token = await grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: "submit" });
 
-            const res = await fetch(`/api/places/${venue.id}`, {
+            const res = await fetch(`/api/places/${venue.slug || venue.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ venue: form, captcha: token }),
@@ -115,7 +115,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
             const json = await res.json();
             if (res.ok && json.ok) {
                 toast.success("Changes submitted to OpenStreetMap!");
-                router.push(`/places/${venue.id}`);
+                router.push(`/places/${venue.slug || venue.id}`);
             } else {
                 toast.error(json.error || "Failed to submit changes");
             }
@@ -144,7 +144,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
                                 <Link href="/countries">Countries</Link>
                             </li>
                             <li>
-                                <Link href={`/places/${venue.id}`}>{venueName}</Link>
+                                <Link href={`/places/${venue.slug || venue.id}`}>{venueName}</Link>
                             </li>
                             <li>
                                 <span>Edit</span>
@@ -328,7 +328,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Link
-                                            href={`/places/${venue.id}`}
+                                            href={`/places/${venue.slug || venue.id}`}
                                             className="px-5 py-2.5 text-sm font-medium text-text-light hover:text-white transition-colors no-underline"
                                         >
                                             Cancel

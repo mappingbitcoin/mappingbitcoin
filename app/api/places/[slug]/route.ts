@@ -1,6 +1,6 @@
 import { buildResponse, successObjectResponse } from '@/utils/ApiUtils';
 import { NextResponse, type NextRequest } from 'next/server'
-import {getVenueCache, getVenueIndexMap} from "@/app/api/cache/VenueCache";
+import {getVenueCache, getVenueIndexMap, getVenueSlugIndexMap} from "@/app/api/cache/VenueCache";
 import {parseStringPromise} from "xml2js";
 import {findNearestCity} from "@/app/api/cache/CitiesCache";
 import {TAG_CATEGORY_MAP} from "@/constants/PlaceOsmDictionary";
@@ -15,16 +15,19 @@ import {
     closeOsmChangeset
 } from "@/utils/OsmHelpers";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: number }> }) {
-    const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const searchParams = request.nextUrl.searchParams
     const preview = searchParams.get('preview')
 
-    if (!id) return buildResponse('Missing venue ID', 400);
+    if (!slug) return buildResponse('Missing venue slug or ID', 400);
 
     if (preview === "true") {
+        // Preview mode uses changeset ID (numeric)
+        const changesetId = parseInt(slug, 10);
+        if (isNaN(changesetId)) return buildResponse('Invalid changeset ID for preview', 400);
         try {
-            const venue = await fetchVenueFromChangeset(id);
+            const venue = await fetchVenueFromChangeset(changesetId);
             if (!venue) return buildResponse("Preview venue not found", 404);
             return successObjectResponse(venue);
         } catch {
@@ -33,12 +36,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const venues = await getVenueCache();
-    const venueIndexMap = await getVenueIndexMap()
-    const venueId = venueIndexMap[id];
+    const slugIndexMap = await getVenueSlugIndexMap();
+    const idIndexMap = await getVenueIndexMap();
 
-    if (!venueId && venueId !== 0) return buildResponse("Venue not found", 404);
+    // Try to find by slug first
+    let venueIndex = slugIndexMap[slug];
 
-    return successObjectResponse(venues[venueId]);
+    // If not found by slug, try to find by ID (for backwards compatibility)
+    if (venueIndex === undefined) {
+        const numericId = parseInt(slug, 10);
+        if (!isNaN(numericId)) {
+            venueIndex = idIndexMap[numericId];
+        }
+    }
+
+    if (venueIndex === undefined) return buildResponse("Venue not found", 404);
+
+    return successObjectResponse(venues[venueIndex]);
 }
 
 async function fetchVenueFromChangeset(changesetId: number) {
@@ -93,11 +107,29 @@ async function fetchVenueFromChangeset(changesetId: number) {
     };
 }
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: number }> }) {
-    const { id } = await params;
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const { venue, captcha } = await request.json();
 
-    if (!id) return buildResponse('Missing venue ID', 400);
+    if (!slug) return buildResponse('Missing venue slug or ID', 400);
+
+    // Find the venue to get the OSM node ID
+    const venues = await getVenueCache();
+    const slugIndexMap = await getVenueSlugIndexMap();
+    const idIndexMap = await getVenueIndexMap();
+
+    let venueIndex = slugIndexMap[slug];
+    if (venueIndex === undefined) {
+        const numericId = parseInt(slug, 10);
+        if (!isNaN(numericId)) {
+            venueIndex = idIndexMap[numericId];
+        }
+    }
+
+    if (venueIndex === undefined) return buildResponse("Venue not found", 404);
+
+    const existingVenue = venues[venueIndex];
+    const osmNodeId = existingVenue.id;
 
     // 1. Check if user is logged in via OSM
     const user = await getSession();
@@ -125,7 +157,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     try {
         // 3. Fetch current node from OSM to get version
-        const currentNode = await fetchOsmNode(Number(id));
+        const currentNode = await fetchOsmNode(osmNodeId);
 
         // 4. Build new tags from form
         const newTags = buildTagsFromForm(venue);
@@ -135,7 +167,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         // 6. Build modify XML
         const xml = buildOsmModifyXML(
-            Number(id),
+            osmNodeId,
             currentNode.version,
             venue.lat || currentNode.lat,
             venue.lon || currentNode.lon,
@@ -147,7 +179,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         await uploadOsmNode(changesetId, xml, token);
         await closeOsmChangeset(changesetId, token);
 
-        return NextResponse.json({ ok: true, changesetId, nodeId: id });
+        return NextResponse.json({ ok: true, changesetId, nodeId: osmNodeId, slug: existingVenue.slug });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         return NextResponse.json({ error: "Failed to update venue on OSM: " + message }, { status: 500 });

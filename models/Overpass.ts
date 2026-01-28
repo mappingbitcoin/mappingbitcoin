@@ -44,6 +44,9 @@ export type EnrichedVenue<T extends PlaceCategory = PlaceCategory> = OverpassEle
     lon: number;
     tags: Record<string, string>;
 
+    // Venue slug for URL
+    slug?: string;
+
     // Geolocation enrichment
     country: string;
     state?: string;
