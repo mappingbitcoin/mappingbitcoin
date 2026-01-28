@@ -467,7 +467,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
         if (!map) return;
 
-        if (map.getSource('clusters')) {
+        if (map.getSource('clusters') && map.getLayer('venue-icons') && map.getLayer('cluster-circles')) {
             setMapReady(true)
             return;
         }
@@ -593,6 +593,9 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         if (!map) return;
 
         const getProps = (e: MapMouseEvent) => {
+            if (!map.getLayer('venue-icons') || !map.getLayer('cluster-circles')) {
+                return;
+            }
             const features = map.queryRenderedFeatures(e.point, {
                 layers: ['venue-icons', 'cluster-circles'],
             });

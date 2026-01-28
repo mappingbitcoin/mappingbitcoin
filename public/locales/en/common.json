@@ -10,7 +10,8 @@
     "login": "Log In",
     "logout": "Log Out",
     "signedInAs": "Signed in as",
-    "readOnly": "Read-only"
+    "readOnly": "Read-only",
+    "myVerifications": "My Verifications"
   },
   "footer": {
     "allRightsReserved": "All Rights Reserved.",

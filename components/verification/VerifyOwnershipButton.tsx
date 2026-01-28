@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { EnrichedVenue } from "@/models/Overpass";
 import VerifyOwnershipModal from "./VerifyOwnershipModal";
@@ -28,11 +28,19 @@ export default function VerifyOwnershipButton({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [status, setStatus] = useState<VerificationStatus | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const lastFetchedId = useRef<string | null>(null);
 
     useEffect(() => {
+        const osmId = `${venue.type}/${venue.id}`;
+
+        // Skip if we already fetched for this venue
+        if (lastFetchedId.current === osmId) {
+            return;
+        }
+
         const checkStatus = async () => {
+            lastFetchedId.current = osmId;
             try {
-                const osmId = `${venue.type}/${venue.id}`;
                 const response = await fetch(`/api/verify/status?osmId=${encodeURIComponent(osmId)}`);
                 if (response.ok) {
                     const data = await response.json();

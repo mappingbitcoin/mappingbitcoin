@@ -59,6 +59,13 @@ model Claim {
   revokedAt            DateTime?   @map("revoked_at")
   revokedReason        String?     @map("revoked_reason") // e.g., "email_changed"
 
+  // Domain verification fields
+  domainToVerify       String?     @map("domain_to_verify") // e.g., "example.com"
+  txtRecordValue       String?     @map("txt_record_value") // e.g., "mappingbitcoin-verify=abc123"
+  lastCheckAt          DateTime?   @map("last_check_at") // Last manual check timestamp
+  nextCheckAt          DateTime?   @map("next_check_at") // When next check is allowed (rate limiting)
+  checkCount           Int         @default(0) @map("check_count") // Number of checks performed
+
   // Relations
   venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
   claimer User  @relation(fields: [claimerPubkey], references: [pubkey], onDelete: Cascade)

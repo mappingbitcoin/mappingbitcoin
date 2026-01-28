@@ -16,7 +16,8 @@ interface VerifyOwnershipModalProps {
     osmEmail?: string;
 }
 
-export type VerificationState = "login" | "verifying" | "code" | "success" | "error";
+export type VerificationState = "login" | "method-select" | "verifying" | "code" | "domain-pending" | "success" | "error";
+export type VerificationMethod = "email" | "domain";
 
 export default function VerifyOwnershipModal({
     isOpen,
@@ -27,27 +28,63 @@ export default function VerifyOwnershipModal({
 }: VerifyOwnershipModalProps) {
     const { user } = useNostrAuth();
     const [step, setStep] = useState<VerificationState>("login");
+    const [method, setMethod] = useState<VerificationMethod | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Check if venue has email and/or website for verification options
+    const hasEmail = !!osmEmail;
+    const hasWebsite = !!venue.tags?.website || !!venue.tags?.['contact:website'];
 
     // Reset state when modal opens
     useEffect(() => {
         if (isOpen) {
-            setStep(user ? "verifying" : "login");
+            // If only one method available, skip method selection
+            if (user) {
+                if (hasEmail && !hasWebsite) {
+                    setMethod("email");
+                    setStep("verifying");
+                } else if (!hasEmail && hasWebsite) {
+                    setMethod("domain");
+                    setStep("verifying");
+                } else if (hasEmail || hasWebsite) {
+                    setStep("method-select");
+                } else {
+                    setStep("verifying"); // Will show error in VerificationStep
+                }
+            } else {
+                setStep("login");
+            }
             setError(null);
         }
-    }, [isOpen, user]);
+    }, [isOpen, user, hasEmail, hasWebsite]);
 
     // Update step when user logs in
     useEffect(() => {
         if (user && step === "login") {
-            setStep("verifying");
+            if (hasEmail && !hasWebsite) {
+                setMethod("email");
+                setStep("verifying");
+            } else if (!hasEmail && hasWebsite) {
+                setMethod("domain");
+                setStep("verifying");
+            } else if (hasEmail || hasWebsite) {
+                setStep("method-select");
+            } else {
+                setStep("verifying");
+            }
         }
-    }, [user, step]);
+    }, [user, step, hasEmail, hasWebsite]);
 
     const handleClose = () => {
-        setStep(user ? "verifying" : "login");
+        setStep(user ? "method-select" : "login");
+        setMethod(null);
         setError(null);
         onClose();
+    };
+
+    const handleSelectMethod = (selectedMethod: VerificationMethod) => {
+        setMethod(selectedMethod);
+        setStep("verifying");
     };
 
     return (
@@ -70,7 +107,7 @@ export default function VerifyOwnershipModal({
                 <div className="flex items-center gap-2 mb-6">
                     <StepIndicator number={1} label="Login" active={step === "login"} completed={!!user} />
                     <div className="flex-1 h-px bg-border-light" />
-                    <StepIndicator number={2} label="Verify" active={step === "verifying" || step === "code"} completed={step === "success"} />
+                    <StepIndicator number={2} label="Verify" active={step === "method-select" || step === "verifying" || step === "code" || step === "domain-pending"} completed={step === "success"} />
                     <div className="flex-1 h-px bg-border-light" />
                     <StepIndicator number={3} label="Done" active={step === "success"} completed={step === "success"} />
                 </div>
@@ -95,12 +132,67 @@ export default function VerifyOwnershipModal({
                         <LoginStep key="login" onError={setError} />
                     )}
 
-                    {(step === "verifying" || step === "code" || step === "success" || step === "error") && user && (
+                    {step === "method-select" && user && (
+                        <motion.div
+                            key="method-select"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="space-y-4"
+                        >
+                            <p className="text-text-light text-sm text-center mb-4">
+                                Choose how you want to verify ownership of this venue:
+                            </p>
+
+                            <div className="space-y-3">
+                                {hasEmail && (
+                                    <button
+                                        onClick={() => handleSelectMethod("email")}
+                                        className="w-full p-4 bg-surface-light hover:bg-surface-light/80 border border-border-light hover:border-accent/50 rounded-lg transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-white font-medium group-hover:text-accent transition-colors">Email Verification</h3>
+                                                <p className="text-text-light text-sm">Receive a code at the registered email</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                )}
+
+                                {hasWebsite && (
+                                    <button
+                                        onClick={() => handleSelectMethod("domain")}
+                                        className="w-full p-4 bg-surface-light hover:bg-surface-light/80 border border-border-light hover:border-accent/50 rounded-lg transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-white font-medium group-hover:text-blue-400 transition-colors">Domain TXT Record</h3>
+                                                <p className="text-text-light text-sm">Add a DNS TXT record to your domain</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {(step === "verifying" || step === "code" || step === "domain-pending" || step === "success" || step === "error") && user && method && (
                         <VerificationStep
                             key="verification"
                             venue={venue}
                             venueName={venueName}
                             osmEmail={osmEmail}
+                            method={method}
                             step={step}
                             setStep={setStep}
                             onError={setError}

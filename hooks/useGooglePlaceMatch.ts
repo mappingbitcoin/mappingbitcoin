@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {EnrichedVenue} from "@/models/Overpass";
 
 
@@ -7,21 +7,25 @@ export function useGooglePlaceMatch(venue: EnrichedVenue | null) {
     const [place, setPlace] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const lastFetchedId = useRef<number | null>(null);
 
     useEffect(() => {
-        setPlace(null)
-        if (!venue?.tags?.name || !venue?.lat || !venue?.lon) return;
+        if (!venue?.id || !venue?.tags?.name || !venue?.lat || !venue?.lon) {
+            setPlace(null);
+            return;
+        }
+
+        // Skip if we already fetched for this venue
+        if (lastFetchedId.current === venue.id) {
+            return;
+        }
 
         const fetchMatchAndReviews = async () => {
+            lastFetchedId.current = venue.id;
             setLoading(true);
             setError(null);
 
             try {
-                if (!venue.tags.name || !venue?.lat || !venue?.lon) {
-                    setPlace(null);
-                    return;
-                }
-
                 const placeId = venue.tags['google:place_id'] ?? venue.placeId
 
                 const response = await fetch(`/api/map/places?id=${venue.id}&placeId=${placeId}&name=${encodeURIComponent(venue.tags.name)}&lat=${venue.lat}&lon=${venue.lon}&country=${venue.country}`);
@@ -41,7 +45,7 @@ export function useGooglePlaceMatch(venue: EnrichedVenue | null) {
         };
 
         fetchMatchAndReviews();
-    }, [venue]);
+    }, [venue?.id, venue?.tags, venue?.lat, venue?.lon, venue?.placeId, venue?.country]);
 
     return { place, loading, error };
 }
