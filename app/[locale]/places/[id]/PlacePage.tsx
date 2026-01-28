@@ -9,6 +9,7 @@ import Image from "next/image";
 import {EnrichedVenue, GoogleReview} from "@/models/Overpass";
 import {parseTags, formatOpeningHours} from "@/utils/OsmHelpers";
 import {Link} from '@/i18n/navigation';
+import { NewsletterCTA } from "@/components/common";
 import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug} from "@/utils/SlugUtils";
 import {deslugify} from "@/utils/StringUtils";
 import {getSubcategoryLabel, PLACE_CATEGORIES} from "@/constants/PlaceCategories";
@@ -658,6 +659,9 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                     Suggest an edit →
                                 </Link>
                             </div>
+
+                            {/* Newsletter */}
+                            <NewsletterCTA />
                         </div>
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import { Locale } from "@/i18n/types"
 import { getContinentName } from '@brixtol/country-continent';
 import { getLocalizedCountryName } from "@/utils/CountryUtils";
 import { Place } from "@/models/Place";
-import { FAQSection } from "@/components/common";
+import { FAQSection, NewsletterCTA } from "@/components/common";
 import Image from 'next/image'
 
 interface RegionData {
@@ -131,6 +131,9 @@ export default function CountriesPage({ countries }: { countries: Record<string,
                         substitutions={{}}
                     />
                 </div>
+
+                {/* Newsletter */}
+                <NewsletterCTA />
             </div>
         </section>
     )

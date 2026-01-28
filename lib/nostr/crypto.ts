@@ -1,6 +1,7 @@
 import * as secp256k1 from "@noble/secp256k1";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
+import * as nip44 from "nostr-tools/nip44";
 
 // Generate a random 32-byte private key
 export function generatePrivateKey(): string {
@@ -142,14 +143,75 @@ export async function nip04Encrypt(
     return `${encryptedBase64}?iv=${ivBase64}`;
 }
 
-// NIP-04 decryption
-export async function nip04Decrypt(
+// NIP-44 decryption using nostr-tools (proven implementation)
+function nip44DecryptMessage(
+    privateKey: string,
+    senderPubkey: string,
+    ciphertext: string
+): string {
+    try {
+    const conversationKey = nip44.v2.utils.getConversationKey(
+        hexToBytes(privateKey),
+        senderPubkey
+    );
+    return nip44.v2.decrypt(ciphertext, conversationKey);
+    } catch (e) {
+        console.error('[nip44DecryptMessage]', e)
+        throw e;
+    }
+}
+
+// NIP-04 decryption (legacy format)
+async function nip04DecryptOnly(
     privateKey: string,
     senderPubkey: string,
     ciphertext: string
 ): Promise<string> {
-    const [encryptedBase64, ivPart] = ciphertext.split("?iv=");
-    const ivBase64 = ivPart || "";
+    // Check if crypto.subtle is available (not available in SSR or non-secure contexts)
+    if (typeof crypto === "undefined" || !crypto.subtle) {
+        throw new Error("WebCrypto not available in this context");
+    }
+
+    let encryptedBytes: Uint8Array | undefined;
+    let ivBytes: Uint8Array | undefined;
+
+    // Try different IV separator formats used by various signers
+    if (ciphertext.includes("?iv=")) {
+        const [encryptedBase64, ivBase64] = ciphertext.split("?iv=");
+        encryptedBytes = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+        ivBytes = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+    } else if (ciphertext.includes("&iv=")) {
+        const [encryptedBase64, ivBase64] = ciphertext.split("&iv=");
+        encryptedBytes = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+        ivBytes = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+    } else if (ciphertext.includes("_iv=")) {
+        const [encryptedBase64, ivBase64] = ciphertext.split("_iv=");
+        encryptedBytes = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+        ivBytes = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+    } else {
+        // Try to parse as JSON format: {"ciphertext": "...", "iv": "..."}
+        try {
+            const json = JSON.parse(ciphertext);
+            if (json.ciphertext && json.iv) {
+                encryptedBytes = Uint8Array.from(atob(json.ciphertext), c => c.charCodeAt(0));
+                ivBytes = Uint8Array.from(atob(json.iv), c => c.charCodeAt(0));
+            }
+        } catch {
+            // Not JSON, continue to next format
+        }
+
+        if (!encryptedBytes || !ivBytes) {
+            throw new Error(`Invalid NIP-04 ciphertext format: no IV separator found`);
+        }
+    }
+
+    if (!ivBytes || ivBytes.length !== 16) {
+        throw new Error(`Invalid IV length: expected 16 bytes, got ${ivBytes?.length ?? 0} bytes`);
+    }
+
+    if (!encryptedBytes || encryptedBytes.length === 0) {
+        throw new Error("Empty ciphertext");
+    }
 
     const sharedPoint = secp256k1.getSharedSecret(hexToBytes(privateKey), hexToBytes("02" + senderPubkey));
     const sharedX = sharedPoint.slice(1, 33);
@@ -162,16 +224,56 @@ export async function nip04Decrypt(
         ["decrypt"]
     );
 
-    const encrypted = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
-    const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
-
     const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-CBC", iv },
+        // @ts-ignore
+        { name: "AES-CBC", iv: ivBytes },
         key,
-        encrypted
+        encryptedBytes
     );
 
     return new TextDecoder().decode(decrypted);
+}
+
+// Unified decrypt function - detects NIP-44 vs NIP-04 format
+export async function nip04Decrypt(
+    privateKey: string,
+    senderPubkey: string,
+    ciphertext: string
+): Promise<string> {
+    // First, try to decode as base64 to check if it's NIP-44 format
+    // NIP-44 is pure base64 without separators, so check this first
+    try {
+        const decoded = Uint8Array.from(atob(ciphertext), c => c.charCodeAt(0));
+        // NIP-44 starts with version byte 0x02 and has minimum length:
+        // 1 (version) + 32 (nonce) + 16 (min ciphertext) + 16 (poly1305 tag) = 65 bytes
+        if (decoded[0] === 2 && decoded.length >= 65) {
+            console.log("Detected NIP-44 format, decrypting with nostr-tools...");
+            return nip44DecryptMessage(privateKey, senderPubkey, ciphertext);
+        }
+    } catch (e) {
+        // Not valid base64 or decoding failed, try NIP-04
+        console.log("Base64 decode failed or NIP-44 decrypt failed, trying NIP-04:", e);
+    }
+
+    // Check if this looks like NIP-04 format (has IV separator)
+    if (ciphertext.includes("?iv=") || ciphertext.includes("&iv=") || ciphertext.includes("_iv=")) {
+        console.log("Detected NIP-04 format with IV separator");
+        return nip04DecryptOnly(privateKey, senderPubkey, ciphertext);
+    }
+
+    // Try to parse as JSON (NIP-04 variant)
+    try {
+        const json = JSON.parse(ciphertext);
+        if (json.ciphertext && json.iv) {
+            console.log("Detected NIP-04 JSON format");
+            return nip04DecryptOnly(privateKey, senderPubkey, ciphertext);
+        }
+    } catch {
+        // Not JSON
+    }
+
+    // Unknown format
+    throw new Error(`Unknown encryption format. Content preview: ${ciphertext.substring(0, 50)}...`);
 }
 
 // Sign a Nostr event

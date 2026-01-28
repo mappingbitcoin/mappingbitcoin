@@ -6,6 +6,7 @@ import Link from "next/link";
 import fs from "fs/promises";
 import path from "path";
 import TopographicPattern from "@/components/ui/TopographicPattern";
+import { NewsletterCTA } from "@/components/common";
 
 export const generateMetadata = buildGeneratePageMetadata('home')
 
@@ -292,6 +293,9 @@ const HomePage = async ({ params }: Localized) => {
                         </Link>
                     </div>
                 </section>
+
+                {/* Section 7: Newsletter CTA */}
+                <NewsletterCTA />
             </main>
         </>
     );

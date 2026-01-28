@@ -24,15 +24,16 @@
     }
   },
   "subscribe": {
-    "title": "Stay Updated",
-    "description": "Join our newsletter to receive the latest insights on Bitcoin and cyber-security.",
+    "cta": {
+      "title":"Keep Updated",
+      "subtitle":"Get notifications about new features, upgrades, and news about bitcoin ecosystem."
+    },
     "placeholder": "Enter your email",
     "button": "Subscribe",
-    "sending": "Subscribing...",
-    "success": "Thank you for subscribing! Check your email for confirmation.",
-    "alreadySubscribed": "You are already subscribed to this list.",
+    "success": "You're in! We'll keep you posted.",
+    "alreadySubscribed": "You're already subscribed.",
     "invalidEmail": "Please enter a valid email address.",
-    "error": "Failed to subscribe. Please try again."
+    "error": "Something went wrong. Please try again."
   },
   "search": {
     "placeholder": "Search posts..."
