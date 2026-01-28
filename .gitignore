@@ -58,3 +58,5 @@ next-env.d.ts
 # ignore not processed data
 /scripts/cmc/people/*
 
+
+/lib/generated/prisma

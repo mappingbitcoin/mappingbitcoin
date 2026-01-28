@@ -34,6 +34,9 @@ jobs:
         run: |
           echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
       - name: Build Next.js app
         run: npm run build
 
@@ -43,7 +46,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".next/**,public,package.json,package-lock.json,next.config.js,.env,data/**,posts/**"
+          source: ".next/**,public,package.json,prisma.config.ts,prisma/**,lib/generated/**,package-lock.json,next.config.js,.env,data/**,posts/**"
           target: "/root/mappingbitcoin-temp"
 
       - name: Install production dependencies on server
@@ -62,6 +65,22 @@ jobs:
               rm -rf /root/mappingbitcoin-temp
               exit 1
             fi
+
+      - name: Run Prisma migrations
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/mappingbitcoin-temp
+            echo "🗄️ Running Prisma migrations..."
+            if ! npx prisma migrate deploy; then
+              echo "❌ Prisma migration failed. Aborting."
+              rm -rf /root/mappingbitcoin-temp
+              exit 1
+            fi
+            echo "✅ Prisma migrations applied successfully"
 
       - name: Run test server and check health
         uses: appleboy/ssh-action@v1.0.0
