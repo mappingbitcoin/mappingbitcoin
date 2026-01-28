@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Venues table - exists only for FK integrity
+// No venue data stored here — that's in memory
+model Venue {
+  id        String   @id @default(cuid())
+  osmId     String   @unique @map("osm_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  claims  Claim[]
+  reviews Review[]
+
+  @@index([osmId])
+  @@map("venues")
+}
+
+// Users table - Nostr users with cached profile data
+model User {
+  id               String    @id @default(cuid())
+  pubkey           String    @unique
+  name             String?   // cached from kind 0
+  picture          String?   // cached from kind 0
+  nip05            String?
+  profileUpdatedAt DateTime? @map("profile_updated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  claims        Claim[]
+  reviews       Review[]
+  reviewReplies ReviewReply[]
+
+  @@index([pubkey])
+  @@map("users")
+}
+
+// Claims table - venue ownership claims
+model Claim {
+  id                   String      @id @default(cuid())
+  venueId              String      @map("venue_id")
+  claimerPubkey        String      @map("claimer_pubkey")
+  status               ClaimStatus @default(PENDING)
+  method               ClaimMethod
+  verificationCode     String?     @map("verification_code")
+  verificationAttempts Int         @default(0) @map("verification_attempts")
+  verifiedAt           DateTime?   @map("verified_at")
+  expiresAt            DateTime?   @map("expires_at")
+  createdAt            DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  claimer User  @relation(fields: [claimerPubkey], references: [pubkey], onDelete: Cascade)
+
+  @@index([venueId])
+  @@index([claimerPubkey])
+  @@index([status])
+  @@map("claims")
+}
+
+enum ClaimStatus {
+  PENDING  @map("pending")
+  VERIFIED @map("verified")
+  REJECTED @map("rejected")
+  EXPIRED  @map("expired")
+}
+
+enum ClaimMethod {
+  PHONE    @map("phone")
+  EMAIL    @map("email")
+  DOMAIN   @map("domain")
+  GOOGLE   @map("google")
+  PHYSICAL @map("physical")
+  MANUAL   @map("manual")
+}
+
+// Reviews table - venue reviews from Nostr
+model Review {
+  id             String   @id @default(cuid())
+  eventId        String   @unique @map("event_id")
+  venueId        String   @map("venue_id")
+  authorPubkey   String   @map("author_pubkey")
+  rating         Int?     // 1-5 stars, nullable for text-only reviews
+  content        String?
+  eventCreatedAt DateTime @map("event_created_at")
+  indexedAt      DateTime @default(now()) @map("indexed_at")
+
+  // Relations
+  venue   Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  author  User          @relation(fields: [authorPubkey], references: [pubkey], onDelete: Cascade)
+  replies ReviewReply[]
+
+  @@index([venueId])
+  @@index([authorPubkey])
+  @@index([eventCreatedAt])
+  @@map("reviews")
+}
+
+// Review replies table
+model ReviewReply {
+  id             String   @id @default(cuid())
+  eventId        String   @unique @map("event_id")
+  reviewId       String   @map("review_id")
+  authorPubkey   String   @map("author_pubkey")
+  content        String
+  isOwnerReply   Boolean  @default(false) @map("is_owner_reply")
+  eventCreatedAt DateTime @map("event_created_at")
+  indexedAt      DateTime @default(now()) @map("indexed_at")
+
+  // Relations
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorPubkey], references: [pubkey], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([authorPubkey])
+  @@map("review_replies")
+}
