@@ -1,9 +1,13 @@
 import prisma from "../prisma";
 import { Resend } from "resend";
+import dns from "dns/promises";
 import { createVerificationCodeEmail } from "@/lib/email/templates";
 
 const VERIFICATION_CODE_EXPIRY_MINUTES = 15;
 const MAX_VERIFICATION_ATTEMPTS = 5;
+const CLAIM_EXPIRY_HOURS = 24; // Claims expire after 24 hours
+const BASE_CHECK_COOLDOWN_SECONDS = 30; // Base cooldown between checks
+const MAX_CHECK_COOLDOWN_SECONDS = 3600; // Max cooldown (1 hour)
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -248,4 +252,269 @@ export async function getVerificationStatus(osmId: string): Promise<{
         ownerPubkey: claim.claimerPubkey,
         verifiedAt: claim.verifiedAt ?? undefined,
     };
+}
+
+/**
+ * Generate a unique TXT record value for domain verification
+ */
+function generateTxtRecordValue(): string {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    return `mappingbitcoin-verify=${hex}`;
+}
+
+/**
+ * Extract domain from a URL or website string
+ */
+export function extractDomain(website: string): string | null {
+    try {
+        let url = website.trim();
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        const parsed = new URL(url);
+        return parsed.hostname.replace(/^www\./, '');
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Initiate domain verification for a venue
+ */
+export async function initiateDomainVerification(
+    osmId: string,
+    pubkey: string,
+    domain: string
+): Promise<{ claimId: string; txtRecordValue: string; expiresAt: Date }> {
+    const txtRecordValue = generateTxtRecordValue();
+    const expiresAt = new Date(Date.now() + CLAIM_EXPIRY_HOURS * 60 * 60 * 1000);
+
+    // Ensure user exists
+    await prisma.user.upsert({
+        where: { pubkey },
+        update: {},
+        create: { pubkey },
+    });
+
+    // Ensure venue exists
+    const venue = await prisma.venue.upsert({
+        where: { osmId },
+        update: {},
+        create: { osmId },
+    });
+
+    // Check for existing pending domain claim from this user for this venue
+    const existingClaim = await prisma.claim.findFirst({
+        where: {
+            venueId: venue.id,
+            claimerPubkey: pubkey,
+            method: "DOMAIN",
+            status: "PENDING",
+        },
+    });
+
+    let claim;
+    if (existingClaim) {
+        // Update existing claim with new TXT value
+        claim = await prisma.claim.update({
+            where: { id: existingClaim.id },
+            data: {
+                domainToVerify: domain,
+                txtRecordValue,
+                expiresAt,
+                checkCount: 0,
+                lastCheckAt: null,
+                nextCheckAt: null,
+            },
+        });
+    } else {
+        // Create new claim
+        claim = await prisma.claim.create({
+            data: {
+                venueId: venue.id,
+                claimerPubkey: pubkey,
+                method: "DOMAIN",
+                domainToVerify: domain,
+                txtRecordValue,
+                expiresAt,
+            },
+        });
+    }
+
+    return { claimId: claim.id, txtRecordValue, expiresAt };
+}
+
+/**
+ * Calculate next check time with exponential backoff
+ */
+function calculateNextCheckTime(checkCount: number): Date {
+    // Exponential backoff: 30s, 60s, 120s, 240s, ... up to 1 hour
+    const cooldownSeconds = Math.min(
+        BASE_CHECK_COOLDOWN_SECONDS * Math.pow(2, checkCount),
+        MAX_CHECK_COOLDOWN_SECONDS
+    );
+    return new Date(Date.now() + cooldownSeconds * 1000);
+}
+
+/**
+ * Check domain TXT record for verification
+ */
+export async function checkDomainVerification(
+    claimId: string,
+    pubkey: string
+): Promise<{
+    success: boolean;
+    verified?: boolean;
+    error?: string;
+    nextCheckAt?: Date;
+    cooldownSeconds?: number;
+}> {
+    const claim = await prisma.claim.findUnique({
+        where: { id: claimId },
+    });
+
+    if (!claim) {
+        return { success: false, error: "Claim not found" };
+    }
+
+    if (claim.claimerPubkey !== pubkey) {
+        return { success: false, error: "Not authorized to check this claim" };
+    }
+
+    if (claim.status !== "PENDING") {
+        return { success: false, error: "Claim is no longer pending" };
+    }
+
+    if (claim.method !== "DOMAIN") {
+        return { success: false, error: "This is not a domain verification claim" };
+    }
+
+    if (claim.expiresAt && claim.expiresAt < new Date()) {
+        // Mark as expired
+        await prisma.claim.update({
+            where: { id: claimId },
+            data: { status: "EXPIRED" },
+        });
+        return { success: false, error: "Verification request has expired. Please start a new verification." };
+    }
+
+    // Check rate limiting
+    if (claim.nextCheckAt && claim.nextCheckAt > new Date()) {
+        const cooldownSeconds = Math.ceil((claim.nextCheckAt.getTime() - Date.now()) / 1000);
+        return {
+            success: false,
+            error: `Please wait before checking again`,
+            nextCheckAt: claim.nextCheckAt,
+            cooldownSeconds,
+        };
+    }
+
+    if (!claim.domainToVerify || !claim.txtRecordValue) {
+        return { success: false, error: "Domain verification not properly initialized" };
+    }
+
+    // Update check count and next check time
+    const nextCheckAt = calculateNextCheckTime(claim.checkCount);
+    await prisma.claim.update({
+        where: { id: claimId },
+        data: {
+            checkCount: { increment: 1 },
+            lastCheckAt: new Date(),
+            nextCheckAt,
+        },
+    });
+
+    // Perform DNS TXT record lookup
+    try {
+        const records = await dns.resolveTxt(claim.domainToVerify);
+        const flatRecords = records.flat();
+
+        const found = flatRecords.some(record => record === claim.txtRecordValue);
+
+        if (found) {
+            // Verification successful
+            await prisma.claim.update({
+                where: { id: claimId },
+                data: {
+                    status: "VERIFIED",
+                    verifiedAt: new Date(),
+                },
+            });
+            return { success: true, verified: true };
+        }
+
+        return {
+            success: true,
+            verified: false,
+            nextCheckAt,
+            cooldownSeconds: Math.ceil((nextCheckAt.getTime() - Date.now()) / 1000),
+        };
+    } catch (error) {
+        // DNS lookup failed (NXDOMAIN, timeout, etc.)
+        return {
+            success: true,
+            verified: false,
+            error: "Could not find TXT records for this domain. Make sure the DNS record is properly configured.",
+            nextCheckAt,
+            cooldownSeconds: Math.ceil((nextCheckAt.getTime() - Date.now()) / 1000),
+        };
+    }
+}
+
+/**
+ * Get all claims for a user
+ */
+export async function getClaimsForUser(pubkey: string): Promise<Array<{
+    id: string;
+    osmId: string;
+    status: string;
+    method: string;
+    createdAt: Date;
+    expiresAt: Date | null;
+    verifiedAt: Date | null;
+    domainToVerify: string | null;
+    txtRecordValue: string | null;
+    nextCheckAt: Date | null;
+    checkCount: number;
+}>> {
+    const claims = await prisma.claim.findMany({
+        where: { claimerPubkey: pubkey },
+        include: { venue: true },
+        orderBy: { createdAt: 'desc' },
+    });
+
+    return claims.map(claim => ({
+        id: claim.id,
+        osmId: claim.venue.osmId,
+        status: claim.status,
+        method: claim.method,
+        createdAt: claim.createdAt,
+        expiresAt: claim.expiresAt,
+        verifiedAt: claim.verifiedAt,
+        domainToVerify: claim.domainToVerify,
+        txtRecordValue: claim.txtRecordValue,
+        nextCheckAt: claim.nextCheckAt,
+        checkCount: claim.checkCount,
+    }));
+}
+
+/**
+ * Expire old pending claims (run periodically)
+ */
+export async function expirePendingClaims(): Promise<number> {
+    const result = await prisma.claim.updateMany({
+        where: {
+            status: "PENDING",
+            expiresAt: {
+                lt: new Date(),
+            },
+        },
+        data: {
+            status: "EXPIRED",
+        },
+    });
+
+    return result.count;
 }
