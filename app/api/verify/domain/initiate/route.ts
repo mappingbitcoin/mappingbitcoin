@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAuthToken } from "@/lib/db/services/auth";
 import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import { parseTags } from "@/utils/OsmHelpers";
-import { initiateDomainVerification, extractDomain, getVerificationStatus } from "@/lib/db/services/verification";
+import { initiateDomainVerification, extractDomain, extractDomainFromEmail, getVerificationStatus } from "@/lib/db/services/verification";
 
 function getAuthToken(request: NextRequest): string | null {
     const authHeader = request.headers.get("authorization");
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { osmId } = body;
+        const { osmId, selectedDomain } = body;
 
         if (!osmId) {
             return NextResponse.json(
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         // Normalize osmId format
         const normalizedOsmId = osmId.includes("/") ? osmId : `node/${osmId}`;
 
-        // Get venue from cache to extract website
+        // Get venue from cache to extract website and email
         const venues = await getVenueCache();
         const indexMap = await getVenueIndexMap();
         const numericId = parseInt(normalizedOsmId.split("/")[1], 10);
@@ -60,18 +60,33 @@ export async function POST(request: NextRequest) {
         const venue = venues[venueIndex];
         const { contact } = parseTags(venue.tags);
         const website = contact?.website;
+        const email = contact?.email;
 
-        if (!website) {
-            return NextResponse.json(
-                { error: "This venue does not have a website registered. Domain verification requires a website." },
-                { status: 400 }
-            );
+        // Extract available domains
+        const websiteDomain = website ? extractDomain(website) : null;
+        const emailDomain = email ? extractDomainFromEmail(email) : null;
+
+        // Determine which domain to use
+        let domain: string | null = null;
+
+        if (selectedDomain) {
+            // User explicitly selected a domain - validate it matches one of the available domains
+            if (selectedDomain === websiteDomain || selectedDomain === emailDomain) {
+                domain = selectedDomain;
+            } else {
+                return NextResponse.json(
+                    { error: "Selected domain does not match venue's website or email domain" },
+                    { status: 400 }
+                );
+            }
+        } else {
+            // No explicit selection - use website domain if available, otherwise email domain
+            domain = websiteDomain || emailDomain;
         }
 
-        const domain = extractDomain(website);
         if (!domain) {
             return NextResponse.json(
-                { error: "Could not extract a valid domain from the venue's website" },
+                { error: "This venue does not have a website or email registered. Domain verification requires at least one." },
                 { status: 400 }
             );
         }

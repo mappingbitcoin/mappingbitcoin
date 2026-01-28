@@ -11,6 +11,7 @@ interface VerificationStepProps {
     venueName: string;
     osmEmail?: string;
     method: VerificationMethod;
+    selectedDomain?: string | null;
     step: VerificationState;
     setStep: (step: VerificationState) => void;
     onError: (error: string | null) => void;
@@ -21,6 +22,7 @@ export default function VerificationStep({
     venue,
     venueName,
     method,
+    selectedDomain,
     step,
     setStep,
     onError,
@@ -112,6 +114,7 @@ export default function VerificationStep({
                 },
                 body: JSON.stringify({
                     osmId: `${venue.type}/${venue.id}`,
+                    selectedDomain: selectedDomain || undefined,
                 }),
             });
 
