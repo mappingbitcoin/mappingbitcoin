@@ -736,7 +736,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                     <div className={`pointer-events-none absolute w-[90vw] max-w-container flex gap-4 flex-col md:flex-row top-4 z-999 left-4 max-md:h-22 max-md:w-[calc(100%-2rem)] ${selectedVenue ? '' : 'max-md:[&_.searchContainer]:min-w-full max-md:[&_.searchInputContainer]:min-w-full max-md:[&_.search]:min-w-full max-md:[&_.search]:max-w-full'}`}>
                         <div className="searchContainer w-full max-w-82 pointer-events-auto">
                             <div className="searchInputContainer relative">
-                                <input type="search" className="search relative w-full min-w-[150px] bg-surface text-text py-2 pl-5 pr-10 h-10 rounded-btn shadow-[0_1px_3px_rgba(0,0,0,0.3)] mb-4 placeholder:text-text-light border border-border-light" value={query ?? ''} onChange={(e) => setQuery(e.target.value ?? '')} placeholder={t("searchPlaceholder")} />
+                                <input type="search" className="search relative w-full min-w-[150px] bg-surface text-text py-2 pl-5 pr-10 h-10 rounded-btn shadow-[0_1px_3px_rgba(0,0,0,0.3)] mb-4 placeholder:text-text-light border border-border-light [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden" value={query ?? ''} onChange={(e) => setQuery(e.target.value ?? '')} placeholder={t("searchPlaceholder")} />
                                 {query && <button onClick={() => {
                                     setSelectedVenue(null);
                                     setQuery("")

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo} from "react";
-import {SOCIAL_CONTACTS} from "@/constants/SocialIcons";
+import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {useLocale} from "next-intl";
 import {Locale} from "@/i18n/types";
@@ -287,16 +287,15 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                 </div>
                             )}
 
-                            {contact && Object.entries(contact).length > 0 && (
+                            {contact && Object.entries(contact).some(([type]) => SOCIAL_ICONS[type]) && (
                                 <div className="mt-6">
-                                    <h4 className="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t("contactAndSocials")}</h4>
+                                    <h4 className="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t("socials")}</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {Object.entries(contact).map(([type, value]) => {
-                                            const info = SOCIAL_CONTACTS[type];
+                                            const info = SOCIAL_ICONS[type];
                                             if (!value || !info) return null;
-                                            const href = type === "phone" ? `tel:${value}` : value;
                                             return (
-                                                <a key={type} className="w-10 h-10 rounded-lg bg-primary-light border border-border-light flex items-center justify-center text-xl no-underline text-white hover:bg-surface-light hover:border-accent/50 transition-colors" href={href} target="_blank"
+                                                <a key={type} className="w-10 h-10 rounded-lg bg-primary-light border border-border-light flex items-center justify-center no-underline text-white hover:bg-surface-light hover:border-accent/50 transition-colors" href={value} target="_blank"
                                                    rel="noreferrer" title={info.label}>{info.icon}</a>
                                             );
                                         })}
