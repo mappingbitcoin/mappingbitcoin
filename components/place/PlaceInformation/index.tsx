@@ -16,6 +16,7 @@ import {parseTags} from "@/utils/OsmHelpers";
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import moment from 'moment'
 import {deslugify} from "@/utils/StringUtils";
+import { VerifyOwnershipButton } from "@/components/verification";
 
 type Props = {
     venue: EnrichedVenue;
@@ -105,7 +106,17 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
             )}
             <div className={isSideBar ? "py-20 px-4" : "px-4"}>
                 <div>
-                    <h2 className="text-xl font-bold m-0 text-white">{name}</h2>
+                    <div className="flex items-start justify-between gap-2">
+                        <h2 className="text-xl font-bold m-0 text-white flex-1">{name}</h2>
+                        {contact?.email && (
+                            <VerifyOwnershipButton
+                                venue={venue}
+                                venueName={name || 'This venue'}
+                                osmEmail={contact.email}
+                                compact={true}
+                            />
+                        )}
+                    </div>
                     <div className="flex flex-row flex-wrap gap-2 mt-2">
                         {venue.subcategory && venue.category ? (
                             <CategoryChip as="span" category={venue.category ?? 'other'}>

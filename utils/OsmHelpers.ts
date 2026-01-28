@@ -501,11 +501,19 @@ export function parseTags(tags: Record<string, string>): {
     if (tags['air_conditioning']) amenitiesTags.air_conditioning = tags['air_conditioning']
     if (tags['drive_through']) amenitiesTags.drive_through = tags['drive_through']
 
+    // Build contact object from contact: prefixed tags
+    const contact: Record<string, string> = Object.fromEntries(
+        tagEntries.filter(([k]) => k.startsWith("contact:")).map(([key, value]) => [key.replace("contact:", ""), value])
+    );
+
+    // Also check for direct website, email, phone tags (fallback if not in contact:)
+    if (!contact.website && tags['website']) contact.website = tags['website'];
+    if (!contact.email && tags['email']) contact.email = tags['email'];
+    if (!contact.phone && tags['phone']) contact.phone = tags['phone'];
+
     return {
         paymentMethods,
-        contact: Object.fromEntries(
-            tagEntries.filter(([k]) => k.startsWith("contact:")).map(([key, value]) => [key.replace("contact:", ""), value])
-        ),
+        contact,
         address: Object.fromEntries(
             tagEntries
                 .filter(([k]) => k.startsWith("addr:"))
