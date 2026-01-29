@@ -33,7 +33,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
     return createPortal(
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" data-modal="true">
                     {/* Backdrop */}
                     <motion.div
                         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -50,6 +50,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
                         {title && (

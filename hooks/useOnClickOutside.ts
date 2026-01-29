@@ -6,11 +6,17 @@ export const useOnClickOutside = (
 ) => {
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            const target = event.target as Node;
+
+            // Check if click is inside any of the provided refs
             const isClickInside = refs.some(ref =>
-                ref.current?.contains(event.target as Node)
+                ref.current?.contains(target)
             );
 
-            if (!isClickInside) {
+            // Check if click is inside a modal (portaled elements)
+            const isClickInsideModal = (target as Element).closest?.('[data-modal="true"]');
+
+            if (!isClickInside && !isClickInsideModal) {
                 callback();
             }
         };
