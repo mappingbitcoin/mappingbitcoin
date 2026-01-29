@@ -1,94 +1,104 @@
 {
   "hero": {
-    "title": "Discover the <span>Bitcoin Economy</span>",
-    "description": "Find Bitcoin-friendly merchants, learn about sound money, and explore stories from the global Bitcoin community.",
+    "title": "The Bitcoin Economy, Mapped",
+    "description": "{venues}+ venues across {continents} continents. Find where Bitcoin works.",
     "cta": {
-      "primary": "Explore Directory",
-      "secondary": "Go to Map"
-    }
+      "primary": "Explore map",
+      "secondary": "Browse directory"
+    },
+    "poweredBy": "Powered by"
   },
   "stats": {
-    "title": "Bitcoin Adoption is Growing",
-    "description": "Real-time data from our global network of Bitcoin merchants and community contributors.",
-    "totalVenues": "Total Venues",
-    "newThisMonth": "New This Month",
+    "venues": "Venues",
     "countries": "Countries",
-    "growth": "Monthly Growth"
+    "continents": "Continents",
+    "verifiedBusinesses": "Verified Businesses"
   },
-  "content": {
-    "title": "Explore Bitcoin Knowledge",
-    "description": "From inspiring stories to the latest news, stay connected with the Bitcoin ecosystem.",
-    "stories": {
-      "badge": "Stories",
-      "title": "Community Stories",
-      "description": "Real experiences from Bitcoin users around the world.",
-      "story1": {
-        "title": "How Bitcoin Changed My Business",
-        "description": "A merchant's journey to accepting Bitcoin in El Salvador."
+  "ownBusiness": {
+    "title": "Own a Bitcoin business?",
+    "description": "Add your venue to the largest Bitcoin merchant directory. Get discovered by customers looking to spend Bitcoin.",
+    "cta": "Add your business",
+    "verifyLink": "Learn how to verify",
+    "benefits": {
+      "verified": {
+        "title": "Verified Badge",
+        "description": "Show customers you're legitimate"
       },
-      "story2": {
-        "title": "Freedom Through Sound Money",
-        "description": "Personal accounts of financial sovereignty."
+      "edit": {
+        "title": "Edit Listing",
+        "description": "Keep your info up to date"
       },
-      "cta": "Read All Stories"
-    },
-    "news": {
-      "badge": "News",
-      "title": "Latest Updates",
-      "description": "Stay informed about Bitcoin developments worldwide.",
-      "news1": {
-        "title": "Global Bitcoin Adoption Rises",
-        "description": "New data shows increasing merchant acceptance globally."
+      "reviews": {
+        "title": "Respond to Reviews",
+        "description": "Engage with customers"
       },
-      "news2": {
-        "title": "Lightning Network Growth",
-        "description": "Payment network capacity reaches new milestones."
-      },
-      "cta": "View All News"
+      "secure": {
+        "title": "Secure & Free",
+        "description": "No fees, your keys"
+      }
     }
   },
-  "ecosystem": {
-    "title": "Explore the <span>Global Network</span>",
-    "titleAlt": "Explore the Global Network",
-    "description": "Our interactive map connects you with thousands of Bitcoin-accepting merchants worldwide. Find places to spend, learn, and connect with the Bitcoin community.",
-    "cta": "Explore the Map"
-  },
-  "education": {
-    "title": "Education Categories",
-    "subtitle": "Expert perspectives on Bitcoin self-custody, strategies, and long-term preservation.",
-    "readMore": "Read Article",
-    "viewAll": "View All Articles",
-    "minRead": "min read",
-    "category": {
-      "Bitcoin Basics": "Basics",
-      "Cryptographic Security": "Security",
-      "Economic Series": "Economy",
-      "Economic Truths": "Truths"
+  "howItWorks": {
+    "title": "How it works",
+    "features": {
+      "openData": {
+        "title": "Open data",
+        "description": "Built on OpenStreetMap. Transparent and verifiable."
+      },
+      "communityDriven": {
+        "title": "Community driven",
+        "description": "Anyone can add venues. Real user reviews."
+      },
+      "verifiablePlaces": {
+        "title": "Verifiable places",
+        "description": "Businesses can prove ownership. Trust built in."
+      },
+      "alwaysCurrent": {
+        "title": "Always current",
+        "description": "Continuous updates. Moderated submissions."
+      }
     }
   },
-  "map": {
-    "title": "Bitcoin Map Explorer",
-    "description": "Find Bitcoin-friendly places around the world. Our map helps connect users and merchants using Bitcoin.",
-    "localMerchants": {
-      "title": "Local Merchants",
-      "description": "Shops, restaurants, and services that accept Bitcoin."
-    },
-    "bitcoinAtms": {
-      "title": "Bitcoin ATMs",
-      "description": "Find nearby ATMs to buy or sell Bitcoin."
-    },
-    "reviewsRatings": {
-      "title": "Reviews & Ratings",
-      "description": "Read feedback from real users."
-    },
-    "notifications": {
-      "title": "Notifications",
-      "description": "Get notified when new places are added nearby."
-    },
-    "button": "Explore Bitcoin Map",
-    "badge": {
-      "count": "15000+",
-      "label": "Locations Worldwide"
-    }
+  "regions": {
+    "title": "Explore by region"
+  },
+  "topCountries": {
+    "title": "Top Bitcoin countries",
+    "venues": "venues"
+  },
+  "newsletter": {
+    "title": "Stay Updated",
+    "description": "Get the latest Bitcoin merchant news and map updates.",
+    "placeholder": "Enter your email",
+    "cta": "Subscribe"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "questions": [
+      {
+        "question": "What is MappingBitcoin?",
+        "answer": "MappingBitcoin is the largest open-source directory of Bitcoin-accepting merchants worldwide. We aggregate data from OpenStreetMap and allow businesses to verify their listings using Nostr, a decentralized identity protocol."
+      },
+      {
+        "question": "How do I add my business to the map?",
+        "answer": "You can add your business by clicking \"Add your business\" and filling out the form. Your listing will be submitted to OpenStreetMap, the world's largest open mapping project. Alternatively, you can add it directly on OpenStreetMap and it will appear on MappingBitcoin automatically."
+      },
+      {
+        "question": "Is MappingBitcoin free to use?",
+        "answer": "Yes, MappingBitcoin is completely free for both users and businesses. We believe in open access to the Bitcoin economy."
+      },
+      {
+        "question": "What does it mean for a business to be \"verified\"?",
+        "answer": "Verified businesses have cryptographically proven ownership of their listing through email or domain verification. This is linked to their Nostr identity, providing trust without relying on any central authority."
+      },
+      {
+        "question": "How accurate is the data?",
+        "answer": "Our data comes from OpenStreetMap, a community-maintained map. While we strive for accuracy, information can become outdated. We encourage users to report incorrect listings and businesses to verify their information."
+      },
+      {
+        "question": "Do you support Lightning Network?",
+        "answer": "Yes! Many listed businesses accept Lightning payments. You can filter the map to show only Lightning-accepting venues. We also support on-chain Bitcoin payments."
+      }
+    ]
   }
 }
