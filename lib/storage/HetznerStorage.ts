@@ -430,8 +430,16 @@ class HetznerStorageClient {
     }
 }
 
-// Singleton instance
-const storage = new HetznerStorageClient();
+// Singleton instance with HMR support
+const globalForStorage = globalThis as unknown as {
+    hetznerStorage: HetznerStorageClient | undefined;
+};
+
+const storage = globalForStorage.hetznerStorage ?? new HetznerStorageClient();
+
+if (process.env.NODE_ENV !== "production") {
+    globalForStorage.hetznerStorage = storage;
+}
 
 export default storage;
 

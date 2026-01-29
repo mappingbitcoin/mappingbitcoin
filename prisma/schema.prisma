@@ -183,10 +183,10 @@ model Subscriber {
 
 // Many-to-many relation: subscribers to lists
 model SubscriberList {
-  id             String   @id @default(cuid())
-  subscriberId   String   @map("subscriber_id")
-  listId         String   @map("list_id")
-  subscribedAt   DateTime @default(now()) @map("subscribed_at")
+  id             String    @id @default(cuid())
+  subscriberId   String    @map("subscriber_id")
+  listId         String    @map("list_id")
+  subscribedAt   DateTime  @default(now()) @map("subscribed_at")
   unsubscribedAt DateTime? @map("unsubscribed_at")
 
   // Relations
@@ -197,4 +197,91 @@ model SubscriberList {
   @@index([subscriberId])
   @@index([listId])
   @@map("subscriber_lists")
+}
+
+// ============================================
+// Community Trust System
+// ============================================
+
+// Admin users who can manage seeders and system settings
+model AdminUser {
+  id        String   @id @default(cuid())
+  pubkey    String   @unique
+  label     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
+
+// Community seeders - trusted nodes in the social graph
+model CommunitySeeder {
+  id        String   @id @default(cuid())
+  pubkey    String   @unique
+  region    String
+  label     String?
+  addedBy   String?  @map("added_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("community_seeders")
+}
+
+// Pre-computed trust graph nodes with follower counts by depth
+model CommunityGraph {
+  id               String   @id @default(cuid())
+  pubkey           String   @unique
+
+  // Is this pubkey a seeder themselves?
+  isSeeder         Boolean  @default(false) @map("is_seeder")
+
+  // Follower counts: how many people at each depth follow this user
+  followedByDepth0 Int      @default(0) @map("followed_by_depth_0")  // Seeders who follow this user
+  followedByDepth1 Int      @default(0) @map("followed_by_depth_1")  // Depth-1 users who follow this user
+  followedByDepth2 Int      @default(0) @map("followed_by_depth_2")  // Depth-2 users who follow this user
+
+  // Total followers in the trust network
+  totalTrustFollowers Int   @default(0) @map("total_trust_followers")
+
+  // Minimum depth at which this user appears (0=seeder, 1=followed by seeder, etc)
+  minDepth         Int      @map("min_depth")
+
+  // Calculated trust score (can be recomputed from counts)
+  score            Float
+
+  computedAt       DateTime @default(now()) @map("computed_at")
+
+  @@index([score(sort: Desc)])
+  @@index([minDepth])
+  @@index([followedByDepth0(sort: Desc)])
+  @@map("community_graph")
+}
+
+// Cache for Nostr follows (kind 3 events)
+model FollowsCache {
+  id            String   @id @default(cuid())
+  pubkey        String
+  followsPubkey String   @map("follows_pubkey")
+  fetchedAt     DateTime @default(now()) @map("fetched_at")
+
+  @@unique([pubkey, followsPubkey])
+  @@index([pubkey])
+  @@map("follows_cache")
+}
+
+// Log of graph build operations
+model GraphBuildLog {
+  id           String           @id @default(cuid())
+  startedAt    DateTime         @default(now()) @map("started_at")
+  completedAt  DateTime?        @map("completed_at")
+  status       GraphBuildStatus
+  seedersCount Int?             @map("seeders_count")
+  nodesCount   Int?             @map("nodes_count")
+  errorMessage String?          @map("error_message")
+
+  @@map("graph_build_logs")
+}
+
+enum GraphBuildStatus {
+  RUNNING   @map("running")
+  COMPLETED @map("completed")
+  FAILED    @map("failed")
 }
