@@ -166,7 +166,7 @@ const HomePage = async ({ params }: Localized) => {
                                     <img
                                         src="/assets/icons/osm.svg"
                                         alt="OpenStreetMap"
-                                        className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity"
+                                        className="w-5 h-5 opacity-32 group-hover:opacity-100 transition-opacity"
                                     />
                                     <span className="text-sm font-medium">OpenStreetMap</span>
                                 </a>
