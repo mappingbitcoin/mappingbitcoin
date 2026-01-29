@@ -19,7 +19,8 @@
   "scripts": {
     "dev": "next dev",
     "maps:update": "node ./scripts/map/download-venues.mjs && node ./scripts/map/add-country-city-if-missing.mjs && node ./scripts/map/migrate-venues.js && node ./scripts/map/tile-cache-generator.js && node scripts/map/slugs-work/generate-slug-combinatories.js",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
