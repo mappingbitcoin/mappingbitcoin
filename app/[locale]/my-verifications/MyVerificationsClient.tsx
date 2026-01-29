@@ -24,7 +24,7 @@ interface Claim {
 }
 
 export default function MyVerificationsClient() {
-    const { user, getAuthToken } = useNostrAuth();
+    const { authToken } = useNostrAuth();
     const [claims, setClaims] = useState<Claim[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -32,13 +32,12 @@ export default function MyVerificationsClient() {
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
 
     const fetchClaims = useCallback(async () => {
-        if (!user) return;
+        if (!authToken) return;
 
         try {
-            const token = await getAuthToken();
             const response = await fetch("/api/verify/my-claims", {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${authToken}`,
                 },
             });
 
@@ -65,7 +64,7 @@ export default function MyVerificationsClient() {
         } finally {
             setLoading(false);
         }
-    }, [user, getAuthToken]);
+    }, [authToken]);
 
     useEffect(() => {
         fetchClaims();
@@ -165,7 +164,7 @@ export default function MyVerificationsClient() {
         return labels[method] || method;
     };
 
-    if (!user) {
+    if (!authToken) {
         return (
             <div className="min-h-screen bg-primary pt-24 px-4">
                 <div className="max-w-2xl mx-auto">
