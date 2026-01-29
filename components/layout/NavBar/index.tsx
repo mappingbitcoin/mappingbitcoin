@@ -239,12 +239,27 @@ const NavBar = () => {
 
                         {/* Desktop Navigation + CTA */}
                         <div className="hidden md:flex items-center gap-8">
-                            <ul className="flex items-center gap-8 list-none">
+                            <ul className="flex items-center gap-6 list-none">
+                                {/* Expandable Search - hidden on map page, positioned left of Map */}
+                                {!isMapPage && (
+                                    <motion.li
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: 0.1 }}
+                                        className="group/search"
+                                    >
+                                        {/* Container expands from w-8 (icon only) to w-52 (full input) */}
+                                        <div className="w-8 group-hover/search:w-52 group-focus-within/search:w-52 transition-all duration-300 ease-out">
+                                            <NavBarSearch placeholder="Search..." expandable />
+                                        </div>
+                                    </motion.li>
+                                )}
+
                                 {/* Map link */}
                                 <motion.li
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3, delay: 0.1 }}
+                                    transition={{ duration: 0.3, delay: 0.15 }}
                                 >
                                     <Link
                                         onClick={closeMenu}
@@ -256,27 +271,6 @@ const NavBar = () => {
                                         {t('map')}
                                     </Link>
                                 </motion.li>
-
-                                {/* Expandable Search - hidden on map page */}
-                                {!isMapPage && (
-                                    <motion.li
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3, delay: 0.15 }}
-                                        className="relative group/search"
-                                    >
-                                        <div className="w-8 h-8 flex items-center justify-center text-white/70 group-hover/search:text-white transition-colors cursor-pointer">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                        <div className="absolute left-0 top-full mt-2 w-72 opacity-0 invisible group-hover/search:opacity-100 group-hover/search:visible transition-all duration-200 z-50">
-                                            <div className="bg-surface border border-border-light rounded-lg shadow-xl p-2">
-                                                <NavBarSearch placeholder="Search venues, cities..." />
-                                            </div>
-                                        </div>
-                                    </motion.li>
-                                )}
 
                                 {/* Other menu items */}
                                 {menuItems.slice(1).map((el, ix) => (

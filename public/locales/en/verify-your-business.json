@@ -1,0 +1,103 @@
+{
+  "hero": {
+    "title": "Verify Your Business",
+    "description": "Claim and verify your listing on MappingBitcoin to build trust with customers and unlock additional features."
+  },
+  "whyVerify": {
+    "title": "Why Verify?",
+    "cards": {
+      "trust": {
+        "title": "Build Trust",
+        "description": "A verified badge shows customers that your business has been confirmed as legitimate."
+      },
+      "manage": {
+        "title": "Manage Your Listing",
+        "description": "Update your business information, respond to reviews, and keep details accurate."
+      },
+      "standOut": {
+        "title": "Stand Out",
+        "description": "Verified businesses appear more prominently in search results."
+      }
+    }
+  },
+  "methods": {
+    "title": "Verification Methods",
+    "description": "Choose the method that works best for you. Both options are free and secure.",
+    "email": {
+      "title": "Email Verification",
+      "description": "Verify by receiving a code at your business email address listed on OpenStreetMap.",
+      "requirements": "What you need:",
+      "req1": "Access to the email address listed on your venue",
+      "req2": "A Nostr account to link the verification to your identity",
+      "howItWorks": "How it works:",
+      "step1": "Find your business on MappingBitcoin and click \"Verify\"",
+      "step2": "Log in with your Nostr account",
+      "step3": "We send a 6-digit code to your business email",
+      "step4": "Enter the code to complete verification"
+    },
+    "domain": {
+      "title": "Domain Verification",
+      "description": "Verify by adding a DNS TXT record to your website domain.",
+      "requirements": "What you need:",
+      "req1": "Access to your domain's DNS settings",
+      "req2": "A Nostr account to link the verification to your identity",
+      "howItWorks": "How it works:",
+      "step1": "Find your business on MappingBitcoin and click \"Verify\"",
+      "step2": "Log in with your Nostr account",
+      "step3": "Copy the unique TXT record we provide",
+      "step4": "Add it to your domain's DNS settings",
+      "step5": "Click \"Verify\" once DNS propagates (usually 5-30 minutes)"
+    }
+  },
+  "transparency": {
+    "title": "Our Commitment to Transparency",
+    "cards": {
+      "openSource": {
+        "title": "Open Source",
+        "description": "Our verification system is open source. Anyone can review the code and verify how we handle the verification process."
+      },
+      "decentralized": {
+        "title": "Decentralized Identity",
+        "description": "Verifications are linked to your Nostr public key, giving you sovereign control over your business identity."
+      },
+      "noAuthority": {
+        "title": "No Central Authority",
+        "description": "We don't hold custody of your identity. Your Nostr keys are yours, and verification proves ownership without intermediaries."
+      },
+      "cryptographic": {
+        "title": "Cryptographic Proof",
+        "description": "All verifications are recorded with cryptographic signatures that can be independently verified."
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "questions": [
+      {
+        "question": "What is Nostr?",
+        "answer": "Nostr is a decentralized protocol for social networking. It uses cryptographic key pairs for identity, meaning you own your account without relying on any company. We use Nostr for verification because it aligns with Bitcoin's values of self-sovereignty."
+      },
+      {
+        "question": "How long does verification take?",
+        "answer": "Email verification is instant once you enter the code. Domain verification depends on DNS propagation, typically 5-30 minutes, but can take up to 48 hours in some cases."
+      },
+      {
+        "question": "Can I verify multiple businesses?",
+        "answer": "Yes, a single Nostr account can verify multiple businesses, as long as you can prove ownership of each one through email or domain verification."
+      },
+      {
+        "question": "Why can't I use common email providers for domain verification?",
+        "answer": "For domain verification via email, we only accept custom email domains (like you@yourbusiness.com). This ensures the verification actually proves domain ownership. However, if your venue has an email listed (even Gmail), you can still use email code verification."
+      },
+      {
+        "question": "Is verification free?",
+        "answer": "Yes, verification is completely free. We believe in open access to the Bitcoin economy."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to verify your business?",
+    "description": "Find your listing on the map and click the Verify button to get started.",
+    "button": "Find your business"
+  }
+}

@@ -9,9 +9,11 @@ interface NavBarSearchProps {
     placeholder?: string;
     onClose?: () => void;
     autoFocus?: boolean;
+    compact?: boolean; // Hides internal icon for inline use
+    expandable?: boolean; // For navbar expanding search
 }
 
-export default function NavBarSearch({ placeholder = "Search venues...", onClose, autoFocus = false }: NavBarSearchProps) {
+export default function NavBarSearch({ placeholder = "Search venues...", onClose, autoFocus = false, compact = false, expandable = false }: NavBarSearchProps) {
     const router = useRouter();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<AutocompleteResult[]>([]);
@@ -200,20 +202,28 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
                     onKeyDown={handleKeyDown}
                     onFocus={() => results.length > 0 && setIsOpen(true)}
                     placeholder={placeholder}
-                    className="w-full md:w-64 lg:w-80 px-4 py-2 pl-10 text-sm bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-accent/50 focus:bg-white/15 transition-all"
+                    className={`text-sm text-white placeholder-white/50 focus:outline-none transition-all ${
+                        expandable
+                            ? "w-full py-1.5 pl-8 pr-3 bg-transparent border border-transparent rounded-lg group-hover/search:bg-white/10 group-hover/search:border-white/20 group-focus-within/search:bg-white/10 group-focus-within/search:border-white/20 focus:border-accent/50"
+                            : compact
+                                ? "w-full px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg"
+                                : "w-full md:w-64 lg:w-80 px-4 py-2 pl-10 bg-white/10 border border-white/20 rounded-lg focus:border-accent/50 focus:bg-white/15"
+                    }`}
                 />
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                    {isLoading ? (
-                        <svg className="w-4 h-4 text-white/50 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                    ) : (
-                        <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    )}
-                </div>
+                {(expandable || !compact) && (
+                    <div className="absolute left-2.5 top-1/2 -translate-y-1/2">
+                        {isLoading ? (
+                            <svg className="w-4 h-4 text-white/50 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                        ) : (
+                            <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        )}
+                    </div>
+                )}
                 {query && (
                     <button
                         onClick={() => {

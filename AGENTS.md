@@ -169,7 +169,6 @@ public/locales/
     ├── places.json     # Place forms and breadcrumbs
     ├── countries.json  # Countries page and region listings
     ├── common.json     # Shared: menu, footer, subscribe, notFound
-    └── lessons.json    # Educational content (21 lessons)
 ```
 
 ### Translation Key Patterns

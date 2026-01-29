@@ -1,19 +1,14 @@
+"use client";
+
 import React from "react";
-import { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-
-export const metadata: Metadata = {
-    title: "Verify Your Business | MappingBitcoin.com",
-    description: "Prove ownership of your Bitcoin-accepting business on MappingBitcoin. Learn about our transparent verification process using email or domain verification.",
-    openGraph: {
-        title: "Verify Your Business | MappingBitcoin.com",
-        description: "Prove ownership of your Bitcoin-accepting business on MappingBitcoin. Learn about our transparent verification process.",
-        type: "website",
-    },
-};
+import { useTranslations } from "next-intl";
+import { FAQSection } from "@/components/common";
 
 const VerifyYourBusinessPage = () => {
+    const t = useTranslations("verify-your-business");
+
     return (
         <>
             <Script
@@ -69,10 +64,10 @@ const VerifyYourBusinessPage = () => {
                             </svg>
                         </div>
                         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                            Verify Your Business
+                            {t("hero.title")}
                         </h1>
                         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                            Claim and verify your listing on MappingBitcoin to build trust with customers and unlock additional features.
+                            {t("hero.description")}
                         </p>
                     </div>
                 </section>
@@ -81,7 +76,7 @@ const VerifyYourBusinessPage = () => {
                 <section className="py-12 px-6 border-t border-white/10">
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-8 text-center">
-                            Why Verify?
+                            {t("whyVerify.title")}
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
@@ -90,9 +85,9 @@ const VerifyYourBusinessPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-white mb-2">Build Trust</h3>
+                                <h3 className="text-lg font-semibold text-white mb-2">{t("whyVerify.cards.trust.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    A verified badge shows customers that your business has been confirmed as legitimate.
+                                    {t("whyVerify.cards.trust.description")}
                                 </p>
                             </div>
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
@@ -101,9 +96,9 @@ const VerifyYourBusinessPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-white mb-2">Manage Your Listing</h3>
+                                <h3 className="text-lg font-semibold text-white mb-2">{t("whyVerify.cards.manage.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    Update your business information, respond to reviews, and keep details accurate.
+                                    {t("whyVerify.cards.manage.description")}
                                 </p>
                             </div>
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
@@ -112,9 +107,9 @@ const VerifyYourBusinessPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-white mb-2">Stand Out</h3>
+                                <h3 className="text-lg font-semibold text-white mb-2">{t("whyVerify.cards.standOut.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    Verified businesses appear more prominently in search results.
+                                    {t("whyVerify.cards.standOut.description")}
                                 </p>
                             </div>
                         </div>
@@ -125,10 +120,10 @@ const VerifyYourBusinessPage = () => {
                 <section className="py-16 px-6 bg-[#111111]">
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4 text-center">
-                            Verification Methods
+                            {t("methods.title")}
                         </h2>
                         <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-                            Choose the method that works best for you. Both options are free and secure.
+                            {t("methods.description")}
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -140,49 +135,49 @@ const VerifyYourBusinessPage = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-xl font-semibold text-white">Email Verification</h3>
+                                    <h3 className="text-xl font-semibold text-white">{t("methods.email.title")}</h3>
                                 </div>
 
                                 <p className="text-gray-400 mb-6">
-                                    Verify by receiving a code at your business email address listed on OpenStreetMap.
+                                    {t("methods.email.description")}
                                 </p>
 
                                 <div className="space-y-4 mb-6">
-                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">What you need:</h4>
+                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">{t("methods.email.requirements")}</h4>
                                     <ul className="space-y-2 text-gray-400 text-sm">
                                         <li className="flex items-start gap-2">
-                                            <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Access to the email address listed on your venue
+                                            {t("methods.email.req1")}
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
-                                            A Nostr account to link the verification to your identity
+                                            {t("methods.email.req2")}
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">How it works:</h4>
+                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">{t("methods.email.howItWorks")}</h4>
                                     <ol className="space-y-3 text-gray-400 text-sm">
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold flex-shrink-0">1</span>
-                                            Find your business on MappingBitcoin and click "Verify"
+                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold shrink-0">1</span>
+                                            {t("methods.email.step1")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold flex-shrink-0">2</span>
-                                            Log in with your Nostr account
+                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold shrink-0">2</span>
+                                            {t("methods.email.step2")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold flex-shrink-0">3</span>
-                                            We send a 6-digit code to your business email
+                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold shrink-0">3</span>
+                                            {t("methods.email.step3")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold flex-shrink-0">4</span>
-                                            Enter the code to complete verification
+                                            <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-semibold shrink-0">4</span>
+                                            {t("methods.email.step4")}
                                         </li>
                                     </ol>
                                 </div>
@@ -196,53 +191,53 @@ const VerifyYourBusinessPage = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-xl font-semibold text-white">Domain Verification</h3>
+                                    <h3 className="text-xl font-semibold text-white">{t("methods.domain.title")}</h3>
                                 </div>
 
                                 <p className="text-gray-400 mb-6">
-                                    Verify by adding a DNS TXT record to your website domain.
+                                    {t("methods.domain.description")}
                                 </p>
 
                                 <div className="space-y-4 mb-6">
-                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">What you need:</h4>
+                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">{t("methods.domain.requirements")}</h4>
                                     <ul className="space-y-2 text-gray-400 text-sm">
                                         <li className="flex items-start gap-2">
-                                            <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Access to your domain&apos;s DNS settings
+                                            {t("methods.domain.req1")}
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
-                                            A Nostr account to link the verification to your identity
+                                            {t("methods.domain.req2")}
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">How it works:</h4>
+                                    <h4 className="text-sm font-semibold text-white uppercase tracking-wide">{t("methods.domain.howItWorks")}</h4>
                                     <ol className="space-y-3 text-gray-400 text-sm">
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold flex-shrink-0">1</span>
-                                            Find your business on MappingBitcoin and click "Verify"
+                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold shrink-0">1</span>
+                                            {t("methods.domain.step1")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold flex-shrink-0">2</span>
-                                            Log in with your Nostr account
+                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold shrink-0">2</span>
+                                            {t("methods.domain.step2")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold flex-shrink-0">3</span>
-                                            Copy the unique TXT record we provide
+                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold shrink-0">3</span>
+                                            {t("methods.domain.step3")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold flex-shrink-0">4</span>
-                                            Add it to your domain&apos;s DNS settings
+                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold shrink-0">4</span>
+                                            {t("methods.domain.step4")}
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold flex-shrink-0">5</span>
-                                            Click &quot;Verify&quot; once DNS propagates (usually 5-30 minutes)
+                                            <span className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-semibold shrink-0">5</span>
+                                            {t("methods.domain.step5")}
                                         </li>
                                     </ol>
                                 </div>
@@ -255,31 +250,31 @@ const VerifyYourBusinessPage = () => {
                 <section className="py-16 px-6">
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-8 text-center">
-                            Our Commitment to Transparency
+                            {t("transparency.title")}
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-3">Open Source</h3>
+                                <h3 className="text-lg font-semibold text-white mb-3">{t("transparency.cards.openSource.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    Our verification system is open source. Anyone can review the code and verify how we handle the verification process.
+                                    {t("transparency.cards.openSource.description")}
                                 </p>
                             </div>
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-3">Decentralized Identity</h3>
+                                <h3 className="text-lg font-semibold text-white mb-3">{t("transparency.cards.decentralized.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    Verifications are linked to your Nostr public key, giving you sovereign control over your business identity.
+                                    {t("transparency.cards.decentralized.description")}
                                 </p>
                             </div>
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-3">No Central Authority</h3>
+                                <h3 className="text-lg font-semibold text-white mb-3">{t("transparency.cards.noAuthority.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    We don&apos;t hold custody of your identity. Your Nostr keys are yours, and verification proves ownership without intermediaries.
+                                    {t("transparency.cards.noAuthority.description")}
                                 </p>
                             </div>
                             <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-3">Cryptographic Proof</h3>
+                                <h3 className="text-lg font-semibold text-white mb-3">{t("transparency.cards.cryptographic.title")}</h3>
                                 <p className="text-gray-400 text-sm">
-                                    All verifications are recorded with cryptographic signatures that can be independently verified.
+                                    {t("transparency.cards.cryptographic.description")}
                                 </p>
                             </div>
                         </div>
@@ -287,60 +282,22 @@ const VerifyYourBusinessPage = () => {
                 </section>
 
                 {/* FAQ Section */}
-                <section className="py-16 px-6 bg-[#111111]">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl md:text-3xl font-semibold text-white mb-8 text-center">
-                            Frequently Asked Questions
-                        </h2>
-                        <div className="space-y-4">
-                            <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-2">What is Nostr?</h3>
-                                <p className="text-gray-400 text-sm">
-                                    Nostr is a decentralized protocol for social networking. It uses cryptographic key pairs for identity, meaning you own your account without relying on any company. We use Nostr for verification because it aligns with Bitcoin&apos;s values of self-sovereignty.
-                                </p>
-                            </div>
-                            <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-2">How long does verification take?</h3>
-                                <p className="text-gray-400 text-sm">
-                                    Email verification is instant once you enter the code. Domain verification depends on DNS propagation, typically 5-30 minutes, but can take up to 48 hours in some cases.
-                                </p>
-                            </div>
-                            <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-2">Can I verify multiple businesses?</h3>
-                                <p className="text-gray-400 text-sm">
-                                    Yes, a single Nostr account can verify multiple businesses, as long as you can prove ownership of each one through email or domain verification.
-                                </p>
-                            </div>
-                            <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-2">Why do you block common email providers?</h3>
-                                <p className="text-gray-400 text-sm">
-                                    For domain verification via email, we only accept custom email domains (like you@yourbusiness.com). This ensures the verification actually proves domain ownership. However, if your venue has an email listed (even Gmail), you can still use email code verification.
-                                </p>
-                            </div>
-                            <div className="p-6 bg-[#1A1A1A] border border-white/10 rounded-xl">
-                                <h3 className="text-lg font-semibold text-white mb-2">Is verification free?</h3>
-                                <p className="text-gray-400 text-sm">
-                                    Yes, verification is completely free. We believe in open access to the Bitcoin economy.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <FAQSection translationKey="verify-your-business.faq" />
 
                 {/* CTA Section */}
-                <section className="py-16 md:py-24 px-6 bg-gradient-to-r from-orange-500/10 via-orange-500/5 to-orange-500/10 border-y border-orange-500/20">
+                <section className="py-16 md:py-24 px-6 bg-linear-to-r from-orange-500/10 via-orange-500/5 to-orange-500/10 border-y border-orange-500/20">
                     <div className="max-w-3xl mx-auto text-center">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-                            Ready to verify your business?
+                            {t("cta.title")}
                         </h2>
                         <p className="text-gray-400 mb-8">
-                            Find your listing on the map and click the Verify button to get started.
+                            {t("cta.description")}
                         </p>
                         <Link
                             href="/map"
                             className="inline-flex items-center justify-center px-8 py-4 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
                         >
-                            Find your business
+                            {t("cta.button")}
                         </Link>
                     </div>
                 </section>
