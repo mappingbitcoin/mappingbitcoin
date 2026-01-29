@@ -62,6 +62,7 @@ const Footer = () => {
                                 {[
                                     { href: "/map", key: "menu.map" },
                                     { href: "/countries", key: "menu.countries" },
+                                    { href: "/verify-your-business", label: "Verify Your Business" },
                                     { href: "/contact", key: "menu.contact" }
                                 ].map((item, index) => (
                                     <motion.li
@@ -72,7 +73,7 @@ const Footer = () => {
                                         transition={{ duration: 0.3, delay: index * 0.1 }}
                                     >
                                         <Link href={item.href} className="text-white/60 no-underline text-[15px] transition-colors duration-200 hover:text-white/90">
-                                            {t(item.key)}
+                                            {item.label || t(item.key!)}
                                         </Link>
                                     </motion.li>
                                 ))}

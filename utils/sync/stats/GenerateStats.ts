@@ -3,6 +3,7 @@ import path from 'path';
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import { EnrichedVenue } from '@/models/Overpass';
+import { prisma } from '@/lib/db/prisma';
 
 countries.registerLocale(enLocale);
 
@@ -92,6 +93,7 @@ export interface StatsData {
     totalVenues: number;
     countries: number;
     continents: number;
+    verifiedBusinesses: number;
     regions: {
         name: string;
         count: number;
@@ -163,10 +165,24 @@ export async function generateStats() {
             };
         });
 
+    // Get verified businesses count from database
+    let verifiedBusinesses = 0;
+    try {
+        verifiedBusinesses = await prisma.claim.count({
+            where: {
+                status: "VERIFIED",
+                revokedAt: null,
+            },
+        });
+    } catch (error) {
+        console.warn('Failed to get verified businesses count:', error);
+    }
+
     const stats: StatsData = {
         totalVenues: venues.length,
         countries: countryCounts.size,
         continents: continentsSet.size,
+        verifiedBusinesses,
         regions,
         topCountries,
         generatedAt: new Date().toISOString(),

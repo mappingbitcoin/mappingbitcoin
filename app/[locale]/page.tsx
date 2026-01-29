@@ -14,6 +14,7 @@ interface StatsData {
     totalVenues: number;
     countries: number;
     continents: number;
+    verifiedBusinesses: number;
     regions: { name: string; count: number }[];
     topCountries: { code: string; name: string; flag: string; count: number; slug: string }[];
 }
@@ -29,6 +30,7 @@ async function getStats(): Promise<StatsData> {
             totalVenues: 21000,
             countries: 150,
             continents: 6,
+            verifiedBusinesses: 0,
             regions: [
                 { name: "Europe", count: 7371 },
                 { name: "North America", count: 7027 },
@@ -49,8 +51,8 @@ async function getStats(): Promise<StatsData> {
     }
 }
 
-function formatNumber(num: number): string {
-    return num.toLocaleString();
+function formatNumber(num: number | undefined): string {
+    return (num ?? 0).toLocaleString();
 }
 
 // How it works data
@@ -62,6 +64,10 @@ const features = [
     {
         title: "Community driven",
         description: "Anyone can add venues. Real user reviews.",
+    },
+    {
+        title: "Verifiable places",
+        description: "Businesses can prove ownership. Trust built in.",
     },
     {
         title: "Always current",
@@ -125,14 +131,14 @@ const HomePage = async ({ params }: Localized) => {
                     {/* Animated topographic pattern */}
                     <TopographicPattern className="z-0" lineCount={14} baseColor="orange" />
 
-                    <div className="relative z-10 text-center max-w-4xl mx-auto">
+                    <div className="relative z-10 text-center max-w-4xl mx-auto mt-20">
                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                             The Bitcoin Economy, Mapped
                         </h1>
                         <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
                             {formatNumber(stats.totalVenues)}+ venues across {stats.continents} continents. Find where Bitcoin works.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                             <Link
                                 href="/map"
                                 className="inline-flex items-center justify-center px-8 py-4 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
@@ -145,6 +151,49 @@ const HomePage = async ({ params }: Localized) => {
                             >
                                 Browse directory
                             </Link>
+                        </div>
+
+                        {/* Powered by */}
+                        <div className="mt-14 flex flex-col items-center justify-center gap-2 text-gray-500">
+                            <span className="text-sm">Powered by</span>
+                            <div className="flex items-center gap-5">
+                                <a
+                                    href="https://www.openstreetmap.org"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-4 text-gray-400 hover:text-white transition-colors group"
+                                >
+                                    <img
+                                        src="/assets/icons/osm.svg"
+                                        alt="OpenStreetMap"
+                                        className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity"
+                                    />
+                                    <span className="text-sm font-medium">OpenStreetMap</span>
+                                </a>
+                                <span className="text-gray-600">+</span>
+                                <a
+                                    href="https://nostr.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-0 text-gray-400 hover:text-purple-400 transition-colors group -ml-4"
+                                >
+                                    <span
+                                        className="w-11 h-11 opacity-60 group-hover:opacity-100 transition-all bg-current"
+                                        style={{
+                                            maskImage: 'url(/assets/icons/nostr.svg)',
+                                            WebkitMaskImage: 'url(/assets/icons/nostr.svg)',
+                                            maskSize: 'contain',
+                                            WebkitMaskSize: 'contain',
+                                            maskRepeat: 'no-repeat',
+                                            WebkitMaskRepeat: 'no-repeat',
+                                            maskPosition: 'center',
+                                            WebkitMaskPosition: 'center',
+                                        }}
+                                        aria-hidden="true"
+                                    />
+                                    <span className="text-sm font-medium">Nostr</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -173,15 +222,107 @@ const HomePage = async ({ params }: Localized) => {
                             </div>
                             <div className="text-center">
                                 <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                                    Open
+                                    {formatNumber(stats.verifiedBusinesses)}
                                 </div>
-                                <div className="text-sm md:text-base text-gray-400">Source</div>
+                                <div className="text-sm md:text-base text-gray-400">Verified</div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Section 3: Browse by Region */}
+                {/* Section 3: Own a Bitcoin Business */}
+                <section className="py-16 md:py-24 px-6">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
+                                    Own a Bitcoin business?
+                                </h2>
+                                <p className="text-gray-400 mb-6">
+                                    Claim and verify your listing to build trust with customers, manage your information, and stand out in search results.
+                                </p>
+                                <div className="flex flex-wrap gap-4">
+                                    <Link
+                                        href="/verify-your-business"
+                                        className="inline-flex items-center justify-center px-6 py-3 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
+                                    >
+                                        Learn how to verify
+                                    </Link>
+                                    <Link
+                                        href="/places/create"
+                                        className="inline-flex items-center justify-center px-6 py-3 border border-white/30 hover:border-white/60 text-white font-semibold rounded-lg transition-colors"
+                                    >
+                                        Add your business
+                                    </Link>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
+                                    <div className="w-10 h-10 mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-1">Verified Badge</h3>
+                                    <p className="text-gray-400 text-sm">Show customers you&apos;re legitimate</p>
+                                </div>
+                                <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
+                                    <div className="w-10 h-10 mb-3 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-1">Edit Listing</h3>
+                                    <p className="text-gray-400 text-sm">Keep your info up to date</p>
+                                </div>
+                                <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
+                                    <div className="w-10 h-10 mb-3 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-1">Respond to Reviews</h3>
+                                    <p className="text-gray-400 text-sm">Engage with customers</p>
+                                </div>
+                                <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
+                                    <div className="w-10 h-10 mb-3 rounded-full bg-orange-500/10 flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-1">Secure & Free</h3>
+                                    <p className="text-gray-400 text-sm">No fees, your keys</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Section 4: How It Works */}
+                <section className="py-16 md:py-24 px-6 bg-[#111111]">
+                    <div className="max-w-6xl mx-auto">
+                        <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
+                            How it works
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {features.map((feature, index) => (
+                                <div key={index} className="text-center p-6">
+                                    <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-orange-500/10 flex items-center justify-center">
+                                        <span className="text-orange-500 font-bold text-lg">{index + 1}</span>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-white mb-3">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-gray-400">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Section 5: Browse by Region */}
                 <section className="py-16 md:py-24 px-6">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
@@ -216,7 +357,7 @@ const HomePage = async ({ params }: Localized) => {
                     </div>
                 </section>
 
-                {/* Section 4: Featured Countries */}
+                {/* Section 6: Featured Countries */}
                 <section className="py-16 md:py-24 px-6 bg-[#111111]">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
@@ -249,48 +390,6 @@ const HomePage = async ({ params }: Localized) => {
                                 </Link>
                             ))}
                         </div>
-                    </div>
-                </section>
-
-                {/* Section 5: How It Works */}
-                <section className="py-16 md:py-24 px-6">
-                    <div className="max-w-6xl mx-auto">
-                        <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
-                            How it works
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {features.map((feature, index) => (
-                                <div key={index} className="text-center p-6">
-                                    <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-orange-500/10 flex items-center justify-center">
-                                        <span className="text-orange-500 font-bold text-lg">{index + 1}</span>
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-white mb-3">
-                                        {feature.title}
-                                    </h3>
-                                    <p className="text-gray-400">
-                                        {feature.description}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Section 6: Add Business CTA */}
-                <section className="py-16 md:py-24 px-6 bg-gradient-to-r from-orange-500/10 via-orange-500/5 to-orange-500/10 border-y border-orange-500/20">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-                            Accept Bitcoin? Get on the map.
-                        </h2>
-                        <p className="text-gray-400 mb-8">
-                            Join {formatNumber(stats.totalVenues)}+ venues worldwide. Free listing.
-                        </p>
-                        <Link
-                            href="/places/create"
-                            className="inline-flex items-center justify-center px-8 py-4 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
-                        >
-                            Add your venue
-                        </Link>
                     </div>
                 </section>
 
