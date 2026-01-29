@@ -136,3 +136,17 @@ export function getVerifiableDomains(tags: Record<string, string> | undefined): 
 export function hasVerifiableDomain(tags: Record<string, string> | undefined): boolean {
     return getVerifiableDomains(tags).length > 0;
 }
+
+/**
+ * Check if a venue can be verified (has email OR verifiable domain)
+ */
+export function canVerifyVenue(tags: Record<string, string> | undefined): boolean {
+    if (!tags) return false;
+
+    // Check for email (for email code verification)
+    const email = tags.email || tags['contact:email'];
+    if (email) return true;
+
+    // Check for verifiable domains (website or custom email domain)
+    return getVerifiableDomains(tags).length > 0;
+}

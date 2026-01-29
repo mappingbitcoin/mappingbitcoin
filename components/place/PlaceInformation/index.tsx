@@ -17,7 +17,7 @@ import {getFormattedAddress} from "@/utils/AddressUtils";
 import moment from 'moment'
 import {deslugify} from "@/utils/StringUtils";
 import { VerifyOwnershipButton } from "@/components/verification";
-import { hasVerifiableDomain } from "@/lib/verification/domainUtils";
+import { canVerifyVenue } from "@/lib/verification/domainUtils";
 
 type Props = {
     venue: EnrichedVenue;
@@ -109,7 +109,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                 <div>
                     <div className="flex items-start justify-between gap-2">
                         <h2 className="text-xl font-bold m-0 text-white flex-1">{name}</h2>
-                        {hasVerifiableDomain(venue.tags) && (
+                        {canVerifyVenue(venue.tags) && (
                             <VerifyOwnershipButton
                                 venue={venue}
                                 venueName={name || 'This venue'}
