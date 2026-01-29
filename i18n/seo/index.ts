@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import type { Locale, LocalizedMetadata } from "./types";
 
 // Import all SEO modules
@@ -8,8 +7,8 @@ import contactSeo, { type ContactPageKey } from "./contact";
 import placesSeo, { type PlacesPageKey } from "./places";
 import countriesSeo, { type CountriesPageKey } from "./countries";
 import legalSeo, { type LegalPageKey } from "./legal";
-import counterSeo, { type CounterPageKey } from "./counter";
 import notFoundSeo, { type NotFoundPageKey } from "./not-found";
+import verifyYourBusinessSeo, { type VerifyYourBusinessPageKey } from "./verify-your-business";
 
 // Re-export utilities
 export { generateCanonical } from "./utils";
@@ -22,8 +21,8 @@ export type PageKey =
     | PlacesPageKey
     | CountriesPageKey
     | LegalPageKey
-    | CounterPageKey
-    | NotFoundPageKey;
+    | NotFoundPageKey
+    | VerifyYourBusinessPageKey;
 
 // Re-export types
 export type { Locale, LocalizedMetadata };
@@ -41,8 +40,8 @@ const seoContent: SEOMap<PageKey> = {
     ...placesSeo,
     ...countriesSeo,
     ...legalSeo,
-    ...counterSeo,
     ...notFoundSeo,
+    ...verifyYourBusinessSeo,
 };
 
 export default seoContent;

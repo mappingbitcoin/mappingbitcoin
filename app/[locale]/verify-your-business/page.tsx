@@ -1,18 +1,16 @@
-import { Metadata } from "next";
+import React from "react";
+import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
+import { Localized } from "@/i18n/types";
+import { generateCanonical } from "@/i18n/seo";
 import Script from "next/script";
 import VerifyYourBusinessContent from "./VerifyYourBusinessContent";
 
-export const metadata: Metadata = {
-    title: "Verify Your Business | MappingBitcoin.com",
-    description: "Prove ownership of your Bitcoin-accepting business on MappingBitcoin. Learn about our transparent verification process using email or domain verification.",
-    openGraph: {
-        title: "Verify Your Business | MappingBitcoin.com",
-        description: "Prove ownership of your Bitcoin-accepting business on MappingBitcoin. Learn about our transparent verification process.",
-        type: "website",
-    },
-};
+export const generateMetadata = buildGeneratePageMetadata('verify-your-business');
 
-export default function VerifyYourBusinessPage() {
+const VerifyYourBusinessPage = async ({ params }: Localized) => {
+    const { metadata, locale } = await getPageSeo('verify-your-business')({ params });
+    const canonical = generateCanonical('verify-your-business', locale);
+
     return (
         <>
             <Script
@@ -22,9 +20,9 @@ export default function VerifyYourBusinessPage() {
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@type": "WebPage",
-                        "name": "Verify Your Business",
-                        "description": "Learn how to verify ownership of your Bitcoin-accepting business on MappingBitcoin.com",
-                        "url": "https://mappingbitcoin.com/verify-your-business",
+                        "name": metadata.title,
+                        "description": metadata.description,
+                        "url": canonical,
                         "isPartOf": {
                             "@type": "WebSite",
                             "name": "MappingBitcoin.com",
@@ -51,7 +49,7 @@ export default function VerifyYourBusinessPage() {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Verify Your Business",
-                                "item": "https://mappingbitcoin.com/verify-your-business"
+                                "item": canonical
                             }
                         ]
                     }),
@@ -60,4 +58,6 @@ export default function VerifyYourBusinessPage() {
             <VerifyYourBusinessContent />
         </>
     );
-}
+};
+
+export default VerifyYourBusinessPage;

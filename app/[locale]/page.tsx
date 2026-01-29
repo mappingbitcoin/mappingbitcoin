@@ -1,12 +1,14 @@
 import React from "react";
 import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
+import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 import Link from "next/link";
 import fs from "fs/promises";
 import path from "path";
 import TopographicPattern from "@/components/ui/TopographicPattern";
-import { NewsletterCTA } from "@/components/common";
+import { NewsletterCTA, FAQSection } from "@/components/common";
+import HomeStatsSection from "./HomeStatsSection";
 
 export const generateMetadata = buildGeneratePageMetadata('home')
 
@@ -55,29 +57,30 @@ function formatNumber(num: number | undefined): string {
     return (num ?? 0).toLocaleString();
 }
 
-// How it works data
-const features = [
-    {
-        title: "Open data",
-        description: "Built on OpenStreetMap. Transparent and verifiable.",
-    },
-    {
-        title: "Community driven",
-        description: "Anyone can add venues. Real user reviews.",
-    },
-    {
-        title: "Verifiable places",
-        description: "Businesses can prove ownership. Trust built in.",
-    },
-    {
-        title: "Always current",
-        description: "Continuous updates. Moderated submissions.",
-    },
-];
-
 const HomePage = async ({ params }: Localized) => {
     const { locale } = await params;
     const stats = await getStats();
+    const t = await getTranslations({ locale, namespace: "home" });
+
+    // How it works features from translations
+    const features = [
+        {
+            title: t("howItWorks.features.openData.title"),
+            description: t("howItWorks.features.openData.description"),
+        },
+        {
+            title: t("howItWorks.features.communityDriven.title"),
+            description: t("howItWorks.features.communityDriven.description"),
+        },
+        {
+            title: t("howItWorks.features.verifiablePlaces.title"),
+            description: t("howItWorks.features.verifiablePlaces.description"),
+        },
+        {
+            title: t("howItWorks.features.alwaysCurrent.title"),
+            description: t("howItWorks.features.alwaysCurrent.description"),
+        },
+    ];
 
     return (
         <>
@@ -133,29 +136,29 @@ const HomePage = async ({ params }: Localized) => {
 
                     <div className="relative z-10 text-center max-w-4xl mx-auto mt-20">
                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                            The Bitcoin Economy, Mapped
+                            {t("hero.title")}
                         </h1>
                         <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-                            {formatNumber(stats.totalVenues)}+ venues across {stats.continents} continents. Find where Bitcoin works.
+                            {t("hero.description", { venues: formatNumber(stats.totalVenues), continents: stats.continents })}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                             <Link
                                 href="/map"
                                 className="inline-flex items-center justify-center px-8 py-4 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
                             >
-                                Explore map
+                                {t("hero.cta.primary")}
                             </Link>
                             <Link
                                 href="/countries"
                                 className="inline-flex items-center justify-center px-8 py-4 border border-white/30 hover:border-white/60 text-white font-semibold rounded-lg transition-colors"
                             >
-                                Browse directory
+                                {t("hero.cta.secondary")}
                             </Link>
                         </div>
 
                         {/* Powered by */}
                         <div className="mt-14 flex flex-col items-center justify-center gap-2 text-gray-500">
-                            <span className="text-sm">Powered by</span>
+                            <span className="text-sm">{t("hero.poweredBy")}</span>
                             <div className="flex items-center gap-5">
                                 <a
                                     href="https://www.openstreetmap.org"
@@ -199,36 +202,12 @@ const HomePage = async ({ params }: Localized) => {
                 </section>
 
                 {/* Section 2: Stats Bar */}
-                <section className="py-12 border-y border-white/10 bg-[#111111]">
-                    <div className="max-w-6xl mx-auto px-6">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
-                            <div className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                                    {formatNumber(stats.totalVenues)}+
-                                </div>
-                                <div className="text-sm md:text-base text-gray-400">Venues</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                                    {stats.countries}+
-                                </div>
-                                <div className="text-sm md:text-base text-gray-400">Countries</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                                    {stats.continents}
-                                </div>
-                                <div className="text-sm md:text-base text-gray-400">Continents</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                                    {formatNumber(stats.verifiedBusinesses)}
-                                </div>
-                                <div className="text-sm md:text-base text-gray-400">Verified</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <HomeStatsSection
+                    totalVenues={stats.totalVenues}
+                    countries={stats.countries}
+                    continents={stats.continents}
+                    verifiedBusinesses={stats.verifiedBusinesses}
+                />
 
                 {/* Section 3: Own a Bitcoin Business */}
                 <section className="py-16 md:py-24 px-6">
@@ -236,23 +215,23 @@ const HomePage = async ({ params }: Localized) => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                             <div>
                                 <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-                                    Own a Bitcoin business?
+                                    {t("ownBusiness.title")}
                                 </h2>
                                 <p className="text-gray-400 mb-6">
-                                    Claim and verify your listing to build trust with customers, manage your information, and stand out in search results.
+                                    {t("ownBusiness.description")}
                                 </p>
                                 <div className="flex flex-wrap gap-4">
                                     <Link
                                         href="/verify-your-business"
                                         className="inline-flex items-center justify-center px-6 py-3 bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 text-white font-semibold rounded-lg transition-colors"
                                     >
-                                        Learn how to verify
+                                        {t("ownBusiness.verifyLink")}
                                     </Link>
                                     <Link
                                         href="/places/create"
                                         className="inline-flex items-center justify-center px-6 py-3 border border-white/30 hover:border-white/60 text-white font-semibold rounded-lg transition-colors"
                                     >
-                                        Add your business
+                                        {t("ownBusiness.cta")}
                                     </Link>
                                 </div>
                             </div>
@@ -263,8 +242,8 @@ const HomePage = async ({ params }: Localized) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-white font-semibold mb-1">Verified Badge</h3>
-                                    <p className="text-gray-400 text-sm">Show customers you&apos;re legitimate</p>
+                                    <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.verified.title")}</h3>
+                                    <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.verified.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-blue-500/10 flex items-center justify-center">
@@ -272,8 +251,8 @@ const HomePage = async ({ params }: Localized) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-white font-semibold mb-1">Edit Listing</h3>
-                                    <p className="text-gray-400 text-sm">Keep your info up to date</p>
+                                    <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.edit.title")}</h3>
+                                    <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.edit.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -281,8 +260,8 @@ const HomePage = async ({ params }: Localized) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-white font-semibold mb-1">Respond to Reviews</h3>
-                                    <p className="text-gray-400 text-sm">Engage with customers</p>
+                                    <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.reviews.title")}</h3>
+                                    <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.reviews.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -290,8 +269,8 @@ const HomePage = async ({ params }: Localized) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-white font-semibold mb-1">Secure & Free</h3>
-                                    <p className="text-gray-400 text-sm">No fees, your keys</p>
+                                    <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.secure.title")}</h3>
+                                    <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.secure.description")}</p>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +281,7 @@ const HomePage = async ({ params }: Localized) => {
                 <section className="py-16 md:py-24 px-6 bg-[#111111]">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
-                            How it works
+                            {t("howItWorks.title")}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                             {features.map((feature, index) => (
@@ -326,7 +305,7 @@ const HomePage = async ({ params }: Localized) => {
                 <section className="py-16 md:py-24 px-6">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
-                            Explore by region
+                            {t("regions.title")}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {stats.regions.map((region, index) => (
@@ -340,7 +319,7 @@ const HomePage = async ({ params }: Localized) => {
                                             {region.name}
                                         </div>
                                         <div className="text-sm text-gray-400">
-                                            {formatNumber(region.count)} venues
+                                            {formatNumber(region.count)} {t("topCountries.venues")}
                                         </div>
                                     </div>
                                     <svg
@@ -361,7 +340,7 @@ const HomePage = async ({ params }: Localized) => {
                 <section className="py-16 md:py-24 px-6 bg-[#111111]">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-10 text-center">
-                            Top Bitcoin countries
+                            {t("topCountries.title")}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {stats.topCountries.slice(0, 6).map((country, index) => (
@@ -376,7 +355,7 @@ const HomePage = async ({ params }: Localized) => {
                                             {country.name}
                                         </div>
                                         <div className="text-sm text-gray-400">
-                                            {formatNumber(country.count)} venues
+                                            {formatNumber(country.count)} {t("topCountries.venues")}
                                         </div>
                                     </div>
                                     <svg
@@ -393,7 +372,10 @@ const HomePage = async ({ params }: Localized) => {
                     </div>
                 </section>
 
-                {/* Section 7: Newsletter CTA */}
+                {/* Section 7: FAQ */}
+                <FAQSection translationKey="home.faq" />
+
+                {/* Section 8: Newsletter CTA */}
                 <NewsletterCTA />
             </main>
         </>

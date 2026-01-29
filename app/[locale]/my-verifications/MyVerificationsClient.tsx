@@ -92,16 +92,15 @@ export default function MyVerificationsClient() {
     }, []);
 
     const handleCheckDomain = async (claimId: string) => {
-        if (cooldowns[claimId]) return;
+        if (cooldowns[claimId] || !authToken) return;
 
         setCheckingClaim(claimId);
         try {
-            const token = await getAuthToken();
             const response = await fetch("/api/verify/domain/check", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify({ claimId }),
             });
