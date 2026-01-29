@@ -22,6 +22,7 @@ import {getFormattedAddress} from "@/utils/AddressUtils";
 import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import moment from 'moment';
 import { VerifyOwnershipButton } from "@/components/verification";
+import { hasVerifiableDomain } from "@/lib/verification/domainUtils";
 
 // SVG icons for payment methods
 const PaymentIcon = ({ type }: { type: string }) => {
@@ -587,8 +588,8 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                         {/* Right Column - Sidebar */}
                         <div className="lg:sticky lg:top-24 h-fit space-y-4">
 
-                            {/* Verify Ownership - only show if venue has an email */}
-                            {contact?.email && (
+                            {/* Verify Ownership - only show if venue has a verifiable domain */}
+                            {hasVerifiableDomain(venue.tags) && (
                                 <div className="bg-surface rounded-card border border-border-light p-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -602,7 +603,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                     <VerifyOwnershipButton
                                         venue={venue}
                                         venueName={name || 'This venue'}
-                                        osmEmail={contact.email}
+                                        osmEmail={contact?.email}
                                     />
                                 </div>
                             )}
