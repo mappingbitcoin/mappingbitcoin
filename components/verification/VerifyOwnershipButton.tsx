@@ -9,7 +9,7 @@ import VerifiedBadge from "./VerifiedBadge";
 interface VerifyOwnershipButtonProps {
     venue: EnrichedVenue;
     venueName: string;
-    osmEmail: string;
+    osmEmail?: string;
     compact?: boolean;
 }
 
