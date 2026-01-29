@@ -21,6 +21,11 @@ interface NostrProfile {
     nip05?: string;
 }
 
+interface SeederInfo {
+    label: string | null;
+    region: string;
+}
+
 // Fetch user profile from relays (NIP-01 kind:0)
 async function fetchNostrProfile(pubkey: string): Promise<NostrProfile | null> {
     const relays = [
@@ -84,36 +89,71 @@ function fetchProfileFromRelay(relayUrl: string, pubkey: string): Promise<NostrP
     });
 }
 
-const UserAvatar = ({ pubkey, picture, name }: { pubkey: string; picture?: string; name?: string }) => {
+// Fetch seeder status from API
+async function fetchSeederStatus(pubkey: string): Promise<{ isSeeder: boolean; seeder: SeederInfo | null }> {
+    try {
+        const response = await fetch(`/api/user/seeder-status?pubkey=${pubkey}`);
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.warn("Failed to fetch seeder status:", e);
+    }
+    return { isSeeder: false, seeder: null };
+}
+
+const UserAvatar = ({ pubkey, picture, name, isSeeder }: { pubkey: string; picture?: string; name?: string; isSeeder?: boolean }) => {
     // Generate a deterministic color based on pubkey
     const hue = parseInt(pubkey.slice(0, 8), 16) % 360;
     const initial = name ? name.charAt(0).toUpperCase() : pubkey.slice(0, 2).toUpperCase();
 
+    const ringClass = isSeeder
+        ? "ring-2 ring-green-400 group-hover:ring-green-300"
+        : "ring-2 ring-transparent group-hover:ring-accent/50";
+
     if (picture) {
         return (
-            <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all">
-                <img
-                    src={picture}
-                    alt={name || "User"}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                        // Fallback to colored circle if image fails
-                        (e.target as HTMLImageElement).style.display = 'none';
-                        (e.target as HTMLImageElement).parentElement!.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center text-white text-xs font-bold" style="background-color: hsl(${hue}, 60%, 45%)">${initial}</div>
-                        `;
-                    }}
-                />
+            <div className="relative">
+                <div className={`w-9 h-9 rounded-full overflow-hidden ${ringClass} transition-all`}>
+                    <img
+                        src={picture}
+                        alt={name || "User"}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            // Fallback to colored circle if image fails
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement!.innerHTML = `
+                                <div class="w-full h-full flex items-center justify-center text-white text-xs font-bold" style="background-color: hsl(${hue}, 60%, 45%)">${initial}</div>
+                            `;
+                        }}
+                    />
+                </div>
+                {isSeeder && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
+                        <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                    </div>
+                )}
             </div>
         );
     }
 
     return (
-        <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-transparent group-hover:ring-accent/50 transition-all"
-            style={{ backgroundColor: `hsl(${hue}, 60%, 45%)` }}
-        >
-            {initial}
+        <div className="relative">
+            <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold ${ringClass} transition-all`}
+                style={{ backgroundColor: `hsl(${hue}, 60%, 45%)` }}
+            >
+                {initial}
+            </div>
+            {isSeeder && (
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
+                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                </div>
+            )}
         </div>
     );
 };
@@ -127,6 +167,7 @@ const NavBar = () => {
     const { user, logout } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
     const [profile, setProfile] = useState<NostrProfile | null>(null);
+    const [seederInfo, setSeederInfo] = useState<{ isSeeder: boolean; seeder: SeederInfo | null }>({ isSeeder: false, seeder: null });
 
     const openMenu = () => {
         setMenuOpen(true);
@@ -136,12 +177,14 @@ const NavBar = () => {
         setMenuOpen(false);
     };
 
-    // Fetch user profile when logged in
+    // Fetch user profile and seeder status when logged in
     useEffect(() => {
         if (user?.pubkey) {
             fetchNostrProfile(user.pubkey).then(setProfile);
+            fetchSeederStatus(user.pubkey).then(setSeederInfo);
         } else {
             setProfile(null);
+            setSeederInfo({ isSeeder: false, seeder: null });
         }
     }, [user?.pubkey]);
 
@@ -230,6 +273,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
+                                                isSeeder={seederInfo.isSeeder}
                                             />
                                         </motion.button>
 
@@ -248,6 +292,7 @@ const NavBar = () => {
                                                                 pubkey={user.pubkey}
                                                                 picture={profile?.picture}
                                                                 name={profile?.name}
+                                                                isSeeder={seederInfo.isSeeder}
                                                             />
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-sm font-medium text-white truncate">
@@ -265,11 +310,21 @@ const NavBar = () => {
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        {user.mode === 'read' && (
-                                                            <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
-                                                                {t('readOnly')}
-                                                            </span>
-                                                        )}
+                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                            {seederInfo.isSeeder && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
+                                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                                                                    </svg>
+                                                                    {seederInfo.seeder?.label || 'Community Seeder'}
+                                                                </span>
+                                                            )}
+                                                            {user.mode === 'read' && (
+                                                                <span className="inline-block px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
+                                                                    {t('readOnly')}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <div className="p-1">
                                                         <Link
@@ -366,6 +421,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
+                                                isSeeder={seederInfo.isSeeder}
                                             />
                                             <div>
                                                 <p className="text-sm text-white font-medium">
@@ -376,11 +432,21 @@ const NavBar = () => {
                                                         {profile.nip05}
                                                     </p>
                                                 )}
-                                                {user.mode === 'read' && (
-                                                    <span className="inline-block px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
-                                                        {t('readOnly')}
-                                                    </span>
-                                                )}
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {seederInfo.isSeeder && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
+                                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                                                            </svg>
+                                                            {seederInfo.seeder?.label || 'Community Seeder'}
+                                                        </span>
+                                                    )}
+                                                    {user.mode === 'read' && (
+                                                        <span className="inline-block px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
+                                                            {t('readOnly')}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                         <Link

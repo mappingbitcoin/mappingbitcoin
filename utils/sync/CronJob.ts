@@ -6,6 +6,7 @@ import {initOsmReplicationState} from "@/utils/sync/ReplicationFetcher";
 import {generateMerchantSlugs} from "@/utils/sync/slugs/MerchantSlugs";
 import {generateVenueSlugs} from "@/utils/sync/slugs/VenueSlugs";
 import {generateStats} from "@/utils/sync/stats/GenerateStats";
+import {buildCommunityGraph, isBuildRunning} from "@/lib/trust/graphBuilder";
 
 let started = false;
 
@@ -69,6 +70,28 @@ export async function startBitcoinVenueCron() {
             console.error('[Cron] Merchant slug sync error:', err);
         } finally {
             isSyncRunningMerchantSlugs = false;
+        }
+    });
+
+    // 🕒 Community trust graph rebuild - daily at 03:00 UTC
+    cron.schedule('0 3 * * *', async () => {
+        const isRunning = await isBuildRunning();
+        if (isRunning) {
+            console.log(`[Cron] Trust graph build already running, skipping at ${new Date().toISOString()}`);
+            return;
+        }
+
+        console.log(`[Cron] Running trust graph rebuild at ${new Date().toISOString()}`);
+
+        try {
+            const result = await buildCommunityGraph();
+            if (result.success) {
+                console.log(`[Cron] Trust graph rebuild complete with ${result.nodesCount} nodes ✅`);
+            } else {
+                console.error('[Cron] Trust graph rebuild failed:', result.error);
+            }
+        } catch (err) {
+            console.error('[Cron] Trust graph rebuild error:', err);
         }
     });
 

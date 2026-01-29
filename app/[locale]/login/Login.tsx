@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { PageSection } from "@/components/layout";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNostrAuth, useNpub } from "@/contexts/NostrAuthContext";
@@ -51,6 +52,8 @@ type ConnectTab = "qr" | "manual";
 const Login: React.FC = () => {
     const t = useTranslations("login");
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const returnTo = searchParams.get("returnTo") || "/";
     const { user, isLoading, error, loginWithKey, loginWithExtension, loginWithBunker, clearError } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
 
@@ -104,9 +107,9 @@ const Login: React.FC = () => {
     // Redirect if already logged in
     useEffect(() => {
         if (user && !isLoading) {
-            router.push("/");
+            router.push(returnTo);
         }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, returnTo]);
 
     // Cleanup on unmount
     useEffect(() => {
