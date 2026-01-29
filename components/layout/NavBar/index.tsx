@@ -6,6 +6,7 @@ import Image from "next/image";
 import {useTranslations} from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNostrAuth, useNpub } from "@/contexts/NostrAuthContext";
+import NavBarSearch from "./NavBarSearch";
 
 const menuItems = [
     'map',
@@ -162,12 +163,16 @@ const NavBar = () => {
     const pathname = usePathname()
     const [menuOpen, setMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const t = useTranslations("menu");
     const { user, logout } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
     const [profile, setProfile] = useState<NostrProfile | null>(null);
     const [seederInfo, setSeederInfo] = useState<{ isSeeder: boolean; seeder: SeederInfo | null }>({ isSeeder: false, seeder: null });
+
+    // Check if we're on the map page (which has its own search)
+    const isMapPage = pathname === "/map" || pathname?.endsWith("/map");
 
     const openMenu = () => {
         setMenuOpen(true);
@@ -235,12 +240,51 @@ const NavBar = () => {
                         {/* Desktop Navigation + CTA */}
                         <div className="hidden md:flex items-center gap-8">
                             <ul className="flex items-center gap-8 list-none">
-                                {menuItems.map((el, ix) => (
+                                {/* Map link */}
+                                <motion.li
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3, delay: 0.1 }}
+                                >
+                                    <Link
+                                        onClick={closeMenu}
+                                        className={`text-white/70 no-underline text-sm font-medium transition-colors duration-300 relative hover:text-white ${
+                                            pathname === '/map' ? 'text-white' : ''
+                                        }`}
+                                        href="/map"
+                                    >
+                                        {t('map')}
+                                    </Link>
+                                </motion.li>
+
+                                {/* Expandable Search - hidden on map page */}
+                                {!isMapPage && (
+                                    <motion.li
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: 0.15 }}
+                                        className="relative group/search"
+                                    >
+                                        <div className="w-8 h-8 flex items-center justify-center text-white/70 group-hover/search:text-white transition-colors cursor-pointer">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                        <div className="absolute left-0 top-full mt-2 w-72 opacity-0 invisible group-hover/search:opacity-100 group-hover/search:visible transition-all duration-200 z-50">
+                                            <div className="bg-surface border border-border-light rounded-lg shadow-xl p-2">
+                                                <NavBarSearch placeholder="Search venues, cities..." />
+                                            </div>
+                                        </div>
+                                    </motion.li>
+                                )}
+
+                                {/* Other menu items */}
+                                {menuItems.slice(1).map((el, ix) => (
                                     <motion.li
                                         key={ix}
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3, delay: 0.1 + ix * 0.05 }}
+                                        transition={{ duration: 0.3, delay: 0.2 + ix * 0.05 }}
                                     >
                                         <Link
                                             onClick={closeMenu}
@@ -365,24 +409,39 @@ const NavBar = () => {
                             </motion.div>
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        <motion.button
-                            className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white cursor-pointer hover:bg-white/10 transition-colors"
-                            onClick={openMenu}
-                            whileTap={{ scale: 0.95 }}
-                            aria-label="Open menu"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </svg>
-                        </motion.button>
+                        {/* Mobile Search & Menu Buttons */}
+                        <div className="flex md:hidden items-center gap-2">
+                            {/* Mobile Search Button - hidden on map page */}
+                            {!isMapPage && (
+                                <motion.button
+                                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white cursor-pointer hover:bg-white/10 transition-colors"
+                                    onClick={() => setMobileSearchOpen(true)}
+                                    whileTap={{ scale: 0.95 }}
+                                    aria-label="Search"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </motion.button>
+                            )}
+                            <motion.button
+                                className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white cursor-pointer hover:bg-white/10 transition-colors"
+                                onClick={openMenu}
+                                whileTap={{ scale: 0.95 }}
+                                aria-label="Open menu"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                                </svg>
+                            </motion.button>
+                        </div>
                     </>
                 ) : (
                     <AnimatePresence>
                         <motion.div
-                            className="fixed h-screen top-0 left-0 w-full bg-primary/98 backdrop-blur-[20px] flex flex-col items-center justify-center gap-8 overscroll-none touch-none z-50"
+                            className="fixed h-screen top-0 left-0 w-full bg-primary/80 backdrop-blur-xl flex flex-col items-center justify-center gap-8 overscroll-none touch-none z-50"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -501,6 +560,43 @@ const NavBar = () => {
                         </motion.div>
                     </AnimatePresence>
                 )}
+
+                {/* Mobile Search Overlay */}
+                <AnimatePresence>
+                    {mobileSearchOpen && (
+                        <motion.div
+                            className="fixed inset-0 bg-primary/80 backdrop-blur-xl z-50 flex flex-col p-4"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1">
+                                    <NavBarSearch
+                                        placeholder="Search venues, cities..."
+                                        onClose={() => setMobileSearchOpen(false)}
+                                        autoFocus
+                                    />
+                                </div>
+                                <motion.button
+                                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white cursor-pointer hover:bg-white/10 transition-colors"
+                                    onClick={() => setMobileSearchOpen(false)}
+                                    whileTap={{ scale: 0.95 }}
+                                    aria-label="Close search"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </motion.button>
+                            </div>
+                            <p className="text-center text-white/40 text-sm mt-8">
+                                Search for Bitcoin-accepting venues or locations
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </motion.nav>
     );
