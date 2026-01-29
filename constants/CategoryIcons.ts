@@ -1,173 +1,177 @@
 import {PlaceSubcategory} from "@/constants/PlaceCategories";
 
+/**
+ * Maps place subcategories to Maki icon names
+ * Reference: https://github.com/mapbox/maki/tree/main/icons
+ * NOTE: Maki uses hyphens (e.g., "fast-food", "ice-cream")
+ */
 export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     car_dealer: "car",
-    car_rental: "car_rental",
-    car_repair: "car_repair",
-    car_wash: "car", // no direct match, fallback to general car
-    bicycle_rental: "bicycle_rental",
-    electric_vehicle_charging_station: "charging_station",
+    car_rental: "car-rental",
+    car_repair: "car-repair",
+    car_wash: "car",
+    bicycle_rental: "bicycle-share",
+    electric_vehicle_charging_station: "charging-station",
     gas_station: "fuel",
     parking: "parking",
-    rest_stop: "highway_rest_area",
+    rest_stop: "highway-rest-area",
     corporate_office: "commercial",
     farm: "farm",
-    ranch: "farm", // no "ranch" icon, using "farm" as closest
-    coworking_space: "commercial" /* ← no direct match, suggest custom if needed */,
+    ranch: "farm",
+    coworking_space: "commercial",
 
     // Culture
-    art_gallery: "art_gallery",
-    art_studio: "paint", // best creative/visual match
+    art_gallery: "art-gallery",
+    art_studio: "paint",
     auditorium: "theatre",
     cultural_landmark: "landmark",
     historical_place: "historic",
     monument: "monument",
     museum: "museum",
     performing_arts_theater: "theatre",
-    sculpture: "sculpture",
+    sculpture: "monument",
+
     // Education
     library: "library",
-    preschool: "school", // closest match, generic
+    preschool: "school",
     primary_school: "school",
     school: "school",
     secondary_school: "school",
     university: "college",
     music_school: "music",
-    cooking_school: "restaurant", // fallback, no better visual match
-    driving_school: "car", // fallback
+    cooking_school: "restaurant",
+    driving_school: "car",
 
     // Entertainment & Recreation
-    adventure_sports_center: "soccer" /* ← no direct match, custom? */,
+    adventure_sports_center: "soccer",
     amphitheatre: "theatre",
-    amusement_center: "theme_park",
-    amusement_park: "theme_park",
+    amusement_center: "amusement-park",
+    amusement_park: "amusement-park",
     aquarium: "aquarium",
-    banquet_hall: "restaurant", // fallback
+    banquet_hall: "restaurant",
     barbecue_area: "bbq",
     botanical_garden: "garden",
-    bowling_alley: "bowling",
+    bowling_alley: "bowling-alley",
     casino: "casino",
-    childrens_camp: "campfire", // fallback symbol of camp life
-    comedy_club: "theatre", // best available match
-    community_center: "town_hall", // fallback civic building
+    childrens_camp: "campsite",
+    comedy_club: "theatre",
+    community_center: "town-hall",
     concert_hall: "music",
-    convention_center: "theatre", // fallback for large venues
-    cultural_center: "landmark", // fallback to signify cultural place
-    cycling_park: "bicycle", // generic cycling icon
-    dance_hall: "music", // fallback for music/dance venues
-    dog_park: "dog_park",
-    event_venue: "marker", // generic event marker
-    ferris_wheel: "theme_park", // best thematic match
+    convention_center: "theatre",
+    cultural_center: "landmark",
+    cycling_park: "bicycle",
+    dance_hall: "music",
+    dog_park: "dog-park",
+    event_venue: "marker",
+    ferris_wheel: "amusement-park",
     garden: "garden",
-    hiking_area: "natural", // fallback for nature/hiking
+    hiking_area: "natural",
     historical_landmark: "historic",
-    internet_cafe: "mobile_phone" /* ← not available, consider custom */,
+    internet_cafe: "mobile-phone",
     karaoke: "karaoke",
     marina: "harbor",
-    movie_rental: "cinema", // closest available
+    movie_rental: "cinema",
     movie_theater: "cinema",
     national_park: "park",
-    night_club: "bar",
-    observation_deck: "observation_tower",
-    off_roading_area: "truck", // fallback
+    night_club: "nightclub",
+    observation_deck: "observation-tower",
+    off_roading_area: "car",
     opera_house: "theatre",
     park: "park",
     philharmonic_hall: "music",
-    picnic_ground: "picnic_site",
-    planetarium: "star", // fallback
+    picnic_ground: "picnic-site",
+    planetarium: "star",
     plaza: "city",
-    // Entertainment & Recreation
-    roller_coaster: "theme_park", // fallback, no direct icon
+    roller_coaster: "amusement-park",
     skateboard_park: "skateboard",
     state_park: "park",
     tourist_attraction: "attraction",
     video_arcade: "gaming",
     visitor_center: "information",
-    water_park: "water_park",
+    water_park: "swimming",
     wedding_venue: "heart",
     wildlife_park: "zoo",
-    wildlife_refuge: "zoo", // fallback
+    wildlife_refuge: "zoo",
     zoo: "zoo",
 
     // Facilities
-    public_bath: "hot_spring", // closest available
-    public_bathroom: "toilets",
-    stable: "horse_riding", // closest thematic match
+    public_bath: "hot-spring",
+    public_bathroom: "toilet",
+    stable: "horse-riding",
 
     // Finance
-    accounting: "bank", // fallback
-    atm: "atm",
+    accounting: "bank",
+    atm: "bank",  // Maki doesn't have ATM, use bank
     bank: "bank",
-    currency_exchange: "bank", // fallback
+    currency_exchange: "bank",
 
-    // Food & Drink (start)
-    acai_shop: "ice_cream", // closest available visual
-    afghani_restaurant: "restaurant", // general fallback
+    // Food & Drink
+    acai_shop: "ice-cream",
+    afghani_restaurant: "restaurant",
     african_restaurant: "restaurant",
     american_restaurant: "restaurant",
-    asian_restaurant: "noodle", // symbolic match
-    bagel_shop: "bakery", // fallback
+    asian_restaurant: "restaurant-noodle",
+    bagel_shop: "bakery",
     bakery: "bakery",
     bar: "bar",
-    bar_and_grill: "bar", // fallback
-    barbecue_restaurant: "bbq",
-    brazilian_restaurant: "restaurant", // fallback
-    breakfast_restaurant: "cafe", // best symbolic match
-    brunch_restaurant: "cafe", // same
-    buffet_restaurant: "restaurant", // fallback
+    bar_and_grill: "bar",
+    barbecue_restaurant: "restaurant-bbq",
+    brazilian_restaurant: "restaurant",
+    breakfast_restaurant: "cafe",
+    brunch_restaurant: "cafe",
+    buffet_restaurant: "restaurant",
     cafe: "cafe",
-    cafeteria: "cafe", // fallback
+    cafeteria: "cafe",
     candy_store: "confectionery",
-    cat_cafe: "cafe", // fallback
-    chinese_restaurant: "noodle", // closest match
-    chocolate_factory: "confectionery", // fallback
+    cat_cafe: "cafe",
+    chinese_restaurant: "restaurant-noodle",
+    chocolate_factory: "confectionery",
     chocolate_shop: "confectionery",
     coffee_shop: "cafe",
     confectionery: "confectionery",
-    deli: "convenience", // or use "deli" if added manually
-    dessert_restaurant: "ice_cream", // closest symbol
-    dessert_shop: "ice_cream",
+    deli: "convenience",
+    dessert_restaurant: "ice-cream",
+    dessert_shop: "ice-cream",
     diner: "restaurant",
-    dog_cafe: "cafe", // fallback
-    donut_shop: "bakery", // fallback
-    fast_food_restaurant: "fast_food",
+    dog_cafe: "cafe",
+    donut_shop: "bakery",
+    fast_food_restaurant: "fast-food",
     fine_dining_restaurant: "restaurant",
-    food_court: "restaurant", // fallback
+    food_court: "restaurant",
     french_restaurant: "restaurant",
     greek_restaurant: "restaurant",
-    hamburger_restaurant: "fast_food",
-    ice_cream_shop: "ice_cream",
+    hamburger_restaurant: "fast-food",
+    ice_cream_shop: "ice-cream",
     indian_restaurant: "restaurant",
     indonesian_restaurant: "restaurant",
     italian_restaurant: "restaurant",
-    japanese_restaurant: "sushi",
-    juice_shop: "teahouse", // closest symbolic match
+    japanese_restaurant: "restaurant-sushi",
+    juice_shop: "teahouse",
     korean_restaurant: "restaurant",
-    // Food & Drink
     lebanese_restaurant: "restaurant",
-    meal_delivery: "restaurant", // fallback
-    meal_takeaway: "fast_food", // best fit
+    meal_delivery: "restaurant",
+    meal_takeaway: "fast-food",
     mediterranean_restaurant: "restaurant",
     mexican_restaurant: "restaurant",
     middle_eastern_restaurant: "restaurant",
-    pizza_restaurant: "pizza",
+    pizza_restaurant: "restaurant-pizza",
     pub: "bar",
-    ramen_restaurant: "noodle",
+    ramen_restaurant: "restaurant-noodle",
     restaurant: "restaurant",
-    sandwich_shop: "fast_food", // closest visual
-    seafood_restaurant: "seafood",
+    sandwich_shop: "fast-food",
+    seafood_restaurant: "restaurant-seafood",
     spanish_restaurant: "restaurant",
     steak_house: "restaurant",
-    sushi_restaurant: "sushi",
+    sushi_restaurant: "restaurant-sushi",
     tea_house: "teahouse",
     thai_restaurant: "restaurant",
     turkish_restaurant: "restaurant",
     vegan_restaurant: "restaurant",
     vegetarian_restaurant: "restaurant",
     vietnamese_restaurant: "restaurant",
-    wine_bar: "wine",
+    wine_bar: "bar",
 
-    // Geographical Areas (no clear visual icons in map set, using best guess or fallback)
+    // Geographical Areas
     administrative_area_level_1: "town",
     administrative_area_level_2: "town",
     country: "globe",
@@ -176,35 +180,36 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     school_district: "school",
 
     // Government
-    city_hall: "town_hall",
-    courthouse: "town_hall", // fallback
-    embassy: "diplomatic",
-    fire_station: "fire_station",
-    government_office: "town_hall", // general fallback
-    local_government_office: "town_hall",
+    city_hall: "town-hall",
+    courthouse: "town-hall",
+    embassy: "embassy",
+    fire_station: "fire-station",
+    government_office: "town-hall",
+    local_government_office: "town-hall",
     neighborhood_police_station: "police",
     police: "police",
     post_office: "post",
+
     // Health & Wellness
-    alternative_medicine: "doctors", // fallback
-    chiropractor: "doctors", // fallback
-    clinic: "doctors",
+    alternative_medicine: "doctor",
+    chiropractor: "doctor",
+    clinic: "doctor",
     dental_clinic: "dentist",
     dentist: "dentist",
-    doctor: "doctors",
-    drugstore: "pharmacy", // closest visual match
+    doctor: "doctor",
+    drugstore: "pharmacy",
     hospital: "hospital",
-    massage: "hairdresser", // fallback
-    medical_lab: "doctors", // fallback
+    massage: "hairdresser",
+    medical_lab: "doctor",
     pharmacy: "pharmacy",
-    physiotherapist: "doctors", // fallback
-    sauna: "hot_spring", // closest symbolic match
-    psychotherapist: "doctors", // fallback
-    skin_care_clinic: "hairdresser", // fallback
+    physiotherapist: "doctor",
+    sauna: "hot-spring",
+    psychotherapist: "doctor",
+    skin_care_clinic: "hairdresser",
     spa: "hairdresser",
-    tanning_studio: "fitness_centre", // fallback
+    tanning_studio: "fitness-centre",
     wellness_center: "hairdresser",
-    yoga_studio: "park", // closest peaceful/neutral symbol
+    yoga_studio: "park",
 
     // Housing
     apartment_building: "building",
@@ -214,11 +219,10 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
 
     // Lodging
     bed_and_breakfast: "lodging",
-    // Lodging
     budget_japanese_inn: "lodging",
     campground: "campsite",
-    camping_cabin: "hut", // closest symbolic structure
-    cottage: "hut", // fallback
+    camping_cabin: "lodging",
+    cottage: "lodging",
     extended_stay_hotel: "lodging",
     farmstay: "farm",
     guest_house: "lodging",
@@ -228,105 +232,106 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     inn: "lodging",
     japanese_inn: "lodging",
     lodging: "lodging",
-    mobile_home_park: "camper_trailer",
+    mobile_home_park: "campsite",
     motel: "lodging",
     private_guest_room: "lodging",
     resort_hotel: "lodging",
-    rv_park: "camper_trailer",
+    rv_park: "campsite",
 
     // Natural Features
     beach: "beach",
 
     // Places of Worship
-    church: "christian",
-    hindu_temple: "hinduist",
-    mosque: "muslim",
-    synagogue: "jewish",
-    "3d-printing": "hardware" /* ← no direct match, suggest custom */,
-    advertising: "board", // symbolic for signage
-    astrologer: "star", // symbolic
-    architect: "building", // fallback
+    church: "religious-christian",
+    hindu_temple: "place-of-worship",
+    mosque: "religious-muslim",
+    synagogue: "religious-jewish",
+
+    // Services
+    "3d-printing": "hardware",
+    advertising: "information",
+    astrologer: "star",
+    architect: "building",
     barber_shop: "hairdresser",
-    beautician: "hairdresser", // fallback
+    beautician: "hairdresser",
     beauty_salon: "hairdresser",
-    body_art_service: "paint", // fallback
-    cleaning: "laundry" ,
+    body_art_service: "paint",
+    cleaning: "laundry",
     contractor: "construction",
-    catering_service: "restaurant", // fallback
+    catering_service: "restaurant",
     cemetery: "cemetery",
-    child_care_agency: "school", // fallback
-    consultant: "commercial" /* ← not available, suggest custom */,
-    courier_service: "scooter" /* ← no icon, suggest "car" as fallback */,
-    electrician: "danger", // symbolic
+    child_care_agency: "school",
+    consultant: "commercial",
+    courier_service: "scooter",
+    electrician: "danger",
     florist: "florist",
-    food_delivery: "fast_food", // symbolic
-    foot_care: "doctors", // fallback
-    funeral_home: "cemetery", // closest match
-    graphic_design: "paint", // symbolic
+    food_delivery: "fast-food",
+    foot_care: "doctor",
+    funeral_home: "cemetery",
+    graphic_design: "paint",
     gardener: "garden",
     hair_care: "hairdresser",
     hair_salon: "hairdresser",
-    insurance_agency: "bank", // symbolic for service
+    insurance_agency: "bank",
     laundry: "laundry",
-    lawyer: "town_hall", // symbolic fallback
-    locksmith: "gate" /* ← not in list, consider custom */,
-    makeup_artist: "hairdresser", // fallback
-    moving_company: "truck",
-    nail_salon: "hairdresser", // fallback
+    lawyer: "town-hall",
+    locksmith: "gate",
+    makeup_artist: "hairdresser",
+    moving_company: "car",
+    nail_salon: "hairdresser",
     painter: "paint",
-    photographer: "art_gallery",
-    plumber: "pipe",
-    psychic: "star", // symbolic
-    real_estate_agency: "home", // symbolic
-    roofing_contractor: "construction", // fallback
+    photographer: "art-gallery",
+    plumber: "industry",
+    psychic: "star",
+    real_estate_agency: "home",
+    roofing_contractor: "construction",
     storage: "warehouse",
-    summer_camp_organizer: "campfire",
-    tailor: "clothing_store", // fallback
-    telecommunications_service_provider: "mobile_phone",
+    summer_camp_organizer: "campsite",
+    tailor: "clothing-store",
+    telecommunications_service_provider: "mobile-phone",
     tour_agency: "suitcase",
     tourist_information_center: "information",
     travel_agency: "suitcase",
     veterinary_care: "veterinary",
-    beekeeper: "farm" /* ← no icon, suggest custom */,
-    carpenter: "hardware" /* ← no icon, suggest custom */,
+    beekeeper: "farm",
+    carpenter: "hardware",
 
     // Shopping
     asian_grocery_store: "grocery",
-    auto_parts_store: "car_repair", // fallback
+    auto_parts_store: "car-repair",
     bicycle_store: "bicycle",
-    book_store: "library", // closest match
+    book_store: "library",
     butcher_shop: "shop",
     cannabis: "pharmacy",
-    cell_phone_store: "mobile_phone",
-    clothing_store: "clothing_store",
+    cell_phone_store: "mobile-phone",
+    clothing_store: "clothing-store",
     craft_store: "paint",
     convenience_store: "convenience",
     copyshop: "hardware",
-    department_store: "shop", // fallback
+    department_store: "shop",
     discount_store: "shop",
-    gardening_store: "garden",
-    electronics_store: "mobile_phone", // fallback
+    gardening_store: "garden-centre",
+    electronics_store: "mobile-phone",
     food_store: "grocery",
     furniture_store: "furniture",
     gift_shop: "gift",
-    second_hand: 'shop',
-    // Shopping
+    second_hand: "shop",
     grocery_store: "grocery",
     hardware_store: "hardware",
-    home_goods_store: "furniture", // closest match
+    home_goods_store: "furniture",
     home_improvement_store: "hardware",
-    jewelry_store: "shop",
-    liquor_store: "beer",
-    market: "grocery", // general fallback
+    jewelry_store: "jewelry-store",
+    liquor_store: "alcohol-shop",
+    market: "grocery",
     music_store: "music",
-    pet_store: "dog_park", // closest available, suggest custom
+    pet_store: "animal-shelter",
     optician: "optician",
-    tobacco: "pharmacy",
-    seafood_shop: "seafood",
-    shoe_store: "shop",
+    tobacco: "shop",
+    seafood_shop: "restaurant-seafood",
+    shoe_store: "shoe",
     shopping_mall: "shop",
-    sporting_goods_store: "soccer", // fallback, suggest custom
-    stationery_store: "shop" /* ← not in icon set, suggest "convenience" or custom */,
+    sporting_goods_store: "soccer",
+    stationery_store: "shop",
     store: "shop",
     supermarket: "grocery",
     warehouse_store: "warehouse",
@@ -338,35 +343,35 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     dojo: "stadium",
     fishing_charter: "park",
     fishing_pond: "park",
-    fitness_center: "fitness_centre",
+    fitness_center: "fitness-centre",
     golf_course: "golf",
-    gym: "fitness_centre",
+    gym: "fitness-centre",
     ice_skating_rink: "skiing",
     playground: "playground",
     ski_resort: "skiing",
-    sports_activity_location: "stadium", // fallback
-    sports_club: "stadium", // fallback
-    sports_coaching: "stadium", // fallback
+    sports_activity_location: "stadium",
+    sports_club: "stadium",
+    sports_coaching: "stadium",
     sports_complex: "stadium",
     stadium: "stadium",
     swimming_pool: "swimming",
-    water_sports: "swimming", // symbolic
-    surf_school: "water", // best match from existing icons
+    water_sports: "swimming",
+    surf_school: "water",
 
     // Transportation
     airport: "airport",
     airstrip: "airfield",
-    bus_station: "bus_stop",
-    bus_stop: "bus_stop",
-    ferry_terminal: "ferry_terminal",
+    bus_station: "bus",
+    bus_stop: "bus",
+    ferry_terminal: "ferry",
     heliport: "heliport",
     international_airport: "airport",
-    light_rail_station: "light_rail",
+    light_rail_station: "rail-light",
     park_and_ride: "parking",
-    subway_station: "subway",
+    subway_station: "rail-metro",
     taxi_stand: "taxi",
-    train_station: "railway",
-    transit_depot: "transit",
-    transit_station: "transit",
-    truck_stop: "truck"
+    train_station: "rail",
+    transit_depot: "bus",
+    transit_station: "bus",
+    truck_stop: "car"
 };
