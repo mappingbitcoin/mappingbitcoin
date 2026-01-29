@@ -116,6 +116,11 @@ model Review {
   eventCreatedAt DateTime @map("event_created_at")
   indexedAt      DateTime @default(now()) @map("indexed_at")
 
+  // Spam filtering
+  spamScore      Float?       @map("spam_score")      // 0-1, higher = more likely spam
+  spamStatus     SpamStatus   @default(PENDING) @map("spam_status")
+  spamReasons    String[]     @map("spam_reasons")    // Array of reasons if flagged
+
   // Relations
   venue   Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
   author  User          @relation(fields: [authorPubkey], references: [pubkey], onDelete: Cascade)
@@ -124,7 +129,16 @@ model Review {
   @@index([venueId])
   @@index([authorPubkey])
   @@index([eventCreatedAt])
+  @@index([spamStatus])
   @@map("reviews")
+}
+
+// Spam status for reviews
+enum SpamStatus {
+  PENDING   @map("pending")    // Awaiting moderation
+  APPROVED  @map("approved")   // Manually or auto-approved
+  FLAGGED   @map("flagged")    // Flagged for review
+  BLOCKED   @map("blocked")    // Blocked as spam
 }
 
 // Review replies table
