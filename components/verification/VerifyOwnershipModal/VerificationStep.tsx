@@ -16,16 +16,20 @@ interface VerificationStepProps {
     setStep: (step: VerificationState) => void;
     onError: (error: string | null) => void;
     onSuccess: () => void;
+    onBack?: () => void;
 }
 
 export default function VerificationStep({
     venue,
     venueName,
+    osmEmail,
+    method,
     selectedDomain,
     step,
     setStep,
     onError,
     onSuccess,
+    onBack,
 }: VerificationStepProps) {
     const { authenticate, authToken } = useNostrAuth();
     const [claimId, setClaimId] = useState<string | null>(null);
@@ -36,6 +40,11 @@ export default function VerificationStep({
     const [txtRecordValue, setTxtRecordValue] = useState<string | null>(null);
     const [checkCooldown, setCheckCooldown] = useState(0);
 
+    // Email verification state
+    const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
+    const [verificationCode, setVerificationCode] = useState("");
+    const [resendCooldown, setResendCooldown] = useState(0);
+
     // Check cooldown timer
     useEffect(() => {
         if (checkCooldown > 0) {
@@ -43,6 +52,16 @@ export default function VerificationStep({
             return () => clearTimeout(timer);
         }
     }, [checkCooldown]);
+
+    // Resend cooldown timer
+    useEffect(() => {
+        if (resendCooldown > 0) {
+            const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [resendCooldown]);
+
+    // ==================== DOMAIN VERIFICATION ====================
 
     const handleInitiateDomainVerification = async () => {
         setIsLoading(true);
@@ -124,12 +143,104 @@ export default function VerificationStep({
         }
     };
 
+    // ==================== EMAIL VERIFICATION ====================
+
+    const handleInitiateEmailVerification = async () => {
+        setIsLoading(true);
+        onError(null);
+
+        try {
+            let token = authToken;
+            if (!token) {
+                token = await authenticate();
+            }
+
+            const response = await fetch("/api/verify/initiate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    osmId: `${venue.type}/${venue.id}`,
+                    venueName,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to send verification code");
+            }
+
+            setClaimId(data.claimId);
+            setMaskedEmail(data.maskedEmail);
+            setResendCooldown(60); // 60 second cooldown before resend
+            setStep("email-pending");
+        } catch (err) {
+            onError(err instanceof Error ? err.message : "Failed to send verification code");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleVerifyEmailCode = async () => {
+        if (!claimId || !verificationCode.trim()) return;
+
+        setIsLoading(true);
+        onError(null);
+
+        try {
+            let token = authToken;
+            if (!token) {
+                token = await authenticate();
+            }
+
+            const response = await fetch("/api/verify/confirm", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    claimId,
+                    code: verificationCode.trim(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Invalid verification code");
+            }
+
+            if (data.success) {
+                setStep("success");
+            } else {
+                onError(data.error || "Verification failed");
+            }
+        } catch (err) {
+            onError(err instanceof Error ? err.message : "Failed to verify code");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResendCode = async () => {
+        if (resendCooldown > 0) return;
+        await handleInitiateEmailVerification();
+    };
+
+    // ==================== HELPERS ====================
+
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
 
-    // Domain: Verifying step - initiate domain verification
-    if (step === "verifying") {
+    // ==================== RENDER ====================
+
+    // Email: Verifying step - initiate email verification
+    if (method === "email" && step === "verifying") {
         return (
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -137,6 +248,135 @@ export default function VerificationStep({
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-4"
             >
+                {onBack && (
+                    <button
+                        onClick={onBack}
+                        className="text-sm text-text-light hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to methods
+                    </button>
+                )}
+
+                <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p className="text-sm text-blue-300">
+                        We&apos;ll send a 6-digit verification code to the email address registered for this venue in OpenStreetMap.
+                    </p>
+                </div>
+
+                {osmEmail && (
+                    <div className="p-4 bg-surface-light rounded-lg">
+                        <p className="text-sm text-text-light mb-1">
+                            <strong className="text-white">Registered email:</strong>
+                        </p>
+                        <p className="text-accent font-mono">{osmEmail}</p>
+                    </div>
+                )}
+
+                <button
+                    onClick={handleInitiateEmailVerification}
+                    disabled={isLoading}
+                    className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                    {isLoading ? (
+                        <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Sending...
+                        </>
+                    ) : (
+                        <>
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Send Verification Code
+                        </>
+                    )}
+                </button>
+            </motion.div>
+        );
+    }
+
+    // Email: Pending step - enter code
+    if (method === "email" && step === "email-pending") {
+        return (
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-4"
+            >
+                <div className="text-center">
+                    <p className="text-text-light text-sm">
+                        Enter the 6-digit code sent to <span className="text-white font-medium">{maskedEmail}</span>
+                    </p>
+                </div>
+
+                <div className="space-y-3">
+                    <input
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="000000"
+                        maxLength={6}
+                        className="w-full p-4 bg-surface-light border border-border-light rounded-lg text-white text-center text-2xl font-mono tracking-widest placeholder-text-light/50 focus:outline-none focus:border-accent"
+                    />
+
+                    <button
+                        onClick={handleVerifyEmailCode}
+                        disabled={isLoading || verificationCode.length !== 6}
+                        className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                Verifying...
+                            </>
+                        ) : (
+                            "Verify Code"
+                        )}
+                    </button>
+                </div>
+
+                <div className="text-center">
+                    <button
+                        onClick={handleResendCode}
+                        disabled={resendCooldown > 0 || isLoading}
+                        className="text-sm text-accent hover:text-accent-dark disabled:text-text-light disabled:cursor-not-allowed transition-colors"
+                    >
+                        {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
+                    </button>
+                </div>
+
+                <p className="text-xs text-text-light text-center">
+                    The code expires in 15 minutes. Check your spam folder if you don&apos;t see it.
+                </p>
+            </motion.div>
+        );
+    }
+
+    // Domain: Verifying step - initiate domain verification
+    if (method === "domain" && step === "verifying") {
+        return (
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-4"
+            >
+                {onBack && (
+                    <button
+                        onClick={onBack}
+                        className="text-sm text-text-light hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to methods
+                    </button>
+                )}
+
                 <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                     <p className="text-sm text-blue-300">
                         To verify ownership, you&apos;ll need to add a TXT record to your domain&apos;s DNS settings.
@@ -174,7 +414,7 @@ export default function VerificationStep({
     }
 
     // Domain: Pending step - show TXT record and check button
-    if (step === "domain-pending") {
+    if (method === "domain" && step === "domain-pending") {
         return (
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -246,7 +486,7 @@ export default function VerificationStep({
         );
     }
 
-    // Success step
+    // Success step (shared)
     if (step === "success") {
         return (
             <motion.div
