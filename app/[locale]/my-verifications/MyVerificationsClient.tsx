@@ -3,7 +3,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import { LoginModal } from "@/components/auth";
+import {
+    UserIcon,
+    LoginIcon,
+    ShieldCheckIcon,
+    MapIcon,
+    ClockIcon,
+    CheckmarkIcon,
+    WarningIcon,
+    CopyIcon,
+    RefreshIcon,
+} from "@/assets/icons";
 
 interface Claim {
     id: string;
@@ -24,12 +37,15 @@ interface Claim {
 }
 
 export default function MyVerificationsClient() {
+    const t = useTranslations("login.myVerifications");
+    const tMenu = useTranslations("menu");
     const { authToken } = useNostrAuth();
     const [claims, setClaims] = useState<Claim[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [checkingClaim, setCheckingClaim] = useState<string | null>(null);
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     const fetchClaims = useCallback(async () => {
         if (!authToken) return;
@@ -169,24 +185,24 @@ export default function MyVerificationsClient() {
                 <div className="max-w-2xl mx-auto">
                     <div className="bg-surface rounded-2xl border border-border-light p-8 text-center">
                         <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
+                            <UserIcon className="w-8 h-8 text-accent" />
                         </div>
-                        <h1 className="text-xl font-bold text-white mb-2">Login Required</h1>
+                        <h1 className="text-xl font-bold text-white mb-2">{t("loginRequired")}</h1>
                         <p className="text-text-light mb-6">
-                            Please log in with Nostr to view your venue verifications.
+                            {t("pleaseLogin")}
                         </p>
-                        <Link
-                            href="/login"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors no-underline"
+                        <button
+                            onClick={() => setShowLoginModal(true)}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
                         >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                            </svg>
-                            Log In
-                        </Link>
+                            <LoginIcon className="w-5 h-5" />
+                            {tMenu("login")}
+                        </button>
                     </div>
+                    <LoginModal
+                        isOpen={showLoginModal}
+                        onClose={() => setShowLoginModal(false)}
+                    />
                 </div>
             </div>
         );
@@ -219,9 +235,7 @@ export default function MyVerificationsClient() {
                     ) : claims.length === 0 ? (
                         <div className="bg-surface rounded-2xl border border-border-light p-8 text-center">
                             <div className="w-16 h-16 bg-surface-light rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-text-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
+                                <ShieldCheckIcon className="w-8 h-8 text-text-light" />
                             </div>
                             <h2 className="text-lg font-semibold text-white mb-2">No Verifications Yet</h2>
                             <p className="text-text-light mb-4">
@@ -231,9 +245,7 @@ export default function MyVerificationsClient() {
                                 href="/map"
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors no-underline"
                             >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
+                                <MapIcon className="w-4 h-4" />
                                 Explore Map
                             </Link>
                         </div>
@@ -274,30 +286,22 @@ export default function MyVerificationsClient() {
 
                                             <div className="flex flex-wrap gap-4 text-sm text-text-light">
                                                 <span className="flex items-center gap-1">
-                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                    </svg>
+                                                    <ShieldCheckIcon className="w-4 h-4" />
                                                     {getMethodLabel(claim.method)}
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
+                                                    <ClockIcon className="w-4 h-4" />
                                                     {formatDate(claim.createdAt)}
                                                 </span>
                                                 {claim.verifiedAt && (
                                                     <span className="flex items-center gap-1 text-green-400">
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                                        <CheckmarkIcon className="w-4 h-4" />
                                                         Verified {formatDate(claim.verifiedAt)}
                                                     </span>
                                                 )}
                                                 {claim.expiresAt && claim.status === "PENDING" && (
                                                     <span className="flex items-center gap-1 text-amber-400">
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                        </svg>
+                                                        <WarningIcon className="w-4 h-4" />
                                                         Expires {formatDate(claim.expiresAt)}
                                                     </span>
                                                 )}
@@ -320,9 +324,7 @@ export default function MyVerificationsClient() {
                                                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                                                     title="Copy to clipboard"
                                                 >
-                                                    <svg className="w-4 h-4 text-text-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                                    </svg>
+                                                    <CopyIcon className="w-4 h-4 text-text-light" />
                                                 </button>
                                             </div>
                                             <div className="mt-3 flex items-center gap-3">
@@ -338,16 +340,12 @@ export default function MyVerificationsClient() {
                                                         </>
                                                     ) : cooldowns[claim.id] ? (
                                                         <>
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
+                                                            <ClockIcon className="w-4 h-4" />
                                                             Wait {cooldowns[claim.id]}s
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                            </svg>
+                                                            <RefreshIcon className="w-4 h-4" />
                                                             Check Now
                                                         </>
                                                     )}

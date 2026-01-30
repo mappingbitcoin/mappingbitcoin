@@ -3,6 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { FormInput } from "@/components/forms";
+import { PinIcon } from "@/assets/icons/ui";
 
 // Dynamically import the MapLibre-based map component (free, open-source)
 const MapWithDraggableMarker = dynamic(
@@ -52,10 +53,7 @@ export default function LocationSection({
             {!hasCoordinates && (
                 <div className="h-[250px] bg-surface-light rounded-xl border-2 border-dashed border-border-light flex items-center justify-center">
                     <div className="text-center text-text-light">
-                        <svg className="w-10 h-10 mx-auto mb-2 text-text-light/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        <PinIcon className="w-10 h-10 mx-auto mb-2 text-text-light/50" />
                         <p className="text-sm">Enter an address to show the map</p>
                     </div>
                 </div>

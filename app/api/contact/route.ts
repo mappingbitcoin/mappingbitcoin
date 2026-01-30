@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactFormLimiter } from "@/lib/rate-limiter";
 import { createContactNotificationEmail } from "@/lib/email/templates";
+import { serverEnv } from "@/lib/Environment";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(serverEnv.resendApiKey);
 
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const RECAPTCHA_THRESHOLD = 0.5;
 
 interface ContactFormData {
@@ -16,7 +16,8 @@ interface ContactFormData {
 }
 
 async function verifyRecaptcha(token: string): Promise<{ success: boolean; score?: number; error?: string }> {
-    if (!RECAPTCHA_SECRET_KEY) {
+    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
+    if (!recaptchaSecretKey) {
         console.warn("RECAPTCHA_SECRET_KEY not configured, skipping verification");
         return { success: true };
     }
@@ -26,7 +27,7 @@ async function verifyRecaptcha(token: string): Promise<{ success: boolean; score
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                secret: RECAPTCHA_SECRET_KEY,
+                secret: recaptchaSecretKey,
                 response: token,
             }),
         });

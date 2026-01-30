@@ -9,6 +9,8 @@ import path from "path";
 import TopographicPattern from "@/components/ui/TopographicPattern";
 import { NewsletterCTA, FAQSection } from "@/components/common";
 import HomeStatsSection from "./HomeStatsSection";
+import { ShieldCheckIcon, EditIcon, ChatIcon, LockIcon, ChevronRightIcon } from "@/assets/icons/ui";
+import { OSMIcon, NostrIcon } from "@/assets/icons/social";
 
 export const generateMetadata = buildGeneratePageMetadata('home')
 
@@ -201,11 +203,7 @@ const HomePage = async ({ params }: Localized) => {
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-4 text-gray-400 hover:text-white transition-colors group"
                                 >
-                                    <img
-                                        src="/assets/icons/osm.svg"
-                                        alt="OpenStreetMap"
-                                        className="w-5 h-5 opacity-32 group-hover:opacity-100 transition-opacity"
-                                    />
+                                    <OSMIcon className="w-5 h-5 opacity-32 group-hover:opacity-100 transition-opacity" />
                                     <span className="text-sm font-medium">OpenStreetMap</span>
                                 </a>
                                 <span className="text-gray-600">+</span>
@@ -213,22 +211,9 @@ const HomePage = async ({ params }: Localized) => {
                                     href="https://nostr.com"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-0 text-gray-400 hover:text-purple-400 transition-colors group -ml-4"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors group"
                                 >
-                                    <span
-                                        className="w-11 h-11 opacity-60 group-hover:opacity-100 transition-all bg-current"
-                                        style={{
-                                            maskImage: 'url(/assets/icons/nostr.svg)',
-                                            WebkitMaskImage: 'url(/assets/icons/nostr.svg)',
-                                            maskSize: 'contain',
-                                            WebkitMaskSize: 'contain',
-                                            maskRepeat: 'no-repeat',
-                                            WebkitMaskRepeat: 'no-repeat',
-                                            maskPosition: 'center',
-                                            WebkitMaskPosition: 'center',
-                                        }}
-                                        aria-hidden="true"
-                                    />
+                                    <NostrIcon className="w-8 h-8 opacity-60 group-hover:opacity-100 transition-all" />
                                     <span className="text-sm font-medium">Nostr</span>
                                 </a>
                             </div>
@@ -273,36 +258,28 @@ const HomePage = async ({ params }: Localized) => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
+                                        <ShieldCheckIcon className="w-5 h-5 text-green-500" />
                                     </div>
                                     <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.verified.title")}</h3>
                                     <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.verified.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-blue-500/10 flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
+                                        <EditIcon className="w-5 h-5 text-blue-500" />
                                     </div>
                                     <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.edit.title")}</h3>
                                     <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.edit.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-purple-500/10 flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                        </svg>
+                                        <ChatIcon className="w-5 h-5 text-purple-500" />
                                     </div>
                                     <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.reviews.title")}</h3>
                                     <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.reviews.description")}</p>
                                 </div>
                                 <div className="p-5 bg-[#1A1A1A] border border-white/10 rounded-xl">
                                     <div className="w-10 h-10 mb-3 rounded-full bg-orange-500/10 flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
+                                        <LockIcon className="w-5 h-5 text-orange-500" />
                                     </div>
                                     <h3 className="text-white font-semibold mb-1">{t("ownBusiness.benefits.secure.title")}</h3>
                                     <p className="text-gray-400 text-sm">{t("ownBusiness.benefits.secure.description")}</p>
@@ -357,14 +334,7 @@ const HomePage = async ({ params }: Localized) => {
                                             {formatNumber(region.count)} {t("topCountries.venues")}
                                         </div>
                                     </div>
-                                    <svg
-                                        className="w-5 h-5 text-gray-500 group-hover:text-orange-500 group-hover:translate-x-1 transition-all"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
+                                    <ChevronRightIcon className="w-5 h-5 text-gray-500 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
                                 </Link>
                             ))}
                         </div>
@@ -393,14 +363,7 @@ const HomePage = async ({ params }: Localized) => {
                                             {formatNumber(country.count)} {t("topCountries.venues")}
                                         </div>
                                     </div>
-                                    <svg
-                                        className="w-5 h-5 text-gray-500 group-hover:text-orange-500 group-hover:translate-x-1 transition-all"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
+                                    <ChevronRightIcon className="w-5 h-5 text-gray-500 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
                                 </Link>
                             ))}
                         </div>

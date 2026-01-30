@@ -3,6 +3,7 @@
 import { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { CloseIcon } from "@/assets/icons/ui";
 
 interface ModalProps {
     isOpen: boolean;
@@ -61,9 +62,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-light text-text-light hover:text-white hover:bg-primary-light transition-colors"
                                     aria-label="Close"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <CloseIcon className="w-4 h-4" />
                                 </button>
                             </div>
                         )}
@@ -76,9 +75,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
                                     className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-surface-light text-text-light hover:text-white hover:bg-primary-light transition-colors z-10"
                                     aria-label="Close"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <CloseIcon className="w-4 h-4" />
                                 </button>
                             )}
                             {children}

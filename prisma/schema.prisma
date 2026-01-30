@@ -299,3 +299,126 @@ enum GraphBuildStatus {
   COMPLETED @map("completed")
   FAILED    @map("failed")
 }
+
+// ============================================
+// Marketing Content Seeder System
+// ============================================
+
+enum SocialNetwork {
+  TWITTER   @map("twitter")
+  INSTAGRAM @map("instagram")
+  LINKEDIN  @map("linkedin")
+  FACEBOOK  @map("facebook")
+  TIKTOK    @map("tiktok")
+  YOUTUBE   @map("youtube")
+  NOSTR     @map("nostr")
+}
+
+enum PostType {
+  IMAGE       @map("image")
+  VIDEO       @map("video")
+  CAROUSEL    @map("carousel")
+  STORY       @map("story")
+  REEL        @map("reel")
+  TEXT        @map("text")
+  INFOGRAPHIC @map("infographic")
+}
+
+enum ContentTopic {
+  ANNOUNCEMENTS @map("announcements")
+  EDUCATION     @map("education")
+  COMMUNITY     @map("community")
+  PRODUCT       @map("product")
+  NEWS          @map("news")
+  EVENTS        @map("events")
+  TIPS          @map("tips")
+  OTHER         @map("other")
+}
+
+// Brand voice, guidelines, do/don't lists - single row config
+model MarketingGuidelines {
+  id           String   @id @default(cuid())
+  voiceTone    String?  @map("voice_tone")     // Brand voice description
+  doList       String[] @map("do_list")        // Things to do in content
+  dontList     String[] @map("dont_list")      // Things to avoid
+  brandValues  String[] @map("brand_values")   // Core brand values
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("marketing_guidelines")
+}
+
+// Link library for marketing content
+model MarketingLink {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?
+  category    String   // e.g., "website", "social", "resources", "campaigns"
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("marketing_links")
+}
+
+// Media assets stored in Hetzner with tagging
+model MarketingAsset {
+  id             String          @id @default(cuid())
+  filename       String          // Original filename
+  storageKey     String          @unique @map("storage_key") // Key in Hetzner storage
+  mimeType       String          @map("mime_type")
+  size           Int             // File size in bytes
+  socialNetworks SocialNetwork[] @map("social_networks")
+  postTypes      PostType[]      @map("post_types")
+  topic          ContentTopic?
+  customTags     String[]        @map("custom_tags")
+  altText        String?         @map("alt_text")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@index([topic])
+  @@map("marketing_assets")
+}
+
+// Named groups of hashtags
+model HashtagSet {
+  id             String          @id @default(cuid())
+  name           String          @unique
+  hashtags       String[]        // Array of hashtags (without #)
+  socialNetworks SocialNetwork[] @map("social_networks")
+  description    String?
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@map("hashtag_sets")
+}
+
+// Example posts for each social network
+model ExamplePost {
+  id            String        @id @default(cuid())
+  socialNetwork SocialNetwork @map("social_network")
+  content       String        // The post content
+  hashtags      String[]      // Hashtags used
+  notes         String?       // Internal notes about why this works
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@index([socialNetwork])
+  @@map("example_posts")
+}
+
+// Marketing statistics and facts
+model MarketingStat {
+  id          String    @id @default(cuid())
+  label       String    // e.g., "Active Users", "Countries Served"
+  value       String    // The stat value (as string for flexibility)
+  source      String?   // Where this stat comes from
+  category    String    // e.g., "growth", "engagement", "reach"
+  expiresAt   DateTime? @map("expires_at") // When this stat should be reviewed
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("marketing_stats")
+}

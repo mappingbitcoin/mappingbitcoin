@@ -3,6 +3,7 @@ import { validateAuthToken } from "@/lib/db/services/auth";
 import { initiateEmailVerification, getVerificationStatus } from "@/lib/db/services/verification";
 import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import { parseTags } from "@/utils/OsmHelpers";
+import { isDevelopment } from "@/lib/Environment";
 
 interface InitiateRequest {
     osmId: string;
@@ -129,8 +130,7 @@ export async function POST(request: NextRequest) {
         }
 
         // In development, override email to test address
-        const isDev = process.env.NODE_ENV === "development";
-        const targetEmail = isDev ? "leon@dandelionlabs.io" : email;
+        const targetEmail = isDevelopment ? "leon@dandelionlabs.io" : email;
 
         // Initiate verification - send code to the email from our cache
         const { claimId, expiresAt } = await initiateEmailVerification(
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Return masked email for UI (show actual email in dev, masked in prod)
-        const maskedEmail = isDev ? `${targetEmail} (dev mode)` : maskEmail(email);
+        const maskedEmail = isDevelopment ? `${targetEmail} (dev mode)` : maskEmail(email);
 
         return NextResponse.json({
             success: true,

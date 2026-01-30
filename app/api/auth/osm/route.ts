@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { serverEnv, isProduction } from "@/lib/Environment";
 
 const AUTH_URL = "https://www.openstreetmap.org/oauth2/authorize";
 
@@ -11,13 +12,13 @@ export async function GET(req: NextRequest) {
         path: "/",
         maxAge: 300, // 5 minutes
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         sameSite: "lax",
     });
 
     const params = new URLSearchParams({
-        client_id: process.env.OSM_CLIENT_ID!,
-        redirect_uri: process.env.OSM_REDIRECT_URI!,
+        client_id: serverEnv.osm.clientId,
+        redirect_uri: serverEnv.osm.redirectUri,
         response_type: "code",
         scope: "read_prefs write_api",
     });

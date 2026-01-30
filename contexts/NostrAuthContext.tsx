@@ -10,18 +10,27 @@ interface NostrUser {
     method: "nsec" | "npub" | "extension" | "bunker";
 }
 
+interface AuthenticateOptions {
+    /** If true, don't throw errors for user-interaction-required scenarios */
+    silent?: boolean;
+}
+
 interface NostrAuthContextType {
     user: NostrUser | null;
     isLoading: boolean;
     error: string | null;
     authToken: string | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
+    isAdminLoading: boolean;
+    /** Whether authentication requires user interaction (extension/bunker popup) */
+    requiresInteraction: boolean;
     loginWithKey: (key: string) => Promise<void>;
     loginWithExtension: () => Promise<void>;
     loginWithBunker: (bunkerUrl: string) => Promise<void>;
     logout: () => void;
     clearError: () => void;
-    authenticate: () => Promise<string>;
+    authenticate: (options?: AuthenticateOptions) => Promise<string | null>;
 }
 
 const NostrAuthContext = createContext<NostrAuthContextType | undefined>(undefined);
@@ -136,17 +145,20 @@ async function derivePublicKey(privateKeyHex: string): Promise<string> {
     return getPublicKey(privateKeyHex);
 }
 
-declare global {
-    interface Window {
-        nostr?: {
-            getPublicKey: () => Promise<string>;
-            signEvent: (event: object) => Promise<object>;
-            nip04?: {
-                encrypt: (pubkey: string, plaintext: string) => Promise<string>;
-                decrypt: (pubkey: string, ciphertext: string) => Promise<string>;
-            };
-        };
+// Check if user is admin
+async function checkAdminStatus(authToken: string): Promise<boolean> {
+    try {
+        const response = await fetch("/api/admin/check", {
+            headers: { Authorization: `Bearer ${authToken}` },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return data.isAdmin === true;
+        }
+    } catch (e) {
+        console.warn("Failed to check admin status:", e);
     }
+    return false;
 }
 
 export function NostrAuthProvider({ children }: { children: ReactNode }) {
@@ -154,23 +166,32 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [authToken, setAuthToken] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdminLoading, setIsAdminLoading] = useState(false);
 
     // Load user and auth token from storage on mount
     useEffect(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
+            let loadedUser: NostrUser | null = null;
             if (stored) {
                 const parsed = JSON.parse(stored);
+                loadedUser = parsed;
                 setUser(parsed);
             }
             const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
             if (storedToken) {
-                // Check if token is expired by decoding JWT
+                // Check if token is expired and matches the current user
                 try {
                     const payload = JSON.parse(atob(storedToken.split(".")[1]));
-                    if (payload.exp * 1000 > Date.now()) {
+                    const isExpired = payload.exp * 1000 <= Date.now();
+                    const pubkeyMatches = loadedUser && payload.sub &&
+                        payload.sub.toLowerCase() === loadedUser.pubkey.toLowerCase();
+
+                    if (!isExpired && pubkeyMatches) {
                         setAuthToken(storedToken);
                     } else {
+                        // Token expired or belongs to different user
                         localStorage.removeItem(AUTH_TOKEN_KEY);
                     }
                 } catch {
@@ -193,9 +214,26 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         }
     }, [user]);
 
+    // Check admin status when auth token changes
+    useEffect(() => {
+        if (authToken && user?.pubkey) {
+            setIsAdminLoading(true);
+            checkAdminStatus(authToken)
+                .then(setIsAdmin)
+                .finally(() => setIsAdminLoading(false));
+        } else {
+            setIsAdmin(false);
+            setIsAdminLoading(false);
+        }
+    }, [authToken, user?.pubkey]);
+
     const loginWithKey = useCallback(async (key: string) => {
         setIsLoading(true);
         setError(null);
+
+        // Clear any existing auth token when logging in with a new key
+        setAuthToken(null);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
 
         try {
             const trimmedKey = key.trim();
@@ -248,6 +286,10 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
+        // Clear any existing auth token when logging in with extension
+        setAuthToken(null);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+
         try {
             if (typeof window === "undefined" || !window.nostr) {
                 throw new Error("No Nostr extension found. Please install Alby or nos2x.");
@@ -273,6 +315,10 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const loginWithBunker = useCallback(async (bunkerUrl: string) => {
         setIsLoading(true);
         setError(null);
+
+        // Clear any existing auth token when logging in with bunker
+        setAuthToken(null);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
 
         try {
             // Parse bunker URL: bunker://<pubkey>?relay=<relay>&secret=<secret>
@@ -301,6 +347,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const logout = useCallback(() => {
         setUser(null);
         setAuthToken(null);
+        setIsAdmin(false);
         sessionStorage.removeItem("nostr_privkey");
         sessionStorage.removeItem("nostr_bunker");
         localStorage.removeItem(STORAGE_KEY);
@@ -311,26 +358,48 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         setError(null);
     }, []);
 
+    // Check if authentication requires user interaction
+    const requiresInteraction = user?.method === "extension" || user?.method === "bunker";
+
     // Authenticate: perform challenge-response flow to get JWT
-    const authenticate = useCallback(async (): Promise<string> => {
+    // If silent is true, returns null instead of throwing for interactive methods
+    const authenticate = useCallback(async (options?: AuthenticateOptions): Promise<string | null> => {
+        const { silent = false } = options || {};
+
         if (!user) {
+            if (silent) return null;
             throw new Error("Must be logged in to authenticate");
         }
 
         if (user.mode !== "write") {
+            if (silent) return null;
             throw new Error("Write mode required for authentication");
         }
 
-        // Check if we already have a valid token
+        // Check if we already have a valid token that belongs to current user
         if (authToken) {
             try {
                 const payload = JSON.parse(atob(authToken.split(".")[1]));
-                if (payload.exp * 1000 > Date.now()) {
+                const isExpired = payload.exp * 1000 <= Date.now();
+                const pubkeyMatches = payload.sub &&
+                    payload.sub.toLowerCase() === user.pubkey.toLowerCase();
+
+                if (!isExpired && pubkeyMatches) {
                     return authToken;
                 }
+                // Token expired or belongs to different user, clear it
+                setAuthToken(null);
+                localStorage.removeItem(AUTH_TOKEN_KEY);
             } catch {
                 // Token invalid, continue to get new one
+                setAuthToken(null);
+                localStorage.removeItem(AUTH_TOKEN_KEY);
             }
+        }
+
+        // For silent mode with extension/bunker, don't attempt (requires user interaction)
+        if (silent && (user.method === "extension" || user.method === "bunker")) {
+            return null;
         }
 
         // Request challenge
@@ -358,6 +427,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         } else if (user.method === "bunker") {
             signResult = await signChallenge(challenge, "bunker");
         } else {
+            if (silent) return null;
             throw new Error("Cannot authenticate with read-only access");
         }
 
@@ -398,6 +468,9 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
                 error,
                 authToken,
                 isAuthenticated,
+                isAdmin,
+                isAdminLoading,
+                requiresInteraction,
                 loginWithKey,
                 loginWithExtension,
                 loginWithBunker,

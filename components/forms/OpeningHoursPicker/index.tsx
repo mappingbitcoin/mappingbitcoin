@@ -3,6 +3,7 @@
 import React from "react";
 import { Day, DayHours, DAYS } from "@/utils/OpeningHoursParser";
 import { stringifyOpeningHours } from "@/utils/OpeningHoursParser";
+import { CheckmarkIcon, PlusIcon, CloseIcon } from "@/assets/icons/ui";
 
 const clonePreset = (value: DayHours[]): DayHours[] =>
     value.map(({ day, hours }) => ({
@@ -157,9 +158,7 @@ export default function OpeningHoursPicker({ value, onChange }: OpeningHoursPick
                                     `}
                                 >
                                     {enabled && (
-                                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
+                                        <CheckmarkIcon className="w-2.5 h-2.5 text-white" strokeWidth={3} />
                                     )}
                                 </div>
                                 <input
@@ -204,9 +203,7 @@ export default function OpeningHoursPicker({ value, onChange }: OpeningHoursPick
                                                     className="p-0.5 text-text-light hover:text-green-600 transition-colors"
                                                     title="Add time range"
                                                 >
-                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                                    </svg>
+                                                    <PlusIcon className="w-3.5 h-3.5" />
                                                 </button>
                                                 <button
                                                     type="button"
@@ -214,9 +211,7 @@ export default function OpeningHoursPicker({ value, onChange }: OpeningHoursPick
                                                     className="p-0.5 text-text-light hover:text-red-500 transition-colors"
                                                     title="Remove"
                                                 >
-                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <CloseIcon className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
                                         </div>

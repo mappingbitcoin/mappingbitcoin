@@ -1,30 +1,25 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 import fs from 'fs/promises';
+import { serverEnv } from '@/lib/Environment';
 
-const hasSpacesConfig = Boolean(
-    process.env.DO_SPACES_ENDPOINT &&
-    process.env.DO_SPACES_BUCKET_NAME &&
-    process.env.DO_SPACES_SECRET &&
-    process.env.DO_SPACES_KEY &&
-    process.env.DO_SPACES_REGION
-);
+const { digitalOcean } = serverEnv;
 
-if (!hasSpacesConfig) {
+if (!digitalOcean.isConfigured) {
     console.warn('DigitalOcean Spaces env variables not set; Spaces operations will be skipped.');
 }
 
-const bucketName = process.env.DO_SPACES_BUCKET_NAME || '';
+const bucketName = digitalOcean.bucket;
 let space: S3Client | null = null;
 
-if (hasSpacesConfig) {
+if (digitalOcean.isConfigured) {
     space = new S3Client({
-        endpoint: process.env.DO_SPACES_ENDPOINT,
+        endpoint: digitalOcean.endpoint,
         credentials: {
-            accessKeyId: process.env.DO_SPACES_KEY || '',
-            secretAccessKey: process.env.DO_SPACES_SECRET || ''
+            accessKeyId: digitalOcean.accessKey,
+            secretAccessKey: digitalOcean.secretKey
         },
-        region: process.env.DO_SPACES_REGION
+        region: digitalOcean.region
     });
 }
 

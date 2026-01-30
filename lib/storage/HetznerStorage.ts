@@ -9,6 +9,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Readable } from "stream";
 import fs from "fs/promises";
+import { serverEnv, isProduction } from "@/lib/Environment";
 
 /**
  * Asset types for organizing storage
@@ -33,6 +34,9 @@ export enum AssetType {
 
     // Temporary files
     TEMP = "temp",               // Temporary uploads (auto-cleaned)
+
+    // Marketing content
+    MARKETING = "marketing",     // Marketing images, videos, and assets
 }
 
 /**
@@ -105,17 +109,19 @@ class HetznerStorageClient {
     }
 
     private getConfig(): HetznerStorageConfig | null {
-        const endpoint = process.env.HETZNER_STORAGE_ENDPOINT;
-        const region = process.env.HETZNER_STORAGE_REGION;
-        const bucket = process.env.HETZNER_STORAGE_BUCKET;
-        const accessKeyId = process.env.HETZNER_STORAGE_ACCESS_KEY;
-        const secretAccessKey = process.env.HETZNER_STORAGE_SECRET_KEY;
+        const { hetzner } = serverEnv;
 
-        if (!endpoint || !region || !bucket || !accessKeyId || !secretAccessKey) {
+        if (!hetzner.isConfigured) {
             return null;
         }
 
-        return { endpoint, region, bucket, accessKeyId, secretAccessKey };
+        return {
+            endpoint: hetzner.endpoint!,
+            region: hetzner.region!,
+            bucket: hetzner.bucket!,
+            accessKeyId: hetzner.accessKey!,
+            secretAccessKey: hetzner.secretKey!,
+        };
     }
 
     /**
@@ -437,7 +443,7 @@ const globalForStorage = globalThis as unknown as {
 
 const storage = globalForStorage.hetznerStorage ?? new HetznerStorageClient();
 
-if (process.env.NODE_ENV !== "production") {
+if (!isProduction) {
     globalForStorage.hetznerStorage = storage;
 }
 

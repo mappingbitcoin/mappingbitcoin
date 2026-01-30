@@ -4,6 +4,7 @@ import { verifyEmailCode } from "@/lib/db/services/verification";
 import prisma from "@/lib/db/prisma";
 import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import { parseTags } from "@/utils/OsmHelpers";
+import { isDevelopment } from "@/lib/Environment";
 
 interface ConfirmRequest {
     claimId: string;
@@ -118,8 +119,7 @@ export async function POST(request: NextRequest) {
         }
 
         // In development, use test email for hash verification
-        const isDev = process.env.NODE_ENV === "development";
-        const email = isDev ? "leon@dandelionlabs.io" : venueEmail;
+        const email = isDevelopment ? "leon@dandelionlabs.io" : venueEmail;
 
         // Verify the code
         const result = await verifyEmailCode(claimId, code, email);

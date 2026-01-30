@@ -37,6 +37,16 @@ import {
 } from "@/components/place-form";
 import { useAddressAutocomplete, reverseGeocode } from "@/hooks/useAddressAutocomplete";
 import { useVenueSearch, fetchVenueDetails } from "@/hooks/useVenueSearch";
+import {
+    CheckmarkIcon,
+    SpinnerIcon,
+    SearchIcon,
+    DirectionsIcon,
+    CloseIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    SendIcon,
+} from "@/assets/icons";
 
 const OpeningHoursPicker = dynamic(
     () => import("@/components/forms/OpeningHoursPicker"),
@@ -81,9 +91,6 @@ const EMPTY_FORM: VenueForm = {
 };
 
 const STORAGE_KEY = "venue_form_data";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const grecaptcha: any;
 
 const STEPS = [
     { key: 1, label: 'About', desc: 'Basic info' },
@@ -335,9 +342,7 @@ export default function VenueSubmissionForm() {
                                                 step > s.key ? 'bg-green-500 text-white' : 'bg-surface-light text-text-light'
                                             }`}>
                                                 {step > s.key ? (
-                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                    </svg>
+                                                    <CheckmarkIcon className="w-3.5 h-3.5" />
                                                 ) : s.key}
                                             </div>
                                             <span className={`text-xs font-medium ${step === s.key ? 'text-accent' : 'text-white'}`}>{s.label}</span>
@@ -373,14 +378,9 @@ export default function VenueSubmissionForm() {
                                                         className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                                                     />
                                                     {venueLoading ? (
-                                                        <svg className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                                        </svg>
+                                                        <SpinnerIcon className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" />
                                                     ) : (
-                                                        <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                        </svg>
+                                                        <SearchIcon className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" />
                                                     )}
                                                 </div>
                                                 {venueSuggestions.length > 0 && (
@@ -419,7 +419,7 @@ export default function VenueSubmissionForm() {
                                                             <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 bg-accent/20 text-accent rounded text-xs">
                                                                 {s}
                                                                 <button type="button" onClick={() => setSuggestedSubcategories(suggestedSubcategories.filter(x => x !== s))} className="hover:text-white">
-                                                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                                    <CloseIcon className="w-3 h-3" />
                                                                 </button>
                                                             </span>
                                                         ))}
@@ -452,7 +452,7 @@ export default function VenueSubmissionForm() {
                                                                     <label key={tag} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${rawValue === 'yes' ? 'border-accent bg-accent/10' : 'border-border-light hover:border-accent/40'}`}>
                                                                         <input type="checkbox" checked={rawValue === 'yes'} onChange={(e) => setForm(prev => ({ ...prev, additionalTags: { ...prev.additionalTags, [tag]: e.target.checked ? 'yes' : 'no' } }))} className="sr-only" />
                                                                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${rawValue === 'yes' ? 'bg-accent border-accent' : 'border-border-light'}`}>
-                                                                            {rawValue === 'yes' && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                                                                            {rawValue === 'yes' && <CheckmarkIcon className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                                                                         </div>
                                                                         <span className="text-sm text-white">{COMMON_TAG_TRANSLATIONS[locale][tag]}</span>
                                                                     </label>
@@ -523,15 +523,9 @@ export default function VenueSubmissionForm() {
                                                         className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                                                     />
                                                     {addressLoading ? (
-                                                        <svg className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                                        </svg>
+                                                        <SpinnerIcon className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" />
                                                     ) : (
-                                                        <svg className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        </svg>
+                                                        <DirectionsIcon className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" />
                                                     )}
                                                 </div>
                                                 {addressSuggestions.length > 0 && (
@@ -590,7 +584,7 @@ export default function VenueSubmissionForm() {
                                     <div>
                                         {step > 1 ? (
                                             <button type="button" onClick={() => changeStep(step - 1)} className="text-sm text-text-light hover:text-white flex items-center gap-1">
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                                                <ChevronLeftIcon className="w-4 h-4" />
                                                 {t('backButton')}
                                             </button>
                                         ) : (
@@ -601,7 +595,7 @@ export default function VenueSubmissionForm() {
                                         {step < 3 ? (
                                             <button type="button" onClick={() => changeStep(step + 1)} className="bg-accent hover:bg-accent-dark text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center gap-1">
                                                 {t('nextButton')}
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                                <ChevronRightIcon className="w-4 h-4" />
                                             </button>
                                         ) : !user ? (
                                             <LoginWithOSM />
@@ -609,12 +603,12 @@ export default function VenueSubmissionForm() {
                                             <button type="submit" disabled={isSubmitting} className="bg-accent hover:bg-accent-dark text-white py-2 px-4 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-1.5">
                                                 {isSubmitting ? (
                                                     <>
-                                                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                                                        <SpinnerIcon className="animate-spin w-4 h-4" />
                                                         Submitting...
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                                        <SendIcon className="w-4 h-4" />
                                                         {t('submitVenue')}
                                                     </>
                                                 )}

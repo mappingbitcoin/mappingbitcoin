@@ -3,12 +3,11 @@ import { Resend } from "resend";
 import { subscribeEmail } from "@/lib/db";
 import { contactFormLimiter } from "@/lib/rate-limiter";
 import { createWelcomeEmail, createSubscriberNotificationEmail } from "@/lib/email/templates";
+import { serverEnv, publicEnv } from "@/lib/Environment";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(serverEnv.resendApiKey);
 
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const RECAPTCHA_THRESHOLD = 0.5;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mappingbitcoin.com";
 
 interface SubscribeRequest {
     email: string;
@@ -17,7 +16,8 @@ interface SubscribeRequest {
 }
 
 async function verifyRecaptcha(token: string): Promise<{ success: boolean; score?: number; error?: string }> {
-    if (!RECAPTCHA_SECRET_KEY) {
+    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
+    if (!recaptchaSecretKey) {
         console.warn("RECAPTCHA_SECRET_KEY not configured, skipping verification");
         return { success: true };
     }
@@ -27,7 +27,7 @@ async function verifyRecaptcha(token: string): Promise<{ success: boolean; score
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                secret: RECAPTCHA_SECRET_KEY,
+                secret: recaptchaSecretKey,
                 response: token,
             }),
         });
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Send notification email to admin
-        const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${result.subscriber.unsubscribeToken}`;
+        const unsubscribeUrl = `${publicEnv.siteUrl}/unsubscribe?token=${result.subscriber.unsubscribeToken}`;
         const notificationEmail = createSubscriberNotificationEmail(email, list);
 
         await resend.emails.send({

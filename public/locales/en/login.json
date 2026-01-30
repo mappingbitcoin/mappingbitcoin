@@ -5,56 +5,69 @@
   },
   "heading": "Sign In",
   "subheading": "Use your Nostr identity to access MappingBitcoin",
+  "modal": {
+    "title": "Log In",
+    "subtitle": "Sign in with your Nostr identity",
+    "adminTitle": "Admin Login",
+    "adminDescription": "Log in with your Nostr key to access the admin panel."
+  },
+  "description": {
+    "default": "Sign in with your Nostr identity. Choose your preferred method:",
+    "verification": "To verify ownership, you need to sign in with your Nostr identity. Choose your preferred method:"
+  },
   "methods": {
-    "key": {
-      "title": "Login with Key",
-      "description": "Enter your nsec (full access) or npub (read-only) to sign in"
-    },
     "extension": {
       "title": "Browser Extension",
-      "description": "Connect using Alby, nos2x, or another NIP-07 extension",
-      "notFound": "No extension detected. Install Alby or nos2x to use this method"
+      "description": "Alby, nos2x, or other NIP-07 extension",
+      "notFound": "No extension detected - install Alby or nos2x"
+    },
+    "key": {
+      "title": "Nsec / Npub Key",
+      "description": "Enter your private (nsec) or public (npub) key",
+      "hint": "Note: nsec gives write access, npub is read-only"
     },
     "bunker": {
-      "title": "Remote Signer",
-      "description": "Connect to a Nostr bunker for secure remote signing (NIP-46)"
+      "title": "Remote Signer (NIP-46)",
+      "description": "Connect via QR code or bunker URL",
+      "scanQR": "Scan QR Code",
+      "scanDescription": "Use your signer app to scan",
+      "pasteURL": "Enter Bunker URL",
+      "pasteDescription": "Paste bunker:// connection string",
+      "backToOptions": "Back to options",
+      "scanInstructions": "Scan with your Nostr signer app (Amber, nsec.app, etc.)",
+      "orManual": "Or enter bunker URL manually"
     }
   },
   "keyInput": {
     "label": "Enter your key",
-    "placeholder": "nsec1... or npub1...",
-    "hint": "nsec gives full write access. npub provides read-only access."
+    "placeholder": "nsec1... or npub1..."
   },
   "bunkerInput": {
-    "label": "Bunker URL",
-    "placeholder": "bunker://...",
-    "hint": "Paste the bunker connection string from your remote signer"
-  },
-  "bunker": {
-    "scanQR": "Scan QR Code",
-    "pasteURL": "Paste URL",
-    "scanInstructions": "Scan this QR code with your Nostr signer app to connect",
-    "waiting": "Waiting for connection...",
-    "timeout": "Connection timed out. Please try again.",
-    "tryAgain": "Try Again",
-    "supportedApps": "Works with Amber, Nostrudel, nsec.app, and other NIP-46 signers"
-  },
-  "extension": {
-    "ready": "Extension detected! Click below to connect.",
-    "install": "Install a Nostr extension to use this sign-in method:"
+    "placeholder": "bunker://..."
   },
   "actions": {
-    "loginWithKey": "Sign In with Key",
-    "connectExtension": "Connect Extension",
-    "connectBunker": "Connect to Bunker",
-    "loggingIn": "Signing in...",
+    "continue": "Continue",
+    "connect": "Connect",
     "connecting": "Connecting..."
   },
-  "divider": "or",
   "createAccount": {
-    "description": "New to Nostr? Create your identity in minutes.",
-    "button": "Create Nostr Account"
+    "question": "Don't have a Nostr account?",
+    "title": "Create New Account",
+    "description": "Get started with Nostr via nstart.me",
+    "creating": "Creating your account...",
+    "completeSetup": "Complete the setup in the popup window",
+    "cancel": "Cancel",
+    "popupNote": "Opens in a popup. You'll be logged in automatically when done.",
+    "popupBlocked": "Popup blocked. Please allow popups for this site."
   },
+  "errors": {
+    "enterKey": "Please enter your nsec or npub key",
+    "enterBunkerUrl": "Please enter your bunker URL",
+    "extensionFailed": "Failed to login with extension",
+    "keyFailed": "Failed to login with key",
+    "bunkerFailed": "Failed to connect with bunker"
+  },
+  "divider": "or",
   "info": {
     "title": "What is Nostr?",
     "description": "Nostr is a decentralized protocol for social networking and identity. Your Nostr keys let you own your identity across apps without relying on centralized services."
@@ -62,5 +75,46 @@
   "loggedIn": {
     "title": "You're signed in!",
     "redirecting": "Redirecting..."
+  },
+  "steps": {
+    "login": "Login",
+    "verify": "Verify",
+    "done": "Done"
+  },
+  "admin": {
+    "accessRequired": "Admin Access Required",
+    "pleaseLogin": "Please log in with a Nostr key to access the admin panel.",
+    "writeRequired": "Write Access Required",
+    "writeRequiredDescription": "Admin access requires signing capability. Please log in with an nsec key or browser extension.",
+    "loginWithWriteAccess": "Log In with Write Access",
+    "currentlyReadOnly": "Currently logged in as read-only:",
+    "verifyIdentity": "Verify Your Identity",
+    "extensionPrompt": "Your browser extension will prompt you to sign a message.",
+    "bunkerPrompt": "Your Nostr bunker will prompt you to sign a message.",
+    "signPrompt": "Sign a message to prove you control this Nostr key.",
+    "signToContinue": "Sign to Continue",
+    "tryAgain": "Try Again",
+    "loggedInAs": "Logged in as:",
+    "accessDenied": "Access Denied",
+    "noPrivileges": "Your account does not have admin privileges.",
+    "pubkey": "Pubkey:",
+    "returnHome": "Return Home",
+    "returnToSite": "Return to site",
+    "checkingAccess": "Checking access...",
+    "authenticating": "Authenticating...",
+    "authenticatedBackground": "Authenticated with background signature"
+  },
+  "myVerifications": {
+    "loginRequired": "Login Required",
+    "pleaseLogin": "Please log in with Nostr to view your venue verifications."
+  },
+  "verification": {
+    "badge": {
+      "verified": "Verified",
+      "verifiedOwner": "Verified Owner",
+      "description": "This venue's ownership has been verified via email confirmation.",
+      "owner": "Owner",
+      "since": "Since"
+    }
   }
 }
