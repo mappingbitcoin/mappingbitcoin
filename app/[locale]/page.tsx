@@ -85,15 +85,49 @@ const HomePage = async ({ params }: Localized) => {
     return (
         <>
             <Script
+                id="organization-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        "@id": "https://mappingbitcoin.com/#organization",
+                        "name": "MappingBitcoin",
+                        "url": "https://mappingbitcoin.com",
+                        "logo": "https://mappingbitcoin.com/assets/logo.png",
+                        "description": "The largest open-source directory of Bitcoin-accepting merchants worldwide. Built on OpenStreetMap with Nostr-based verification.",
+                        "foundingDate": "2024",
+                        "sameAs": [
+                            "https://github.com/AustinKelsworthy/mappingbitcoin"
+                        ],
+                        "contactPoint": {
+                            "@type": "ContactPage",
+                            "url": "https://mappingbitcoin.com/contact"
+                        },
+                        "knowsAbout": [
+                            "Bitcoin",
+                            "Lightning Network",
+                            "Cryptocurrency payments",
+                            "Bitcoin merchants",
+                            "Nostr protocol"
+                        ]
+                    })
+                }}
+            />
+            <Script
                 id="website-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@type": "WebSite",
+                        "@id": "https://mappingbitcoin.com/#website",
                         "name": "MappingBitcoin.com",
                         "url": "https://mappingbitcoin.com/",
-                        "description": "Discover Bitcoin-accepting merchants worldwide. Interactive map with 21,000+ venues across 150+ countries.",
+                        "description": "Discover Bitcoin-accepting merchants worldwide. Interactive map with 24,000+ venues across 150+ countries.",
+                        "publisher": {
+                            "@id": "https://mappingbitcoin.com/#organization"
+                        },
                         "potentialAction": {
                             "@type": "SearchAction",
                             "target": {
@@ -101,7 +135,8 @@ const HomePage = async ({ params }: Localized) => {
                                 "urlTemplate": "https://mappingbitcoin.com/map?search={search_term_string}"
                             },
                             "query-input": "required name=search_term_string"
-                        }
+                        },
+                        "inLanguage": ["en", "es"]
                     })
                 }}
             />

@@ -1,0 +1,63 @@
+# MappingBitcoin.com
+
+## About
+MappingBitcoin is the largest open-source directory of Bitcoin-accepting merchants worldwide. We aggregate venue data from OpenStreetMap and enable businesses to verify their listings using Nostr, a decentralized identity protocol.
+
+## What We Do
+- Map and directory of 24,000+ Bitcoin-accepting venues across 150+ countries
+- Business verification system using Nostr (decentralized identity)
+- Community-driven data from OpenStreetMap
+- Support for both on-chain Bitcoin and Lightning Network payments
+- User reviews for venues (in development)
+
+## Key Features
+- Interactive map to find Bitcoin merchants nearby
+- Browse by country, region, or category
+- Business verification via email or DNS domain verification
+- Open data: all venue information comes from OpenStreetMap
+- No central authority: verifications are cryptographically signed
+- Free for users and businesses
+
+## Coming Soon
+- User reviews: Rate and review Bitcoin-accepting venues using your Nostr identity
+- Community trust scoring: Reviews weighted by social graph proximity to trusted community members
+- Enriched data API: Programmatic access to venue data with reviews, verification status, and community trust scores
+
+## Technology
+- Built on OpenStreetMap for venue data
+- Nostr protocol for decentralized identity and verification
+- Supports Bitcoin (on-chain) and Lightning Network
+
+## Structured Data (JSON-LD)
+All pages include schema.org structured data for machine parsing:
+
+- Home page: Organization, WebSite schemas with search action
+- Venue pages: LocalBusiness schema with geo coordinates, address, payment methods, opening hours, amenities
+- Country/region listings: CollectionPage with ItemList of venues
+- Countries directory: ItemList of countries with venue counts
+
+Schema types used per venue category:
+- Restaurants, cafes, bars: Restaurant, CafeOrCoffeeShop, BarOrPub
+- Hotels, hostels: Hotel, Hostel, LodgingBusiness
+- Shops: GroceryStore, ConvenienceStore
+- Services: LocalBusiness with specific subtypes
+
+All venue schemas include:
+- name, url, geo (lat/lon)
+- address (street, city, region, country, postal code)
+- paymentAccepted (Bitcoin, Lightning Network)
+- telephone, email, website (when available)
+- openingHours, amenityFeature (WiFi, wheelchair access)
+- aggregateRating (when reviews available)
+
+## How to Cite
+MappingBitcoin.com - The Bitcoin Economy, Mapped
+URL: https://mappingbitcoin.com
+Source: OpenStreetMap contributors, Nostr protocol
+
+## Contact
+Website: https://mappingbitcoin.com
+Contact page: https://mappingbitcoin.com/contact
+
+## License
+Venue data is sourced from OpenStreetMap and is available under the Open Database License (ODbL).
