@@ -1,7 +1,7 @@
 "use client";
 
-import Image from 'next/image'
 import {Link, usePathname} from '@/i18n/navigation';
+import { OSMIcon } from "@/assets/icons/social";
 
 export default function LoginWithOSM() {
     const pathname = usePathname();
@@ -11,7 +11,7 @@ export default function LoginWithOSM() {
     return (
         <Link href={loginUrl}>
             <button>
-                <Image src="/assets/icons/osm.svg" alt="OSM" width={15} height={15}/>
+                <OSMIcon className="w-4 h-4 inline-block" />
                 {' '}CONNECT WITH OSM
             </button>
         </Link>

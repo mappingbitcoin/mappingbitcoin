@@ -1,0 +1,10 @@
+export { InstagramIcon } from "./InstagramIcon";
+export { FacebookIcon } from "./FacebookIcon";
+export { TwitterIcon } from "./TwitterIcon";
+export { LinkedInIcon } from "./LinkedInIcon";
+export { TelegramIcon } from "./TelegramIcon";
+export { YouTubeIcon } from "./YouTubeIcon";
+export { TikTokIcon } from "./TikTokIcon";
+export { WhatsAppIcon } from "./WhatsAppIcon";
+export { NostrIcon } from "./NostrIcon";
+export { OSMIcon } from "./OSMIcon";

@@ -10,6 +10,14 @@ import {
     PLACE_SUBTYPE_MAP,
     PlaceCategory
 } from "@/constants/PlaceCategories";
+import {
+    ChevronRightIcon,
+    ChevronDownIcon,
+    CloseIcon,
+    FolderIcon,
+    CheckmarkIcon,
+    PlusIcon,
+} from "@/assets/icons";
 
 interface CategorySelectorProps {
     category: PlaceCategory | '';
@@ -171,9 +179,7 @@ export default function CategorySelector({
                                 {subcategory ? (
                                     <>
                                         {getCategoryLabel(category as PlaceCategory)}
-                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
+                                        <ChevronRightIcon className="w-3 h-3" />
                                         {getSubcategoryLabel(locale, category as PlaceCategory, subcategory) || subcategory}
                                     </>
                                 ) : (
@@ -184,9 +190,7 @@ export default function CategorySelector({
                                     onClick={handleClear}
                                     className="ml-1 hover:text-accent-dark transition-colors"
                                 >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <CloseIcon className="w-4 h-4" />
                                 </button>
                             </span>
                         )}
@@ -222,12 +226,9 @@ export default function CategorySelector({
                         focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent
                         transition-all duration-200"
                 />
-                <svg
+                <ChevronDownIcon
                     className={`w-5 h-5 text-text-light absolute right-3 top-1/2 -translate-y-1/2 transition-transform ${showDropdown ? 'rotate-180' : ''}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                />
             </div>
 
             {/* Category breadcrumb */}
@@ -244,9 +245,7 @@ export default function CategorySelector({
                     >
                         All categories
                     </button>
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ChevronRightIcon className="w-3 h-3" />
                     <span className="font-medium text-white">{getCategoryLabel(category as PlaceCategory)}</span>
                 </div>
             )}
@@ -285,22 +284,16 @@ export default function CategorySelector({
                             >
                                 {item.type === 'category' ? (
                                     <>
-                                        <svg className="w-4 h-4 text-text-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                        </svg>
+                                        <FolderIcon className="w-4 h-4 text-text-light" />
                                         <span>{item.label}</span>
-                                        <svg className="w-4 h-4 text-text-light ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
+                                        <ChevronRightIcon className="w-4 h-4 text-text-light ml-auto" />
                                     </>
                                 ) : (
                                     <>
                                         <span className="w-4" />
                                         <span>{item.label}</span>
                                         {item.subcategory === subcategory && (
-                                            <svg className="w-4 h-4 text-accent ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
+                                            <CheckmarkIcon className="w-4 h-4 text-accent ml-auto" />
                                         )}
                                     </>
                                 )}
@@ -317,9 +310,7 @@ export default function CategorySelector({
                                     onClick={() => setShowSuggestInput(true)}
                                     className="w-full text-left px-4 py-2.5 text-sm text-text-light hover:text-accent hover:bg-surface flex items-center gap-2 transition-colors"
                                 >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
+                                    <PlusIcon className="w-4 h-4" />
                                     Suggest a new subcategory
                                 </button>
                             ) : (

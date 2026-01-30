@@ -1,4 +1,5 @@
 import prisma from "../prisma";
+import { serverEnv } from "@/lib/Environment";
 
 /**
  * Convert npub to hex pubkey
@@ -56,7 +57,7 @@ export async function isAdmin(pubkey: string): Promise<boolean> {
     const normalizedPubkey = normalizeToHex(pubkey);
 
     // Check if this is the initial admin from env var
-    const initialAdminPubkey = process.env.INITIAL_ADMIN_PUBKEY;
+    const initialAdminPubkey = serverEnv.initialAdminPubkey;
     if (initialAdminPubkey) {
         const normalizedInitial = normalizeToHex(initialAdminPubkey);
         if (normalizedPubkey === normalizedInitial) {

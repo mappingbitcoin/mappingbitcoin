@@ -2,13 +2,21 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Modal from "@/components/ui/Modal";
+import { useTranslations } from "next-intl";
+import { Modal, StepIndicator } from "@/components/ui";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { EnrichedVenue } from "@/models/Overpass";
-import LoginStep from "./LoginStep";
+import { LoginStep } from "@/components/auth";
 import VerificationStep from "./VerificationStep";
 import { getVerifiableDomains } from "@/lib/verification/domainUtils";
 import { parseTags } from "@/utils/OsmHelpers";
+import {
+    ShieldCheckIcon,
+    EmailIcon,
+    GlobeIcon,
+    ChevronRightIcon,
+    ChevronLeftIcon,
+} from "@/assets/icons";
 
 interface VerifyOwnershipModalProps {
     isOpen: boolean;
@@ -27,6 +35,7 @@ export default function VerifyOwnershipModal({
     venue,
     venueName,
 }: VerifyOwnershipModalProps) {
+    const t = useTranslations("login");
     const { user } = useNostrAuth();
     const [step, setStep] = useState<VerificationState>("login");
     const [method, setMethod] = useState<VerificationMethod | null>(null);
@@ -146,9 +155,7 @@ export default function VerifyOwnershipModal({
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
+                        <ShieldCheckIcon className="w-6 h-6 text-accent" />
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-white">Verify Ownership</h2>
@@ -157,13 +164,19 @@ export default function VerifyOwnershipModal({
                 </div>
 
                 {/* Step indicator */}
-                <div className="flex items-center gap-2 mb-6">
-                    <StepIndicator number={1} label="Login" active={step === "login"} completed={!!user} />
-                    <div className="flex-1 h-px bg-border-light" />
-                    <StepIndicator number={2} label="Verify" active={["method-select", "domain-select", "verifying", "domain-pending", "email-pending"].includes(step)} completed={step === "success"} />
-                    <div className="flex-1 h-px bg-border-light" />
-                    <StepIndicator number={3} label="Done" active={step === "success"} completed={step === "success"} />
-                </div>
+                <StepIndicator
+                    variant="compact"
+                    className="mb-6"
+                    steps={[
+                        { label: t("steps.login"), completed: !!user },
+                        { label: t("steps.verify"), completed: step === "success" },
+                        { label: t("steps.done"), completed: step === "success" },
+                    ]}
+                    currentStep={
+                        step === "login" ? 0 :
+                        step === "success" ? 2 : 1
+                    }
+                />
 
                 {/* Error display */}
                 <AnimatePresence mode="wait">
@@ -182,7 +195,11 @@ export default function VerifyOwnershipModal({
                 {/* Content */}
                 <AnimatePresence mode="wait">
                     {step === "login" && (
-                        <LoginStep key="login" onError={setError} />
+                        <LoginStep
+                            key="login"
+                            onError={setError}
+                            descriptionKey="verification"
+                        />
                     )}
 
                     {step === "method-select" && user && (
@@ -206,9 +223,7 @@ export default function VerifyOwnershipModal({
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                                <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                </svg>
+                                                <EmailIcon className="w-5 h-5 text-blue-400" />
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="text-white font-medium group-hover:text-accent transition-colors">Email Verification</h3>
@@ -216,9 +231,7 @@ export default function VerifyOwnershipModal({
                                                     We&apos;ll send a code to the venue&apos;s registered email
                                                 </p>
                                             </div>
-                                            <svg className="w-5 h-5 text-text-light group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            <ChevronRightIcon className="w-5 h-5 text-text-light group-hover:text-accent transition-colors" />
                                         </div>
                                     </button>
                                 )}
@@ -231,9 +244,7 @@ export default function VerifyOwnershipModal({
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                                                <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                                </svg>
+                                                <GlobeIcon className="w-5 h-5 text-accent" />
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="text-white font-medium group-hover:text-accent transition-colors">Domain Verification</h3>
@@ -241,9 +252,7 @@ export default function VerifyOwnershipModal({
                                                     Add a DNS TXT record to your domain
                                                 </p>
                                             </div>
-                                            <svg className="w-5 h-5 text-text-light group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            <ChevronRightIcon className="w-5 h-5 text-text-light group-hover:text-accent transition-colors" />
                                         </div>
                                     </button>
                                 )}
@@ -264,9 +273,7 @@ export default function VerifyOwnershipModal({
                                     onClick={handleBackToMethodSelect}
                                     className="text-sm text-text-light hover:text-white flex items-center gap-1 transition-colors"
                                 >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
+                                    <ChevronLeftIcon className="w-4 h-4" />
                                     Back to methods
                                 </button>
                             )}
@@ -284,9 +291,7 @@ export default function VerifyOwnershipModal({
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                                                <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                                </svg>
+                                                <GlobeIcon className="w-5 h-5 text-accent" />
                                             </div>
                                             <div>
                                                 <h3 className="text-white font-medium group-hover:text-accent transition-colors">{domain}</h3>
@@ -323,24 +328,5 @@ export default function VerifyOwnershipModal({
                 </AnimatePresence>
             </div>
         </Modal>
-    );
-}
-
-function StepIndicator({ number, label, active, completed }: { number: number; label: string; active: boolean; completed: boolean }) {
-    return (
-        <div className="flex flex-col items-center gap-1">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                completed ? "bg-green-500 text-white" : active ? "bg-accent text-white" : "bg-surface-light text-text-light"
-            }`}>
-                {completed ? (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                ) : (
-                    number
-                )}
-            </div>
-            <span className={`text-xs ${active || completed ? "text-white" : "text-text-light"}`}>{label}</span>
-        </div>
     );
 }

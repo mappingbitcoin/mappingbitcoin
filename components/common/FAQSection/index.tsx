@@ -1,7 +1,8 @@
 "use client";
 
-import {useTranslations} from "next-intl";
-import {ReactNode, useState} from "react";
+import { useTranslations } from "next-intl";
+import { ReactNode, useState } from "react";
+import { ChevronDownIcon } from "@/assets/icons/ui";
 
 type FAQEntry = {
     question: string;
@@ -15,26 +16,12 @@ type FAQSectionProps = {
     faqs?: FAQEntry[]; // Optional override of FAQ entries
 };
 
-function ChevronIcon({ isOpen }: { isOpen: boolean }) {
-    return (
-        <svg
-            className={`w-5 h-5 text-accent transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-        >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-    );
-}
-
 export default function FAQSection({
-                                       translationKey,
-                                       substitutions = {},
-                                       titleKey = "title",
-                                       faqs
-                                   }: FAQSectionProps) {
+    translationKey,
+    substitutions = {},
+    titleKey = "title",
+    faqs
+}: FAQSectionProps) {
     const t = useTranslations(translationKey);
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -63,7 +50,7 @@ export default function FAQSection({
                 </div>
 
                 <div className="space-y-3">
-                    {finalFaqs.map(({question, answer}, i) => {
+                    {finalFaqs.map(({ question, answer }, i) => {
                         const renderedQ = renderWithPlaceholders(question);
                         const isStringAnswer = typeof answer === 'string';
                         const isOpen = openIndex === i;
@@ -78,7 +65,9 @@ export default function FAQSection({
                                     className="w-full flex items-center justify-between gap-4 p-4 text-left cursor-pointer"
                                 >
                                     <span className="font-medium text-text-dark pr-4">{renderedQ}</span>
-                                    <ChevronIcon isOpen={isOpen} />
+                                    <span className={`text-accent transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                                        <ChevronDownIcon className="w-5 h-5" />
+                                    </span>
                                 </button>
 
                                 <div
@@ -88,7 +77,7 @@ export default function FAQSection({
                                 >
                                     <div className="px-4 pb-4 text-text text-sm leading-relaxed [&_a]:text-accent [&_a]:underline [&_a:hover]:text-accent-dark">
                                         {isStringAnswer ? (
-                                            <div dangerouslySetInnerHTML={{__html: renderWithPlaceholders(answer)}} />
+                                            <div dangerouslySetInnerHTML={{ __html: renderWithPlaceholders(answer) }} />
                                         ) : (
                                             answer
                                         )}

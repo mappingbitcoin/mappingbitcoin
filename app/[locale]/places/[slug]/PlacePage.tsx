@@ -23,33 +23,35 @@ import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import moment from 'moment';
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
+import {
+    StarIcon,
+    ChevronRightIcon,
+    PinIcon,
+    DirectionsIcon,
+    ClockIcon,
+    ShieldCheckIcon,
+    ChatIcon,
+    LightningIcon,
+    LightningContactlessIcon,
+    OnchainIcon,
+    EmailIcon,
+    WebsiteIcon,
+    PhoneIcon,
+} from "@/assets/icons";
+import { ComponentType } from "react";
+import { IconProps } from "@/assets/icons";
 
-// SVG icons for payment methods
-const PaymentIcon = ({ type }: { type: string }) => {
-    switch (type) {
-        case 'lightning':
-            return (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-            );
-        case 'lightning_contactless':
-            return (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11 2L4 12h6l-1 6 7-8h-5l1-8z" />
-                    <path d="M17 8c1.5 1.5 2.5 3.5 2.5 6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M19.5 5.5c2 2 3.5 5 3.5 8.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-            );
-        case 'onchain':
-            return (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h1c.55 0 1 .45 1 1v3c0 .55-.45 1-1 1h-3v1h4v2h-2v2h-2v-2h-1c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h3v-1h-4V9h2V7z" />
-                </svg>
-            );
-        default:
-            return null;
-    }
+// Payment icon mapping
+const PAYMENT_ICON_MAP: Record<string, ComponentType<IconProps>> = {
+    lightning: LightningIcon,
+    lightning_contactless: LightningContactlessIcon,
+    onchain: OnchainIcon,
+};
+
+const PaymentIcon = ({ type, className }: { type: string; className?: string }) => {
+    const IconComponent = PAYMENT_ICON_MAP[type];
+    if (!IconComponent) return null;
+    return <IconComponent className={className || "w-4 h-4"} />;
 };
 
 export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, isPreview: boolean }) {
@@ -90,9 +92,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                 </div>
                 <div className="flex items-center gap-1 mb-2">
                     {[...Array(5)].map((_, i) => (
-                        <svg key={i} className={`w-4 h-4 ${i < r.rating ? 'text-amber-400' : 'text-gray-600'}`} fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
+                        <StarIcon key={i} className={`w-4 h-4 ${i < r.rating ? 'text-amber-400' : 'text-gray-600'}`} />
                     ))}
                 </div>
                 {r.text && <p className="text-sm text-text-light leading-relaxed">{r.text}</p>}
@@ -193,9 +193,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                 )}
                                 {score > 0 && (
                                     <span className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 py-1.5 px-3 rounded-full text-sm">
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
+                                        <StarIcon className="w-4 h-4" />
                                         {score.toFixed(1)} {totalRatings > 0 && `(${totalRatings})`}
                                     </span>
                                 )}
@@ -261,15 +259,11 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
                                         <span className="text-white text-sm font-medium flex items-center gap-1.5">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            <ChevronRightIcon className="w-4 h-4" />
                                             View on map
                                         </span>
                                         <span className="bg-white/20 backdrop-blur-sm text-white text-xs py-1 px-2 rounded-full flex items-center gap-1">
-                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                                            </svg>
+                                            <PinIcon className="w-3 h-3" />
                                             1 pin
                                         </span>
                                     </div>
@@ -285,10 +279,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                     className="flex-1 inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white py-2.5 px-4 rounded-btn font-medium text-sm transition-colors no-underline"
                                     title={tMap('getDirections')}
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+                                    <DirectionsIcon className="w-4 h-4" />
                                     <span className="max-md:hidden">{tMap('getDirections')}</span>
                                 </a>
                                 {contact?.website && (
@@ -299,9 +290,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                         className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white py-2.5 px-4 rounded-btn font-medium text-sm transition-colors no-underline"
                                         title="Website"
                                     >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                        </svg>
+                                        <WebsiteIcon className="w-4 h-4" />
                                         <span className="max-md:hidden">Website</span>
                                     </a>
                                 )}
@@ -357,10 +346,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 {address && (
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                                                            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            </svg>
+                                                            <DirectionsIcon className="w-5 h-5 text-accent" />
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Address</p>
@@ -372,9 +358,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 {formattedHours && (
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                                                            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
+                                                            <ClockIcon className="w-5 h-5 text-accent" />
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Hours</p>
@@ -386,9 +370,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 {contact?.email && (
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                                                            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                            </svg>
+                                                            <EmailIcon className="w-5 h-5 text-accent" />
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Email</p>
@@ -402,9 +384,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 {contact?.phone && (
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                                                            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                                            </svg>
+                                                            <PhoneIcon className="w-5 h-5 text-accent" />
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Phone</p>
@@ -509,9 +489,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                     <div>
                                                         <div className="flex items-center gap-0.5 mb-1">
                                                             {[...Array(5)].map((_, i) => (
-                                                                <svg key={i} className={`w-5 h-5 ${i < Math.round(score) ? 'text-amber-400' : 'text-gray-600'}`} fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                </svg>
+                                                                <StarIcon key={i} className={`w-5 h-5 ${i < Math.round(score) ? 'text-amber-400' : 'text-gray-600'}`} />
                                                             ))}
                                                         </div>
                                                         <p className="text-sm text-text-light">{totalRatings} {tMap('tabs.reviews')}</p>
@@ -524,9 +502,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 </div>
                                             ) : (
                                                 <div className="text-center py-8">
-                                                    <svg className="w-12 h-12 mx-auto text-text-light mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                                    </svg>
+                                                    <ChatIcon className="w-12 h-12 mx-auto text-text-light mb-3" />
                                                     <p className="text-text-light">{tMap('noReviews')}</p>
                                                 </div>
                                             )}
@@ -592,9 +568,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                             {canVerifyVenue(venue.tags) && (
                                 <div className="bg-surface rounded-card border border-border-light p-4">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
+                                        <ShieldCheckIcon className="w-4 h-4 text-accent" />
                                         <h4 className="text-sm font-medium text-white">Are you the owner?</h4>
                                     </div>
                                     <p className="text-xs text-text-light mb-3">

@@ -20,7 +20,7 @@ import Script from "next/script";
 import React from "react";
 import { distance } from 'fastest-levenshtein';
 import { PageSection } from "@/components/layout";
-import VenueRegionWrapper from "@/app/[locale]/[slug]/VenueRegionWrapper";
+import PlacesDirectoryWrapper from "@/app/[locale]/[slug]/PlacesDirectoryWrapper";
 
 function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, exactMatch: boolean } | null {
     const lowerSlug = slug.toLowerCase();
@@ -173,7 +173,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 
-export default async function VenueRegionPage({ params }: PageProps) {
+export default async function PlacesDirectoryPage({ params }: PageProps) {
     const { slug, locale } = await params;
     const all2 = await getMessages({ locale: 'en' });
     const t = { merchants: all2.merchants, map: all2.map } as Record<string, any>;
@@ -393,7 +393,7 @@ export default async function VenueRegionPage({ params }: PageProps) {
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
             />
-            <VenueRegionWrapper country={countryLabel} venues={venues} city={location} categoryAndSubcategory={categoryAndSubcategory} availableCities={availableCities} availableSubcategories={availableCategories} exactMatch={data.exactMatch} />
+            <PlacesDirectoryWrapper country={countryLabel} places={venues} city={location} categoryAndSubcategory={categoryAndSubcategory} availableCities={availableCities} availableSubcategories={availableCategories} exactMatch={data.exactMatch} />
         </>
     );
 }

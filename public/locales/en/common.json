@@ -11,7 +11,8 @@
     "logout": "Log Out",
     "signedInAs": "Signed in as",
     "readOnly": "Read-only",
-    "myVerifications": "My Verifications"
+    "myVerifications": "My Verifications",
+    "admin": "Admin Panel"
   },
   "footer": {
     "allRightsReserved": "All Rights Reserved.",

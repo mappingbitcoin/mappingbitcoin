@@ -7,6 +7,18 @@ import {useTranslations} from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNostrAuth, useNpub } from "@/contexts/NostrAuthContext";
 import NavBarSearch from "./NavBarSearch";
+import { LoginModal } from "@/components/auth";
+import {
+    CheckmarkIcon,
+    BadgeCheckIcon,
+    SettingsIcon,
+    ShieldCheckIcon,
+    LogoutIcon,
+    LoginIcon,
+    SearchIcon,
+    MenuIcon,
+    CloseIcon,
+} from "@/assets/icons/ui";
 
 const menuItems = [
     'map',
@@ -131,9 +143,7 @@ const UserAvatar = ({ pubkey, picture, name, isSeeder }: { pubkey: string; pictu
                 </div>
                 {isSeeder && (
                     <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
-                        <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                        <CheckmarkIcon className="w-2.5 h-2.5 text-white" />
                     </div>
                 )}
             </div>
@@ -150,9 +160,7 @@ const UserAvatar = ({ pubkey, picture, name, isSeeder }: { pubkey: string; pictu
             </div>
             {isSeeder && (
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
-                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                    <CheckmarkIcon className="w-2.5 h-2.5 text-white" />
                 </div>
             )}
         </div>
@@ -164,15 +172,19 @@ const NavBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const t = useTranslations("menu");
-    const { user, logout } = useNostrAuth();
+    const { user, logout, isAdmin } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
     const [profile, setProfile] = useState<NostrProfile | null>(null);
     const [seederInfo, setSeederInfo] = useState<{ isSeeder: boolean; seeder: SeederInfo | null }>({ isSeeder: false, seeder: null });
 
     // Check if we're on the map page (which has its own search)
     const isMapPage = pathname === "/map" || pathname?.endsWith("/map");
+
+    // Check if we're on an admin page - hide navbar entirely
+    const isAdminPage = pathname?.includes("/admin");
 
     const openMenu = () => {
         setMenuOpen(true);
@@ -212,6 +224,11 @@ const NavBar = () => {
     };
 
     const displayName = profile?.display_name || profile?.name || (npub ? `${npub.slice(0, 12)}...` : user?.pubkey?.slice(0, 12) + "...");
+
+    // Hide navbar on admin pages (admin has its own sidebar)
+    if (isAdminPage) {
+        return null;
+    }
 
     return (
         <motion.nav
@@ -351,9 +368,7 @@ const NavBar = () => {
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             {seederInfo.isSeeder && (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
-                                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                                                                    </svg>
+                                                                    <BadgeCheckIcon className="w-3 h-3" />
                                                                     {seederInfo.seeder?.label || 'Community Seeder'}
                                                                 </span>
                                                             )}
@@ -365,23 +380,29 @@ const NavBar = () => {
                                                         </div>
                                                     </div>
                                                     <div className="p-1">
+                                                        {isAdmin && (
+                                                            <Link
+                                                                href="/admin"
+                                                                onClick={() => setUserMenuOpen(false)}
+                                                                className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors no-underline"
+                                                            >
+                                                                <SettingsIcon className="w-4 h-4" />
+                                                                {t('admin')}
+                                                            </Link>
+                                                        )}
                                                         <Link
                                                             href="/my-verifications"
                                                             onClick={() => setUserMenuOpen(false)}
                                                             className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors no-underline"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                            </svg>
+                                                            <ShieldCheckIcon className="w-4 h-4" />
                                                             {t('myVerifications')}
                                                         </Link>
                                                         <button
                                                             onClick={handleLogout}
                                                             className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                                                            </svg>
+                                                            <LogoutIcon className="w-4 h-4" />
                                                             {t('logout')}
                                                         </button>
                                                     </div>
@@ -390,15 +411,13 @@ const NavBar = () => {
                                         </AnimatePresence>
                                     </div>
                                 ) : (
-                                    <Link
-                                        href="/login"
-                                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors"
+                                    <button
+                                        onClick={() => setShowLoginModal(true)}
+                                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
                                     >
-                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                                        </svg>
+                                        <LoginIcon className="w-4 h-4" />
                                         {t('login')}
-                                    </Link>
+                                    </button>
                                 )}
                             </motion.div>
                         </div>
@@ -413,9 +432,7 @@ const NavBar = () => {
                                     whileTap={{ scale: 0.95 }}
                                     aria-label="Search"
                                 >
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
+                                    <SearchIcon className="w-5 h-5" />
                                 </motion.button>
                             )}
                             <motion.button
@@ -424,11 +441,7 @@ const NavBar = () => {
                                 whileTap={{ scale: 0.95 }}
                                 aria-label="Open menu"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                                </svg>
+                                <MenuIcon className="w-5 h-5" />
                             </motion.button>
                         </div>
                     </>
@@ -488,9 +501,7 @@ const NavBar = () => {
                                                 <div className="flex flex-wrap gap-2 mt-1">
                                                     {seederInfo.isSeeder && (
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
-                                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                                                            </svg>
+                                                            <BadgeCheckIcon className="w-3 h-3" />
                                                             {seederInfo.seeder?.label || 'Community Seeder'}
                                                         </span>
                                                     )}
@@ -502,37 +513,43 @@ const NavBar = () => {
                                                 </div>
                                             </div>
                                         </div>
+                                        {isAdmin && (
+                                            <Link
+                                                href="/admin"
+                                                onClick={closeMenu}
+                                                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white/80 bg-white/5 border border-white/20 rounded-lg hover:bg-white/10 transition-colors no-underline"
+                                            >
+                                                <SettingsIcon className="w-5 h-5" />
+                                                {t('admin')}
+                                            </Link>
+                                        )}
                                         <Link
                                             href="/my-verifications"
                                             onClick={closeMenu}
                                             className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white/80 bg-white/5 border border-white/20 rounded-lg hover:bg-white/10 transition-colors no-underline"
                                         >
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                            </svg>
+                                            <ShieldCheckIcon className="w-5 h-5" />
                                             {t('myVerifications')}
                                         </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white/80 bg-white/5 border border-white/20 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
                                         >
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                                            </svg>
+                                            <LogoutIcon className="w-5 h-5" />
                                             {t('logout')}
                                         </button>
                                     </div>
                                 ) : (
-                                    <Link
-                                        onClick={closeMenu}
-                                        href="/login"
-                                        className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors"
+                                    <button
+                                        onClick={() => {
+                                            closeMenu();
+                                            setShowLoginModal(true);
+                                        }}
+                                        className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
                                     >
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                                        </svg>
+                                        <LoginIcon className="w-5 h-5" />
                                         {t('login')}
-                                    </Link>
+                                    </button>
                                 )}
                             </motion.div>
 
@@ -546,10 +563,7 @@ const NavBar = () => {
                                 transition={{ delay: 0.2 }}
                                 aria-label="Close menu"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
+                                <CloseIcon className="w-5 h-5" />
                             </motion.button>
                         </motion.div>
                     </AnimatePresence>
@@ -579,10 +593,7 @@ const NavBar = () => {
                                     whileTap={{ scale: 0.95 }}
                                     aria-label="Close search"
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
+                                    <CloseIcon className="w-5 h-5" />
                                 </motion.button>
                             </div>
                             <p className="text-center text-white/40 text-sm mt-8">
@@ -592,6 +603,12 @@ const NavBar = () => {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Login Modal */}
+            <LoginModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+            />
         </motion.nav>
     );
 };

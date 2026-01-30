@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PageSection } from "@/components/layout";
 import { Link } from "@/i18n/navigation";
+import { CircleWarningIcon, CircleXIcon, CircleCheckIcon } from "@/assets/icons/ui";
 
 interface SubscriptionList {
     slug: string;
@@ -104,11 +105,7 @@ const Unsubscribe: React.FC = () => {
             <PageSection background="dark">
                 <div className="max-w-lg mx-auto text-center py-12">
                     <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
+                        <CircleWarningIcon className="w-8 h-8 stroke-yellow-500" />
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("noToken.title")}</h1>
                     <p className="text-text-light mb-6">{t("noToken.description")}</p>
@@ -141,11 +138,7 @@ const Unsubscribe: React.FC = () => {
             <PageSection background="dark">
                 <div className="max-w-lg mx-auto text-center py-12">
                     <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="15" y1="9" x2="9" y2="15"/>
-                            <line x1="9" y1="9" x2="15" y2="15"/>
-                        </svg>
+                        <CircleXIcon className="w-8 h-8 stroke-red-500" />
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("error")}</h1>
                     <p className="text-text-light mb-6">{errorMessage}</p>
@@ -166,9 +159,7 @@ const Unsubscribe: React.FC = () => {
             <PageSection background="dark">
                 <div className="max-w-lg mx-auto text-center py-12">
                     <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
+                        <CircleCheckIcon className="w-8 h-8 stroke-green-500" />
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("success.title")}</h1>
                     <p className="text-text-light mb-6">{t("success.description")}</p>

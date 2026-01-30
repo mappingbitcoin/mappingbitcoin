@@ -17,6 +17,7 @@ const ALLOWED_UPLOAD_TYPES = [
     AssetType.CLAIMS,
     AssetType.VENUE_IMAGES,
     AssetType.USER_AVATARS,
+    AssetType.MARKETING,
 ];
 
 // File size limits per asset type (in bytes)
@@ -30,6 +31,7 @@ const SIZE_LIMITS: Record<AssetType, number> = {
     [AssetType.EXPORTS]: 0, // Not allowed for user upload
     [AssetType.REPORTS]: 0, // Not allowed for user upload
     [AssetType.TEMP]: 5 * 1024 * 1024, // 5MB
+    [AssetType.MARKETING]: 50 * 1024 * 1024, // 50MB
 };
 
 // Allowed content types per asset type
@@ -43,6 +45,11 @@ const ALLOWED_CONTENT_TYPES: Record<AssetType, string[]> = {
     [AssetType.EXPORTS]: [],
     [AssetType.REPORTS]: [],
     [AssetType.TEMP]: ["image/jpeg", "image/png", "image/webp", "application/pdf", "application/json"],
+    [AssetType.MARKETING]: [
+        "image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml",
+        "video/mp4", "video/webm",
+        "application/pdf"
+    ],
 };
 
 /**
@@ -225,6 +232,9 @@ function getExtensionFromContentType(contentType: string): string {
         "image/png": ".png",
         "image/webp": ".webp",
         "image/gif": ".gif",
+        "image/svg+xml": ".svg",
+        "video/mp4": ".mp4",
+        "video/webm": ".webm",
         "application/pdf": ".pdf",
         "application/json": ".json",
     };

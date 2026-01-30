@@ -1,6 +1,12 @@
 "use client";
 
 import React from "react";
+import {
+    CircleCheckFilledIcon,
+    ShieldFilledIcon,
+    UserFilledIcon,
+    QuestionCircleIcon,
+} from "@/assets/icons/ui";
 
 interface TrustBadgeProps {
     score: number;
@@ -83,49 +89,21 @@ function TrustIcon({ score, size }: TrustIconProps) {
 
     if (score >= 1.0) {
         // Verified checkmark for seeders
-        return (
-            <svg className={iconSize} fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                    clipRule="evenodd"
-                />
-            </svg>
-        );
+        return <CircleCheckFilledIcon className={iconSize} />;
     }
 
     if (score >= 0.4) {
         // Shield for trusted
-        return (
-            <svg className={iconSize} fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    fillRule="evenodd"
-                    d="M10 1a.75.75 0 01.65.375l3 5.25a.75.75 0 01-.65 1.125H7a.75.75 0 01-.65-1.125l3-5.25A.75.75 0 0110 1zM5.23 8.75A.75.75 0 016 8.25h8a.75.75 0 01.77.5l1.5 5.5a.75.75 0 01-.27.83l-5.25 3.5a.75.75 0 01-.83 0l-5.25-3.5a.75.75 0 01-.27-.83l1.5-5.5a.75.75 0 01.33-.5z"
-                    clipRule="evenodd"
-                />
-            </svg>
-        );
+        return <ShieldFilledIcon className={iconSize} />;
     }
 
     if (score >= 0.1) {
         // User check for known
-        return (
-            <svg className={iconSize} fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-            </svg>
-        );
+        return <UserFilledIcon className={iconSize} />;
     }
 
     // Question mark for new/unknown
-    return (
-        <svg className={iconSize} fill="currentColor" viewBox="0 0 20 20">
-            <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.94 6.94a.75.75 0 11-1.06-1.06 3 3 0 112.12 5.122.75.75 0 01-.75.75v.75a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75 1.5 1.5 0 00.44-2.94zM10 15a1 1 0 100-2 1 1 0 000 2z"
-                clipRule="evenodd"
-            />
-        </svg>
-    );
+    return <QuestionCircleIcon className={iconSize} />;
 }
 
 /**

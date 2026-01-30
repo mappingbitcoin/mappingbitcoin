@@ -2,11 +2,12 @@ import {NextRequest} from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import levenshtein from 'fast-levenshtein';
+import { serverEnv } from "@/lib/Environment";
 
 const CACHE_DIR = path.resolve(process.cwd(), "data", "google-places");
 const REFRESH_DAYS = 10;
 
-const key = String(process.env.GOOGLE_MAPS_APIKEY_BE);
+const key = serverEnv.googleMapsApiKey || "";
 
 async function getCacheFilePath(id: string) {
     await fs.mkdir(CACHE_DIR, { recursive: true });

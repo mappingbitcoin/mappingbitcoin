@@ -2,6 +2,7 @@ import prisma from "../prisma";
 import { Resend } from "resend";
 import dns from "dns/promises";
 import { createVerificationCodeEmail } from "@/lib/email/templates";
+import { serverEnv } from "@/lib/Environment";
 
 const VERIFICATION_CODE_EXPIRY_MINUTES = 15;
 const MAX_VERIFICATION_ATTEMPTS = 5;
@@ -9,7 +10,7 @@ const CLAIM_EXPIRY_HOURS = 24; // Claims expire after 24 hours
 const BASE_CHECK_COOLDOWN_SECONDS = 30; // Base cooldown between checks
 const MAX_CHECK_COOLDOWN_SECONDS = 3600; // Max cooldown (1 hour)
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(serverEnv.resendApiKey);
 
 /**
  * Generate a 6-digit verification code

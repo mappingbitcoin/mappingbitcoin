@@ -14,6 +14,7 @@ import {
     uploadOsmNode
 } from "@/utils/OsmHelpers";
 import {TileCluster} from "@/models/TileCluster";
+import { serverEnv } from "@/lib/Environment";
 
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(String(req.url));
@@ -130,12 +131,12 @@ export async function POST(req: Request) {
     const token = user.access_token;
 
     // 2. Validate CAPTCHA
-    const secret = process.env.RECAPTCHA_SECRET_KEY;
+    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
     const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            secret: secret || "",
+            secret: recaptchaSecretKey || "",
             response: captcha,
         }),
     });

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { LocationPinIcon } from "@/assets/icons/ui";
 
 interface MapLibreMarkerProps {
     lat: number;
@@ -177,25 +178,7 @@ export default function MapLibreMarker({
                 className="absolute bottom-3 left-3 bg-surface hover:bg-surface-light text-white p-2 rounded-lg shadow-lg border border-border-light transition-colors"
                 title="Use my location"
             >
-                <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                </svg>
+                <LocationPinIcon className="w-5 h-5" />
             </button>
 
             {/* Instructions */}

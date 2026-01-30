@@ -7,11 +7,12 @@ import {generateMerchantSlugs} from "@/utils/sync/slugs/MerchantSlugs";
 import {generateVenueSlugs} from "@/utils/sync/slugs/VenueSlugs";
 import {generateStats} from "@/utils/sync/stats/GenerateStats";
 import {buildCommunityGraph, isBuildRunning} from "@/lib/trust/graphBuilder";
+import { isProduction } from "@/lib/Environment";
 
 let started = false;
 
 export async function startBitcoinVenueCron() {
-    if (started || process.env.NODE_ENV !== 'production') return;
+    if (started || !isProduction) return;
     started = true;
 
     // ✅ Run startup sync ONCE

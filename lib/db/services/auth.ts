@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import prisma from "../prisma";
+import { serverEnv } from "@/lib/Environment";
 
 const CHALLENGE_EXPIRY_MINUTES = 5;
 const TOKEN_EXPIRY_DAYS = 7;
@@ -103,17 +104,12 @@ export async function verifyAndConsumeChallenge(challenge: string, pubkey: strin
  * Create a JWT auth token for a verified pubkey
  */
 export async function createAuthToken(pubkey: string): Promise<string> {
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) {
-        throw new Error("SESSION_SECRET environment variable is not set");
-    }
-
     const token = await new SignJWT({ pubkey })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(`${TOKEN_EXPIRY_DAYS}d`)
         .setSubject(pubkey)
-        .sign(new TextEncoder().encode(secret));
+        .sign(new TextEncoder().encode(serverEnv.sessionSecret));
 
     return token;
 }
@@ -123,13 +119,8 @@ export async function createAuthToken(pubkey: string): Promise<string> {
  * Returns null if token is invalid or expired
  */
 export async function validateAuthToken(token: string): Promise<string | null> {
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) {
-        throw new Error("SESSION_SECRET environment variable is not set");
-    }
-
     try {
-        const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(serverEnv.sessionSecret));
 
         if (!payload.pubkey || typeof payload.pubkey !== "string") {
             return null;

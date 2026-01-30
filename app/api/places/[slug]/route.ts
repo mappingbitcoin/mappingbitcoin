@@ -14,6 +14,7 @@ import {
     uploadOsmNode,
     closeOsmChangeset
 } from "@/utils/OsmHelpers";
+import { serverEnv } from "@/lib/Environment";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -140,12 +141,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const token = user.access_token;
 
     // 2. Validate CAPTCHA
-    const secret = process.env.RECAPTCHA_SECRET_KEY;
+    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
     const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            secret: secret || "",
+            secret: recaptchaSecretKey || "",
             response: captcha,
         }),
     });

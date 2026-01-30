@@ -1,4 +1,5 @@
 import React, { cache, Suspense } from "react";
+import { Toaster } from "react-hot-toast";
 
 import { Footer, NavBar, PageTransition, BodyLockManager } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
@@ -37,6 +38,22 @@ export default async function LocaleLayout({
         return (
           <NextIntlClientProvider locale={locale} messages={allMessages}>
             <NostrAuthProvider>
+              <Toaster
+                position="bottom-right"
+                toastOptions={{
+                  style: {
+                    background: '#1A1A1A',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: '#f7931a',
+                      secondary: '#fff',
+                    },
+                  },
+                }}
+              />
               <ClientOnlyAnalytics />
               <BodyLockManager />
               <NavBar />

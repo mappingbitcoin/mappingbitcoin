@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
+import { serverEnv } from "@/lib/Environment";
 
-const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
+const secret = new TextEncoder().encode(serverEnv.sessionSecret);
 
 export async function getSession(): Promise<null | {
     id: string;

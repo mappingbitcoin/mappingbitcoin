@@ -1,19 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
+import { CheckmarkIcon } from "@/assets/icons/ui";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { isValidEmail } from "@/utils/validation";
 
-declare global {
-    interface Window {
-        // @ts-ignore
-        grecaptcha?: {
-            ready: (callback: () => void) => void;
-            execute: (siteKey: string, options: { action: string }) => Promise<string>;
-        };
-    }
-}
-
-const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+type SubscribeStatus = "idle" | "loading" | "success" | "error" | "already";
 
 interface NewsletterFormProps {
     list?: string;
@@ -26,40 +19,14 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
 }) => {
     const t = useTranslations("subscribe");
     const [email, setEmail] = useState("");
-    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "already">("idle");
+    const [status, setStatus] = useState<SubscribeStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
-
-    useEffect(() => {
-        if (window.grecaptcha) {
-            setRecaptchaLoaded(true);
-        }
-    }, []);
-
-    const getRecaptchaToken = useCallback(async (): Promise<string | null> => {
-        if (!RECAPTCHA_SITE_KEY || !window.grecaptcha) {
-            return null;
-        }
-
-        return new Promise((resolve) => {
-            window.grecaptcha!.ready(async () => {
-                try {
-                    const token = await window.grecaptcha!.execute(RECAPTCHA_SITE_KEY, {
-                        action: "newsletter_subscribe",
-                    });
-                    resolve(token);
-                } catch (error) {
-                    console.error("reCAPTCHA error:", error);
-                    resolve(null);
-                }
-            });
-        });
-    }, []);
+    const { getToken, isReady } = useRecaptcha({ action: "newsletter_subscribe" });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (!email || !isValidEmail(email)) {
             setErrorMessage(t("invalidEmail"));
             setStatus("error");
             return;
@@ -69,16 +36,12 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
         setErrorMessage("");
 
         try {
-            const recaptchaToken = recaptchaLoaded ? await getRecaptchaToken() : null;
+            const recaptchaToken = isReady ? await getToken() : null;
 
             const response = await fetch("/api/subscribe", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email,
-                    list,
-                    recaptchaToken,
-                }),
+                body: JSON.stringify({ email, list, recaptchaToken }),
             });
 
             const data = await response.json();
@@ -101,28 +64,29 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
         }
     };
 
+    // Success state
     if (status === "success") {
         return (
-            <div className={`flex items-center gap-2 text-green-400 ${className}`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                <span className="text-sm">{t("success")}</span>
-            </div>
+            <StatusMessage
+                className={className}
+                color="green"
+                message={t("success")}
+            />
         );
     }
 
+    // Already subscribed state
     if (status === "already") {
         return (
-            <div className={`flex items-center gap-2 text-orange-400 ${className}`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                <span className="text-sm">{t("alreadySubscribed")}</span>
-            </div>
+            <StatusMessage
+                className={className}
+                color="orange"
+                message={t("alreadySubscribed")}
+            />
         );
     }
 
+    // Form state
     return (
         <div className={className}>
             <form onSubmit={handleSubmit} className="flex gap-2">
@@ -148,5 +112,21 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
         </div>
     );
 };
+
+// Small presentational component for status messages
+const StatusMessage = ({
+    className,
+    color,
+    message,
+}: {
+    className: string;
+    color: "green" | "orange";
+    message: string;
+}) => (
+    <div className={`flex items-center gap-2 text-${color}-400 ${className}`}>
+        <CheckmarkIcon className="w-[18px] h-[18px]" />
+        <span className="text-sm">{message}</span>
+    </div>
+);
 
 export default NewsletterForm;

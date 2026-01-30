@@ -7,7 +7,9 @@
  * - Dark Blue Gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mappingbitcoin.com";
+import { publicEnv } from "@/lib/Environment";
+
+const SITE_URL = publicEnv.siteUrl;
 const CURRENT_YEAR = new Date().getFullYear();
 
 // Bitcoin logo SVG for emails
