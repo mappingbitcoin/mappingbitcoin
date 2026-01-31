@@ -7,6 +7,7 @@ import common from './common.json';
 import login from './login.json';
 import unsubscribe from './unsubscribe.json';
 import verifyYourBusiness from './verify-your-business.json';
+import admin from './admin.json';
 
 const messages = {
     // Spread common keys at root level (menu, footer, subscribe, etc.)
@@ -26,7 +27,9 @@ const messages = {
     // Countries module - also keep 'merchants' key for backward compatibility
     countries,
     merchants: countries,
-    "verify-your-business": verifyYourBusiness
+    "verify-your-business": verifyYourBusiness,
+    // Admin panel translations
+    admin
 };
 
 export default messages;

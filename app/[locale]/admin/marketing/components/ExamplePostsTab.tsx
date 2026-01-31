@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import TagInput from "./TagInput";
@@ -9,6 +10,7 @@ import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
 import { EditIcon, TrashIcon } from "@/assets/icons/ui";
 
 export default function ExamplePostsTab() {
+    const t = useTranslations("admin.marketing");
     const { authToken } = useNostrAuth();
     const [posts, setPosts] = useState<ExamplePost[]>([]);
     const [loading, setLoading] = useState(true);
@@ -89,7 +91,7 @@ export default function ExamplePostsTab() {
         e.preventDefault();
 
         if (!formData.socialNetwork) {
-            setFormError("Please select a social network");
+            setFormError(t("posts.selectNetwork"));
             return;
         }
 
@@ -147,7 +149,7 @@ export default function ExamplePostsTab() {
     };
 
     const handleDelete = async (post: ExamplePost) => {
-        if (!confirm("Are you sure you want to delete this example post?")) {
+        if (!confirm(t("confirm.deletePost"))) {
             return;
         }
 
@@ -159,12 +161,12 @@ export default function ExamplePostsTab() {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || "Failed to delete post");
+                throw new Error(data.error || t("errors.failedToDelete"));
             }
 
             fetchPosts();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete post");
+            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
         }
     };
 
@@ -199,7 +201,7 @@ export default function ExamplePostsTab() {
                         onChange={(e) => setSelectedNetwork(e.target.value as SocialNetwork | "")}
                         className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                     >
-                        <option value="">All Networks</option>
+                        <option value="">{t("posts.allNetworks")}</option>
                         {SOCIAL_NETWORKS.map((network) => (
                             <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
                         ))}
@@ -209,14 +211,14 @@ export default function ExamplePostsTab() {
                     onClick={openCreateModal}
                     className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
                 >
-                    Add Example Post
+                    {t("posts.addButton")}
                 </button>
             </div>
 
             {/* Posts by Network */}
             {posts.length === 0 ? (
                 <div className="bg-surface rounded-xl border border-border-light p-8 text-center text-text-light">
-                    <p>No example posts yet. Add your first example post.</p>
+                    <p>{t("posts.emptyMessage")}</p>
                 </div>
             ) : selectedNetwork ? (
                 // Single network view
@@ -234,7 +236,7 @@ export default function ExamplePostsTab() {
                                 <span className="w-2 h-2 rounded-full bg-primary" />
                                 {SOCIAL_NETWORK_LABELS[network]}
                                 <span className="text-sm font-normal text-text-light">
-                                    ({groupedPosts[network].length} posts)
+                                    ({t("posts.postsCount", { count: groupedPosts[network].length })})
                                 </span>
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -251,7 +253,7 @@ export default function ExamplePostsTab() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                title={editingPost ? "Edit Example Post" : "Add Example Post"}
+                title={editingPost ? t("posts.editTitle") : t("posts.addTitle")}
                 maxWidth="max-w-2xl"
             >
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -263,7 +265,7 @@ export default function ExamplePostsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Social Network
+                            {t("posts.fields.socialNetwork")}
                         </label>
                         <select
                             value={formData.socialNetwork}
@@ -271,7 +273,7 @@ export default function ExamplePostsTab() {
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                             required
                         >
-                            <option value="">Select network...</option>
+                            <option value="">{t("posts.placeholders.selectNetwork")}</option>
                             {SOCIAL_NETWORKS.map((network) => (
                                 <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
                             ))}
@@ -280,40 +282,40 @@ export default function ExamplePostsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Post Content
+                            {t("posts.fields.content")}
                         </label>
                         <textarea
                             value={formData.content}
                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            placeholder="Write the example post content..."
+                            placeholder={t("posts.placeholders.content")}
                             rows={6}
                             className="w-full px-4 py-3 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none font-mono text-sm"
                             required
                         />
                         <p className="text-xs text-text-light mt-1">
-                            {formData.content.length} characters
+                            {formData.content.length} {t("posts.characters")}
                         </p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Hashtags
+                            {t("posts.fields.hashtags")}
                         </label>
                         <TagInput
                             tags={formData.hashtags}
                             onChange={(tags) => setFormData({ ...formData, hashtags: tags })}
-                            placeholder="Add hashtags..."
+                            placeholder={t("posts.placeholders.hashtags")}
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Notes (optional)
+                            {t("posts.fields.notes")}
                         </label>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                            placeholder="Internal notes about why this post works well..."
+                            placeholder={t("posts.placeholders.notes")}
                             rows={2}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
                         />
@@ -325,14 +327,14 @@ export default function ExamplePostsTab() {
                             onClick={closeModal}
                             className="px-4 py-2 text-text-light hover:text-white transition-colors"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={submitting}
                             className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                            {submitting ? "Saving..." : editingPost ? "Update" : "Add Post"}
+                            {submitting ? t("common.saving") : editingPost ? t("common.update") : t("posts.addPost")}
                         </button>
                     </div>
                 </form>

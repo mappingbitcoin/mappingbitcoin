@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import type { MarketingStat } from "../types";
 
 export default function StatsTab() {
+    const t = useTranslations("admin.marketing");
     const { authToken } = useNostrAuth();
     const [stats, setStats] = useState<MarketingStat[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
@@ -147,7 +149,7 @@ export default function StatsTab() {
     };
 
     const handleDelete = async (stat: MarketingStat) => {
-        if (!confirm(`Are you sure you want to delete "${stat.label}"?`)) {
+        if (!confirm(t("confirm.deleteStat", { name: stat.label }))) {
             return;
         }
 
@@ -159,12 +161,12 @@ export default function StatsTab() {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || "Failed to delete stat");
+                throw new Error(data.error || t("errors.failedToDelete"));
             }
 
             fetchStats();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete stat");
+            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
         }
     };
 
@@ -206,7 +208,7 @@ export default function StatsTab() {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                     >
-                        <option value="">All Categories</option>
+                        <option value="">{t("statsTab.allCategories")}</option>
                         {categories.map((cat) => (
                             <option key={cat} value={cat}>{cat}</option>
                         ))}
@@ -219,14 +221,14 @@ export default function StatsTab() {
                             onChange={(e) => setShowExpired(e.target.checked)}
                             className="w-4 h-4 rounded border-border-light bg-surface-light text-primary focus:ring-primary"
                         />
-                        Show expired
+                        {t("statsTab.showExpired")}
                     </label>
                 </div>
                 <button
                     onClick={openCreateModal}
                     className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
                 >
-                    Add Stat
+                    {t("statsTab.addButton")}
                 </button>
             </div>
 
@@ -234,19 +236,19 @@ export default function StatsTab() {
             <div className="bg-surface rounded-xl border border-border-light overflow-hidden">
                 {stats.length === 0 ? (
                     <div className="p-8 text-center text-text-light">
-                        <p>No stats yet. Add your first marketing stat or fact.</p>
+                        <p>{t("statsTab.emptyMessage")}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-surface-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">Label</th>
-                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">Value</th>
-                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">Category</th>
-                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">Source</th>
-                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">Expires</th>
-                                    <th className="px-4 py-3 text-right text-sm font-medium text-text-light">Actions</th>
+                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">{t("statsTab.fields.label")}</th>
+                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">{t("statsTab.fields.value")}</th>
+                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">{t("statsTab.fields.category")}</th>
+                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">{t("statsTab.fields.source")}</th>
+                                    <th className="px-4 py-3 text-left text-sm font-medium text-text-light">{t("statsTab.fields.expires")}</th>
+                                    <th className="px-4 py-3 text-right text-sm font-medium text-text-light">{t("common.actions")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-light">
@@ -265,7 +267,7 @@ export default function StatsTab() {
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-sm text-text-light">
-                                            {stat.source || <span className="italic">No source</span>}
+                                            {stat.source || <span className="italic">{t("statsTab.noSource")}</span>}
                                         </td>
                                         <td className="px-4 py-3 text-sm">
                                             {stat.expiresAt ? (
@@ -279,11 +281,11 @@ export default function StatsTab() {
                                                     }`}
                                                 >
                                                     {new Date(stat.expiresAt).toLocaleDateString()}
-                                                    {isExpired(stat) && " (expired)"}
-                                                    {isExpiringSoon(stat) && " (soon)"}
+                                                    {isExpired(stat) && ` ${t("statsTab.expired")}`}
+                                                    {isExpiringSoon(stat) && ` ${t("statsTab.expiringSoon")}`}
                                                 </span>
                                             ) : (
-                                                <span className="text-text-light italic">Never</span>
+                                                <span className="text-text-light italic">{t("statsTab.never")}</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-right space-x-2">
@@ -291,13 +293,13 @@ export default function StatsTab() {
                                                 onClick={() => openEditModal(stat)}
                                                 className="px-3 py-1 text-sm text-primary hover:text-primary-light transition-colors"
                                             >
-                                                Edit
+                                                {t("common.edit")}
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(stat)}
                                                 className="px-3 py-1 text-sm text-red-400 hover:text-red-300 transition-colors"
                                             >
-                                                Delete
+                                                {t("common.delete")}
                                             </button>
                                         </td>
                                     </tr>
@@ -312,7 +314,7 @@ export default function StatsTab() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                title={editingStat ? "Edit Stat" : "Add Stat"}
+                title={editingStat ? t("statsTab.editTitle") : t("statsTab.addTitle")}
                 maxWidth="max-w-lg"
             >
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -324,13 +326,13 @@ export default function StatsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Label
+                            {t("statsTab.fields.label")}
                         </label>
                         <input
                             type="text"
                             value={formData.label}
                             onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                            placeholder="e.g., Active Users, Countries Served"
+                            placeholder={t("statsTab.placeholders.label")}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                             required
                         />
@@ -338,13 +340,13 @@ export default function StatsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Value
+                            {t("statsTab.fields.value")}
                         </label>
                         <input
                             type="text"
                             value={formData.value}
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                            placeholder="e.g., 10,000+, 50 countries"
+                            placeholder={t("statsTab.placeholders.value")}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                             required
                         />
@@ -352,13 +354,13 @@ export default function StatsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Category
+                            {t("statsTab.fields.category")}
                         </label>
                         <input
                             type="text"
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            placeholder="e.g., growth, engagement, reach"
+                            placeholder={t("statsTab.placeholders.category")}
                             list="stat-category-suggestions"
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                             required
@@ -372,20 +374,20 @@ export default function StatsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Source (optional)
+                            {t("statsTab.fields.sourceOptional")}
                         </label>
                         <input
                             type="text"
                             value={formData.source}
                             onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                            placeholder="e.g., Internal analytics, Q4 2024 report"
+                            placeholder={t("statsTab.placeholders.source")}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Expires (optional)
+                            {t("statsTab.fields.expiresOptional")}
                         </label>
                         <input
                             type="date"
@@ -394,7 +396,7 @@ export default function StatsTab() {
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                         />
                         <p className="text-xs text-text-light mt-1">
-                            Set an expiration date to be reminded to update this stat
+                            {t("statsTab.expiresHelper")}
                         </p>
                     </div>
 
@@ -404,14 +406,14 @@ export default function StatsTab() {
                             onClick={closeModal}
                             className="px-4 py-2 text-text-light hover:text-white transition-colors"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={submitting}
                             className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                            {submitting ? "Saving..." : editingStat ? "Update" : "Add Stat"}
+                            {submitting ? t("common.saving") : editingStat ? t("common.update") : t("statsTab.addStat")}
                         </button>
                     </div>
                 </form>
