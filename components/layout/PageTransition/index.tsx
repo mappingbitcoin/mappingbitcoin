@@ -6,6 +6,14 @@ import { usePathname } from "@/i18n/navigation";
 export default function PageTransition({ children }: { children: React.ReactNode }) {
     const pathname = usePathname(); // Detects route changes
 
+    // Don't animate admin routes - they have their own layout with sidebar
+    // Using key={pathname} causes full remount which resets admin sidebar state
+    const isAdminRoute = pathname.startsWith("/admin");
+
+    if (isAdminRoute) {
+        return <div className="w-full">{children}</div>;
+    }
+
     return (
         <AnimatePresence mode="wait"> {/* Prevents exit animation on first load */}
             <motion.div

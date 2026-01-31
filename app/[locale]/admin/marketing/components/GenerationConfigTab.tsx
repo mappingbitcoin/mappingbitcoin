@@ -25,16 +25,22 @@ export default function GenerationConfigTab() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    // Form state
-    const [postsPerPlatform, setPostsPerPlatform] = useState<Record<string, number>>({});
-    const [contentMixWeights, setContentMixWeights] = useState<Record<string, number>>({});
+    // Default values (matches API defaults)
+    const defaultPostsPerPlatform = { x: 20, nostr: 15, instagram: 10 };
+    const defaultContentMixWeights = { venue_spotlight: 40, education: 30, stats: 20, community: 10 };
+    const defaultPostsPerDay = { x: 2, nostr: 1, instagram: 1 };
+    const defaultActiveDays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+    // Form state with defaults
+    const [postsPerPlatform, setPostsPerPlatform] = useState<Record<string, number>>(defaultPostsPerPlatform);
+    const [contentMixWeights, setContentMixWeights] = useState<Record<string, number>>(defaultContentMixWeights);
     const [generateImages, setGenerateImages] = useState(false);
     const [aiModel, setAiModel] = useState<"sonnet" | "opus">("sonnet");
-    const [postsPerDay, setPostsPerDay] = useState<Record<string, number>>({});
+    const [postsPerDay, setPostsPerDay] = useState<Record<string, number>>(defaultPostsPerDay);
     const [activeHoursStart, setActiveHoursStart] = useState("12:00");
     const [activeHoursEnd, setActiveHoursEnd] = useState("22:00");
     const [timezone, setTimezone] = useState("UTC");
-    const [activeDays, setActiveDays] = useState<string[]>([]);
+    const [activeDays, setActiveDays] = useState<string[]>(defaultActiveDays);
     const [webhookUrl, setWebhookUrl] = useState("");
     const [webhookSecret, setWebhookSecret] = useState("");
     const [lastTriggeredAt, setLastTriggeredAt] = useState<string | null>(null);
@@ -54,15 +60,15 @@ export default function GenerationConfigTab() {
             const data = await response.json();
             const config: GenerationConfig = data.config;
 
-            setPostsPerPlatform(config.postsPerPlatform || {});
-            setContentMixWeights(config.contentMixWeights || {});
-            setGenerateImages(config.generateImages);
-            setAiModel(config.aiModel);
-            setPostsPerDay(config.postsPerDay || {});
-            setActiveHoursStart(config.activeHoursStart);
-            setActiveHoursEnd(config.activeHoursEnd);
-            setTimezone(config.timezone);
-            setActiveDays(config.activeDays);
+            setPostsPerPlatform(config.postsPerPlatform && Object.keys(config.postsPerPlatform).length > 0 ? config.postsPerPlatform : defaultPostsPerPlatform);
+            setContentMixWeights(config.contentMixWeights && Object.keys(config.contentMixWeights).length > 0 ? config.contentMixWeights : defaultContentMixWeights);
+            setGenerateImages(config.generateImages ?? false);
+            setAiModel(config.aiModel || "sonnet");
+            setPostsPerDay(config.postsPerDay && Object.keys(config.postsPerDay).length > 0 ? config.postsPerDay : defaultPostsPerDay);
+            setActiveHoursStart(config.activeHoursStart || "12:00");
+            setActiveHoursEnd(config.activeHoursEnd || "22:00");
+            setTimezone(config.timezone || "UTC");
+            setActiveDays(config.activeDays && config.activeDays.length > 0 ? config.activeDays : defaultActiveDays);
             setWebhookUrl(config.webhookUrl || "");
             setWebhookSecret(config.webhookSecret || "");
             setLastTriggeredAt(config.lastTriggeredAt);
