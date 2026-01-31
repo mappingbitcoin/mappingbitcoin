@@ -72,38 +72,24 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
     const titleSuffix = baseMetadata.title;
 
     const finalTitle= String(titleSuffix).replaceAll('{{name}}', name).replaceAll('{{city}}', city)
+    // Destructure images out so file-based opengraph-image.tsx is used
+    const { images: _ogImages, ...ogRest } = baseMetadata.openGraph || {};
+    const { images: _twImages, ...twRest } = baseMetadata.twitter || {};
+
     return {
         title: finalTitle,
         description: fullDescription,
         keywords,
         openGraph: {
-            ...baseMetadata.openGraph,
+            ...ogRest,
             title: finalTitle,
             description: fullDescription,
             url: generateCanonical(`places/${venue.slug || slug}`, locale),
-            images: [
-                ...(venue.tags.image ? [{
-                    url: venue.tags.image,
-                    width: 1200,
-                    height: 630,
-                    alt: `${name} @ MappingBitcoin.com`
-                }] : []),
-                {
-                    url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
-                    width: 1200,
-                    height: 630,
-                    alt: `${name} @ MappingBitcoin.com`
-                }
-            ]
         },
         twitter: {
-            ...baseMetadata.twitter,
+            ...twRest,
             title: finalTitle,
             description: fullDescription,
-            images: [
-                ...(venue.tags.image ? [venue.tags.image] : []),
-                `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`
-            ]
         }
     } as Metadata;
 }

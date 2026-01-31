@@ -94,9 +94,14 @@ async function fetchVenuesByRegion({ country, location, categoryAndSubcategory }
     if (location) params.append("city", location ?? '');
     if (categoryAndSubcategory) params.append("subcategory", categoryAndSubcategory.subcategory);
 
-    const res = await fetch(`${env.siteUrl || "http://localhost:3000"}/api/places/region?${params.toString()}`);
-    if (!res.ok) return {venues: []};
-    return (await res.json()) as { venues: EnrichedVenue[], cities: string[], categories:[] };
+    try {
+        const res = await fetch(`${env.siteUrl || "http://localhost:3000"}/api/places/region?${params.toString()}`);
+        if (!res.ok) return {venues: []};
+        return (await res.json()) as { venues: EnrichedVenue[], cities: string[], categories:[] };
+    } catch (error) {
+        console.error("Failed to fetch venues by region:", error);
+        return {venues: []};
+    }
 }
 
 type PageProps = {
