@@ -10,6 +10,7 @@ import WebSocket, { type Data as WebSocketData } from "ws";
 
 // Nostr relays to publish to
 const PUBLISH_RELAYS = [
+    "wss://relay.mappingbitcoin.com",
     "wss://relay.damus.io",
     "wss://relay.nostr.band",
     "wss://nos.lol",
