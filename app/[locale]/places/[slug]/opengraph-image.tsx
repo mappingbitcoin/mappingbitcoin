@@ -26,13 +26,27 @@ async function getVenueBySlug(slug: string): Promise<EnrichedVenue | null> {
     }
 }
 
+async function getLogoImageData(): Promise<ArrayBuffer | null> {
+    const base = env.siteUrl || "https://mappingbitcoin.com";
+    try {
+        const res = await fetch(`${base}/assets/mappingbitcoin-logotipo.png`);
+        if (!res.ok) return null;
+        return await res.arrayBuffer();
+    } catch {
+        return null;
+    }
+}
+
 export default async function Image({
     params,
 }: {
     params: Promise<{ slug: string; locale: string }>;
 }) {
     const { slug, locale } = await params;
-    const venue = await getVenueBySlug(slug);
+    const [venue, logoData] = await Promise.all([
+        getVenueBySlug(slug),
+        getLogoImageData(),
+    ]);
 
     const name = venue?.tags?.name || "Bitcoin Merchant";
     const city = venue?.city || "";
@@ -98,7 +112,7 @@ export default async function Image({
                         justifyContent: "space-between",
                     }}
                 >
-                    {/* Top section - Logo and branding */}
+                    {/* Top section - Logo */}
                     <div
                         style={{
                             display: "flex",
@@ -106,30 +120,32 @@ export default async function Image({
                             gap: 16,
                         }}
                     >
-                        {/* Bitcoin icon */}
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: 56,
-                                height: 56,
-                                borderRadius: "50%",
-                                background: "linear-gradient(135deg, #f7931a 0%, #ff9500 100%)",
-                                boxShadow: "0 4px 20px rgba(247,147,26,0.4)",
-                            }}
-                        >
-                            <span
+                        {logoData ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+
+
+                            <img
+                                src={`${env.siteUrl || "https://mappingbitcoin.com"}/assets/mappingbitcoin-logotipo.png`}
+                                alt="MappingBitcoin"
+                                width={54}
+                                height={50}
+                                style={{ width: 54, height: 50 }}
+                            />
+                        ) : (
+                            <div
                                 style={{
-                                    fontSize: 32,
-                                    fontWeight: 700,
-                                    color: "white",
-                                    fontFamily: "system-ui",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: "50%",
+                                    background: "linear-gradient(135deg, #f7931a 0%, #ff9500 100%)",
                                 }}
                             >
-                                ₿
-                            </span>
-                        </div>
+                                <span style={{ fontSize: 28, fontWeight: 700, color: "white" }}>₿</span>
+                            </div>
+                        )}
                         <span
                             style={{
                                 fontSize: 28,
