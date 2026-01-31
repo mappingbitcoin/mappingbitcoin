@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { RefreshIcon, ExternalLinkIcon } from "@/assets/icons/ui";
 
 interface NostrPost {
@@ -12,15 +13,20 @@ interface NostrPost {
 }
 
 export default function WallTab() {
+    const { authToken } = useNostrAuth();
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<NostrPost[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchPosts = async () => {
+    const fetchPosts = useCallback(async () => {
+        if (!authToken) return;
+
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch("/api/admin/nostr-bot/posts?limit=50");
+            const res = await fetch("/api/admin/nostr-bot/posts?limit=50", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || "Failed to fetch posts");
@@ -32,11 +38,11 @@ export default function WallTab() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [authToken]);
 
     useEffect(() => {
         fetchPosts();
-    }, []);
+    }, [fetchPosts]);
 
     const formatDate = (timestamp: number) => {
         const date = new Date(timestamp * 1000);

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { CopyIcon, RefreshIcon, CheckmarkIcon } from "@/assets/icons/ui";
 
 interface Profile {
@@ -23,17 +24,22 @@ interface BotData {
 }
 
 export default function ProfileTab() {
+    const { authToken } = useNostrAuth();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [botData, setBotData] = useState<BotData | null>(null);
     const [form, setForm] = useState<Profile>({});
     const [error, setError] = useState<string | null>(null);
 
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
+        if (!authToken) return;
+
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch("/api/admin/nostr-bot/profile");
+            const res = await fetch("/api/admin/nostr-bot/profile", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || "Failed to fetch profile");
@@ -46,18 +52,23 @@ export default function ProfileTab() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [authToken]);
 
     useEffect(() => {
         fetchProfile();
-    }, []);
+    }, [fetchProfile]);
 
     const handleSave = async () => {
+        if (!authToken) return;
+
         setSaving(true);
         try {
             const res = await fetch("/api/admin/nostr-bot/profile", {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
                 body: JSON.stringify(form),
             });
             if (!res.ok) {

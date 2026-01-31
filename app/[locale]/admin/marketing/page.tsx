@@ -9,6 +9,7 @@ import AssetsTab from "./components/AssetsTab";
 import HashtagsTab from "./components/HashtagsTab";
 import ExamplePostsTab from "./components/ExamplePostsTab";
 import StatsTab from "./components/StatsTab";
+import GenerationConfigTab from "./components/GenerationConfigTab";
 import {
     DocumentIcon,
     LinkIcon,
@@ -20,6 +21,7 @@ import {
     QueueIcon,
     EyeIcon,
     ArrowLeftIcon,
+    BoltIcon,
 } from "@/assets/icons/ui";
 
 // Main sections
@@ -41,7 +43,7 @@ const sections: Section[] = [
 ];
 
 // Seeder modules
-type SeederModuleId = "guidelines" | "links" | "assets" | "hashtags" | "posts" | "stats" | null;
+type SeederModuleId = "guidelines" | "links" | "assets" | "hashtags" | "posts" | "stats" | "generation" | null;
 
 interface SeederModule {
     id: Exclude<SeederModuleId, null>;
@@ -58,6 +60,7 @@ const seederModules: SeederModule[] = [
     { id: "hashtags", label: "Hashtags", description: "Hashtag sets by network", icon: <HashtagIcon className="w-6 h-6" />, color: "pink" },
     { id: "posts", label: "Example Posts", description: "Sample content templates", icon: <ChatIcon className="w-6 h-6" />, color: "orange" },
     { id: "stats", label: "Stats & Facts", description: "Key metrics & data points", icon: <ChartBarIcon className="w-6 h-6" />, color: "cyan" },
+    { id: "generation", label: "Generation Config", description: "n8n automation settings", icon: <BoltIcon className="w-6 h-6" />, color: "yellow" },
 ];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string }> = {
@@ -67,6 +70,7 @@ const colorClasses: Record<string, { bg: string; text: string; border: string }>
     pink: { bg: "bg-pink-500/10", text: "text-pink-400", border: "border-pink-500/30" },
     orange: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/30" },
     cyan: { bg: "bg-cyan-500/10", text: "text-cyan-400", border: "border-cyan-500/30" },
+    yellow: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30" },
 };
 
 interface SeederStats {
@@ -151,6 +155,8 @@ export default function MarketingPage() {
                 return seederStats.posts > 0 ? t("stats.examples", { count: seederStats.posts }) : t("stats.empty");
             case "stats":
                 return seederStats.stats > 0 ? t("stats.facts", { count: seederStats.stats }) : t("stats.empty");
+            case "generation":
+                return t("stats.configured");
             default:
                 return "—";
         }
@@ -170,6 +176,8 @@ export default function MarketingPage() {
                 return <ExamplePostsTab />;
             case "stats":
                 return <StatsTab />;
+            case "generation":
+                return <GenerationConfigTab />;
             default:
                 return null;
         }
