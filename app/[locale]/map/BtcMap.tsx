@@ -28,8 +28,6 @@ import {loadClustersFromCache, updateClusterCache} from "@/utils/ClusterCacheHel
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import MapFAQ from "@/app/[locale]/map/MapFAQ";
 import { SunIcon, MoonIcon } from "@/assets/icons/ui";
-import { useRouter } from "@/i18n/navigation";
-import { getLocalizedCountrySlug, getLocalizedCitySlug } from "@/utils/SlugUtils";
 
 function tile2lon(x: number, z: number) {
     return (x / 2 ** z) * 360 - 180;
@@ -91,7 +89,6 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
     const t = useTranslations('map')
     const locale = useLocale() as Locale
-    const router = useRouter();
     const categorySelectorRef = useRef(null);
     const categoryDropdownRef = useRef(null);
     const attributionControlRef = useRef<AttributionControl | null>(null);
@@ -840,16 +837,10 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                                                     key={`venue-${idx}`}
                                                     className="py-3 px-4 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
                                                     onClick={() => {
-                                                        if (!res.venue) return;
-                                                        // Navigate to venue detail page
-                                                        if (res.venue.slug) {
-                                                            router.push(`/places/${res.venue.slug}`);
-                                                        } else {
-                                                            // Fallback: show on map
-                                                            setSelectedVenue(res.venue);
-                                                            updateQueryWithoutSearch(res.venue?.tags.name);
-                                                            easeTo(res.longitude, res.latitude, 15);
-                                                        }
+                                                        if (!res.venue) return
+                                                        setSelectedVenue(res.venue);
+                                                        updateQueryWithoutSearch(res.venue?.tags.name)
+                                                        easeTo(res.longitude, res.latitude, 15);
                                                     }}
                                                 >
                                                     📍 {res.label}<span> - {getFormattedAddress(locale, res.venue!)}
@@ -866,20 +857,10 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                                                 key={`place-${idx}`}
                                                 className="py-3 px-4 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
                                                 onClick={() => {
-                                                    // Navigate to location listing page
-                                                    if (res.resultType === 'city' && res.city && res.country) {
-                                                        const citySlug = getLocalizedCitySlug(res.country, res.city);
-                                                        router.push(`/${citySlug}`);
-                                                    } else if (res.resultType === 'country' && res.country) {
-                                                        const countrySlug = getLocalizedCountrySlug(res.country);
-                                                        router.push(`/${countrySlug}`);
-                                                    } else {
-                                                        // Fallback for states: show on map
-                                                        easeTo(res.longitude, res.latitude, res.resultType === 'country' ? 6 : 10);
-                                                        setQuery('');
-                                                        setSelectedVenue(null);
-                                                        setAutocompleteResults([]);
-                                                    }
+                                                    easeTo(res.longitude, res.latitude, res.resultType === 'country' ? 6 : 10);
+                                                    setQuery('');
+                                                    setSelectedVenue(null);
+                                                    setAutocompleteResults([]);
                                                 }}
                                             >
                                                 🏙️ {res.label} ({res.resultType})
