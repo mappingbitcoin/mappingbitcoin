@@ -37,6 +37,17 @@ function getCountryName(countryCode: string): string {
 }
 
 /**
+ * Extract numeric ID from osmId format (e.g., "node/123456" -> "123456")
+ */
+function extractNumericOsmId(osmId: string): string {
+    const match = osmId.match(/^(?:node|way|relation)\/(\d+)$/);
+    if (match) {
+        return match[1];
+    }
+    return osmId; // Return as-is if already numeric
+}
+
+/**
  * GET /api/admin/nostr-bot/places
  * Search for places in the venue cache
  */
@@ -78,7 +89,9 @@ export async function GET(request: NextRequest) {
             let placesWithVerification: PlaceSearchResult[] = [];
 
             for (const claim of verifiedClaims) {
-                const venue = venueMap.get(claim.venue.osmId);
+                // Extract numeric ID from osmId format (e.g., "node/123456" -> "123456")
+                const numericId = extractNumericOsmId(claim.venue.osmId);
+                const venue = venueMap.get(numericId);
                 if (!venue) continue;
 
                 // If there's a query, check if it matches
@@ -167,7 +180,8 @@ export async function GET(request: NextRequest) {
         }
 
         // Fetch verification status for all matching venues
-        const osmIds = results.map((v) => String(v.id));
+        // Format osmIds correctly as "type/id" to match database format
+        const osmIds = results.map((v) => `${v.type}/${v.id}`);
 
         // Get all verified claims for these venues
         const verifiedClaims = await prisma.claim.findMany({
@@ -186,9 +200,9 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        // Create a map of osmId -> claim
-        const claimMap = new Map(
-            verifiedClaims.map((claim) => [claim.venue.osmId, claim])
+        // Create a map of numeric osmId -> claim (for easy lookup by venue.id)
+        const claimMap = new Map<string, typeof verifiedClaims[number]>(
+            verifiedClaims.map((claim) => [extractNumericOsmId(claim.venue.osmId), claim])
         );
 
         // Build results with verification info
@@ -261,8 +275,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get verification status
-        const claim = await getActiveVerifiedClaimByOsmId(String(osmId));
+        // Get verification status - format osmId correctly as "type/id" to match database format
+        const formattedOsmId = `${venue.type}/${venue.id}`;
+        const claim = await getActiveVerifiedClaimByOsmId(formattedOsmId);
 
         const result: PlaceSearchResult = {
             id: venue.id,
