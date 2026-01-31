@@ -21,6 +21,7 @@ import {
 interface VerifyOwnershipModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
     venue: EnrichedVenue;
     venueName: string;
     osmEmail?: string;
@@ -32,6 +33,7 @@ export type VerificationMethod = "domain" | "email";
 export default function VerifyOwnershipModal({
     isOpen,
     onClose,
+    onSuccess,
     venue,
     venueName,
 }: VerifyOwnershipModalProps) {
@@ -121,6 +123,12 @@ export default function VerifyOwnershipModal({
         setSelectedDomain(null);
         setError(null);
         onClose();
+    };
+
+    const handleSuccess = () => {
+        // Call the success callback to refresh venue data
+        onSuccess?.();
+        handleClose();
     };
 
     const handleSelectMethod = (selectedMethod: VerificationMethod) => {
@@ -321,7 +329,7 @@ export default function VerifyOwnershipModal({
                             step={step}
                             setStep={setStep}
                             onError={setError}
-                            onSuccess={handleClose}
+                            onSuccess={handleSuccess}
                             onBack={hasMultipleMethods ? handleBackToMethodSelect : undefined}
                         />
                     )}

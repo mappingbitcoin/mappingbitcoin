@@ -241,8 +241,32 @@ export default function VerificationStep({
 
     // ==================== HELPERS ====================
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
+    const [copied, setCopied] = useState(false);
+
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            // Fallback for older browsers or non-secure contexts
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand("copy");
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch {
+                console.error("Failed to copy text");
+            }
+            document.body.removeChild(textArea);
+        }
     };
 
     // ==================== RENDER ====================
@@ -433,10 +457,21 @@ export default function VerificationStep({
                         <span className="text-xs text-text-light uppercase">TXT Record Value</span>
                         <button
                             onClick={() => txtRecordValue && copyToClipboard(txtRecordValue)}
-                            className="text-xs text-accent hover:text-accent-dark transition-colors flex items-center gap-1"
+                            className={`text-xs transition-colors flex items-center gap-1 ${
+                                copied ? "text-green-400" : "text-accent hover:text-accent-dark"
+                            }`}
                         >
-                            <CopyIcon className="w-3 h-3" />
-                            Copy
+                            {copied ? (
+                                <>
+                                    <CheckmarkIcon className="w-3 h-3" />
+                                    Copied!
+                                </>
+                            ) : (
+                                <>
+                                    <CopyIcon className="w-3 h-3" />
+                                    Copy
+                                </>
+                            )}
                         </button>
                     </div>
                     <code className="block text-sm text-accent font-mono break-all bg-primary-light p-2 rounded">

@@ -62,11 +62,12 @@ export async function initiateEmailVerification(
         create: { osmId },
     });
 
-    // Check for existing pending claim from this user for this venue
+    // Check for existing pending EMAIL claim from this user for this venue
     const existingClaim = await prisma.claim.findFirst({
         where: {
             venueId: venue.id,
             claimerPubkey: pubkey,
+            method: "EMAIL",
             status: "PENDING",
         },
     });
@@ -236,14 +237,24 @@ export async function checkAndRevokeIfEmailChanged(
     return { revoked: false };
 }
 
-/**
- * Get verification status for a venue
- */
-export async function getVerificationStatus(osmId: string): Promise<{
+export interface VerificationMethod {
+    method: "EMAIL" | "DOMAIN";
+    verifiedAt: Date;
+    detail?: string; // masked email or domain
+}
+
+export interface VerificationStatusResult {
     isVerified: boolean;
     ownerPubkey?: string;
     verifiedAt?: Date;
-}> {
+    methods?: VerificationMethod[];
+}
+
+/**
+ * Get verification status for a venue
+ * Returns all active verification methods
+ */
+export async function getVerificationStatus(osmId: string): Promise<VerificationStatusResult> {
     const venue = await prisma.venue.findUnique({
         where: { osmId },
         include: {
@@ -255,7 +266,9 @@ export async function getVerificationStatus(osmId: string): Promise<{
                 include: {
                     claimer: true,
                 },
-                take: 1,
+                orderBy: {
+                    verifiedAt: "asc",
+                },
             },
         },
     });
@@ -264,11 +277,23 @@ export async function getVerificationStatus(osmId: string): Promise<{
         return { isVerified: false };
     }
 
-    const claim = venue.claims[0];
+    // Get all verified methods
+    const methods: VerificationMethod[] = venue.claims.map((claim) => ({
+        method: claim.method as "EMAIL" | "DOMAIN",
+        verifiedAt: claim.verifiedAt!,
+        detail: claim.method === "DOMAIN"
+            ? claim.domainToVerify || undefined
+            : undefined, // Don't expose email
+    }));
+
+    // First claim is the primary owner
+    const primaryClaim = venue.claims[0];
+
     return {
         isVerified: true,
-        ownerPubkey: claim.claimerPubkey,
-        verifiedAt: claim.verifiedAt ?? undefined,
+        ownerPubkey: primaryClaim.claimerPubkey,
+        verifiedAt: primaryClaim.verifiedAt ?? undefined,
+        methods,
     };
 }
 
