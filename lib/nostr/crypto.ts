@@ -12,9 +12,35 @@ export function generatePrivateKey(): string {
     return bytesToHex(privateKey);
 }
 
+// Normalize private key - handles nsec format and ensures proper hex padding
+export function normalizePrivateKey(privateKey: string): string {
+    let hex = privateKey.trim();
+
+    // If it's an nsec, convert to hex
+    if (hex.startsWith("nsec")) {
+        const decoded = bech32ToHex(hex);
+        if (!decoded || decoded.type !== "nsec") {
+            throw new Error("Invalid nsec format");
+        }
+        hex = decoded.hex;
+    }
+
+    // Ensure proper padding to 64 characters (32 bytes)
+    if (hex.length < 64) {
+        hex = hex.padStart(64, "0");
+    }
+
+    if (hex.length !== 64) {
+        throw new Error(`Invalid private key length: expected 64 hex chars, got ${hex.length}`);
+    }
+
+    return hex;
+}
+
 // Derive public key from private key
 export function getPublicKey(privateKey: string): string {
-    const pubkeyBytes = secp256k1.getPublicKey(hexToBytes(privateKey), true);
+    const normalizedKey = normalizePrivateKey(privateKey);
+    const pubkeyBytes = secp256k1.getPublicKey(hexToBytes(normalizedKey), true);
     // Remove the prefix byte (02 or 03) to get the x-coordinate only
     return bytesToHex(pubkeyBytes.slice(1));
 }
@@ -122,7 +148,8 @@ export async function nip04Encrypt(
     recipientPubkey: string,
     message: string
 ): Promise<string> {
-    const sharedPoint = secp256k1.getSharedSecret(hexToBytes(privateKey), hexToBytes("02" + recipientPubkey));
+    const normalizedKey = normalizePrivateKey(privateKey);
+    const sharedPoint = secp256k1.getSharedSecret(hexToBytes(normalizedKey), hexToBytes("02" + recipientPubkey));
     const sharedX = sharedPoint.slice(1, 33);
 
     const iv = crypto.getRandomValues(new Uint8Array(16));
@@ -153,8 +180,9 @@ function nip44DecryptMessage(
     ciphertext: string
 ): string {
     try {
+    const normalizedKey = normalizePrivateKey(privateKey);
     const conversationKey = nip44.v2.utils.getConversationKey(
-        hexToBytes(privateKey),
+        hexToBytes(normalizedKey),
         senderPubkey
     );
     return nip44.v2.decrypt(ciphertext, conversationKey);
@@ -216,7 +244,8 @@ async function nip04DecryptOnly(
         throw new Error("Empty ciphertext");
     }
 
-    const sharedPoint = secp256k1.getSharedSecret(hexToBytes(privateKey), hexToBytes("02" + senderPubkey));
+    const normalizedKey = normalizePrivateKey(privateKey);
+    const sharedPoint = secp256k1.getSharedSecret(hexToBytes(normalizedKey), hexToBytes("02" + senderPubkey));
     const sharedX = sharedPoint.slice(1, 33);
 
     const key = await crypto.subtle.importKey(
@@ -279,8 +308,9 @@ export async function nip04Decrypt(
     throw new Error(`Unknown encryption format. Content preview: ${ciphertext.substring(0, 50)}...`);
 }
 
-// Sign a Nostr event
+// Sign a Nostr event using Schnorr signatures (BIP-340)
 export async function signEvent(event: NostrEvent, privateKey: string): Promise<string> {
+    const normalizedKey = normalizePrivateKey(privateKey);
     const serialized = JSON.stringify([
         0,
         event.pubkey,
@@ -290,8 +320,8 @@ export async function signEvent(event: NostrEvent, privateKey: string): Promise<
         event.content,
     ]);
     const hash = sha256(new TextEncoder().encode(serialized));
-    // signAsync returns 64-byte compact signature as Uint8Array in v3.x
-    const sig = await secp256k1.signAsync(hash, hexToBytes(privateKey));
+    // Nostr uses Schnorr signatures (BIP-340), not ECDSA
+    const sig = await secp256k1.schnorr.sign(hash, hexToBytes(normalizedKey));
     return bytesToHex(sig);
 }
 

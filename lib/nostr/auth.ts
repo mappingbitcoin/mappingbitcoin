@@ -11,6 +11,7 @@ import {
     nip04Decrypt,
     getEventHash,
     signEvent as signNostrEvent,
+    normalizePrivateKey,
     type NostrEvent,
 } from "./crypto";
 
@@ -70,11 +71,14 @@ async function signWithNsec(challenge: string): Promise<SignedChallengeResult> {
         throw new Error("Private key not found. Please log in again.");
     }
 
+    // Normalize the private key (handles nsec format and padding)
+    const normalizedKey = normalizePrivateKey(privateKey);
+
     // Hash the challenge
     const messageHash = sha256(new TextEncoder().encode(challenge));
 
     // Create Schnorr signature
-    const signature = await secp256k1.schnorr.sign(messageHash, hexToBytes(privateKey));
+    const signature = await secp256k1.schnorr.sign(messageHash, hexToBytes(normalizedKey));
 
     return { signature: bytesToHex(signature) };
 }

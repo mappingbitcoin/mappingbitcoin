@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -109,6 +109,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     // Extract locale from pathname
     const locale = pathname.split("/")[1] || "en";
 
+    // Memoize callbacks to prevent unnecessary re-renders
+    const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
+    const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
+    const handleShowLoginModal = useCallback(() => setShowLoginModal(true), []);
+    const handleCloseLoginModal = useCallback(() => setShowLoginModal(false), []);
+
     // Try automatic authentication for non-interactive methods (nsec)
     useEffect(() => {
         if (
@@ -189,7 +195,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         {t("pleaseLogin")}
                     </p>
                     <button
-                        onClick={() => setShowLoginModal(true)}
+                        onClick={handleShowLoginModal}
                         className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                     >
                         <LoginIcon className="w-5 h-5" />
@@ -203,7 +209,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
                 <LoginModal
                     isOpen={showLoginModal}
-                    onClose={() => setShowLoginModal(false)}
+                    onClose={handleCloseLoginModal}
                     titleKey="adminTitle"
                     showCreateAccount={false}
                 />
@@ -226,7 +232,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             {t("writeRequiredDescription")}
                         </p>
                         <button
-                            onClick={() => setShowLoginModal(true)}
+                            onClick={handleShowLoginModal}
                             className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                         >
                             <LoginIcon className="w-5 h-5" />
@@ -238,7 +244,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </div>
                     <LoginModal
                         isOpen={showLoginModal}
-                        onClose={() => setShowLoginModal(false)}
+                        onClose={handleCloseLoginModal}
                         titleKey="adminTitle"
                     />
                 </div>
@@ -322,7 +328,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 title="Admin"
                 sections={navSections}
                 sidebarOpen={sidebarOpen}
-                onSidebarClose={() => setSidebarOpen(false)}
+                onSidebarClose={handleSidebarClose}
             />
 
             {/* Main Content */}
@@ -331,7 +337,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <header className="lg:hidden sticky top-0 z-30 bg-surface border-b border-border-light">
                     <div className="flex items-center justify-between h-16 px-4">
                         <button
-                            onClick={() => setSidebarOpen(true)}
+                            onClick={handleSidebarOpen}
                             className="text-text-light hover:text-white"
                         >
                             <MenuIcon className="w-6 h-6" />
