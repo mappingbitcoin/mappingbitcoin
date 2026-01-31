@@ -64,3 +64,6 @@ export { QuestionCircleIcon } from "./QuestionCircleIcon";
 export { ArrowLeftIcon } from "./ArrowLeftIcon";
 export { CookieIcon } from "./CookieIcon";
 export { LocationPinIcon } from "./LocationPinIcon";
+export { CalendarIcon } from "./CalendarIcon";
+export { QueueIcon } from "./QueueIcon";
+export { EyeIcon } from "./EyeIcon";

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import TagInput from "./TagInput";
@@ -9,6 +10,7 @@ import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
 import { EditIcon, TrashIcon } from "@/assets/icons/ui";
 
 export default function HashtagsTab() {
+    const t = useTranslations("admin.marketing");
     const { authToken } = useNostrAuth();
     const [hashtagSets, setHashtagSets] = useState<HashtagSet[]>([]);
     const [loading, setLoading] = useState(true);
@@ -85,7 +87,7 @@ export default function HashtagsTab() {
         e.preventDefault();
 
         if (formData.hashtags.length === 0) {
-            setFormError("Please add at least one hashtag");
+            setFormError(t("hashtags.atLeastOneHashtag"));
             return;
         }
 
@@ -143,7 +145,7 @@ export default function HashtagsTab() {
     };
 
     const handleDelete = async (set: HashtagSet) => {
-        if (!confirm(`Are you sure you want to delete "${set.name}"?`)) {
+        if (!confirm(t("confirm.deleteHashtagSet", { name: set.name }))) {
             return;
         }
 
@@ -155,12 +157,12 @@ export default function HashtagsTab() {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || "Failed to delete hashtag set");
+                throw new Error(data.error || t("errors.failedToDelete"));
             }
 
             fetchHashtagSets();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete hashtag set");
+            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
         }
     };
 
@@ -198,20 +200,20 @@ export default function HashtagsTab() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <p className="text-text-light">
-                    Create named groups of hashtags for consistent use across platforms.
+                    {t("hashtags.description")}
                 </p>
                 <button
                     onClick={openCreateModal}
                     className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
                 >
-                    Add Hashtag Set
+                    {t("hashtags.addButton")}
                 </button>
             </div>
 
             {/* Hashtag Sets */}
             {hashtagSets.length === 0 ? (
                 <div className="bg-surface rounded-xl border border-border-light p-8 text-center text-text-light">
-                    <p>No hashtag sets yet. Create your first set of hashtags.</p>
+                    <p>{t("hashtags.emptyMessage")}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -277,7 +279,7 @@ export default function HashtagsTab() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                title={editingSet ? "Edit Hashtag Set" : "Add Hashtag Set"}
+                title={editingSet ? t("hashtags.editTitle") : t("hashtags.addTitle")}
                 maxWidth="max-w-lg"
             >
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -289,13 +291,13 @@ export default function HashtagsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Name
+                            {t("hashtags.fields.name")}
                         </label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="e.g., Bitcoin General, Product Launch"
+                            placeholder={t("hashtags.placeholders.name")}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                             required
                         />
@@ -303,19 +305,19 @@ export default function HashtagsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Hashtags
+                            {t("hashtags.fields.hashtags")}
                         </label>
                         <TagInput
                             tags={formData.hashtags}
                             onChange={(tags) => setFormData({ ...formData, hashtags: tags })}
-                            placeholder="Type hashtag and press Enter..."
+                            placeholder={t("hashtags.placeholders.hashtags")}
                         />
-                        <p className="text-xs text-text-light mt-1">Press Enter or comma to add</p>
+                        <p className="text-xs text-text-light mt-1">{t("hashtags.pressEnter")}</p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-2">
-                            Social Networks (optional)
+                            {t("hashtags.fields.socialNetworks")}
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
@@ -337,12 +339,12 @@ export default function HashtagsTab() {
 
                     <div>
                         <label className="block text-sm font-medium text-text-light mb-1">
-                            Description (optional)
+                            {t("hashtags.fields.description")}
                         </label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="When to use this hashtag set..."
+                            placeholder={t("hashtags.placeholders.description")}
                             rows={2}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
                         />
@@ -354,14 +356,14 @@ export default function HashtagsTab() {
                             onClick={closeModal}
                             className="px-4 py-2 text-text-light hover:text-white transition-colors"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={submitting}
                             className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                            {submitting ? "Saving..." : editingSet ? "Update" : "Add Set"}
+                            {submitting ? t("common.saving") : editingSet ? t("common.update") : t("hashtags.addSet")}
                         </button>
                     </div>
                 </form>

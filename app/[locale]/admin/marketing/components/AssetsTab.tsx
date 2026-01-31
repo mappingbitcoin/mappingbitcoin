@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import AssetUploader from "./AssetUploader";
@@ -29,6 +30,7 @@ function getFileIcon(mimeType: string) {
 }
 
 export default function AssetsTab() {
+    const t = useTranslations("admin.marketing");
     const { authToken } = useNostrAuth();
     const [assets, setAssets] = useState<MarketingAsset[]>([]);
     const [loading, setLoading] = useState(true);
@@ -130,7 +132,7 @@ export default function AssetsTab() {
         if (!authToken) return;
 
         if (!uploadedFile && !editingAsset) {
-            setFormError("Please upload a file first");
+            setFormError(t("assets.uploadFirst"));
             return;
         }
 
@@ -196,7 +198,7 @@ export default function AssetsTab() {
     };
 
     const handleDelete = async (asset: MarketingAsset) => {
-        if (!confirm(`Are you sure you want to delete "${asset.filename}"?`)) {
+        if (!confirm(t("confirm.deleteAsset", { name: asset.filename }))) {
             return;
         }
 
@@ -208,12 +210,12 @@ export default function AssetsTab() {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || "Failed to delete asset");
+                throw new Error(data.error || t("errors.failedToDelete"));
             }
 
             fetchAssets();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete asset");
+            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
         }
     };
 
@@ -251,7 +253,7 @@ export default function AssetsTab() {
                         onChange={(e) => setFilterNetwork(e.target.value as SocialNetwork | "")}
                         className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
                     >
-                        <option value="">All Networks</option>
+                        <option value="">{t("assets.allNetworks")}</option>
                         {SOCIAL_NETWORKS.map((network) => (
                             <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
                         ))}
@@ -262,7 +264,7 @@ export default function AssetsTab() {
                         onChange={(e) => setFilterType(e.target.value as PostType | "")}
                         className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
                     >
-                        <option value="">All Types</option>
+                        <option value="">{t("assets.allTypes")}</option>
                         {POST_TYPES.map((type) => (
                             <option key={type} value={type}>{POST_TYPE_LABELS[type]}</option>
                         ))}
@@ -273,7 +275,7 @@ export default function AssetsTab() {
                         onChange={(e) => setFilterTopic(e.target.value as ContentTopic | "")}
                         className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
                     >
-                        <option value="">All Topics</option>
+                        <option value="">{t("assets.allTopics")}</option>
                         {CONTENT_TOPICS.map((topic) => (
                             <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
                         ))}
@@ -284,14 +286,14 @@ export default function AssetsTab() {
                     onClick={openUploadModal}
                     className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
                 >
-                    Upload Asset
+                    {t("assets.uploadButton")}
                 </button>
             </div>
 
             {/* Assets Grid */}
             {assets.length === 0 ? (
                 <div className="bg-surface rounded-xl border border-border-light p-8 text-center text-text-light">
-                    <p>No assets yet. Upload your first marketing asset.</p>
+                    <p>{t("assets.emptyMessage")}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -339,13 +341,13 @@ export default function AssetsTab() {
                                         onClick={() => openEditModal(asset)}
                                         className="px-3 py-1 text-sm text-primary hover:text-primary-light transition-colors"
                                     >
-                                        Edit
+                                        {t("common.edit")}
                                     </button>
                                     <button
                                         onClick={() => handleDelete(asset)}
                                         className="px-3 py-1 text-sm text-red-400 hover:text-red-300 transition-colors"
                                     >
-                                        Delete
+                                        {t("common.delete")}
                                     </button>
                                 </div>
                             </div>
@@ -358,7 +360,7 @@ export default function AssetsTab() {
             <Modal
                 isOpen={isUploadModalOpen}
                 onClose={closeModal}
-                title="Upload Asset"
+                title={t("assets.uploadTitle")}
                 maxWidth="max-w-2xl"
             >
                 <div className="p-6 space-y-6">
@@ -390,7 +392,7 @@ export default function AssetsTab() {
                         <>
                             {/* Social Networks */}
                             <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">Social Networks</label>
+                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
                                 <div className="flex flex-wrap gap-2">
                                     {SOCIAL_NETWORKS.map((network) => (
                                         <button
@@ -411,7 +413,7 @@ export default function AssetsTab() {
 
                             {/* Post Types */}
                             <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">Post Types</label>
+                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
                                 <div className="flex flex-wrap gap-2">
                                     {POST_TYPES.map((type) => (
                                         <button
@@ -432,13 +434,13 @@ export default function AssetsTab() {
 
                             {/* Topic */}
                             <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">Topic</label>
+                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.topic")}</label>
                                 <select
                                     value={assetFormData.topic}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
                                     className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                                 >
-                                    <option value="">Select topic...</option>
+                                    <option value="">{t("assets.placeholders.selectTopic")}</option>
                                     {CONTENT_TOPICS.map((topic) => (
                                         <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
                                     ))}
@@ -447,22 +449,22 @@ export default function AssetsTab() {
 
                             {/* Custom Tags */}
                             <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">Custom Tags</label>
+                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.customTags")}</label>
                                 <TagInput
                                     tags={assetFormData.customTags}
                                     onChange={(tags) => setAssetFormData({ ...assetFormData, customTags: tags })}
-                                    placeholder="Add custom tags..."
+                                    placeholder={t("assets.placeholders.customTags")}
                                 />
                             </div>
 
                             {/* Alt Text */}
                             <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">Alt Text (optional)</label>
+                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.altText")}</label>
                                 <input
                                     type="text"
                                     value={assetFormData.altText}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
-                                    placeholder="Describe the image for accessibility..."
+                                    placeholder={t("assets.placeholders.altText")}
                                     className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                                 />
                             </div>
@@ -475,14 +477,14 @@ export default function AssetsTab() {
                             onClick={closeModal}
                             className="px-4 py-2 text-text-light hover:text-white transition-colors"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             onClick={handleSaveAsset}
                             disabled={submitting || !uploadedFile}
                             className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                            {submitting ? "Saving..." : "Save Asset"}
+                            {submitting ? t("common.saving") : t("assets.saveAsset")}
                         </button>
                     </div>
                 </div>
@@ -492,7 +494,7 @@ export default function AssetsTab() {
             <Modal
                 isOpen={!!editingAsset}
                 onClose={closeModal}
-                title="Edit Asset"
+                title={t("assets.editTitle")}
                 maxWidth="max-w-2xl"
             >
                 <div className="p-6 space-y-6">
@@ -516,7 +518,7 @@ export default function AssetsTab() {
 
                     {/* Social Networks */}
                     <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">Social Networks</label>
+                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
                                 <button
@@ -537,7 +539,7 @@ export default function AssetsTab() {
 
                     {/* Post Types */}
                     <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">Post Types</label>
+                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
                         <div className="flex flex-wrap gap-2">
                             {POST_TYPES.map((type) => (
                                 <button
@@ -558,13 +560,13 @@ export default function AssetsTab() {
 
                     {/* Topic */}
                     <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">Topic</label>
+                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.topic")}</label>
                         <select
                             value={assetFormData.topic}
                             onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
                         >
-                            <option value="">Select topic...</option>
+                            <option value="">{t("assets.placeholders.selectTopic")}</option>
                             {CONTENT_TOPICS.map((topic) => (
                                 <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
                             ))}
@@ -573,22 +575,22 @@ export default function AssetsTab() {
 
                     {/* Custom Tags */}
                     <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">Custom Tags</label>
+                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.customTags")}</label>
                         <TagInput
                             tags={assetFormData.customTags}
                             onChange={(tags) => setAssetFormData({ ...assetFormData, customTags: tags })}
-                            placeholder="Add custom tags..."
+                            placeholder={t("assets.placeholders.customTags")}
                         />
                     </div>
 
                     {/* Alt Text */}
                     <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">Alt Text (optional)</label>
+                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.altText")}</label>
                         <input
                             type="text"
                             value={assetFormData.altText}
                             onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
-                            placeholder="Describe the image for accessibility..."
+                            placeholder={t("assets.placeholders.altText")}
                             className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                         />
                     </div>
@@ -599,14 +601,14 @@ export default function AssetsTab() {
                             onClick={closeModal}
                             className="px-4 py-2 text-text-light hover:text-white transition-colors"
                         >
-                            Cancel
+                            {t("common.cancel")}
                         </button>
                         <button
                             onClick={handleSaveAsset}
                             disabled={submitting}
                             className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                            {submitting ? "Saving..." : "Save Changes"}
+                            {submitting ? t("common.saving") : t("assets.saveChanges")}
                         </button>
                     </div>
                 </div>

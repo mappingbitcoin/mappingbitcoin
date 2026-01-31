@@ -1,0 +1,211 @@
+{
+  "marketing": {
+    "title": "Marketing",
+    "description": "Manage brand content and automate social media distribution",
+    "sections": {
+      "seeder": "Content Seeder",
+      "calendar": "Calendar",
+      "queue": "Generated Queue",
+      "review": "Review Index",
+      "preview": "Content Preview"
+    },
+    "modules": {
+      "guidelines": {
+        "label": "Guidelines",
+        "description": "Brand voice, do's & don'ts"
+      },
+      "links": {
+        "label": "Links",
+        "description": "Marketing link library"
+      },
+      "assets": {
+        "label": "Assets",
+        "description": "Images, videos & files"
+      },
+      "hashtags": {
+        "label": "Hashtags",
+        "description": "Hashtag sets by network"
+      },
+      "posts": {
+        "label": "Example Posts",
+        "description": "Sample content templates"
+      },
+      "stats": {
+        "label": "Stats & Facts",
+        "description": "Key metrics & data points"
+      }
+    },
+    "stats": {
+      "items": "{count} items",
+      "links": "{count} links",
+      "files": "{count} files",
+      "sets": "{count} sets",
+      "examples": "{count} examples",
+      "facts": "{count} facts",
+      "notSet": "Not set",
+      "empty": "Empty"
+    },
+    "common": {
+      "back": "Back",
+      "soon": "Soon",
+      "comingSoon": "Coming Soon",
+      "comingSoonDescription": "This feature is under development and will be available soon.",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "uploading": "Uploading...",
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "update": "Update",
+      "save": "Save",
+      "actions": "Actions"
+    },
+    "guidelines": {
+      "title": "Brand Voice & Tone",
+      "doTitle": "Do This",
+      "dontTitle": "Don't Do This",
+      "valuesTitle": "Brand Values",
+      "voicePlaceholder": "Describe your brand's voice and tone...",
+      "addGuideline": "Add guideline...",
+      "addValue": "Add a brand value...",
+      "saveButton": "Save Guidelines",
+      "successMessage": "Guidelines saved successfully!",
+      "updated": "Updated:"
+    },
+    "links": {
+      "addButton": "Add Link",
+      "editTitle": "Edit Link",
+      "addTitle": "Add Link",
+      "allCategories": "All Categories",
+      "emptyMessage": "No links yet. Add your first marketing link.",
+      "fields": {
+        "title": "Title",
+        "url": "URL",
+        "description": "Description",
+        "category": "Category"
+      },
+      "placeholders": {
+        "title": "e.g., Company Website",
+        "url": "https://example.com",
+        "description": "Brief description...",
+        "category": "e.g., website, social"
+      }
+    },
+    "assets": {
+      "uploadButton": "Upload Asset",
+      "editTitle": "Edit Asset",
+      "uploadTitle": "Upload Asset",
+      "allNetworks": "All Networks",
+      "allTypes": "All Types",
+      "allTopics": "All Topics",
+      "emptyMessage": "No assets yet. Upload your first marketing asset.",
+      "saveAsset": "Save Asset",
+      "saveChanges": "Save Changes",
+      "uploadFirst": "Please upload a file first",
+      "fields": {
+        "socialNetworks": "Social Networks",
+        "postTypes": "Post Types",
+        "topic": "Topic",
+        "customTags": "Custom Tags",
+        "altText": "Alt Text (optional)"
+      },
+      "placeholders": {
+        "selectTopic": "Select topic...",
+        "customTags": "Add custom tags...",
+        "altText": "Describe the image for accessibility..."
+      }
+    },
+    "hashtags": {
+      "addButton": "Add Hashtag Set",
+      "editTitle": "Edit Hashtag Set",
+      "addTitle": "Add Hashtag Set",
+      "description": "Create named groups of hashtags for consistent use across platforms.",
+      "emptyMessage": "No hashtag sets yet. Create your first set of hashtags.",
+      "addSet": "Add Set",
+      "atLeastOneHashtag": "Please add at least one hashtag",
+      "pressEnter": "Press Enter or comma to add",
+      "fields": {
+        "name": "Name",
+        "hashtags": "Hashtags",
+        "socialNetworks": "Social Networks (optional)",
+        "description": "Description (optional)"
+      },
+      "placeholders": {
+        "name": "e.g., Bitcoin General, Product Launch",
+        "hashtags": "Type hashtag and press Enter...",
+        "description": "When to use this hashtag set..."
+      }
+    },
+    "posts": {
+      "addButton": "Add Example Post",
+      "editTitle": "Edit Example Post",
+      "addTitle": "Add Example Post",
+      "allNetworks": "All Networks",
+      "emptyMessage": "No example posts yet. Add your first example post.",
+      "addPost": "Add Post",
+      "selectNetwork": "Please select a social network",
+      "postsCount": "{count} posts",
+      "characters": "characters",
+      "fields": {
+        "socialNetwork": "Social Network",
+        "content": "Post Content",
+        "hashtags": "Hashtags",
+        "notes": "Notes (optional)"
+      },
+      "placeholders": {
+        "selectNetwork": "Select network...",
+        "content": "Write the example post content...",
+        "hashtags": "Add hashtags...",
+        "notes": "Internal notes about why this post works well..."
+      }
+    },
+    "statsTab": {
+      "addButton": "Add Stat",
+      "editTitle": "Edit Stat",
+      "addTitle": "Add Stat",
+      "allCategories": "All Categories",
+      "showExpired": "Show expired",
+      "emptyMessage": "No stats yet. Add your first marketing stat or fact.",
+      "addStat": "Add Stat",
+      "noSource": "No source",
+      "never": "Never",
+      "expired": "(expired)",
+      "expiringSoon": "(soon)",
+      "expiresHelper": "Set an expiration date to be reminded to update this stat",
+      "fields": {
+        "label": "Label",
+        "value": "Value",
+        "category": "Category",
+        "source": "Source",
+        "sourceOptional": "Source (optional)",
+        "expires": "Expires",
+        "expiresOptional": "Expires (optional)"
+      },
+      "placeholders": {
+        "label": "e.g., Active Users, Countries Served",
+        "value": "e.g., 10,000+, 50 countries",
+        "category": "e.g., growth, engagement, reach",
+        "source": "e.g., Internal analytics, Q4 2024 report"
+      }
+    },
+    "uploader": {
+      "authRequired": "Authentication required",
+      "invalidType": "File type {type} is not allowed. Allowed: images, videos, and PDFs.",
+      "fileTooLarge": "File size exceeds 50MB limit.",
+      "dropHere": "Drag and drop a file here, or click to browse",
+      "allowedTypes": "Images, videos, and PDFs up to 50MB"
+    },
+    "errors": {
+      "operationFailed": "Operation failed",
+      "failedToDelete": "Failed to delete"
+    },
+    "confirm": {
+      "deleteLink": "Delete \"{name}\"?",
+      "deleteAsset": "Are you sure you want to delete \"{name}\"?",
+      "deletePost": "Are you sure you want to delete this example post?",
+      "deleteHashtagSet": "Are you sure you want to delete \"{name}\"?",
+      "deleteStat": "Are you sure you want to delete \"{name}\"?"
+    }
+  }
+}

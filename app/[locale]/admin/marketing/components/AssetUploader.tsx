@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { CloudUploadIcon } from "@/assets/icons/ui";
 
@@ -28,6 +29,7 @@ const ALLOWED_TYPES = [
 const MAX_SIZE = 50 * 1024 * 1024; // 50MB
 
 export default function AssetUploader({ onUploadComplete, onError }: AssetUploaderProps) {
+    const t = useTranslations("admin.marketing");
     const { authToken } = useNostrAuth();
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -35,17 +37,17 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
 
     const uploadFile = useCallback(async (file: File) => {
         if (!authToken) {
-            onError("Authentication required");
+            onError(t("uploader.authRequired"));
             return;
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            onError(`File type ${file.type} is not allowed. Allowed: images, videos, and PDFs.`);
+            onError(t("uploader.invalidType", { type: file.type }));
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            onError(`File size exceeds 50MB limit.`);
+            onError(t("uploader.fileTooLarge"));
             return;
         }
 
@@ -111,7 +113,7 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
             setUploading(false);
             setProgress(0);
         }
-    }, [authToken, onUploadComplete, onError]);
+    }, [authToken, onUploadComplete, onError, t]);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -153,7 +155,7 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
                 <div className="space-y-4">
                     <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mx-auto" />
                     <div>
-                        <p className="text-white">Uploading...</p>
+                        <p className="text-white">{t("common.uploading")}</p>
                         <div className="mt-2 h-2 bg-surface-light rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-primary transition-all duration-300"
@@ -167,9 +169,9 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
                 <div className="space-y-3">
                     <CloudUploadIcon className="w-12 h-12 text-text-light mx-auto" />
                     <div>
-                        <p className="text-white">Drag and drop a file here, or click to browse</p>
+                        <p className="text-white">{t("uploader.dropHere")}</p>
                         <p className="text-sm text-text-light mt-1">
-                            Images, videos, and PDFs up to 50MB
+                            {t("uploader.allowedTypes")}
                         </p>
                     </div>
                 </div>
