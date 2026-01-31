@@ -13,6 +13,7 @@ import {
     CloseIcon,
 } from "@/assets/icons/ui";
 import { BuildingIcon } from "@/assets/icons/location";
+import { getLocalizedCountrySlug, getLocalizedCitySlug } from "@/utils/SlugUtils";
 
 interface NavBarSearchProps {
     placeholder?: string;
@@ -133,28 +134,29 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
         }
     };
 
-    // Handle result selection - navigate to map
+    // Handle result selection - navigate to place/location page
     const handleSelect = (result: AutocompleteResult) => {
         setIsOpen(false);
         setQuery("");
         onClose?.();
 
-        // Determine zoom level based on result type
-        let zoom = 15;
-        if (result.resultType === "country") {
-            zoom = 6;
-        } else if (result.resultType === "state") {
-            zoom = 8;
-        } else if (result.resultType === "city") {
-            zoom = 12;
+        // Navigate based on result type
+        if (result.resultType === "venue" && result.venue?.slug) {
+            // Navigate to venue detail page
+            router.push(`/places/${result.venue.slug}`);
+        } else if (result.resultType === "city" && result.city && result.country) {
+            // Navigate to city listing page
+            const citySlug = getLocalizedCitySlug(result.country, result.city);
+            router.push(`/${citySlug}`);
+        } else if (result.resultType === "country" && result.country) {
+            // Navigate to country listing page
+            const countrySlug = getLocalizedCountrySlug(result.country);
+            router.push(`/${countrySlug}`);
+        } else {
+            // Fallback to map for states or missing data
+            const zoom = result.resultType === "state" ? 8 : 12;
+            router.push(`/map?lat=${result.latitude}&lon=${result.longitude}&zoom=${zoom}`);
         }
-
-        // Build URL with coordinates
-        const mapUrl = `/map?lat=${result.latitude}&lon=${result.longitude}&zoom=${zoom}${
-            result.venue ? `&venue=${result.venue.type}/${result.venue.id}` : ""
-        }`;
-
-        router.push(mapUrl);
     };
 
     // Get icon for result type
@@ -234,7 +236,7 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border-light rounded-xl shadow-lg overflow-hidden z-50 max-h-80 overflow-y-auto"
+                        className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border-light rounded-xl shadow-lg overflow-hidden z-50 max-h-[70vh] md:max-h-96 md:min-w-[400px] overflow-y-auto"
                     >
                         {/* Venues */}
                         {results.filter((r) => r.resultType === "venue").length > 0 && (
