@@ -129,3 +129,71 @@ export const CONTENT_TOPIC_LABELS: Record<ContentTopic, string> = {
     TIPS: "Tips",
     OTHER: "Other",
 };
+
+// Generation Config types for n8n integration
+export interface GenerationConfig {
+    id: string;
+    // Generation settings
+    postsPerPlatform: Record<string, number>;
+    contentMixWeights: Record<string, number>;
+    generateImages: boolean;
+    aiModel: "sonnet" | "opus";
+    // Scheduling settings
+    postsPerDay: Record<string, number>;
+    activeHoursStart: string;
+    activeHoursEnd: string;
+    timezone: string;
+    activeDays: string[];
+    // Webhook
+    webhookUrl: string | null;
+    webhookSecret: string | null;
+    lastTriggeredAt: string | null;
+    // Timestamps
+    updatedAt: string;
+    createdAt: string;
+}
+
+export const PLATFORMS = ["x", "nostr", "instagram"] as const;
+export type Platform = typeof PLATFORMS[number];
+
+export const PLATFORM_LABELS: Record<Platform, string> = {
+    x: "Twitter/X",
+    nostr: "Nostr",
+    instagram: "Instagram",
+};
+
+export const CONTENT_MIX_TYPES = [
+    "venue_spotlight",
+    "education",
+    "stats",
+    "community",
+] as const;
+export type ContentMixType = typeof CONTENT_MIX_TYPES[number];
+
+export const CONTENT_MIX_LABELS: Record<ContentMixType, string> = {
+    venue_spotlight: "Venue Spotlight",
+    education: "Education",
+    stats: "Stats & Facts",
+    community: "Community",
+};
+
+export const DAYS_OF_WEEK = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+export type DayOfWeek = typeof DAYS_OF_WEEK[number];
+
+export const DAY_LABELS: Record<DayOfWeek, string> = {
+    mon: "Mon",
+    tue: "Tue",
+    wed: "Wed",
+    thu: "Thu",
+    fri: "Fri",
+    sat: "Sat",
+    sun: "Sun",
+};
+
+export const AI_MODELS = ["sonnet", "opus"] as const;
+export type AIModel = typeof AI_MODELS[number];
+
+export const AI_MODEL_LABELS: Record<AIModel, string> = {
+    sonnet: "Claude Sonnet (Faster)",
+    opus: "Claude Opus (Better)",
+};

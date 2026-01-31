@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { SendIcon, PlusIcon, CloseIcon } from "@/assets/icons/ui";
 
 export default function PostTab() {
+    const { authToken } = useNostrAuth();
     const [content, setContent] = useState("");
     const [hashtags, setHashtags] = useState<string[]>([]);
     const [hashtagInput, setHashtagInput] = useState("");
@@ -30,6 +32,11 @@ export default function PostTab() {
     };
 
     const handleSubmit = async () => {
+        if (!authToken) {
+            toast.error("Authentication required");
+            return;
+        }
+
         if (!content.trim()) {
             toast.error("Content is required");
             return;
@@ -41,7 +48,10 @@ export default function PostTab() {
         try {
             const res = await fetch("/api/admin/nostr-bot/posts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
                 body: JSON.stringify({
                     content: content.trim(),
                     hashtags,

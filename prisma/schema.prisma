@@ -422,3 +422,31 @@ model MarketingStat {
   @@index([category])
   @@map("marketing_stats")
 }
+
+// n8n Generation Configuration (single row)
+model GenerationConfig {
+  id                  String   @id @default(cuid())
+
+  // Generation Config
+  postsPerPlatform    Json     @default("{}") @map("posts_per_platform")     // e.g., { "x": 20, "nostr": 15, "instagram": 10 }
+  contentMixWeights   Json     @default("{}") @map("content_mix_weights")    // e.g., { "venue_spotlight": 40, "education": 30 }
+  generateImages      Boolean  @default(false) @map("generate_images")
+  aiModel             String   @default("sonnet") @map("ai_model")           // "sonnet" or "opus"
+
+  // Scheduling Config
+  postsPerDay         Json     @default("{}") @map("posts_per_day")          // e.g., { "x": 2, "nostr": 1, "instagram": 1 }
+  activeHoursStart    String   @default("12:00") @map("active_hours_start")
+  activeHoursEnd      String   @default("22:00") @map("active_hours_end")
+  timezone            String   @default("UTC")
+  activeDays          String[] @default(["mon", "tue", "wed", "thu", "fri", "sat", "sun"]) @map("active_days")
+
+  // Webhook
+  webhookUrl          String?  @map("webhook_url")
+  webhookSecret       String?  @map("webhook_secret")
+  lastTriggeredAt     DateTime? @map("last_triggered_at")
+
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@map("generation_config")
+}

@@ -33,6 +33,10 @@
       "stats": {
         "label": "Stats & Facts",
         "description": "Key metrics & data points"
+      },
+      "generation": {
+        "label": "Generation Config",
+        "description": "n8n automation settings"
       }
     },
     "stats": {
@@ -43,7 +47,8 @@
       "examples": "{count} examples",
       "facts": "{count} facts",
       "notSet": "Not set",
-      "empty": "Empty"
+      "empty": "Empty",
+      "configured": "Configured"
     },
     "common": {
       "back": "Back",
