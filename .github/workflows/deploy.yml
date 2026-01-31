@@ -46,7 +46,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".next/**,public,package.json,prisma.config.ts,prisma/**,lib/generated/**,package-lock.json,next.config.js,.env,data/**,posts/**"
+          source: ".next/**,public,package.json,prisma.config.ts,prisma/**,lib/**,package-lock.json,next.config.js,.env,data/**,posts/**,scripts/**"
           target: "/root/mappingbitcoin-temp"
 
       - name: Install production dependencies on server
