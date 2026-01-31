@@ -204,7 +204,7 @@ export default function HashtagsTab() {
                 </p>
                 <button
                     onClick={openCreateModal}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                 >
                     {t("hashtags.addButton")}
                 </button>
@@ -232,7 +232,7 @@ export default function HashtagsTab() {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => openEditModal(set)}
-                                        className="p-2 text-text-light hover:text-primary transition-colors"
+                                        className="p-2 text-text-light hover:text-accent transition-colors"
                                     >
                                         <EditIcon className="w-4 h-4" />
                                     </button>
@@ -250,7 +250,7 @@ export default function HashtagsTab() {
                                 {set.hashtags.map((tag, index) => (
                                     <span
                                         key={index}
-                                        className="px-2 py-1 bg-primary/20 text-primary rounded text-sm"
+                                        className="px-2 py-1 bg-primary/20 text-accent rounded text-sm"
                                     >
                                         #{tag}
                                     </span>
@@ -298,7 +298,7 @@ export default function HashtagsTab() {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder={t("hashtags.placeholders.name")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                     </div>
@@ -346,7 +346,7 @@ export default function HashtagsTab() {
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder={t("hashtags.placeholders.description")}
                             rows={2}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                         />
                     </div>
 
@@ -361,7 +361,7 @@ export default function HashtagsTab() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : editingSet ? t("common.update") : t("hashtags.addSet")}
                         </button>

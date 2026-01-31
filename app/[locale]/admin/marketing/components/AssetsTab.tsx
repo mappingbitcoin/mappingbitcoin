@@ -230,7 +230,7 @@ export default function AssetsTab() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent" />
             </div>
         );
     }
@@ -251,7 +251,7 @@ export default function AssetsTab() {
                     <select
                         value={filterNetwork}
                         onChange={(e) => setFilterNetwork(e.target.value as SocialNetwork | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
+                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
                     >
                         <option value="">{t("assets.allNetworks")}</option>
                         {SOCIAL_NETWORKS.map((network) => (
@@ -262,7 +262,7 @@ export default function AssetsTab() {
                     <select
                         value={filterType}
                         onChange={(e) => setFilterType(e.target.value as PostType | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
+                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
                     >
                         <option value="">{t("assets.allTypes")}</option>
                         {POST_TYPES.map((type) => (
@@ -273,7 +273,7 @@ export default function AssetsTab() {
                     <select
                         value={filterTopic}
                         onChange={(e) => setFilterTopic(e.target.value as ContentTopic | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-primary"
+                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
                     >
                         <option value="">{t("assets.allTopics")}</option>
                         {CONTENT_TOPICS.map((topic) => (
@@ -284,7 +284,7 @@ export default function AssetsTab() {
 
                 <button
                     onClick={openUploadModal}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                 >
                     {t("assets.uploadButton")}
                 </button>
@@ -300,7 +300,7 @@ export default function AssetsTab() {
                     {assets.map((asset) => (
                         <div
                             key={asset.id}
-                            className="bg-surface rounded-xl border border-border-light overflow-hidden hover:border-primary/50 transition-colors"
+                            className="bg-surface rounded-xl border border-border-light overflow-hidden hover:border-accent/50 transition-colors"
                         >
                             {/* Preview */}
                             <div className="aspect-video bg-surface-light flex items-center justify-center">
@@ -339,7 +339,7 @@ export default function AssetsTab() {
                                 <div className="flex justify-end gap-2">
                                     <button
                                         onClick={() => openEditModal(asset)}
-                                        className="px-3 py-1 text-sm text-primary hover:text-primary-light transition-colors"
+                                        className="px-3 py-1 text-sm text-accent hover:text-accent-light transition-colors"
                                     >
                                         {t("common.edit")}
                                     </button>
@@ -438,7 +438,7 @@ export default function AssetsTab() {
                                 <select
                                     value={assetFormData.topic}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
-                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                                 >
                                     <option value="">{t("assets.placeholders.selectTopic")}</option>
                                     {CONTENT_TOPICS.map((topic) => (
@@ -465,7 +465,7 @@ export default function AssetsTab() {
                                     value={assetFormData.altText}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
                                     placeholder={t("assets.placeholders.altText")}
-                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                                 />
                             </div>
                         </>
@@ -482,7 +482,7 @@ export default function AssetsTab() {
                         <button
                             onClick={handleSaveAsset}
                             disabled={submitting || !uploadedFile}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : t("assets.saveAsset")}
                         </button>
@@ -564,7 +564,7 @@ export default function AssetsTab() {
                         <select
                             value={assetFormData.topic}
                             onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                         >
                             <option value="">{t("assets.placeholders.selectTopic")}</option>
                             {CONTENT_TOPICS.map((topic) => (
@@ -591,7 +591,7 @@ export default function AssetsTab() {
                             value={assetFormData.altText}
                             onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
                             placeholder={t("assets.placeholders.altText")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
                     </div>
 
@@ -606,7 +606,7 @@ export default function AssetsTab() {
                         <button
                             onClick={handleSaveAsset}
                             disabled={submitting}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : t("assets.saveChanges")}
                         </button>

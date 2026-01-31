@@ -39,7 +39,7 @@ export default function TagInput({ tags, onChange, placeholder = "Add tag...", c
             {tags.map((tag, index) => (
                 <span
                     key={index}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/20 text-primary rounded text-sm"
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent rounded text-sm"
                 >
                     #{tag}
                     <button
