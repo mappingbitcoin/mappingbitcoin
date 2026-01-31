@@ -8,8 +8,9 @@
  */
 
 import "dotenv/config";
-import prisma from "../lib/db/prisma";
-import { SocialNetwork } from "@prisma/client";
+import { PrismaClient, SocialNetwork } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 async function seedGuidelines() {
     console.log("Seeding marketing guidelines...");
