@@ -206,7 +206,7 @@ export default function StatsTab() {
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                     >
                         <option value="">{t("statsTab.allCategories")}</option>
                         {categories.map((cat) => (
@@ -219,14 +219,14 @@ export default function StatsTab() {
                             type="checkbox"
                             checked={showExpired}
                             onChange={(e) => setShowExpired(e.target.checked)}
-                            className="w-4 h-4 rounded border-border-light bg-surface-light text-primary focus:ring-primary"
+                            className="w-4 h-4 rounded border-border-light bg-surface-light text-accent focus:ring-primary"
                         />
                         {t("statsTab.showExpired")}
                     </label>
                 </div>
                 <button
                     onClick={openCreateModal}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                 >
                     {t("statsTab.addButton")}
                 </button>
@@ -259,7 +259,7 @@ export default function StatsTab() {
                                     >
                                         <td className="px-4 py-3 text-white font-medium">{stat.label}</td>
                                         <td className="px-4 py-3">
-                                            <span className="text-primary font-semibold">{stat.value}</span>
+                                            <span className="text-accent font-semibold">{stat.value}</span>
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className="px-2 py-1 bg-surface-light rounded text-sm text-text-light">
@@ -291,7 +291,7 @@ export default function StatsTab() {
                                         <td className="px-4 py-3 text-right space-x-2">
                                             <button
                                                 onClick={() => openEditModal(stat)}
-                                                className="px-3 py-1 text-sm text-primary hover:text-primary-light transition-colors"
+                                                className="px-3 py-1 text-sm text-accent hover:text-accent-light transition-colors"
                                             >
                                                 {t("common.edit")}
                                             </button>
@@ -333,7 +333,7 @@ export default function StatsTab() {
                             value={formData.label}
                             onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                             placeholder={t("statsTab.placeholders.label")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                     </div>
@@ -347,7 +347,7 @@ export default function StatsTab() {
                             value={formData.value}
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                             placeholder={t("statsTab.placeholders.value")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                     </div>
@@ -362,7 +362,7 @@ export default function StatsTab() {
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                             placeholder={t("statsTab.placeholders.category")}
                             list="stat-category-suggestions"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                         <datalist id="stat-category-suggestions">
@@ -381,7 +381,7 @@ export default function StatsTab() {
                             value={formData.source}
                             onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                             placeholder={t("statsTab.placeholders.source")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
                     </div>
 
@@ -393,7 +393,7 @@ export default function StatsTab() {
                             type="date"
                             value={formData.expiresAt}
                             onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                         />
                         <p className="text-xs text-text-light mt-1">
                             {t("statsTab.expiresHelper")}
@@ -411,7 +411,7 @@ export default function StatsTab() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : editingStat ? t("common.update") : t("statsTab.addStat")}
                         </button>

@@ -121,6 +121,25 @@
     text-decoration: none;
   }
 
+  /* Fix select/option styling for dark mode */
+  select {
+    color-scheme: dark;
+  }
+
+  select option {
+    background-color: var(--color-surface-light);
+    color: var(--color-text);
+  }
+
+  /* Fix date input styling for dark mode */
+  input[type="date"] {
+    color-scheme: dark;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
   h1 {
     font-size: var(--font-size-2xl);
     font-weight: 600;

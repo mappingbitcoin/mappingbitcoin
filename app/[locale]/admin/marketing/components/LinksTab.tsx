@@ -155,7 +155,7 @@ export default function LinksTab() {
                 <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-3 py-1.5 text-sm bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                    className="px-3 py-1.5 text-sm bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                 >
                     <option value="">{t("links.allCategories")}</option>
                     {categories.map((cat) => (
@@ -164,7 +164,7 @@ export default function LinksTab() {
                 </select>
                 <button
                     onClick={openCreateModal}
-                    className="px-3 py-1.5 text-sm bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-sm bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                 >
                     {t("links.addButton")}
                 </button>
@@ -200,7 +200,7 @@ export default function LinksTab() {
                                             href={link.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-primary hover:text-primary-light text-xs truncate max-w-[200px] block"
+                                            className="text-accent hover:text-accent-light text-xs truncate max-w-[200px] block"
                                         >
                                             {link.url}
                                         </a>
@@ -213,7 +213,7 @@ export default function LinksTab() {
                                     <td className="px-3 py-2 text-right">
                                         <button
                                             onClick={() => openEditModal(link)}
-                                            className="px-2 py-1 text-xs text-primary hover:text-primary-light transition-colors"
+                                            className="px-2 py-1 text-xs text-accent hover:text-accent-light transition-colors"
                                         >
                                             {t("common.edit")}
                                         </button>
@@ -247,7 +247,7 @@ export default function LinksTab() {
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             placeholder={t("links.placeholders.title")}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                     </div>
@@ -259,7 +259,7 @@ export default function LinksTab() {
                             value={formData.url}
                             onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                             placeholder={t("links.placeholders.url")}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                     </div>
@@ -271,7 +271,7 @@ export default function LinksTab() {
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder={t("links.placeholders.description")}
                             rows={2}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
+                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                         />
                     </div>
 
@@ -283,7 +283,7 @@ export default function LinksTab() {
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                             placeholder={t("links.placeholders.category")}
                             list="category-suggestions"
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                         <datalist id="category-suggestions">
@@ -304,7 +304,7 @@ export default function LinksTab() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-3 py-1.5 text-sm bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-3 py-1.5 text-sm bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : editingLink ? t("common.update") : t("common.add")}
                         </button>

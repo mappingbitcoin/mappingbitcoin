@@ -121,20 +121,63 @@ export default function GuidelinesTab() {
                 </div>
             )}
 
-            {/* Two column layout for Do/Don't */}
+            {/* Voice & Tone + Brand Values row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Voice & Tone */}
-                <div className="lg:col-span-2 bg-surface rounded-lg border border-border-light p-4">
+                <div className="bg-surface rounded-lg border border-border-light p-4">
                     <h3 className="text-sm font-semibold text-white mb-2">{t("guidelines.title")}</h3>
                     <textarea
                         value={voiceTone}
                         onChange={(e) => setVoiceTone(e.target.value)}
                         placeholder={t("guidelines.voicePlaceholder")}
-                        rows={3}
-                        className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
+                        rows={5}
+                        className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                     />
                 </div>
 
+                {/* Brand Values */}
+                <div className="bg-surface rounded-lg border border-border-light p-4">
+                    <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                        <StarIcon className="w-4 h-4 text-accent" />
+                        {t("guidelines.valuesTitle")}
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5 mb-3 max-h-32 overflow-y-auto">
+                        {brandValues.map((value, index) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent rounded-full text-xs"
+                            >
+                                {value}
+                                <button
+                                    onClick={() => removeItem(brandValues, setBrandValues, index)}
+                                    className="hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
+                                >
+                                    <CloseIcon className="w-3 h-3" />
+                                </button>
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="text"
+                            value={newValue}
+                            onChange={(e) => setNewValue(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && addItem(brandValues, setBrandValues, newValue, setNewValue)}
+                            placeholder={t("guidelines.addValue")}
+                            className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
+                        />
+                        <button
+                            onClick={() => addItem(brandValues, setBrandValues, newValue, setNewValue)}
+                            className="px-3 py-1.5 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors text-xs"
+                        >
+                            {t("common.add")}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Do/Don't row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Do List */}
                 <div className="bg-surface rounded-lg border border-border-light p-4">
                     <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
@@ -149,7 +192,7 @@ export default function GuidelinesTab() {
                                 </span>
                                 <button
                                     onClick={() => removeItem(doList, setDoList, index)}
-                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
                                 >
                                     <CloseIcon className="w-3 h-3" />
                                 </button>
@@ -163,7 +206,7 @@ export default function GuidelinesTab() {
                             onChange={(e) => setNewDo(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && addItem(doList, setDoList, newDo, setNewDo)}
                             placeholder={t("guidelines.addGuideline")}
-                            className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
                         <button
                             onClick={() => addItem(doList, setDoList, newDo, setNewDo)}
@@ -188,7 +231,7 @@ export default function GuidelinesTab() {
                                 </span>
                                 <button
                                     onClick={() => removeItem(dontList, setDontList, index)}
-                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
                                 >
                                     <CloseIcon className="w-3 h-3" />
                                 </button>
@@ -202,7 +245,7 @@ export default function GuidelinesTab() {
                             onChange={(e) => setNewDont(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && addItem(dontList, setDontList, newDont, setNewDont)}
                             placeholder={t("guidelines.addGuideline")}
-                            className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                            className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
                         <button
                             onClick={() => addItem(dontList, setDontList, newDont, setNewDont)}
@@ -211,46 +254,6 @@ export default function GuidelinesTab() {
                             {t("common.add")}
                         </button>
                     </div>
-                </div>
-            </div>
-
-            {/* Brand Values */}
-            <div className="bg-surface rounded-lg border border-border-light p-4">
-                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                    <StarIcon className="w-4 h-4 text-primary" />
-                    {t("guidelines.valuesTitle")}
-                </h3>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                    {brandValues.map((value, index) => (
-                        <span
-                            key={index}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary/20 text-primary rounded-full text-xs group"
-                        >
-                            {value}
-                            <button
-                                onClick={() => removeItem(brandValues, setBrandValues, index)}
-                                className="hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                                <CloseIcon className="w-3 h-3" />
-                            </button>
-                        </span>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={newValue}
-                        onChange={(e) => setNewValue(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && addItem(brandValues, setBrandValues, newValue, setNewValue)}
-                        placeholder={t("guidelines.addValue")}
-                        className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
-                    />
-                    <button
-                        onClick={() => addItem(brandValues, setBrandValues, newValue, setNewValue)}
-                        className="px-3 py-1.5 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors text-xs"
-                    >
-                        {t("common.add")}
-                    </button>
                 </div>
             </div>
 
@@ -264,7 +267,7 @@ export default function GuidelinesTab() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm rounded-lg transition-colors disabled:opacity-50"
                 >
                     {saving ? t("common.saving") : t("guidelines.saveButton")}
                 </button>

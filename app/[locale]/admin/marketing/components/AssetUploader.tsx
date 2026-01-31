@@ -136,7 +136,7 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
         <div
             className={`
                 relative border-2 border-dashed rounded-xl p-8 text-center transition-colors
-                ${dragOver ? "border-primary bg-primary/10" : "border-border-light hover:border-primary/50"}
+                ${dragOver ? "border-accent bg-accent/10" : "border-border-light hover:border-accent/50"}
                 ${uploading ? "pointer-events-none opacity-75" : ""}
             `}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -153,12 +153,12 @@ export default function AssetUploader({ onUploadComplete, onError }: AssetUpload
 
             {uploading ? (
                 <div className="space-y-4">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mx-auto" />
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent mx-auto" />
                     <div>
                         <p className="text-white">{t("common.uploading")}</p>
                         <div className="mt-2 h-2 bg-surface-light rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-primary transition-all duration-300"
+                                className="h-full bg-accent transition-all duration-300"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>

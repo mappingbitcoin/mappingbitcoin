@@ -23,6 +23,7 @@ import {
     EditIcon,
     MenuIcon,
 } from "@/assets/icons/ui";
+import { NostrIcon } from "@/assets/icons/social";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -57,6 +58,11 @@ const navSections: NavSection[] = [
                 href: "/admin/marketing",
                 label: "Marketing",
                 icon: <MegaphoneIcon className="w-5 h-5" />,
+            },
+            {
+                href: "/admin/nostr-bot",
+                label: "Nostr Bot",
+                icon: <NostrIcon className="w-5 h-5" />,
             },
         ],
     },

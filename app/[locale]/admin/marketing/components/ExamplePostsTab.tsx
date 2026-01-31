@@ -199,7 +199,7 @@ export default function ExamplePostsTab() {
                     <select
                         value={selectedNetwork}
                         onChange={(e) => setSelectedNetwork(e.target.value as SocialNetwork | "")}
-                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                     >
                         <option value="">{t("posts.allNetworks")}</option>
                         {SOCIAL_NETWORKS.map((network) => (
@@ -209,7 +209,7 @@ export default function ExamplePostsTab() {
                 </div>
                 <button
                     onClick={openCreateModal}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
                 >
                     {t("posts.addButton")}
                 </button>
@@ -270,7 +270,7 @@ export default function ExamplePostsTab() {
                         <select
                             value={formData.socialNetwork}
                             onChange={(e) => setFormData({ ...formData, socialNetwork: e.target.value as SocialNetwork })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-primary"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                             required
                         >
                             <option value="">{t("posts.placeholders.selectNetwork")}</option>
@@ -289,7 +289,7 @@ export default function ExamplePostsTab() {
                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                             placeholder={t("posts.placeholders.content")}
                             rows={6}
-                            className="w-full px-4 py-3 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none font-mono text-sm"
+                            className="w-full px-4 py-3 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none font-mono text-sm"
                             required
                         />
                         <p className="text-xs text-text-light mt-1">
@@ -317,7 +317,7 @@ export default function ExamplePostsTab() {
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             placeholder={t("posts.placeholders.notes")}
                             rows={2}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
+                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                         />
                     </div>
 
@@ -332,7 +332,7 @@ export default function ExamplePostsTab() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {submitting ? t("common.saving") : editingPost ? t("common.update") : t("posts.addPost")}
                         </button>
@@ -356,13 +356,13 @@ function PostCard({
         <div className="bg-surface rounded-xl border border-border-light p-5 space-y-4">
             {/* Header */}
             <div className="flex items-start justify-between">
-                <span className="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                <span className="px-2 py-1 bg-primary/20 text-accent rounded text-xs font-medium">
                     {SOCIAL_NETWORK_LABELS[post.socialNetwork]}
                 </span>
                 <div className="flex gap-1">
                     <button
                         onClick={() => onEdit(post)}
-                        className="p-1.5 text-text-light hover:text-primary transition-colors"
+                        className="p-1.5 text-text-light hover:text-accent transition-colors"
                     >
                         <EditIcon className="w-4 h-4" />
                     </button>
@@ -386,7 +386,7 @@ function PostCard({
                     {post.hashtags.map((tag, index) => (
                         <span
                             key={index}
-                            className="text-primary text-sm"
+                            className="text-accent text-sm"
                         >
                             #{tag}
                         </span>
