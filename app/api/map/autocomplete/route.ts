@@ -6,10 +6,18 @@ import {Locale} from "@/i18n/types";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {tokenizeAndNormalize} from "@/utils/StringUtils";
 import {EnrichedVenue} from "@/models/Overpass";
+import slugify from 'slugify';
 
 function matchesQuery(labelTokens: string[], query: string): boolean {
     const queryTokens = tokenizeAndNormalize(query);
     return queryTokens.every(q => labelTokens.some(l => l.includes(q)));
+}
+
+// Generate a slug for a venue if it doesn't have one
+function getVenueSlug(venue: EnrichedVenue): string {
+    if (venue.slug) return venue.slug;
+    const name = venue.tags?.name || venue.tags?.['name:en'] || `venue-${venue.id}`;
+    return slugify(name, { lower: true, strict: true });
 }
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -45,13 +53,21 @@ export async function GET(req: NextRequest) {
     for (const [index, labelTokens] of Object.entries(venueSearchIndex)) {
         const v: EnrichedVenue = venues[Number(index)]
         if (matchesQuery(labelTokens, query)) {
+            // Ensure venue has a slug
+            const venueWithSlug = {
+                ...v,
+                slug: getVenueSlug(v)
+            };
+            const countryName = getLocalizedCountryName(locale, v.country) || v.country;
+
             const result: AutocompleteResult = {
                 resultType: 'venue',
                 label: v.tags.name,
                 latitude: v.lat,
                 longitude: v.lon,
-                venue: v,
+                venue: venueWithSlug,
                 city: v.city,
+                country: countryName,
                 distance: hasCoords ? getDistanceKm(lat, lon, v.lat, v.lon) : undefined
             };
 
@@ -93,6 +109,8 @@ export async function GET(req: NextRequest) {
                     label: fullLabel,
                     latitude: place.latitude,
                     longitude: place.longitude,
+                    city: resultType === 'city' ? place.label : undefined,
+                    country: countryLabel,
                     distance: hasCoords ? getDistanceKm(lat, lon, place.latitude, place.longitude) : undefined
                 });
             }

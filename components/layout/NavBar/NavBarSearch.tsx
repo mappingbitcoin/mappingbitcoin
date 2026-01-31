@@ -141,19 +141,24 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
         onClose?.();
 
         // Navigate based on result type
-        if (result.resultType === "venue" && result.venue?.slug) {
+        if (result.resultType === "venue") {
             // Navigate to venue detail page
-            router.push(`/places/${result.venue.slug}`);
-        } else if (result.resultType === "city" && result.city && result.country) {
+            if (result.venue?.slug) {
+                router.push(`/places/${result.venue.slug}`);
+            } else {
+                // Fallback to map if no slug
+                router.push(`/map?lat=${result.latitude}&lon=${result.longitude}&zoom=15`);
+            }
+        } else if (result.resultType === "city") {
             // Navigate to city listing page
-            const citySlug = getLocalizedCitySlug(result.country, result.city);
+            const citySlug = getLocalizedCitySlug(result.country || "", result.city || "");
             router.push(`/${citySlug}`);
-        } else if (result.resultType === "country" && result.country) {
+        } else if (result.resultType === "country") {
             // Navigate to country listing page
-            const countrySlug = getLocalizedCountrySlug(result.country);
+            const countrySlug = getLocalizedCountrySlug(result.country || "");
             router.push(`/${countrySlug}`);
         } else {
-            // Fallback to map for states or missing data
+            // Fallback to map for states
             const zoom = result.resultType === "state" ? 8 : 12;
             router.push(`/map?lat=${result.latitude}&lon=${result.longitude}&zoom=${zoom}`);
         }
