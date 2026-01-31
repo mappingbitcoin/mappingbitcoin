@@ -15,6 +15,7 @@ import {
 } from "@/utils/OsmHelpers";
 import {TileCluster} from "@/models/TileCluster";
 import { serverEnv } from "@/lib/Environment";
+import { announceNewVenue } from "@/lib/nostr/bot";
 
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(String(req.url));
@@ -152,10 +153,25 @@ export async function POST(req: Request) {
     try {
         const xml = buildOsmChangeXML(venue.lat, venue.lon, tags);
         const changesetId = await openOsmChangeset(token);
-        await uploadOsmNode(changesetId, xml, token);
+        const diffResult = await uploadOsmNode(changesetId, xml, token);
         await closeOsmChangeset(changesetId, token);
 
-        return NextResponse.json({ ok: true, changesetId });
+        // Parse node ID from OSM diff result (format: <node old_id="-1" new_id="12345" .../>)
+        const nodeIdMatch = diffResult.match(/new_id="(\d+)"/);
+        const nodeId = nodeIdMatch ? nodeIdMatch[1] : null;
+
+        // Announce new venue on Nostr (non-blocking)
+        if (nodeId) {
+            announceNewVenue({
+                osmId: `node:${nodeId}`,
+                name: venue.name || "New venue",
+                city: venue.city,
+                country: venue.country,
+                category: venue.category,
+            }).catch((err) => console.error("[NostrBot] Announcement failed:", err));
+        }
+
+        return NextResponse.json({ ok: true, changesetId, nodeId });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         return NextResponse.json({ error: "Failed to upload to OSM: " + err.message }, { status: 500 });

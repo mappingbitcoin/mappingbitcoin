@@ -126,6 +126,14 @@ export const serverEnv = {
         return process.env.INITIAL_ADMIN_PUBKEY;
     },
 
+    /**
+     * Mapping Bitcoin Bot private key for posting Nostr events
+     * Used for automated announcements (new venues, verifications)
+     */
+    get nostrBotPrivateKey(): string | undefined {
+        return process.env.MAPPING_BITCOIN_BOT_PRIVATE_KEY;
+    },
+
     // -------------------------------------------------------------------------
     // OpenStreetMap OAuth Configuration
     // -------------------------------------------------------------------------

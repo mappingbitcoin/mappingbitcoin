@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import dns from "dns/promises";
 import { createVerificationCodeEmail } from "@/lib/email/templates";
 import { serverEnv } from "@/lib/Environment";
+import { announceVerification } from "@/lib/nostr/bot";
 
 const VERIFICATION_CODE_EXPIRY_MINUTES = 15;
 const MAX_VERIFICATION_ATTEMPTS = 5;
@@ -157,7 +158,7 @@ export async function verifyEmailCode(
     // Verification successful - update claim
     const emailHash = await hashEmail(email);
 
-    await prisma.claim.update({
+    const updatedClaim = await prisma.claim.update({
         where: { id: claimId },
         data: {
             status: "VERIFIED",
@@ -165,7 +166,23 @@ export async function verifyEmailCode(
             verifiedEmailHash: emailHash,
             verificationCode: null, // Clear the code
         },
+        include: {
+            venue: true,
+        },
     });
+
+    // Announce verification on Nostr (non-blocking)
+    announceVerification(
+        {
+            osmId: updatedClaim.venue.osmId,
+            name: "Verified Merchant", // Name will be fetched from cache if needed
+        },
+        {
+            method: "EMAIL",
+            detail: email,
+            ownerPubkey: updatedClaim.claimerPubkey,
+        }
+    ).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
 
     return { success: true };
 }
@@ -452,13 +469,30 @@ export async function checkDomainVerification(
 
         if (found) {
             // Verification successful
-            await prisma.claim.update({
+            const updatedClaim = await prisma.claim.update({
                 where: { id: claimId },
                 data: {
                     status: "VERIFIED",
                     verifiedAt: new Date(),
                 },
+                include: {
+                    venue: true,
+                },
             });
+
+            // Announce verification on Nostr (non-blocking)
+            announceVerification(
+                {
+                    osmId: updatedClaim.venue.osmId,
+                    name: "Verified Merchant", // Name will be fetched from cache if needed
+                },
+                {
+                    method: "DOMAIN",
+                    detail: claim.domainToVerify || undefined,
+                    ownerPubkey: updatedClaim.claimerPubkey,
+                }
+            ).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
+
             return { success: true, verified: true };
         }
 
