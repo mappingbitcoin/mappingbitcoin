@@ -126,7 +126,7 @@ const HomePage = async ({ params }: Localized) => {
                         "@id": "https://mappingbitcoin.com/#website",
                         "name": "MappingBitcoin.com",
                         "url": "https://mappingbitcoin.com/",
-                        "description": "Discover Bitcoin-accepting merchants worldwide. Interactive map with 24,000+ venues across 150+ countries.",
+                        "description": `Discover Bitcoin-accepting merchants worldwide. Interactive map with ${stats.totalVenues.toLocaleString()}+ venues across ${stats.countries}+ countries.`,
                         "publisher": {
                             "@id": "https://mappingbitcoin.com/#organization"
                         },
@@ -134,11 +134,75 @@ const HomePage = async ({ params }: Localized) => {
                             "@type": "SearchAction",
                             "target": {
                                 "@type": "EntryPoint",
-                                "urlTemplate": "https://mappingbitcoin.com/map?search={search_term_string}"
+                                "urlTemplate": "https://mappingbitcoin.com/map?q={search_term_string}"
                             },
-                            "query-input": "required name=search_term_string"
+                            "query-input": "required name=search_term_string",
+                            "description": "Search for Bitcoin-accepting venues, cities, or countries"
                         },
                         "inLanguage": ["en", "es"]
+                    })
+                }}
+            />
+            <Script
+                id="search-results-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "ItemList",
+                        "name": "Bitcoin Merchant Search Examples",
+                        "description": "Examples of searchable content on MappingBitcoin",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Search by Venue Name",
+                                "description": "Find specific Bitcoin-accepting businesses by name",
+                                "url": "https://mappingbitcoin.com/places/",
+                                "item": {
+                                    "@type": "LocalBusiness",
+                                    "name": "Bitcoin-accepting venues",
+                                    "description": "Restaurants, cafes, shops, hotels and more accepting Bitcoin payments"
+                                }
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Search by City",
+                                "description": "Browse all Bitcoin merchants in a specific city",
+                                "url": "https://mappingbitcoin.com/bitcoin-shops-in-rome-italy",
+                                "item": {
+                                    "@type": "City",
+                                    "name": "Cities with Bitcoin merchants",
+                                    "description": "Find Bitcoin-accepting businesses grouped by city"
+                                }
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 3,
+                                "name": "Search by Country",
+                                "description": "Explore all Bitcoin merchants in a country",
+                                "url": "https://mappingbitcoin.com/bitcoin-shops-in-italy",
+                                "item": {
+                                    "@type": "Country",
+                                    "name": "Countries with Bitcoin merchants",
+                                    "description": "Browse Bitcoin-accepting businesses by country"
+                                }
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 4,
+                                "name": "Search by Category",
+                                "description": "Find Bitcoin merchants by business type",
+                                "url": "https://mappingbitcoin.com/bitcoin-restaurants-in-italy",
+                                "item": {
+                                    "@type": "Thing",
+                                    "name": "Business categories",
+                                    "description": "Restaurants, cafes, hotels, shops, ATMs and more"
+                                }
+                            }
+                        ],
+                        "numberOfItems": 4
                     })
                 }}
             />
