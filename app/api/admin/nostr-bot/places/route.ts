@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/middleware/adminAuth";
 import { getVenueCache, getVenueSearchIndexMap } from "@/app/api/cache/VenueCache";
 import { getActiveVerifiedClaimByOsmId } from "@/lib/db/services/claims";
 import { tokenizeAndNormalize } from "@/utils/StringUtils";
+import { getLocalizedCountryName } from "@/utils/CountryUtils";
 import { EnrichedVenue } from "@/models/Overpass";
 import prisma from "@/lib/db/prisma";
 
@@ -13,6 +14,7 @@ export interface PlaceSearchResult {
     city: string;
     state?: string;
     country: string;
+    countryCode: string;
     category?: string;
     subcategory?: string;
     slug?: string;
@@ -22,6 +24,16 @@ export interface PlaceSearchResult {
     verificationMethod?: string;
     verifierPubkey?: string;
     creatorPubkey?: string;
+}
+
+/**
+ * Get full country name from country code
+ */
+function getCountryName(countryCode: string): string {
+    if (!countryCode) return "Unknown";
+    // Try to get localized name, fallback to code
+    const name = getLocalizedCountryName("en", countryCode.toUpperCase());
+    return name || countryCode;
 }
 
 /**
@@ -41,6 +53,81 @@ export async function GET(request: NextRequest) {
         const venues = await getVenueCache();
         const searchIndex = await getVenueSearchIndexMap();
 
+        // Create venue lookup map for quick access
+        const venueMap = new Map<string, EnrichedVenue>();
+        venues.forEach((v) => venueMap.set(String(v.id), v));
+
+        // For verified filter, start by getting all verified claims first
+        if (filter === "verified") {
+            // Get all verified claims
+            const verifiedClaims = await prisma.claim.findMany({
+                where: {
+                    status: "VERIFIED",
+                    revokedAt: null,
+                },
+                include: {
+                    venue: true,
+                    claimer: true,
+                },
+                orderBy: {
+                    verifiedAt: "desc",
+                },
+                take: 100, // Get more to filter by query
+            });
+
+            let placesWithVerification: PlaceSearchResult[] = [];
+
+            for (const claim of verifiedClaims) {
+                const venue = venueMap.get(claim.venue.osmId);
+                if (!venue) continue;
+
+                // If there's a query, check if it matches
+                if (query.length >= 2) {
+                    const queryTokens = tokenizeAndNormalize(query);
+                    const venueIndex = venues.indexOf(venue);
+                    const tokens = searchIndex[venueIndex];
+                    if (!tokens) continue;
+
+                    let matchCount = 0;
+                    for (const qToken of queryTokens) {
+                        for (const token of tokens) {
+                            if (token.includes(qToken)) {
+                                matchCount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (matchCount === 0) continue;
+                }
+
+                placesWithVerification.push({
+                    id: venue.id,
+                    osmId: String(venue.id),
+                    name: venue.tags?.name || "Unknown",
+                    city: venue.city,
+                    state: venue.state,
+                    country: getCountryName(venue.country),
+                    countryCode: venue.country,
+                    category: venue.category,
+                    subcategory: venue.subcategory,
+                    slug: venue.slug,
+                    lat: venue.lat,
+                    lon: venue.lon,
+                    isVerified: true,
+                    verificationMethod: claim.method,
+                    verifierPubkey: claim.claimerPubkey,
+                });
+
+                if (placesWithVerification.length >= limit) break;
+            }
+
+            return NextResponse.json({
+                places: placesWithVerification,
+                total: placesWithVerification.length,
+            });
+        }
+
+        // For all/unverified filter, use the original search logic
         let results: EnrichedVenue[] = [];
 
         if (query.length >= 2) {
@@ -73,10 +160,10 @@ export async function GET(request: NextRequest) {
 
             // Sort by score and take top results
             scored.sort((a, b) => b.score - a.score);
-            results = scored.slice(0, limit * 2).map((s) => s.venue);
+            results = scored.slice(0, limit * 3).map((s) => s.venue);
         } else {
-            // No query - return recent venues (by timestamp if available)
-            results = venues.slice(0, limit * 2);
+            // No query - return recent venues
+            results = venues.slice(0, limit * 3);
         }
 
         // Fetch verification status for all matching venues
@@ -108,9 +195,8 @@ export async function GET(request: NextRequest) {
         const placesWithVerification: PlaceSearchResult[] = results
             .filter((venue) => {
                 const isVerified = claimMap.has(String(venue.id));
-                if (filter === "verified") return isVerified;
                 if (filter === "unverified") return !isVerified;
-                return true;
+                return true; // "all" shows everything
             })
             .slice(0, limit)
             .map((venue) => {
@@ -121,7 +207,8 @@ export async function GET(request: NextRequest) {
                     name: venue.tags?.name || "Unknown",
                     city: venue.city,
                     state: venue.state,
-                    country: venue.country,
+                    country: getCountryName(venue.country),
+                    countryCode: venue.country,
                     category: venue.category,
                     subcategory: venue.subcategory,
                     slug: venue.slug,
@@ -183,7 +270,8 @@ export async function POST(request: NextRequest) {
             name: venue.tags?.name || "Unknown",
             city: venue.city,
             state: venue.state,
-            country: venue.country,
+            country: getCountryName(venue.country),
+            countryCode: venue.country,
             category: venue.category,
             subcategory: venue.subcategory,
             slug: venue.slug,

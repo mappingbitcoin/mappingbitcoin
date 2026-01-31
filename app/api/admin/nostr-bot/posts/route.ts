@@ -389,7 +389,8 @@ export interface PlacePostData {
     name: string;
     city?: string;
     state?: string;
-    country?: string;
+    country?: string;      // Full country name for post content
+    countryCode?: string;  // ISO code for hashtags
     category?: string;
     slug?: string;
     isVerified: boolean;
@@ -524,9 +525,9 @@ export async function POST(request: NextRequest) {
                 tags.push(["p", placeData.creatorPubkey]);
             }
 
-            // Add country tag if available
-            if (placeData.country) {
-                hashtags.push(placeData.country.toLowerCase().replace(/\s+/g, ""));
+            // Add country tag if available (use ISO code for hashtags)
+            if (placeData.countryCode) {
+                hashtags.push(placeData.countryCode.toLowerCase());
             }
 
             // Add category tag if available

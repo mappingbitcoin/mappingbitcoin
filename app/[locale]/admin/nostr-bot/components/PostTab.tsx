@@ -14,7 +14,8 @@ interface PlaceSearchResult {
     name: string;
     city: string;
     state?: string;
-    country: string;
+    country: string;      // Full country name (e.g., "United States")
+    countryCode: string;  // ISO code (e.g., "US")
     category?: string;
     subcategory?: string;
     slug?: string;
@@ -149,8 +150,9 @@ export default function PostTab() {
         if (place.isVerified && postType === "verified") {
             defaultHashtags.push("verified");
         }
-        if (place.country) {
-            defaultHashtags.push(place.country.toLowerCase().replace(/\s+/g, ""));
+        // Use countryCode for hashtag (short form like "us", "de")
+        if (place.countryCode) {
+            defaultHashtags.push(place.countryCode.toLowerCase());
         }
         setHashtags(defaultHashtags);
     };
@@ -593,9 +595,9 @@ export default function PostTab() {
                                 {postType === "verified" && (
                                     <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">#verified</span>
                                 )}
-                                {selectedPlace.country && (
+                                {selectedPlace.countryCode && (
                                     <span className="px-2 py-1 bg-accent/20 text-accent text-xs rounded">
-                                        #{selectedPlace.country.toLowerCase().replace(/\s+/g, "")}
+                                        #{selectedPlace.countryCode.toLowerCase()}
                                     </span>
                                 )}
                                 {selectedPlace.verifierPubkey && postType === "verified" && (
