@@ -28,6 +28,8 @@ import {loadClustersFromCache, updateClusterCache} from "@/utils/ClusterCacheHel
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import MapFAQ from "@/app/[locale]/map/MapFAQ";
 import { SunIcon, MoonIcon } from "@/assets/icons/ui";
+import { useRouter } from "@/i18n/navigation";
+import { getLocalizedCountrySlug, getLocalizedCitySlug } from "@/utils/SlugUtils";
 
 function tile2lon(x: number, z: number) {
     return (x / 2 ** z) * 360 - 180;
@@ -89,6 +91,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
     const t = useTranslations('map')
     const locale = useLocale() as Locale
+    const router = useRouter();
     const categorySelectorRef = useRef(null);
     const categoryDropdownRef = useRef(null);
     const attributionControlRef = useRef<AttributionControl | null>(null);
@@ -828,19 +831,25 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                                 }} className="absolute top-0 right-2 h-10 flex items-center justify-center text-xl border-none bg-transparent cursor-pointer text-text-light hover:text-text transition-colors">×</button>}
                             </div>
                             {query?.length > 1 && autocompleteResults.length > 0 && (
-                                <div className="autocomplete absolute top-full left-0 z-20 bg-surface text-text w-full max-h-[calc(100vh-17rem)] max-md:max-h-[20vh] max-md:h-[35vh] overflow-y-auto border border-border-light rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.3)] max-md:-mt-10">
+                                <div className="autocomplete absolute top-full left-0 z-20 bg-surface text-text w-full min-w-[300px] md:min-w-[400px] max-h-[60vh] md:max-h-[50vh] overflow-y-auto border border-border-light rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.4)] mt-1">
                                     {autocompleteResults
                                         .filter(r => r.resultType === 'venue')
                                         .map((res, idx) => {
                                             return (
                                                 <div
                                                     key={`venue-${idx}`}
-                                                    className="py-2 px-3 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
+                                                    className="py-3 px-4 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
                                                     onClick={() => {
-                                                        if (!res.venue) return
-                                                        setSelectedVenue(res.venue);
-                                                        updateQueryWithoutSearch(res.venue?.tags.name)
-                                                        easeTo(res.longitude, res.latitude, 15);
+                                                        if (!res.venue) return;
+                                                        // Navigate to venue detail page
+                                                        if (res.venue.slug) {
+                                                            router.push(`/places/${res.venue.slug}`);
+                                                        } else {
+                                                            // Fallback: show on map
+                                                            setSelectedVenue(res.venue);
+                                                            updateQueryWithoutSearch(res.venue?.tags.name);
+                                                            easeTo(res.longitude, res.latitude, 15);
+                                                        }
                                                     }}
                                                 >
                                                     📍 {res.label}<span> - {getFormattedAddress(locale, res.venue!)}
@@ -855,12 +864,22 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                                         .map((res, idx) => (
                                             <div
                                                 key={`place-${idx}`}
-                                                className="py-2 px-3 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
+                                                className="py-3 px-4 text-sm cursor-pointer border-b border-border-light hover:bg-surface-light [&_span]:text-text-light"
                                                 onClick={() => {
-                                                    easeTo(res.longitude, res.latitude, res.resultType === 'country' ? 6 : 10);
-                                                    setQuery('');
-                                                    setSelectedVenue(null);
-                                                    setAutocompleteResults([]);
+                                                    // Navigate to location listing page
+                                                    if (res.resultType === 'city' && res.city && res.country) {
+                                                        const citySlug = getLocalizedCitySlug(res.country, res.city);
+                                                        router.push(`/${citySlug}`);
+                                                    } else if (res.resultType === 'country' && res.country) {
+                                                        const countrySlug = getLocalizedCountrySlug(res.country);
+                                                        router.push(`/${countrySlug}`);
+                                                    } else {
+                                                        // Fallback for states: show on map
+                                                        easeTo(res.longitude, res.latitude, res.resultType === 'country' ? 6 : 10);
+                                                        setQuery('');
+                                                        setSelectedVenue(null);
+                                                        setAutocompleteResults([]);
+                                                    }
                                                 }}
                                             >
                                                 🏙️ {res.label} ({res.resultType})
