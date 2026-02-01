@@ -96,7 +96,7 @@ export default function MyComponent() {
         <div>
             <h1>{t("title")}</h1>
             <p>{t("description")}</p>
-            <button>{t("buttons.submit")}</button>
+            <Button>{t("buttons.submit")}</Button>
         </div>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
@@ -53,14 +54,16 @@ export default function Pagination({
             {totalPages > 1 ? (
                 <div className="flex items-center gap-1 md:gap-2">
                     {/* Previous Button */}
-                    <button
+                    <Button
                         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-1.5 flex items-center justify-center rounded-btn text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-surface border border-border-light text-white hover:bg-surface-light cursor-pointer"
+                        variant="ghost"
+                        color="neutral"
+                        size="sm"
+                        leftIcon={<ChevronLeftIcon className="w-4 h-4 md:hidden" />}
                     >
-                        <ChevronLeftIcon className="w-4 h-4 md:hidden" />
                         <span className="hidden md:inline">{t("countries.pagination.previous")}</span>
-                    </button>
+                    </Button>
 
                     {/* Page Numbers */}
                     <div className="flex items-center gap-1">
@@ -92,14 +95,16 @@ export default function Pagination({
                     </div>
 
                     {/* Next Button */}
-                    <button
+                    <Button
                         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-1.5 flex items-center justify-center rounded-btn text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-surface border border-border-light text-white hover:bg-surface-light cursor-pointer"
+                        variant="ghost"
+                        color="neutral"
+                        size="sm"
+                        rightIcon={<ChevronRightIcon className="w-4 h-4 md:hidden" />}
                     >
-                        <ChevronRightIcon className="w-4 h-4 md:hidden" />
                         <span className="hidden md:inline">{t("countries.pagination.next")}</span>
-                    </button>
+                    </Button>
                 </div>
             ) : (
                 <div />

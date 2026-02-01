@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button, { IconButton } from "@/components/ui/Button";
 import TagInput from "./TagInput";
 import type { ExamplePost, SocialNetwork } from "../types";
 import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
@@ -207,12 +208,9 @@ export default function ExamplePostsTab() {
                         ))}
                     </select>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openCreateModal}>
                     {t("posts.addButton")}
-                </button>
+                </Button>
             </div>
 
             {/* Posts by Network */}
@@ -322,20 +320,21 @@ export default function ExamplePostsTab() {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
                         >
                             {submitting ? t("common.saving") : editingPost ? t("common.update") : t("posts.addPost")}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>
@@ -360,18 +359,22 @@ function PostCard({
                     {SOCIAL_NETWORK_LABELS[post.socialNetwork]}
                 </span>
                 <div className="flex gap-1">
-                    <button
+                    <IconButton
                         onClick={() => onEdit(post)}
-                        className="p-1.5 text-text-light hover:text-accent transition-colors"
-                    >
-                        <EditIcon className="w-4 h-4" />
-                    </button>
-                    <button
+                        icon={<EditIcon className="w-4 h-4" />}
+                        aria-label="Edit"
+                        variant="ghost"
+                        color="accent"
+                        size="sm"
+                    />
+                    <IconButton
                         onClick={() => onDelete(post)}
-                        className="p-1.5 text-text-light hover:text-red-400 transition-colors"
-                    >
-                        <TrashIcon className="w-4 h-4" />
-                    </button>
+                        icon={<TrashIcon className="w-4 h-4" />}
+                        aria-label="Delete"
+                        variant="ghost"
+                        color="danger"
+                        size="sm"
+                    />
                 </div>
             </div>
 

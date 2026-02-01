@@ -13,6 +13,7 @@ import {
     CheckmarkIcon,
 } from "@/assets/icons/ui";
 import { EmailIcon, WebsiteIcon } from "@/assets/icons/contact";
+import Button, { IconButton } from "@/components/ui/Button";
 
 interface VerificationStepProps {
     venue: EnrichedVenue;
@@ -305,23 +306,15 @@ export default function VerificationStep({
                     </div>
                 )}
 
-                <button
+                <Button
                     onClick={handleInitiateEmailVerification}
                     disabled={isLoading}
-                    className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    loading={isLoading}
+                    fullWidth
+                    leftIcon={!isLoading ? <EmailIcon className="w-5 h-5" /> : undefined}
                 >
-                    {isLoading ? (
-                        <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Sending...
-                        </>
-                    ) : (
-                        <>
-                            <EmailIcon className="w-5 h-5" />
-                            Send Verification Code
-                        </>
-                    )}
-                </button>
+                    {isLoading ? "Sending..." : "Send Verification Code"}
+                </Button>
             </motion.div>
         );
     }
@@ -351,30 +344,26 @@ export default function VerificationStep({
                         className="w-full p-4 bg-surface-light border border-border-light rounded-lg text-white text-center text-2xl font-mono tracking-widest placeholder-text-light/50 focus:outline-none focus:border-accent"
                     />
 
-                    <button
+                    <Button
                         onClick={handleVerifyEmailCode}
                         disabled={isLoading || verificationCode.length !== 6}
-                        className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        loading={isLoading}
+                        fullWidth
                     >
-                        {isLoading ? (
-                            <>
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                Verifying...
-                            </>
-                        ) : (
-                            "Verify Code"
-                        )}
-                    </button>
+                        {isLoading ? "Verifying..." : "Verify Code"}
+                    </Button>
                 </div>
 
                 <div className="text-center">
-                    <button
+                    <Button
                         onClick={handleResendCode}
                         disabled={resendCooldown > 0 || isLoading}
-                        className="text-sm text-accent hover:text-accent-dark disabled:text-text-light disabled:cursor-not-allowed transition-colors"
+                        variant="ghost"
+                        color="accent"
+                        size="sm"
                     >
                         {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
-                    </button>
+                    </Button>
                 </div>
 
                 <p className="text-xs text-text-light text-center">
@@ -416,23 +405,15 @@ export default function VerificationStep({
                     <p className="text-accent font-mono text-lg">{selectedDomain}</p>
                 </div>
 
-                <button
+                <Button
                     onClick={handleInitiateDomainVerification}
                     disabled={isLoading}
-                    className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    loading={isLoading}
+                    fullWidth
+                    leftIcon={!isLoading ? <WebsiteIcon className="w-5 h-5" /> : undefined}
                 >
-                    {isLoading ? (
-                        <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            <WebsiteIcon className="w-5 h-5" />
-                            Generate TXT Record
-                        </>
-                    )}
-                </button>
+                    {isLoading ? "Generating..." : "Generate TXT Record"}
+                </Button>
             </motion.div>
         );
     }
@@ -485,28 +466,20 @@ export default function VerificationStep({
                     </p>
                 </div>
 
-                <button
+                <Button
                     onClick={handleCheckDomain}
                     disabled={isLoading || checkCooldown > 0}
-                    className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    loading={isLoading}
+                    fullWidth
+                    leftIcon={checkCooldown > 0 ? <ClockIcon className="w-5 h-5" /> : <RefreshIcon className="w-5 h-5" />}
                 >
-                    {isLoading ? (
-                        <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Checking...
-                        </>
-                    ) : checkCooldown > 0 ? (
-                        <>
-                            <ClockIcon className="w-5 h-5" />
-                            Wait {checkCooldown}s
-                        </>
-                    ) : (
-                        <>
-                            <RefreshIcon className="w-5 h-5" />
-                            Check TXT Record
-                        </>
-                    )}
-                </button>
+                    {isLoading
+                        ? "Checking..."
+                        : checkCooldown > 0
+                            ? `Wait ${checkCooldown}s`
+                            : "Check TXT Record"
+                    }
+                </Button>
 
                 <p className="text-xs text-text-light text-center">
                     You can also check later from the &quot;My Verifications&quot; page in your profile menu.
@@ -541,12 +514,9 @@ export default function VerificationStep({
                     </p>
                 </div>
 
-                <button
-                    onClick={onSuccess}
-                    className="w-full py-3 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors"
-                >
+                <Button onClick={onSuccess} fullWidth>
                     Done
-                </button>
+                </Button>
             </motion.div>
         );
     }

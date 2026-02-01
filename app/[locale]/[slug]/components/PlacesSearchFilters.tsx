@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useEffect, useState, useMemo, ComponentType } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
 import { PAYMENT_METHODS } from "@/constants/PaymentMethods";
+import { PaymentIcon } from "@/constants/PaymentIcons";
 import { PlaceSubcategory, matchPlaceSubcategory, getSubcategoryLabel } from "@/constants/PlaceCategories";
 import { getLocalizedCountryCategorySlug } from "@/utils/SlugUtils";
-import { IconProps } from "@/assets/icons";
 import {
     SearchIcon,
     CloseIcon,
@@ -17,28 +17,8 @@ import {
     ChevronRightIcon,
     ExternalLinkIcon,
 } from "@/assets/icons/ui";
-import {
-    LightningIcon,
-    LightningContactlessIcon,
-    OnchainIcon,
-    CardIcon,
-    ContactlessIcon,
-} from "@/assets/icons/payment";
-
-const PAYMENT_ICON_MAP: Record<string, ComponentType<IconProps>> = {
-    lightning: LightningIcon,
-    lightning_contactless: LightningContactlessIcon,
-    onchain: OnchainIcon,
-    debit_cards: CardIcon,
-    credit_cards: CardIcon,
-    contactless: ContactlessIcon,
-};
-
-const PaymentIcon = ({ type, className }: { type: string; className?: string }) => {
-    const IconComponent = PAYMENT_ICON_MAP[type];
-    if (!IconComponent) return null;
-    return <IconComponent className={className || "w-3.5 h-3.5"} />;
-};
+import Button, { IconButton } from "@/components/ui/Button";
+import AccordionButton from "@/components/ui/AccordionButton";
 
 interface VenueSearchFiltersProps {
     searchQuery: string;
@@ -163,26 +143,31 @@ export default function VenueSearchFilters({
                 />
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light w-4 h-4" />
                 {searchQuery && (
-                    <button
+                    <IconButton
                         onClick={() => onSearchChange("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-white transition-colors cursor-pointer"
-                    >
-                        <CloseIcon className="w-4 h-4" />
-                    </button>
+                        icon={<CloseIcon className="w-4 h-4" />}
+                        aria-label="Clear search"
+                        variant="ghost"
+                        color="neutral"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2"
+                    />
                 )}
             </div>
 
             {/* Mobile: Filters Icon Button */}
-            <button
-                onClick={onOpenFiltersModal}
-                className="md:hidden relative flex items-center justify-center w-[38px] h-[38px] bg-surface border border-border-light rounded-btn text-white hover:border-accent/50 hover:bg-surface-light transition-all cursor-pointer"
-                title={t("countries.filters.label")}
-            >
-                <FilterIcon className="w-4 h-4" />
+            <div className="md:hidden relative">
+                <IconButton
+                    onClick={onOpenFiltersModal}
+                    icon={<FilterIcon className="w-4 h-4" />}
+                    aria-label={t("countries.filters.label")}
+                    variant="outline"
+                    color="neutral"
+                />
                 {hasActiveFilters && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent rounded-full border-2 border-surface" />
                 )}
-            </button>
+            </div>
 
             {/* Mobile: Add Venue Icon Button */}
             <Link
@@ -213,14 +198,16 @@ export default function VenueSearchFilters({
                     {categoryDropdownOpen && (
                         <div className="absolute top-full left-0 mt-1 w-72 bg-surface border border-border-light rounded-card shadow-medium z-20 max-h-96 overflow-y-auto">
                             <div className="p-2 border-b border-border-light flex items-center justify-between">
-                                <button
+                                <Button
                                     onClick={() => onToggleAllCategories(availableSubcategories || [])}
-                                    className="text-xs text-accent hover:text-accent-dark transition-colors cursor-pointer"
+                                    variant="ghost"
+                                    color="accent"
+                                    size="xs"
                                 >
                                     {selectedCategories.size === (availableSubcategories?.length || 0)
                                         ? t("countries.filters.deselectAll")
                                         : t("countries.filters.selectAll")}
-                                </button>
+                                </Button>
                             </div>
                             <div className="p-1">
                                 {Object.entries(groupedCategories).map(([parentCategory, subcategories]) => {
@@ -230,26 +217,29 @@ export default function VenueSearchFilters({
 
                                     return (
                                         <div key={parentCategory} className="mb-1">
-                                            <button
+                                            <AccordionButton
+                                                expanded={isExpanded}
+                                                expandIcon={<ChevronRightIcon className="w-3 h-3" />}
                                                 onClick={() => toggleCategorySection(parentCategory)}
-                                                className="w-full flex items-center justify-between gap-2 py-2 px-2 hover:bg-primary-light rounded cursor-pointer"
+                                                className="py-2 px-2 hover:bg-primary-light rounded"
                                             >
-                                                <div className="flex items-center gap-2">
-                                                    <ChevronRightIcon className={`w-3 h-3 text-text-light transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                                                <div className="flex items-center gap-2 flex-1">
                                                     <span className="text-sm font-medium text-white">{getCategoryDisplayName(parentCategory)}</span>
+                                                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${allSelectedInSection ? "bg-accent/10 text-accent" : "bg-primary-light text-text-light"}`}>
+                                                        {allSelectedInSection ? "All" : `${selectedInSection}/${subcategories.length}`}
+                                                    </span>
                                                 </div>
-                                                <span className={`text-xs px-1.5 py-0.5 rounded-full ${allSelectedInSection ? "bg-accent/10 text-accent" : "bg-primary-light text-text-light"}`}>
-                                                    {allSelectedInSection ? "All" : `${selectedInSection}/${subcategories.length}`}
-                                                </span>
-                                            </button>
+                                            </AccordionButton>
                                             {isExpanded && (
                                                 <div className="ml-3 pl-2 border-l border-border-light">
-                                                    <button
+                                                    <Button
                                                         onClick={() => toggleSectionCategories(subcategories)}
-                                                        className="text-xs text-accent hover:text-accent-dark py-1 px-2 cursor-pointer"
+                                                        variant="ghost"
+                                                        color="accent"
+                                                        size="xs"
                                                     >
                                                         {allSelectedInSection ? "Deselect all" : "Select all"}
-                                                    </button>
+                                                    </Button>
                                                     {subcategories.map(({ slugKey, subcategory, rawSubcategory }) => {
                                                         const isSelected = selectedCategories.has(rawSubcategory);
                                                         return (

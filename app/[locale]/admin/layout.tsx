@@ -24,6 +24,7 @@ import {
     MenuIcon,
 } from "@/assets/icons/ui";
 import { NostrIcon } from "@/assets/icons/social";
+import Button, { IconButton } from "@/components/ui/Button";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -78,6 +79,11 @@ const navSections: NavSection[] = [
                 href: "/admin/places",
                 label: "Places",
                 icon: <PinIcon className="w-5 h-5" />,
+            },
+            {
+                href: "/admin/users",
+                label: "Users",
+                icon: <UsersIcon className="w-5 h-5" />,
             },
             {
                 href: "/admin/reports",
@@ -194,13 +200,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     <p className="text-text-light mb-6">
                         {t("pleaseLogin")}
                     </p>
-                    <button
+                    <Button
                         onClick={handleShowLoginModal}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
+                        leftIcon={<LoginIcon className="w-5 h-5" />}
                     >
-                        <LoginIcon className="w-5 h-5" />
                         {t("signToContinue")}
-                    </button>
+                    </Button>
                     <p className="text-xs text-text-light mt-4">
                         <Link href="/" className="text-accent hover:text-accent-light">
                             {t("returnToSite")}
@@ -231,13 +236,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <p className="text-text-light mb-6">
                             {t("writeRequiredDescription")}
                         </p>
-                        <button
+                        <Button
                             onClick={handleShowLoginModal}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
+                            leftIcon={<LoginIcon className="w-5 h-5" />}
                         >
-                            <LoginIcon className="w-5 h-5" />
                             {t("loginWithWriteAccess")}
-                        </button>
+                        </Button>
                         <p className="text-xs text-text-light mt-4">
                             {t("currentlyReadOnly")} {user.pubkey.slice(0, 8)}...
                         </p>
@@ -273,13 +277,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 {authError}
                             </div>
                         )}
-                        <button
+                        <Button
                             onClick={handleAuthenticate}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
+                            leftIcon={<EditIcon className="w-5 h-5" />}
                         >
-                            <EditIcon className="w-5 h-5" />
                             {authError ? t("tryAgain") : t("signToContinue")}
-                        </button>
+                        </Button>
                         <p className="text-xs text-text-light mt-4">
                             {t("loggedInAs")} {user.pubkey.slice(0, 8)}...{user.pubkey.slice(-8)}
                         </p>
@@ -336,12 +339,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {/* Top Bar (mobile) */}
                 <header className="lg:hidden sticky top-0 z-30 bg-surface border-b border-border-light">
                     <div className="flex items-center justify-between h-16 px-4">
-                        <button
+                        <IconButton
                             onClick={handleSidebarOpen}
-                            className="text-text-light hover:text-white"
-                        >
-                            <MenuIcon className="w-6 h-6" />
-                        </button>
+                            icon={<MenuIcon className="w-6 h-6" />}
+                            aria-label="Open menu"
+                            variant="ghost"
+                            color="neutral"
+                        />
                         <span className="text-lg font-semibold text-white">Admin</span>
                         <div className="w-6" /> {/* Spacer for centering */}
                     </div>

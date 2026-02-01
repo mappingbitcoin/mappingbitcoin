@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
+import ToggleButton from "@/components/ui/ToggleButton";
 import AssetUploader from "./AssetUploader";
 import TagInput from "./TagInput";
 import type { MarketingAsset, SocialNetwork, PostType, ContentTopic } from "../types";
@@ -282,12 +284,9 @@ export default function AssetsTab() {
                     </select>
                 </div>
 
-                <button
-                    onClick={openUploadModal}
-                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openUploadModal}>
                     {t("assets.uploadButton")}
-                </button>
+                </Button>
             </div>
 
             {/* Assets Grid */}
@@ -337,18 +336,22 @@ export default function AssetsTab() {
 
                                 {/* Actions */}
                                 <div className="flex justify-end gap-2">
-                                    <button
+                                    <Button
                                         onClick={() => openEditModal(asset)}
-                                        className="px-3 py-1 text-sm text-accent hover:text-accent-light transition-colors"
+                                        variant="ghost"
+                                        color="accent"
+                                        size="xs"
                                     >
                                         {t("common.edit")}
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => handleDelete(asset)}
-                                        className="px-3 py-1 text-sm text-red-400 hover:text-red-300 transition-colors"
+                                        variant="ghost"
+                                        color="danger"
+                                        size="xs"
                                     >
                                         {t("common.delete")}
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -395,18 +398,13 @@ export default function AssetsTab() {
                                 <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
                                 <div className="flex flex-wrap gap-2">
                                     {SOCIAL_NETWORKS.map((network) => (
-                                        <button
+                                        <ToggleButton
                                             key={network}
-                                            type="button"
+                                            selected={assetFormData.socialNetworks.includes(network)}
                                             onClick={() => toggleArrayItem(assetFormData.socialNetworks, network, (items) => setAssetFormData({ ...assetFormData, socialNetworks: items }))}
-                                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                                assetFormData.socialNetworks.includes(network)
-                                                    ? "bg-blue-500/30 text-blue-400 border border-blue-500/50"
-                                                    : "bg-surface-light text-text-light border border-transparent hover:border-border-light"
-                                            }`}
                                         >
                                             {SOCIAL_NETWORK_LABELS[network]}
-                                        </button>
+                                        </ToggleButton>
                                     ))}
                                 </div>
                             </div>
@@ -416,18 +414,13 @@ export default function AssetsTab() {
                                 <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
                                 <div className="flex flex-wrap gap-2">
                                     {POST_TYPES.map((type) => (
-                                        <button
+                                        <ToggleButton
                                             key={type}
-                                            type="button"
+                                            selected={assetFormData.postTypes.includes(type)}
                                             onClick={() => toggleArrayItem(assetFormData.postTypes, type, (items) => setAssetFormData({ ...assetFormData, postTypes: items }))}
-                                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                                assetFormData.postTypes.includes(type)
-                                                    ? "bg-purple-500/30 text-purple-400 border border-purple-500/50"
-                                                    : "bg-surface-light text-text-light border border-transparent hover:border-border-light"
-                                            }`}
                                         >
                                             {POST_TYPE_LABELS[type]}
-                                        </button>
+                                        </ToggleButton>
                                     ))}
                                 </div>
                             </div>
@@ -472,20 +465,21 @@ export default function AssetsTab() {
                     )}
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={handleSaveAsset}
                             disabled={submitting || !uploadedFile}
-                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
                         >
                             {submitting ? t("common.saving") : t("assets.saveAsset")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </Modal>
@@ -521,18 +515,13 @@ export default function AssetsTab() {
                         <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
-                                <button
+                                <ToggleButton
                                     key={network}
-                                    type="button"
+                                    selected={assetFormData.socialNetworks.includes(network)}
                                     onClick={() => toggleArrayItem(assetFormData.socialNetworks, network, (items) => setAssetFormData({ ...assetFormData, socialNetworks: items }))}
-                                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                        assetFormData.socialNetworks.includes(network)
-                                            ? "bg-blue-500/30 text-blue-400 border border-blue-500/50"
-                                            : "bg-surface-light text-text-light border border-transparent hover:border-border-light"
-                                    }`}
                                 >
                                     {SOCIAL_NETWORK_LABELS[network]}
-                                </button>
+                                </ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -542,18 +531,13 @@ export default function AssetsTab() {
                         <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
                         <div className="flex flex-wrap gap-2">
                             {POST_TYPES.map((type) => (
-                                <button
+                                <ToggleButton
                                     key={type}
-                                    type="button"
+                                    selected={assetFormData.postTypes.includes(type)}
                                     onClick={() => toggleArrayItem(assetFormData.postTypes, type, (items) => setAssetFormData({ ...assetFormData, postTypes: items }))}
-                                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                        assetFormData.postTypes.includes(type)
-                                            ? "bg-purple-500/30 text-purple-400 border border-purple-500/50"
-                                            : "bg-surface-light text-text-light border border-transparent hover:border-border-light"
-                                    }`}
                                 >
                                     {POST_TYPE_LABELS[type]}
-                                </button>
+                                </ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -596,20 +580,21 @@ export default function AssetsTab() {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={handleSaveAsset}
                             disabled={submitting}
-                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
                         >
                             {submitting ? t("common.saving") : t("assets.saveChanges")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </Modal>

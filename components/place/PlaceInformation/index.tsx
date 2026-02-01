@@ -5,7 +5,7 @@ import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {useLocale} from "next-intl";
 import {Locale} from "@/i18n/types";
-import { CategoryChip, ButtonLink } from "@/components/ui";
+import { CategoryChip, Button, TabButton, TextLink } from "@/components/ui";
 import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import OpeningHoursDisplay from "../OpeningHoursDisplay";
 import Image from "next/image";
@@ -159,23 +159,22 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                     </div>
 
                     <div className="relative my-4 flex w-full">
-                        <ButtonLink href={googleMapLink} target="_blank" rel="noopener noreferrer">
-                            <PinIcon className="w-4 h-4 inline mr-1" />
+                        <Button href={googleMapLink} external variant="soft" color="accent" size="sm" leftIcon={<PinIcon />}>
                             {t("getDirections")}
-                        </ButtonLink>
+                        </Button>
                     </div>
                 </div>
 
                 <nav className="flex gap-0 mt-4 border-b border-border">
-                    <button onClick={() => setActiveTab("overview")}
-                            className={`text-sm flex-1 py-3 px-4 bg-transparent border-none cursor-pointer transition-all duration-200 ${activeTab === "overview" ? 'text-accent font-semibold border-b-2 border-accent -mb-px' : 'text-text-light hover:text-white'}`}>{t("tabs.overview")}
-                    </button>
-                    <button onClick={() => setActiveTab("reviews")}
-                            className={`text-sm flex-1 py-3 px-4 bg-transparent border-none cursor-pointer transition-all duration-200 ${activeTab === "reviews" ? 'text-accent font-semibold border-b-2 border-accent -mb-px' : 'text-text-light hover:text-white'}`}>{t("tabs.reviews")}
-                    </button>
-                    <button onClick={() => setActiveTab("about")}
-                            className={`text-sm flex-1 py-3 px-4 bg-transparent border-none cursor-pointer transition-all duration-200 ${activeTab === "about" ? 'text-accent font-semibold border-b-2 border-accent -mb-px' : 'text-text-light hover:text-white'}`}>{t("tabs.about")}
-                    </button>
+                    <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")}>
+                        {t("tabs.overview")}
+                    </TabButton>
+                    <TabButton active={activeTab === "reviews"} onClick={() => setActiveTab("reviews")}>
+                        {t("tabs.reviews")}
+                    </TabButton>
+                    <TabButton active={activeTab === "about"} onClick={() => setActiveTab("about")}>
+                        {t("tabs.about")}
+                    </TabButton>
                 </nav>
 
                 <div className="mt-4 text-text-light">
@@ -196,8 +195,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                             <GlobeIcon className="w-3.5 h-3.5 text-text-light" />
                                         </div>
                                         <p className="mt-0.5">
-                                            <a href={contact.website} target="_blank"
-                                               rel="noreferrer" className="text-accent hover:text-accent/80 underline break-all">{contact.website}</a>
+                                            <TextLink href={contact.website} external variant="accent" className="break-all">{contact.website}</TextLink>
                                         </p>
                                     </div>
                                 )}
@@ -208,8 +206,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                             <EmailIcon className="w-3.5 h-3.5 text-text-light" />
                                         </div>
                                         <p className="mt-0.5">
-                                            <a href={`mailto:${contact.email}`} target="_blank"
-                                               rel="noreferrer" className="text-accent hover:text-accent/80 underline">{contact.email}</a>
+                                            <TextLink href={`mailto:${contact.email}`} external variant="accent">{contact.email}</TextLink>
                                         </p>
                                     </div>
                                 )}
@@ -219,8 +216,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                             <PhoneIcon className="w-3.5 h-3.5 text-text-light" />
                                         </div>
                                         <p className="mt-0.5">
-                                            <a href={`tel:${contact.phone}`} target="_blank"
-                                               rel="noreferrer" className="text-accent hover:text-accent/80 underline">{contact.phone}</a>
+                                            <TextLink href={`tel:${contact.phone}`} external variant="accent">{contact.phone}</TextLink>
                                         </p>
                                     </div>
                                 )}
@@ -319,9 +315,9 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                             <div className="flex justify-start gap-3 items-start flex-col mt-4">
                                 <p className="text-text-light">
                                     <strong className="text-white">Uploaded in: </strong>
-                                    <a href="https://OpenStreetMap.org" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 underline">
+                                    <TextLink href="https://OpenStreetMap.org" external variant="accent">
                                         OpenStreetMap.org
-                                    </a>
+                                    </TextLink>
                                 </p>
                                 {source && <p className="text-text-light">
                                     <strong className="text-white">Uploaded at: </strong>

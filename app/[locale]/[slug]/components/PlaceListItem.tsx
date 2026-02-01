@@ -3,36 +3,15 @@
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
-import { ComponentType } from "react";
+import { useState } from "react";
 import { EnrichedVenue } from "@/models/Overpass";
 import { PAYMENT_METHODS } from "@/constants/PaymentMethods";
+import { PaymentIcon } from "@/constants/PaymentIcons";
 import { parseTags, formatOpeningHours } from "@/utils/OsmHelpers";
 import { getSubcategoryLabel } from "@/constants/PlaceCategories";
 import { getFormattedAddress } from "@/utils/AddressUtils";
-import { IconProps } from "@/assets/icons";
-import { StarIcon } from "@/assets/icons/ui";
-import {
-    LightningIcon,
-    LightningContactlessIcon,
-    OnchainIcon,
-    CardIcon,
-    ContactlessIcon,
-} from "@/assets/icons/payment";
-
-const PAYMENT_ICON_MAP: Record<string, ComponentType<IconProps>> = {
-    lightning: LightningIcon,
-    lightning_contactless: LightningContactlessIcon,
-    onchain: OnchainIcon,
-    debit_cards: CardIcon,
-    credit_cards: CardIcon,
-    contactless: ContactlessIcon,
-};
-
-const PaymentIcon = ({ type, className }: { type: string; className?: string }) => {
-    const IconComponent = PAYMENT_ICON_MAP[type];
-    if (!IconComponent) return null;
-    return <IconComponent className={className || "w-3.5 h-3.5"} />;
-};
+import { StarIcon, ClockIcon, GlobeIcon, DocumentIcon } from "@/assets/icons/ui";
+import { PhoneIcon } from "@/assets/icons/contact";
 
 interface PlaceListItemProps {
     place: EnrichedVenue;
@@ -51,6 +30,7 @@ export default function PlaceListItem({
 }: PlaceListItemProps) {
     const t = useTranslations();
     const locale = useLocale() as Locale;
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { name, paymentMethods, openingHours, contact, description } = parseTags(place.tags);
     const formattedHours = formatOpeningHours(openingHours);
     const categoryLabel = place.subcategory && place.category
@@ -61,11 +41,16 @@ export default function PlaceListItem({
         ? Object.entries(paymentMethods).filter(([, v]) => v === "yes").map(([type]) => type)
         : [];
 
+    const handleMouseMove = (e: React.MouseEvent) => {
+        setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
     return (
         <div
             className="relative group"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onMouseMove={handleMouseMove}
         >
             <Link
                 href={`/places/${place.slug || place.id}`}
@@ -112,7 +97,7 @@ export default function PlaceListItem({
                                         style={{ marginLeft: idx > 0 ? "-6px" : 0, zIndex: enabledPayments.length - idx }}
                                         title={info.label}
                                     >
-                                        <PaymentIcon type={type} />
+                                        <PaymentIcon type={type} className="w-3.5 h-3.5" />
                                     </span>
                                 );
                             })}
@@ -123,38 +108,43 @@ export default function PlaceListItem({
                 </div>
             </Link>
 
-            {/* Floating Tooltip */}
+            {/* Floating Tooltip - follows mouse pointer */}
             {isHovered && (formattedHours || contact?.phone || contact?.website || description) && (
-                <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+8px)] z-30 pointer-events-none">
+                <div
+                    className="hidden md:block fixed z-50 pointer-events-none"
+                    style={{
+                        left: mousePos.x + 16,
+                        top: mousePos.y + 16,
+                    }}
+                >
                     <div className="bg-surface border border-border-light rounded-lg shadow-lg p-3 text-xs w-64">
                         <h4 className="text-white font-semibold mb-2 truncate">{name}</h4>
                         <div className="grid gap-1.5">
                             {formattedHours && (
                                 <div className="flex items-start gap-2">
-                                    <span className="shrink-0">🕐</span>
+                                    <ClockIcon className="w-3.5 h-3.5 shrink-0 text-text-light" />
                                     <span className="text-text-light">{formattedHours}</span>
                                 </div>
                             )}
                             {contact?.phone && (
                                 <div className="flex items-center gap-2">
-                                    <span className="shrink-0">📞</span>
+                                    <PhoneIcon className="w-3.5 h-3.5 shrink-0 text-text-light" />
                                     <span className="text-text-light">{contact.phone}</span>
                                 </div>
                             )}
                             {contact?.website && (
                                 <div className="flex items-center gap-2">
-                                    <span className="shrink-0">🌐</span>
+                                    <GlobeIcon className="w-3.5 h-3.5 shrink-0 text-text-light" />
                                     <span className="text-accent truncate">{contact.website.replace(/^https?:\/\//, "")}</span>
                                 </div>
                             )}
                             {description && (
                                 <div className="flex items-start gap-2 pt-1.5 mt-1.5 border-t border-border-light">
-                                    <span className="shrink-0">📝</span>
+                                    <DocumentIcon className="w-3.5 h-3.5 shrink-0 text-text-light" />
                                     <span className="text-text-light line-clamp-2">{description}</span>
                                 </div>
                             )}
                         </div>
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-surface border-l border-b border-border-light rotate-45" />
                     </div>
                 </div>
             )}

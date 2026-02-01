@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { SettingsIcon, CloseIcon, UserIcon, ArrowLeftIcon } from "@/assets/icons/ui";
+import { IconButton } from "@/components/ui/Button";
 
 export interface NavItem {
     href: string;
@@ -73,12 +74,14 @@ export default function AdminSidebar({
                             </div>
                             <span className="text-lg font-semibold text-white">{title}</span>
                         </Link>
-                        <button
-                            className="lg:hidden text-text-light hover:text-white"
+                        <IconButton
+                            className="lg:hidden"
                             onClick={onSidebarClose}
-                        >
-                            <CloseIcon className="w-6 h-6" />
-                        </button>
+                            icon={<CloseIcon className="w-6 h-6" />}
+                            aria-label="Close sidebar"
+                            variant="ghost"
+                            color="neutral"
+                        />
                     </div>
 
                     {/* Navigation */}

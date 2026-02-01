@@ -2,9 +2,12 @@ import { IconProps } from "../types";
 
 export function ContactlessIcon(props: IconProps) {
     return (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-            {/* Contactless/NFC payment symbol - 4 curved waves */}
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 16.59c-.78-.78-.78-2.05 0-2.83.78-.78 2.05-.78 2.83 0 .78.78.78 2.05 0 2.83-.78.78-2.05.78-2.83 0zm.71-4.24a3.5 3.5 0 0 1 0-4.95 3.5 3.5 0 0 1 4.95 0c.39.39.39 1.02 0 1.41-.39.39-1.02.39-1.41 0a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12c.39.39.39 1.02 0 1.41-.39.4-1.03.4-1.42.01zm2.83-4.24a5.5 5.5 0 0 1 0 7.78c-.39.39-1.02.39-1.41 0-.39-.39-.39-1.02 0-1.41a3.5 3.5 0 0 0 0-4.95c-.39-.39-.39-1.02 0-1.41.39-.4 1.02-.4 1.41-.01zm2.83 2.83a7.5 7.5 0 0 1 0 2.12c-.39.39-1.02.39-1.41 0-.39-.39-.39-1.02 0-1.41.2-.2.2-.51 0-.71-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0 .29.29.29.71 0 1.41z" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            {/* Contactless/NFC payment symbol - curved waves */}
+            <path d="M6 12a6 6 0 0 1 6 6" />
+            <path d="M6 4a14 14 0 0 1 14 14" />
+            <path d="M6 8a10 10 0 0 1 10 10" />
+            <circle cx="6" cy="18" r="2" fill="currentColor" />
         </svg>
     );
 }

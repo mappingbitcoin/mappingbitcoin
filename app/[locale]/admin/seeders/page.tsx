@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
 
 interface Seeder {
     id: string;
@@ -180,12 +181,9 @@ export default function SeedersPage() {
                         Manage trusted community members who anchor the trust graph
                     </p>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openCreateModal} color="primary">
                     Add Seeder
-                </button>
+                </Button>
             </div>
 
             {/* Seeders Table */}
@@ -221,19 +219,23 @@ export default function SeedersPage() {
                                         <td className="px-4 py-3 text-text-light text-sm">
                                             {new Date(seeder.createdAt).toLocaleDateString()}
                                         </td>
-                                        <td className="px-4 py-3 text-right space-x-2">
-                                            <button
+                                        <td className="px-4 py-3 text-right space-x-1">
+                                            <Button
                                                 onClick={() => openEditModal(seeder)}
-                                                className="px-3 py-1 text-sm text-primary hover:text-primary-light transition-colors"
+                                                variant="ghost"
+                                                color="primary"
+                                                size="xs"
                                             >
                                                 Edit
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 onClick={() => handleDelete(seeder)}
-                                                className="px-3 py-1 text-sm text-red-400 hover:text-red-300 transition-colors"
+                                                variant="ghost"
+                                                color="danger"
+                                                size="xs"
                                             >
                                                 Delete
-                                            </button>
+                                            </Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -300,20 +302,22 @@ export default function SeedersPage() {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
+                            color="primary"
                         >
                             {submitting ? "Saving..." : editingSeeder ? "Update" : "Add Seeder"}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>

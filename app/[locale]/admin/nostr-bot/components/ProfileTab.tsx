@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { CopyIcon, RefreshIcon, CheckmarkIcon, UploadIcon, CloseIcon } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
 
 interface Profile {
     name?: string;
@@ -157,12 +158,15 @@ export default function ProfileTab() {
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
                 <p className="font-medium">Error</p>
                 <p className="text-sm mt-1">{error}</p>
-                <button
+                <Button
                     onClick={fetchProfile}
-                    className="mt-3 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
+                    variant="soft"
+                    color="danger"
+                    size="sm"
+                    className="mt-3"
                 >
                     Try Again
-                </button>
+                </Button>
             </div>
         );
     }
@@ -179,12 +183,14 @@ export default function ProfileTab() {
                             <code className="flex-1 px-3 py-2 bg-surface-light rounded text-sm text-white font-mono truncate">
                                 {botData?.pubkey}
                             </code>
-                            <button
+                            <IconButton
                                 onClick={() => copyToClipboard(botData?.pubkey || "", "Pubkey")}
-                                className="p-2 hover:bg-surface-light rounded transition-colors"
-                            >
-                                <CopyIcon className="w-4 h-4 text-text-light" />
-                            </button>
+                                icon={<CopyIcon className="w-4 h-4" />}
+                                aria-label="Copy pubkey"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                            />
                         </div>
                     </div>
                     <div>
@@ -193,12 +199,14 @@ export default function ProfileTab() {
                             <code className="flex-1 px-3 py-2 bg-surface-light rounded text-sm text-white font-mono truncate">
                                 {botData?.npub}
                             </code>
-                            <button
+                            <IconButton
                                 onClick={() => copyToClipboard(botData?.npub || "", "npub")}
-                                className="p-2 hover:bg-surface-light rounded transition-colors"
-                            >
-                                <CopyIcon className="w-4 h-4 text-text-light" />
-                            </button>
+                                icon={<CopyIcon className="w-4 h-4" />}
+                                aria-label="Copy npub"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                            />
                         </div>
                     </div>
                 </div>
@@ -236,13 +244,17 @@ export default function ProfileTab() {
                                     onChange={(e) => handleFileChange(e, "picture")}
                                     className="hidden"
                                 />
-                                <button
+                                <Button
                                     onClick={() => pictureInputRef.current?.click()}
                                     disabled={uploadingPicture}
-                                    className="w-full px-3 py-2 bg-surface-light hover:bg-border-light border border-border-light rounded-lg text-sm text-white transition-colors disabled:opacity-50"
+                                    loading={uploadingPicture}
+                                    variant="outline"
+                                    color="neutral"
+                                    size="sm"
+                                    fullWidth
                                 >
                                     {uploadingPicture ? "Uploading..." : "Upload Picture"}
-                                </button>
+                                </Button>
                                 <input
                                     type="url"
                                     value={form.picture || ""}
@@ -251,12 +263,14 @@ export default function ProfileTab() {
                                     className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm placeholder-text-light/50 focus:outline-none focus:border-accent"
                                 />
                                 {form.picture && (
-                                    <button
+                                    <Button
                                         onClick={() => setForm({ ...form, picture: "" })}
-                                        className="text-xs text-red-400 hover:text-red-300"
+                                        variant="ghost"
+                                        color="danger"
+                                        size="xs"
                                     >
                                         Remove picture
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -289,13 +303,16 @@ export default function ProfileTab() {
                                     onChange={(e) => handleFileChange(e, "banner")}
                                     className="hidden"
                                 />
-                                <button
+                                <Button
                                     onClick={() => bannerInputRef.current?.click()}
                                     disabled={uploadingBanner}
-                                    className="px-3 py-2 bg-surface-light hover:bg-border-light border border-border-light rounded-lg text-sm text-white transition-colors disabled:opacity-50"
+                                    loading={uploadingBanner}
+                                    variant="outline"
+                                    color="neutral"
+                                    size="sm"
                                 >
                                     {uploadingBanner ? "Uploading..." : "Upload Banner"}
-                                </button>
+                                </Button>
                                 <input
                                     type="url"
                                     value={form.banner || ""}
@@ -305,12 +322,14 @@ export default function ProfileTab() {
                                 />
                             </div>
                             {form.banner && (
-                                <button
+                                <Button
                                     onClick={() => setForm({ ...form, banner: "" })}
-                                    className="text-xs text-red-400 hover:text-red-300"
+                                    variant="ghost"
+                                    color="danger"
+                                    size="xs"
                                 >
                                     Remove banner
-                                </button>
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -325,13 +344,14 @@ export default function ProfileTab() {
             <div className="bg-surface border border-border-light rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-white">Profile Details (kind 0)</h2>
-                    <button
+                    <IconButton
                         onClick={fetchProfile}
-                        className="p-2 hover:bg-surface-light rounded transition-colors"
-                        title="Refresh"
-                    >
-                        <RefreshIcon className="w-4 h-4 text-text-light" />
-                    </button>
+                        icon={<RefreshIcon className="w-4 h-4" />}
+                        aria-label="Refresh"
+                        variant="ghost"
+                        color="neutral"
+                        size="sm"
+                    />
                 </div>
 
                 <div className="grid gap-4">
@@ -405,23 +425,14 @@ export default function ProfileTab() {
                 </div>
 
                 <div className="mt-6 flex justify-end">
-                    <button
+                    <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light disabled:opacity-50 text-white rounded-lg transition-colors"
+                        loading={saving}
+                        leftIcon={!saving ? <CheckmarkIcon className="w-4 h-4" /> : undefined}
                     >
-                        {saving ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <CheckmarkIcon className="w-4 h-4" />
-                                Save Profile
-                            </>
-                        )}
-                    </button>
+                        {saving ? "Saving..." : "Save Profile"}
+                    </Button>
                 </div>
             </div>
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "@/i18n/navigation";
 import { CookieIcon } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
+import { TextLink } from "@/components/ui";
 
 export type ConsentState = {
     necessary: boolean;
@@ -86,7 +87,7 @@ export default function CookieNotice() {
                     <h3 className="text-white text-xl mb-3 font-semibold">Cookie Settings</h3>
                     <p className="text-white/70 text-[0.9rem] leading-relaxed mb-5">
                         We use cookies to enhance your experience. You can customize your preferences or accept all cookies.{" "}
-                        <Link href="/privacy-policy" className="text-accent underline hover:text-accent-light">Privacy Policy</Link>
+                        <TextLink href="/privacy-policy" variant="accent">Privacy Policy</TextLink>
                     </p>
 
                     {showPreferences ? (
@@ -138,40 +139,51 @@ export default function CookieNotice() {
                             </div>
 
                             <div className="flex gap-3 mt-2 flex-col md:flex-row">
-                                <button
-                                    className="flex-1 min-w-[120px] py-3 px-5 rounded-btn text-[0.9rem] font-semibold cursor-pointer transition-all border-none font-oswald bg-transparent text-white/80 border border-white/20 hover:bg-white/10 hover:border-white/30"
+                                <Button
                                     onClick={() => setShowPreferences(false)}
+                                    variant="outline"
+                                    color="neutral"
+                                    fullWidth
+                                    size="lg"
                                 >
                                     Back
-                                </button>
-                                <button
-                                    className="flex-1 min-w-[120px] py-3 px-5 rounded-btn text-[0.9rem] font-semibold cursor-pointer transition-all border-none font-oswald bg-gradient-accent text-white shadow-accent hover:-translate-y-0.5 hover:shadow-accent-hover"
+                                </Button>
+                                <Button
                                     onClick={handleSavePreferences}
+                                    fullWidth
+                                    size="lg"
                                 >
                                     Save Preferences
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     ) : (
                         <div className="flex gap-3 flex-col md:flex-row">
-                            <button
-                                className="flex-1 min-w-[120px] py-3 px-5 rounded-btn text-[0.9rem] font-semibold cursor-pointer transition-all font-oswald bg-transparent text-white/80 border border-white/20 shadow-none hover:bg-white/10 hover:border-white/30"
+                            <Button
                                 onClick={handleNecessaryOnly}
+                                variant="outline"
+                                color="neutral"
+                                fullWidth
+                                size="lg"
                             >
                                 Necessary Only
-                            </button>
-                            <button
-                                className="flex-1 min-w-[120px] py-3 px-5 rounded-btn text-[0.9rem] font-semibold cursor-pointer transition-all border-none font-oswald bg-white/10 text-white shadow-none hover:bg-white/15"
+                            </Button>
+                            <Button
                                 onClick={() => setShowPreferences(true)}
+                                variant="soft"
+                                color="neutral"
+                                fullWidth
+                                size="lg"
                             >
                                 Customize
-                            </button>
-                            <button
-                                className="flex-1 min-w-[120px] py-3 px-5 rounded-btn text-[0.9rem] font-semibold cursor-pointer transition-all border-none font-oswald bg-gradient-accent text-white shadow-accent hover:-translate-y-0.5 hover:shadow-accent-hover"
+                            </Button>
+                            <Button
                                 onClick={handleAcceptAll}
+                                fullWidth
+                                size="lg"
                             >
                                 Accept All
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -186,13 +198,13 @@ export function CookieSettingsButton() {
     };
 
     return (
-        <button
-            className="flex items-center justify-center w-9 h-9 p-0 min-w-0 bg-white/10 border border-white/15 rounded-lg text-white/60 cursor-pointer transition-all shadow-none hover:bg-white/15 hover:text-accent hover:transform-none hover:shadow-none"
+        <IconButton
             onClick={handleClick}
+            icon={<CookieIcon />}
             aria-label="Cookie Settings"
-            title="Cookie Settings"
-        >
-            <CookieIcon className="w-[18px] h-[18px]" />
-        </button>
+            variant="soft"
+            color="neutral"
+            size="sm"
+        />
     );
 }

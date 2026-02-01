@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { NostrIcon } from "@/assets/icons/social";
+import TabButton from "@/components/ui/TabButton";
 import ProfileTab from "./components/ProfileTab";
 import WallTab from "./components/WallTab";
 import PostTab from "./components/PostTab";
@@ -34,19 +35,16 @@ export default function NostrBotPage() {
 
             {/* Tabs */}
             <div className="border-b border-border-light">
-                <nav className="flex gap-4">
+                <nav className="flex">
                     {tabs.map((tab) => (
-                        <button
+                        <TabButton
                             key={tab.id}
+                            active={activeTab === tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                                activeTab === tab.id
-                                    ? "border-accent text-accent"
-                                    : "border-transparent text-text-light hover:text-white"
-                            }`}
+                            className="flex-none"
                         >
                             {tab.label}
-                        </button>
+                        </TabButton>
                     ))}
                 </nav>
             </div>

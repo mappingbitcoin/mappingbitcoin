@@ -9,6 +9,7 @@ export interface VenueForm {
     additionalTags: Partial<Record<CommonTag, string>>;
     type?: string;
     about: string;
+    image?: string; // Blossom URL for venue image
     lat: string;
     lon: string;
     address: {

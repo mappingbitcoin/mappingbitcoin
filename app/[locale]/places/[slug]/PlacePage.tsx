@@ -10,6 +10,7 @@ import {EnrichedVenue, GoogleReview} from "@/models/Overpass";
 import {parseTags, formatOpeningHours} from "@/utils/OsmHelpers";
 import {Link} from '@/i18n/navigation';
 import { NewsletterCTA } from "@/components/common";
+import { Button, TabButton, TextLink } from "@/components/ui";
 import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug} from "@/utils/SlugUtils";
 import {deslugify} from "@/utils/StringUtils";
 import {getSubcategoryLabel, PLACE_CATEGORIES} from "@/constants/PlaceCategories";
@@ -31,28 +32,11 @@ import {
     ClockIcon,
     ShieldCheckIcon,
     ChatIcon,
-    LightningIcon,
-    LightningContactlessIcon,
-    OnchainIcon,
     EmailIcon,
     WebsiteIcon,
     PhoneIcon,
 } from "@/assets/icons";
-import { ComponentType } from "react";
-import { IconProps } from "@/assets/icons";
-
-// Payment icon mapping
-const PAYMENT_ICON_MAP: Record<string, ComponentType<IconProps>> = {
-    lightning: LightningIcon,
-    lightning_contactless: LightningContactlessIcon,
-    onchain: OnchainIcon,
-};
-
-const PaymentIcon = ({ type, className }: { type: string; className?: string }) => {
-    const IconComponent = PAYMENT_ICON_MAP[type];
-    if (!IconComponent) return null;
-    return <IconComponent className={className || "w-4 h-4"} />;
-};
+import { PaymentIcon } from "@/constants/PaymentIcons";
 
 export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, isPreview: boolean }) {
     const t = useTranslations('venues')
@@ -272,27 +256,30 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
                             {/* Action Buttons */}
                             <div className="flex items-center gap-2">
-                                <a
+                                <Button
                                     href={googleMapLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white py-2.5 px-4 rounded-btn font-medium text-sm transition-colors no-underline"
+                                    external
+                                    variant="solid"
+                                    color="accent"
+                                    size="sm"
+                                    leftIcon={<DirectionsIcon className="w-4 h-4" />}
+                                    className="flex-1"
                                     title={tMap('getDirections')}
                                 >
-                                    <DirectionsIcon className="w-4 h-4" />
                                     <span className="max-md:hidden">{tMap('getDirections')}</span>
-                                </a>
+                                </Button>
                                 {contact?.website && (
-                                    <a
+                                    <Button
                                         href={contact.website}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white py-2.5 px-4 rounded-btn font-medium text-sm transition-colors no-underline"
+                                        external
+                                        variant="ghost"
+                                        color="neutral"
+                                        size="sm"
+                                        leftIcon={<WebsiteIcon className="w-4 h-4" />}
                                         title="Website"
                                     >
-                                        <WebsiteIcon className="w-4 h-4" />
                                         <span className="max-md:hidden">Website</span>
-                                    </a>
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -323,17 +310,14 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                             <div className="bg-surface rounded-card border border-border-light overflow-hidden">
                                 <nav className="flex border-b border-border-light">
                                     {(['overview', 'reviews', 'about'] as const).map((tab) => (
-                                        <button
+                                        <TabButton
                                             key={tab}
+                                            active={activeTab === tab}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`flex-1 py-3 px-4 text-sm font-medium transition-colors cursor-pointer ${
-                                                activeTab === tab
-                                                    ? 'text-accent border-b-2 border-accent bg-accent/5'
-                                                    : 'text-text-light hover:text-white hover:bg-primary-light'
-                                            }`}
+                                            className="flex-1"
                                         >
                                             {tMap(`tabs.${tab}`)}
-                                        </button>
+                                        </TabButton>
                                     ))}
                                 </nav>
 
@@ -374,9 +358,9 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Email</p>
-                                                            <a href={`mailto:${contact.email}`} className="text-accent hover:text-accent-dark no-underline">
+                                                            <TextLink href={`mailto:${contact.email}`} external variant="accent">
                                                                 {contact.email}
-                                                            </a>
+                                                            </TextLink>
                                                         </div>
                                                     </div>
                                                 )}
@@ -388,9 +372,9 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Phone</p>
-                                                            <a href={`tel:${contact.phone}`} className="text-accent hover:text-accent-dark no-underline">
+                                                            <TextLink href={`tel:${contact.phone}`} external variant="accent">
                                                                 {contact.phone}
-                                                            </a>
+                                                            </TextLink>
                                                         </div>
                                                     </div>
                                                 )}
@@ -531,9 +515,9 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                 <div className="space-y-2 text-sm">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-text-light">Source:</span>
-                                                        <a href="https://openstreetmap.org" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-dark no-underline">
+                                                        <TextLink href="https://openstreetmap.org" external variant="accent">
                                                             OpenStreetMap
-                                                        </a>
+                                                        </TextLink>
                                                     </div>
                                                     {source && (
                                                         <div className="flex items-center gap-2">
@@ -585,12 +569,13 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                             {/* Suggest Edit */}
                             <div className="bg-surface rounded-card border border-border-light p-4 text-center">
                                 <p className="text-xs text-text-light mb-2">See something wrong?</p>
-                                <Link
+                                <TextLink
                                     href={`/places/${venue.slug || venue.id}/edit`}
-                                    className="text-sm text-accent hover:text-accent-dark no-underline"
+                                    variant="accent"
+                                    className="text-sm"
                                 >
                                     Suggest an edit →
-                                </Link>
+                                </TextLink>
                             </div>
 
                         </div>

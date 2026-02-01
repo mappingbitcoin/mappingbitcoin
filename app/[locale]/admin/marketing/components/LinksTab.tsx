@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
 import type { MarketingLink } from "../types";
 
 export default function LinksTab() {
@@ -162,12 +163,9 @@ export default function LinksTab() {
                         <option key={cat} value={cat}>{cat}</option>
                     ))}
                 </select>
-                <button
-                    onClick={openCreateModal}
-                    className="px-3 py-1.5 text-sm bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openCreateModal} size="sm">
                     {t("links.addButton")}
-                </button>
+                </Button>
             </div>
 
             {/* Links Table */}
@@ -210,19 +208,23 @@ export default function LinksTab() {
                                             {link.category}
                                         </span>
                                     </td>
-                                    <td className="px-3 py-2 text-right">
-                                        <button
+                                    <td className="px-3 py-2 text-right space-x-1">
+                                        <Button
                                             onClick={() => openEditModal(link)}
-                                            className="px-2 py-1 text-xs text-accent hover:text-accent-light transition-colors"
+                                            variant="ghost"
+                                            color="accent"
+                                            size="xs"
                                         >
                                             {t("common.edit")}
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             onClick={() => handleDelete(link)}
-                                            className="px-2 py-1 text-xs text-red-400 hover:text-red-300 transition-colors"
+                                            variant="ghost"
+                                            color="danger"
+                                            size="xs"
                                         >
                                             {t("common.delete")}
-                                        </button>
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}
@@ -294,20 +296,23 @@ export default function LinksTab() {
                     </div>
 
                     <div className="flex justify-end gap-2 pt-2">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-3 py-1.5 text-sm text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
+                            size="sm"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={submitting}
-                            className="px-3 py-1.5 text-sm bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
+                            size="sm"
                         >
                             {submitting ? t("common.saving") : editingLink ? t("common.update") : t("common.add")}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>

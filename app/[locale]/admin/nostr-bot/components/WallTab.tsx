@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { RefreshIcon, ExternalLinkIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 
 interface NostrPost {
     id: string;
@@ -72,12 +73,15 @@ export default function WallTab() {
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
                 <p className="font-medium">Error</p>
                 <p className="text-sm mt-1">{error}</p>
-                <button
+                <Button
                     onClick={fetchPosts}
-                    className="mt-3 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
+                    variant="soft"
+                    color="danger"
+                    size="sm"
+                    className="mt-3"
                 >
                     Try Again
-                </button>
+                </Button>
             </div>
         );
     }
@@ -90,13 +94,15 @@ export default function WallTab() {
                     <h2 className="text-lg font-semibold text-white">Recent Posts</h2>
                     <p className="text-sm text-text-light">{posts.length} posts loaded</p>
                 </div>
-                <button
+                <Button
                     onClick={fetchPosts}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-surface-light hover:bg-border-light rounded-lg text-sm text-white transition-colors"
+                    variant="outline"
+                    color="neutral"
+                    size="sm"
+                    leftIcon={<RefreshIcon className="w-4 h-4" />}
                 >
-                    <RefreshIcon className="w-4 h-4" />
                     Refresh
-                </button>
+                </Button>
             </div>
 
             {/* Posts */}

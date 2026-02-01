@@ -67,3 +67,4 @@ export { LocationPinIcon } from "./LocationPinIcon";
 export { CalendarIcon } from "./CalendarIcon";
 export { QueueIcon } from "./QueueIcon";
 export { EyeIcon } from "./EyeIcon";
+export { BanIcon } from "./BanIcon";

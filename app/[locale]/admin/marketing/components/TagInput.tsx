@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CloseIcon } from "@/assets/icons/ui";
+import TagRemoveButton from "@/components/ui/TagRemoveButton";
 
 interface TagInputProps {
     tags: string[];
@@ -42,13 +42,11 @@ export default function TagInput({ tags, onChange, placeholder = "Add tag...", c
                     className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent rounded text-sm"
                 >
                     #{tag}
-                    <button
-                        type="button"
+                    <TagRemoveButton
                         onClick={() => removeTag(index)}
-                        className="hover:text-red-400 transition-colors"
-                    >
-                        <CloseIcon className="w-3 h-3" />
-                    </button>
+                        className="hover:text-red-400"
+                        aria-label={`Remove ${tag}`}
+                    />
                 </span>
             ))}
             <input

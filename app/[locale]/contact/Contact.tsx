@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { PageSection } from "@/components/layout";
 import { ArrowUpRightIcon } from "@/assets/icons/ui";
 import { PartnersIcon, MediaIcon, EnvelopeIcon } from "@/assets/icons/contact";
+import Button from "@/components/ui/Button";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 type ContactStatus = "idle" | "loading" | "success" | "error" | "rate-limited";
@@ -165,15 +166,17 @@ const Contact: React.FC = () => {
                             />
                         </FormField>
 
-                        <button
+                        <Button
                             type="submit"
                             disabled={status === "loading"}
-                            className="w-full py-3.5 text-[15px] font-semibold text-white border-2 border-accent rounded-btn cursor-pointer transition-all bg-accent/10 hover:enabled:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                            loading={status === "loading"}
+                            fullWidth
+                            className="mt-2"
                         >
                             {status === "loading"
                                 ? t("form.sendingButton")
                                 : t("form.sendButton")}
-                        </button>
+                        </Button>
 
                         {status === "success" && (
                             <FormAlert type="success">

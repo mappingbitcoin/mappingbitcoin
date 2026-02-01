@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "@/i18n/navigation";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import Button from "@/components/ui/Button";
 import { ChartBarIcon } from "@/assets/icons/ui";
 
 interface GraphStats {
@@ -139,23 +139,21 @@ export default function GraphPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <Link
+                    <Button
                         href="/admin/graph/analytics"
-                        className="px-4 py-2 bg-surface-light hover:bg-border-light text-white rounded-lg transition-colors flex items-center space-x-2"
+                        variant="soft"
+                        color="neutral"
+                        leftIcon={<ChartBarIcon className="w-5 h-5" />}
                     >
-                        <ChartBarIcon className="w-5 h-5" />
-                        <span>Analytics</span>
-                    </Link>
-                    <button
+                        Analytics
+                    </Button>
+                    <Button
                         onClick={triggerRebuild}
                         disabled={isRunning}
-                        className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        loading={isRunning}
                     >
-                        {isRunning && (
-                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
-                        )}
-                        <span>{isRunning ? "Building..." : "Rebuild Graph"}</span>
-                    </button>
+                        {isRunning ? "Building..." : "Rebuild Graph"}
+                    </Button>
                 </div>
             </div>
 

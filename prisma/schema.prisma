@@ -29,10 +29,16 @@ model User {
   id               String    @id @default(cuid())
   pubkey           String    @unique
   name             String?   // cached from kind 0
+  displayName      String?   @map("display_name") // cached from kind 0
   picture          String?   // cached from kind 0
   nip05            String?
   profileUpdatedAt DateTime? @map("profile_updated_at")
   createdAt        DateTime  @default(now()) @map("created_at")
+
+  // Moderation
+  bannedAt         DateTime? @map("banned_at")
+  bannedReason     String?   @map("banned_reason")
+  bannedBy         String?   @map("banned_by") // Admin pubkey who banned
 
   // Relations
   claims        Claim[]
@@ -40,6 +46,7 @@ model User {
   reviewReplies ReviewReply[]
 
   @@index([pubkey])
+  @@index([bannedAt])
   @@map("users")
 }
 

@@ -13,6 +13,8 @@ import {
     TikTokIcon,
     NostrIcon,
 } from "@/assets/icons/social";
+import Button, { IconButton } from "@/components/ui/Button";
+import DropdownItem from "@/components/ui/DropdownItem";
 
 interface ContactType {
     key: string;
@@ -212,14 +214,15 @@ export default function SocialLinksEditor({ contact, onChange }: Props) {
                                                 transition-all duration-200"
                                         />
                                     </div>
-                                    <button
+                                    <IconButton
                                         type="button"
                                         onClick={() => handleRemove(type.key)}
-                                        className="p-2 text-text-light hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                                        title="Remove"
-                                    >
-                                        <CloseIcon className="w-4 h-4" />
-                                    </button>
+                                        icon={<CloseIcon className="w-4 h-4" />}
+                                        aria-label="Remove"
+                                        variant="ghost"
+                                        color="danger"
+                                        size="sm"
+                                    />
                                 </div>
                             </div>
                         );
@@ -230,29 +233,29 @@ export default function SocialLinksEditor({ contact, onChange }: Props) {
             {/* Add More Button */}
             {availableSocials.length > 0 && (
                 <div ref={menuRef} className="relative">
-                    <button
+                    <Button
                         type="button"
                         onClick={() => setShowAddMenu(!showAddMenu)}
-                        className="inline-flex items-center gap-1.5 text-sm text-accent hover:text-accent-dark transition-colors"
+                        variant="ghost"
+                        color="accent"
+                        size="sm"
+                        leftIcon={<PlusIcon className="w-4 h-4" />}
                     >
-                        <PlusIcon className="w-4 h-4" />
                         Add social link
-                    </button>
+                    </Button>
 
                     {showAddMenu && (
                         <div className="absolute z-50 mt-1 w-56 bg-surface-light border border-border-light rounded-xl shadow-lg py-1 max-h-64 overflow-y-auto">
                             {availableSocials.map((type) => {
                                 const IconComponent = type.Icon;
                                 return (
-                                    <button
+                                    <DropdownItem
                                         key={type.key}
-                                        type="button"
                                         onClick={() => handleAdd(type.key)}
-                                        className="w-full text-left px-3 py-2 text-sm flex items-center gap-2.5 text-white hover:bg-surface transition-colors"
+                                        icon={<IconComponent className="w-4 h-4" />}
                                     >
-                                        <span className="text-text-light"><IconComponent className="w-4 h-4" /></span>
                                         {type.label}
-                                    </button>
+                                    </DropdownItem>
                                 );
                             })}
                         </div>

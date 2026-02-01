@@ -1,35 +1,15 @@
 "use client";
 
-import { useState, useMemo, ComponentType } from "react";
+import { useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
 import { PAYMENT_METHODS } from "@/constants/PaymentMethods";
+import { PaymentIcon } from "@/constants/PaymentIcons";
 import { PlaceSubcategory, matchPlaceSubcategory, getSubcategoryLabel } from "@/constants/PlaceCategories";
 import { getLocalizedCountryCategorySlug } from "@/utils/SlugUtils";
-import { IconProps } from "@/assets/icons";
 import { CloseIcon, ChevronRightIcon } from "@/assets/icons/ui";
-import {
-    LightningIcon,
-    LightningContactlessIcon,
-    OnchainIcon,
-    CardIcon,
-    ContactlessIcon,
-} from "@/assets/icons/payment";
-
-const PAYMENT_ICON_MAP: Record<string, ComponentType<IconProps>> = {
-    lightning: LightningIcon,
-    lightning_contactless: LightningContactlessIcon,
-    onchain: OnchainIcon,
-    debit_cards: CardIcon,
-    credit_cards: CardIcon,
-    contactless: ContactlessIcon,
-};
-
-const PaymentIcon = ({ type, className }: { type: string; className?: string }) => {
-    const IconComponent = PAYMENT_ICON_MAP[type];
-    if (!IconComponent) return null;
-    return <IconComponent className={className || "w-3.5 h-3.5"} />;
-};
+import Button, { IconButton } from "@/components/ui/Button";
+import AccordionButton from "@/components/ui/AccordionButton";
 
 interface MobileFiltersSheetProps {
     isOpen: boolean;
@@ -132,40 +112,44 @@ export default function MobileFiltersSheet({
                 {/* Modal Header */}
                 <div className="sticky top-0 bg-surface border-b border-border-light px-4 py-3 flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t("countries.filters.label")}</h3>
-                    <button
+                    <IconButton
                         onClick={onClose}
-                        className="p-2 text-text-light hover:text-white transition-colors cursor-pointer"
-                    >
-                        <CloseIcon className="w-5 h-5" />
-                    </button>
+                        icon={<CloseIcon className="w-5 h-5" />}
+                        aria-label="Close"
+                        variant="ghost"
+                        color="neutral"
+                    />
                 </div>
 
                 <div className="p-4 space-y-3">
                     {/* Categories Filter */}
                     {enrichedSubcategories.length > 0 && (
                         <div className="border border-border-light rounded-xl overflow-hidden">
-                            <button
+                            <AccordionButton
+                                expanded={categoriesFilterExpanded}
+                                expandIcon={<ChevronRightIcon className="w-5 h-5" />}
                                 onClick={() => setCategoriesFilterExpanded(!categoriesFilterExpanded)}
-                                className="w-full flex items-center justify-between gap-2 py-4 px-4 bg-primary-light cursor-pointer"
+                                className="py-4 px-4 bg-primary-light"
                             >
-                                <div className="flex items-center gap-3">
-                                    <ChevronRightIcon className={`w-5 h-5 text-text-light transition-transform ${categoriesFilterExpanded ? "rotate-90" : ""}`} />
+                                <div className="flex items-center gap-3 flex-1">
                                     <span className="text-base font-semibold text-white">{t("countries.filters.categories")}</span>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${selectedCategories.size === (availableSubcategories?.length || 0) ? "bg-accent/10 text-accent" : "bg-surface text-text-light border border-border-light"}`}>
+                                        {selectedCategories.size === (availableSubcategories?.length || 0) ? "All" : `${selectedCategories.size}/${availableSubcategories?.length || 0}`}
+                                    </span>
                                 </div>
-                                <span className={`text-xs px-2 py-1 rounded-full ${selectedCategories.size === (availableSubcategories?.length || 0) ? "bg-accent/10 text-accent" : "bg-surface text-text-light border border-border-light"}`}>
-                                    {selectedCategories.size === (availableSubcategories?.length || 0) ? "All" : `${selectedCategories.size}/${availableSubcategories?.length || 0}`}
-                                </span>
-                            </button>
+                            </AccordionButton>
 
                             {categoriesFilterExpanded && (
                                 <div className="px-4 pb-4 bg-surface">
                                     <div className="flex justify-end mb-3">
-                                        <button
+                                        <Button
                                             onClick={() => onToggleAllCategories(availableSubcategories || [])}
-                                            className="text-xs text-accent hover:text-accent-dark transition-colors cursor-pointer"
+                                            variant="ghost"
+                                            color="accent"
+                                            size="xs"
                                         >
                                             {selectedCategories.size === (availableSubcategories?.length || 0) ? t("countries.filters.deselectAll") : t("countries.filters.selectAll")}
-                                        </button>
+                                        </Button>
                                     </div>
                                     <div className="space-y-1">
                                         {Object.entries(groupedCategories).map(([parentCategory, subcategories]) => {
@@ -175,27 +159,31 @@ export default function MobileFiltersSheet({
 
                                             return (
                                                 <div key={parentCategory} className="border border-border-light rounded-lg overflow-hidden">
-                                                    <button
+                                                    <AccordionButton
+                                                        expanded={isExpanded}
+                                                        expandIcon={<ChevronRightIcon className="w-3.5 h-3.5" />}
                                                         onClick={() => toggleCategorySection(parentCategory)}
-                                                        className="w-full flex items-center justify-between gap-2 py-2.5 px-3 bg-primary-light cursor-pointer"
+                                                        className="py-2.5 px-3 bg-primary-light"
                                                     >
-                                                        <div className="flex items-center gap-2">
-                                                            <ChevronRightIcon className={`w-3.5 h-3.5 text-text-light transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                                                        <div className="flex items-center gap-2 flex-1">
                                                             <span className="text-sm font-medium text-white">{getCategoryDisplayName(parentCategory)}</span>
+                                                            <span className={`text-xs px-1.5 py-0.5 rounded-full ${allSelectedInSection ? "bg-accent/10 text-accent" : "bg-surface text-text-light"}`}>
+                                                                {allSelectedInSection ? "All" : `${selectedInSection}/${subcategories.length}`}
+                                                            </span>
                                                         </div>
-                                                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${allSelectedInSection ? "bg-accent/10 text-accent" : "bg-surface text-text-light"}`}>
-                                                            {allSelectedInSection ? "All" : `${selectedInSection}/${subcategories.length}`}
-                                                        </span>
-                                                    </button>
+                                                    </AccordionButton>
 
                                                     {isExpanded && (
                                                         <div className="px-3 pb-3 pt-1 bg-surface">
-                                                            <button
+                                                            <Button
                                                                 onClick={() => toggleSectionCategories(subcategories)}
-                                                                className="text-xs text-accent hover:text-accent-dark mb-2 cursor-pointer"
+                                                                variant="ghost"
+                                                                color="accent"
+                                                                size="xs"
+                                                                className="mb-2"
                                                             >
                                                                 {allSelectedInSection ? "Deselect all" : "Select all"}
-                                                            </button>
+                                                            </Button>
                                                             <div className="space-y-1">
                                                                 {subcategories.map(({ slugKey, subcategory, rawSubcategory }) => {
                                                                     const isSelected = selectedCategories.has(rawSubcategory);
@@ -225,18 +213,19 @@ export default function MobileFiltersSheet({
 
                     {/* Payment Methods Filter */}
                     <div className="border border-border-light rounded-xl overflow-hidden">
-                        <button
+                        <AccordionButton
+                            expanded={paymentFilterExpanded}
+                            expandIcon={<ChevronRightIcon className="w-5 h-5" />}
                             onClick={() => setPaymentFilterExpanded(!paymentFilterExpanded)}
-                            className="w-full flex items-center justify-between gap-2 py-4 px-4 bg-primary-light cursor-pointer"
+                            className="py-4 px-4 bg-primary-light"
                         >
-                            <div className="flex items-center gap-3">
-                                <ChevronRightIcon className={`w-5 h-5 text-text-light transition-transform ${paymentFilterExpanded ? "rotate-90" : ""}`} />
+                            <div className="flex items-center gap-3 flex-1">
                                 <span className="text-base font-semibold text-white">{t("countries.filters.paymentLabel")}</span>
+                                <span className={`text-xs px-2 py-1 rounded-full ${selectedPayments.size === Object.keys(PAYMENT_METHODS).length ? "bg-accent/10 text-accent" : "bg-surface text-text-light border border-border-light"}`}>
+                                    {selectedPayments.size === Object.keys(PAYMENT_METHODS).length ? "All" : `${selectedPayments.size}/${Object.keys(PAYMENT_METHODS).length}`}
+                                </span>
                             </div>
-                            <span className={`text-xs px-2 py-1 rounded-full ${selectedPayments.size === Object.keys(PAYMENT_METHODS).length ? "bg-accent/10 text-accent" : "bg-surface text-text-light border border-border-light"}`}>
-                                {selectedPayments.size === Object.keys(PAYMENT_METHODS).length ? "All" : `${selectedPayments.size}/${Object.keys(PAYMENT_METHODS).length}`}
-                            </span>
-                        </button>
+                        </AccordionButton>
 
                         {paymentFilterExpanded && (
                             <div className="px-4 pb-4 bg-surface">
@@ -266,12 +255,12 @@ export default function MobileFiltersSheet({
 
                 {/* Apply Button */}
                 <div className="sticky bottom-0 bg-surface border-t border-border-light p-4">
-                    <button
+                    <Button
                         onClick={onClose}
-                        className="w-full py-3 bg-accent text-white rounded-btn font-medium hover:bg-accent-dark transition-colors cursor-pointer"
+                        fullWidth
                     >
                         {t("countries.filters.applyFilters")}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
