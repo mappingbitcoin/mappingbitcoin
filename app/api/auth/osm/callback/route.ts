@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     });
 
     const { access_token } = await tokenRes.json();
-    if (!access_token) return NextResponse.redirect(`${BASE_URL}/?error=osm_invalid_token`);
+    if (!access_token) return NextResponse.redirect(`${publicEnv.siteUrl}/?error=osm_invalid_token`);
 
     const userRes = await fetch("https://api.openstreetmap.org/api/0.6/user/details.json", {
         headers: { Authorization: `Bearer ${access_token}` },

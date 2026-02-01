@@ -5,7 +5,7 @@ import {env} from "@/lib/Environment";
 export const revalidate = 3600; // revalidate sitemap every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const staticPages = ["contact", 'countries', 'privacy-policy', 'terms-and-conditions', 'verify-your-business', 'places/create', 'stats'];
+    const staticPages = ["contact", 'countries', 'privacy-policy', 'terms-and-conditions', 'verify-your-business', 'places/create', 'stats', 'verified-places'];
 
     return [
         ...[{

@@ -30,6 +30,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
     const t = useTranslations("map.venue-information");
     const locale = useLocale() as Locale;
     const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "about">("overview");
+    const [imageError, setImageError] = useState(false);
 
     const {place} = useGooglePlaceMatch(venue);
 
@@ -77,6 +78,11 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
     }, [venue, place, address]);
 
     const {featuredPhoto} = useMemo(() => {
+        // First priority: OSM image tag
+        if (venue.tags?.image) {
+            return { featuredPhoto: venue.tags.image };
+        }
+        // Second priority: Google Places photos
         if (place?.photos && place.photos.length > 0) {
             const photoUrls = place.photos.map((photo: { photo_reference: string; }) => {
                 const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
@@ -90,7 +96,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
 
         } else return {featuredPhoto: null}
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address])
+    }, [address, venue.tags?.image])
 
     const {paymentMethods, name, contact, openingHours, source, description,
         descriptionsByLocale, note, notesByLocale,specialTags, amenitiesTags} = useMemo(() => {
@@ -99,15 +105,21 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
 
     return (
         <>
-            {featuredPhoto && (
-                <div className={isSideBar ? "mb-[-5rem] relative h-[300px] w-[360px]" : "relative h-[300px] w-[360px]"}>
-                    <Image src={featuredPhoto} className="h-[300px] w-full object-cover"
-                           alt={name ?? place.label} width={600} height={400}
-                           loading={'lazy'}
-                           unoptimized />
-                </div>
-            )}
-            <div className={isSideBar ? "py-20 px-4" : "px-4"}>
+            <div className={isSideBar ? "pt-16 px-4" : "px-4"}>
+                {/* Image above name - hidden if error or not available */}
+                {featuredPhoto && !imageError && (
+                    <div className="relative h-[140px] w-full rounded-lg overflow-hidden mb-3">
+                        <Image
+                            src={featuredPhoto}
+                            className="h-full w-full object-cover"
+                            alt={name ?? place?.label ?? 'Venue'}
+                            fill
+                            loading={'lazy'}
+                            unoptimized
+                            onError={() => setImageError(true)}
+                        />
+                    </div>
+                )}
                 <div>
                     <div className="flex items-start justify-between gap-2">
                         <h2 className="text-xl font-bold m-0 text-white flex-1">{name}</h2>
