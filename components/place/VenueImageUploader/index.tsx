@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { PhotoIcon, CloseIcon, SpinnerIcon, UploadIcon } from "@/assets/icons/ui";
+import { PhotoIcon, CloseIcon, SpinnerIcon } from "@/assets/icons/ui";
 import { IconButton } from "@/components/ui/Button";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import { LoginModal } from "@/components/auth";
 
 // Blossom servers to try (files.v0l.io excluded - different upload API)
 const BLOSSOM_SERVERS = [
@@ -49,7 +51,10 @@ export default function VenueImageUploader({
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [dragOver, setDragOver] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { user } = useNostrAuth();
 
     // Calculate SHA-256 hash of file bytes
     const calculateHash = async (arrayBuffer: ArrayBuffer): Promise<string> => {
@@ -161,6 +166,20 @@ export default function VenueImageUploader({
         throw new Error("Failed to upload to any Blossom server. Please try again.");
     };
 
+    // Process the upload after validation
+    const processUpload = useCallback(async (file: File) => {
+        setUploading(true);
+        try {
+            const url = await uploadToBlossom(file);
+            onChange(url);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Upload failed");
+        } finally {
+            setUploading(false);
+            setPendingFile(null);
+        }
+    }, [onChange]);
+
     // Handle file selection
     const handleFile = useCallback(async (file: File) => {
         setError(null);
@@ -179,23 +198,23 @@ export default function VenueImageUploader({
             return;
         }
 
-        // Check for NIP-07 extension
+        // Check for NIP-07 extension - show login modal if not available
         if (!window.nostr) {
-            setError("Please connect your Nostr extension (Alby, nos2x, etc.) to upload images.");
+            setPendingFile(file);
+            setShowLoginModal(true);
             return;
         }
 
-        setUploading(true);
+        await processUpload(file);
+    }, [processUpload]);
 
-        try {
-            const url = await uploadToBlossom(file);
-            onChange(url);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Upload failed");
-        } finally {
-            setUploading(false);
+    // Handle successful login - continue with pending upload
+    const handleLoginSuccess = useCallback(() => {
+        setShowLoginModal(false);
+        if (pendingFile && window.nostr) {
+            processUpload(pendingFile);
         }
-    }, [onChange]);
+    }, [pendingFile, processUpload]);
 
     // Handle file input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,9 +337,24 @@ export default function VenueImageUploader({
             )}
 
             <p className="text-xs text-text-light">
-                Requires Nostr extension (Alby, nos2x) in write mode to sign the upload.
-                Image will be stored on Blossom and added to the OSM entry.
+                {user ? (
+                    "Image will be stored on Blossom and added to the OSM entry."
+                ) : (
+                    "Login with Nostr to upload images. They will be stored on Blossom."
+                )}
             </p>
+
+            {/* Nostr Login Modal */}
+            <LoginModal
+                isOpen={showLoginModal}
+                onClose={() => {
+                    setShowLoginModal(false);
+                    setPendingFile(null);
+                }}
+                titleKey="title"
+                descriptionKey="default"
+                onSuccess={handleLoginSuccess}
+            />
         </div>
     );
 }
