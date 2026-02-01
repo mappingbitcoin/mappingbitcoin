@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import {env} from "@/lib/Environment";
-import PlaceEditForm from "./PlaceEditForm";
+import VenueSubmissionForm from "@/app/[locale]/places/create/PlaceSubmissionForm";
 import {Localized} from "@/i18n/types";
 import {EnrichedVenue} from "@/models/Overpass";
 import {parseTags} from "@/utils/OsmHelpers";
@@ -42,7 +42,7 @@ export default async function PlaceEditPage({ params }: PageProps & Localized) {
 
     return (
         <OsmAuthProvider>
-            <PlaceEditForm venue={venue} />
+            <VenueSubmissionForm venue={venue} />
         </OsmAuthProvider>
     );
 }

@@ -17,7 +17,8 @@ import { useOsmUser } from "@/providers/OsmAuth";
 import { LoginWithOSM } from "@/components/auth";
 import { COMMON_TAG_TRANSLATIONS, CommonTag } from "@/constants/CommonOsmTags";
 import {
-    PlaceCategory
+    PlaceCategory,
+    matchPlaceSubcategory,
 } from "@/constants/PlaceCategories";
 import {
     COMMON_TAG_INPUT_TYPES,
@@ -26,6 +27,8 @@ import {
     PLACE_CUSTOMIZATION_META
 } from "@/constants/PlaceOsmDictionary";
 import { VenueForm } from "@/models/VenueForm";
+import { EnrichedVenue } from "@/models/Overpass";
+import { parseTags } from "@/utils/OsmHelpers";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import {
     FormTextarea,
@@ -48,6 +51,56 @@ import {
     SendIcon,
 } from "@/assets/icons";
 import Button, { TagRemoveButton } from "@/components/ui/Button";
+
+interface VenueSubmissionFormProps {
+    venue?: EnrichedVenue; // If provided, form is in edit mode
+}
+
+function venueToForm(venue: EnrichedVenue): VenueForm {
+    const { name, paymentMethods, contact, openingHours, description, note } = parseTags(venue.tags);
+    const match = venue.subcategory ? matchPlaceSubcategory(venue.subcategory) : null;
+
+    return {
+        name: name || "",
+        category: (match?.category || venue.category || "other") as PlaceCategory,
+        subcategory: (match?.subcategory || venue.subcategory || "") as VenueForm["subcategory"],
+        additionalTags: {},
+        about: description || '',
+        image: venue.tags?.image || undefined,
+        lat: String(venue.lat),
+        lon: String(venue.lon),
+        address: {
+            street: venue.tags?.["addr:street"] || "",
+            housenumber: venue.tags?.["addr:housenumber"] || "",
+            district: venue.tags?.["addr:district"] || "",
+            state: venue.state || "",
+            postcode: venue.tags?.["addr:postcode"] || "",
+            city: venue.city || "",
+            country: venue.country || "",
+        },
+        payment: {
+            onchain: paymentMethods?.onchain === "yes",
+            lightning: paymentMethods?.lightning === "yes",
+            lightning_contactless: paymentMethods?.lightning_contactless === "yes",
+        },
+        contact: {
+            website: contact?.website || "",
+            phone: contact?.phone || "",
+            email: contact?.email || "",
+            instagram: contact?.instagram || "",
+            facebook: contact?.facebook || "",
+            twitter: contact?.twitter || "",
+            telegram: contact?.telegram || "",
+            linkedin: contact?.linkedin || "",
+            youtube: contact?.youtube || "",
+            tiktok: contact?.tiktok || "",
+            whatsapp: contact?.whatsapp || "",
+        },
+        opening_hours: openingHours || "",
+        notes: note || "",
+        role: "",
+    };
+}
 
 const OpeningHoursPicker = dynamic(
     () => import("@/components/forms/OpeningHoursPicker"),
@@ -105,15 +158,24 @@ const STEPS = [
     { key: 3, label: 'Details', desc: 'Hours & pay' }
 ];
 
-export default function VenueSubmissionForm() {
+export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps) {
     const { user } = useOsmUser();
     const t = useTranslations('venues.form');
     const locale = useLocale() as Locale;
     const router = useRouter();
     const [step, setStep] = useState<number>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isImageUploading, setIsImageUploading] = useState(false);
     const [suggestedSubcategories, setSuggestedSubcategories] = useState<string[]>([]);
+
+    const isEditMode = Boolean(venue);
+
     const [form, setForm] = useState<VenueForm>(() => {
+        // In edit mode, initialize from venue
+        if (venue) {
+            return venueToForm(venue);
+        }
+        // In create mode, try to restore from session storage
         if (typeof window !== "undefined") {
             const stored = sessionStorage.getItem(STORAGE_KEY);
             return stored ? JSON.parse(stored) : EMPTY_FORM;
@@ -149,9 +211,12 @@ export default function VenueSubmissionForm() {
     useOnClickOutside([venueSelectorRef], () => clearVenueSuggestions());
     useOnClickOutside([addressSelectorRef], () => clearAddressSuggestions());
 
+    // Only save to session storage in create mode
     useEffect(() => {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(form));
-    }, [form]);
+        if (!isEditMode) {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+        }
+    }, [form, isEditMode]);
 
     const parsedOpeningHours: DayHours[] = useMemo(() => parseOpeningHours(form.opening_hours), [form.opening_hours]);
 
@@ -279,22 +344,40 @@ export default function VenueSubmissionForm() {
         setIsSubmitting(true);
         try {
             const token = await getRecaptchaToken();
-            const res = await fetch("/api/places", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    venue: form,
-                    captcha: token,
-                    suggestedSubcategories: suggestedSubcategories.length > 0 ? suggestedSubcategories : undefined,
-                }),
-            });
-            const json = await res.json();
-            if (res.ok && json.changesetId) {
-                sessionStorage.removeItem(STORAGE_KEY);
-                toast.success("Venue submitted!");
-                router.push(`/places/${json.changesetId}?preview=true`);
+
+            if (isEditMode && venue) {
+                // Edit mode - PUT to update existing venue
+                const res = await fetch(`/api/places/${venue.slug || venue.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ venue: form, captcha: token }),
+                });
+                const json = await res.json();
+                if (res.ok && json.ok) {
+                    toast.success("Changes submitted to OpenStreetMap!");
+                    router.push(`/places/${venue.slug || venue.id}`);
+                } else {
+                    toast.error(json.error || "Failed to submit changes");
+                }
             } else {
-                toast.error(json.error || "Submission failed");
+                // Create mode - POST to create new venue
+                const res = await fetch("/api/places", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        venue: form,
+                        captcha: token,
+                        suggestedSubcategories: suggestedSubcategories.length > 0 ? suggestedSubcategories : undefined,
+                    }),
+                });
+                const json = await res.json();
+                if (res.ok && json.changesetId) {
+                    sessionStorage.removeItem(STORAGE_KEY);
+                    toast.success("Venue submitted!");
+                    router.push(`/places/${json.changesetId}?preview=true`);
+                } else {
+                    toast.error(json.error || "Submission failed");
+                }
             }
         } catch (err: unknown) {
             toast.error(err instanceof Error ? err.message : "Submission failed");
@@ -319,13 +402,22 @@ export default function VenueSubmissionForm() {
         }
     };
 
+    const venueName = venue ? parseTags(venue.tags).name : null;
+
     return (
         <>
             {/* Hero Section */}
             <div className="w-full bg-gradient-primary pt-24 pb-10 px-8 max-md:px-4">
                 <div className="max-w-6xl mx-auto">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Add a New Venue</h1>
-                    <p className="text-white/70 text-lg">Help grow the Bitcoin merchant network by adding a new location</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                        {isEditMode ? "Edit Venue" : "Add a New Venue"}
+                    </h1>
+                    <p className="text-white/70 text-lg">
+                        {isEditMode
+                            ? <>Suggest changes to <strong className="text-white font-medium">{venueName}</strong></>
+                            : "Help grow the Bitcoin merchant network by adding a new location"
+                        }
+                    </p>
                 </div>
             </div>
 
@@ -367,56 +459,71 @@ export default function VenueSubmissionForm() {
                                     {/* Step 1 */}
                                     {step === 1 && (
                                         <>
-                                            {/* Venue Name Search */}
-                                            <div ref={venueSelectorRef} className="relative">
-                                                <label className="text-sm font-medium text-white block mb-1">
-                                                    {t('fields.name')} <span className="text-red-500">*</span>
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        placeholder={t('searchVenueName')}
-                                                        value={form.name}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value;
-                                                            setForm(prev => ({ ...prev, name: newValue }));
-                                                            // Trigger venue search for suggestions
-                                                            setVenueValue(newValue);
-                                                        }}
-                                                        autoComplete="off"
-                                                        className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                                            {/* Top row: Image on left, Name/Category on right - 50/50 */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                {/* Left column: Image uploader */}
+                                                <div>
+                                                    <VenueImageUploader
+                                                        value={form.image}
+                                                        onChange={(url) => setForm(prev => ({ ...prev, image: url }))}
+                                                        onUploadingChange={setIsImageUploading}
                                                     />
-                                                    {venueLoading ? (
-                                                        <SpinnerIcon className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" />
-                                                    ) : (
-                                                        <SearchIcon className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" />
-                                                    )}
                                                 </div>
-                                                {venueSuggestions.length > 0 && (
-                                                    <ul className="absolute z-50 w-full mt-1 bg-surface-light border border-border-light rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                                        {venueSuggestions.map((suggestion) => (
-                                                            <li
-                                                                key={suggestion.id}
-                                                                onClick={() => handleSelectVenue(suggestion)}
-                                                                className="px-3 py-2.5 cursor-pointer hover:bg-surface text-sm text-white border-b border-border-light/50 last:border-b-0"
-                                                            >
-                                                                <div className="font-medium">{suggestion.name}</div>
-                                                                <div className="text-xs text-text-light mt-0.5">{suggestion.label}</div>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                                <p className="text-xs text-text-light mt-1">Search existing venues or type a new name</p>
-                                            </div>
 
-                                            {/* Category */}
-                                            <CategorySelector
-                                                category={form.category as PlaceCategory | ''}
-                                                subcategory={form.subcategory}
-                                                onCategoryChange={(cat) => setForm(prev => ({ ...prev, category: cat, subcategory: '' }))}
-                                                onSubcategoryChange={(sub) => setForm(prev => ({ ...prev, subcategory: sub }))}
-                                                onSuggestSubcategory={handleSuggestSubcategory}
-                                                required
-                                            />
+                                                {/* Right column: Name and Category */}
+                                                <div className="space-y-4">
+                                                    {/* Venue Name Search */}
+                                                    <div ref={venueSelectorRef} className="relative">
+                                                        <label className="text-sm font-medium text-white block mb-1">
+                                                            {t('fields.name')} <span className="text-red-500">*</span>
+                                                        </label>
+                                                        <div className="relative">
+                                                            <input
+                                                                placeholder={t('searchVenueName')}
+                                                                value={form.name}
+                                                                onChange={(e) => {
+                                                                    const newValue = e.target.value;
+                                                                    setForm(prev => ({ ...prev, name: newValue }));
+                                                                    // Trigger venue search for suggestions
+                                                                    setVenueValue(newValue);
+                                                                }}
+                                                                autoComplete="off"
+                                                                className="w-full py-2.5 px-3 pr-9 border border-border-light rounded-xl text-sm text-white bg-surface-light placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                                                            />
+                                                            {venueLoading ? (
+                                                                <SpinnerIcon className="w-4 h-4 text-accent absolute right-3 top-1/2 -translate-y-1/2 animate-spin" />
+                                                            ) : (
+                                                                <SearchIcon className="w-4 h-4 text-text-light absolute right-3 top-1/2 -translate-y-1/2" />
+                                                            )}
+                                                        </div>
+                                                        {venueSuggestions.length > 0 && (
+                                                            <ul className="absolute z-50 w-full mt-1 bg-surface-light border border-border-light rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                                                {venueSuggestions.map((suggestion) => (
+                                                                    <li
+                                                                        key={suggestion.id}
+                                                                        onClick={() => handleSelectVenue(suggestion)}
+                                                                        className="px-3 py-2.5 cursor-pointer hover:bg-surface text-sm text-white border-b border-border-light/50 last:border-b-0"
+                                                                    >
+                                                                        <div className="font-medium">{suggestion.name}</div>
+                                                                        <div className="text-xs text-text-light mt-0.5">{suggestion.label}</div>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        <p className="text-xs text-text-light mt-1">Search existing venues or type a new name</p>
+                                                    </div>
+
+                                                    {/* Category */}
+                                                    <CategorySelector
+                                                        category={form.category as PlaceCategory | ''}
+                                                        subcategory={form.subcategory}
+                                                        onCategoryChange={(cat) => setForm(prev => ({ ...prev, category: cat, subcategory: '' as VenueForm["subcategory"] }))}
+                                                        onSubcategoryChange={(sub) => setForm(prev => ({ ...prev, subcategory: sub as VenueForm["subcategory"] }))}
+                                                        onSuggestSubcategory={handleSuggestSubcategory}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
 
                                             {/* Suggested subcategories */}
                                             {suggestedSubcategories.length > 0 && (
@@ -444,12 +551,6 @@ export default function VenueSubmissionForm() {
                                                 onChange={(e) => setForm(prev => ({ ...prev, about: e.target.value }))}
                                                 rows={2}
                                                 placeholder="Brief description..."
-                                            />
-
-                                            {/* Venue Image */}
-                                            <VenueImageUploader
-                                                value={form.image}
-                                                onChange={(url) => setForm(prev => ({ ...prev, image: url }))}
                                             />
 
                                             {/* Additional Tags */}
@@ -602,6 +703,10 @@ export default function VenueSubmissionForm() {
                                             <Button type="button" onClick={() => changeStep(step - 1)} variant="ghost" color="neutral" size="sm" leftIcon={<ChevronLeftIcon />}>
                                                 {t('backButton')}
                                             </Button>
+                                        ) : isEditMode && venue ? (
+                                            <Button href={`/places/${venue.slug || venue.id}`} variant="ghost" color="neutral" size="sm">
+                                                Cancel
+                                            </Button>
                                         ) : (
                                             <Button type="button" onClick={handleReset} variant="ghost" color="danger" size="sm">{t('resetButton')}</Button>
                                         )}
@@ -616,12 +721,12 @@ export default function VenueSubmissionForm() {
                                         ) : (
                                             <Button
                                                 type="submit"
-                                                disabled={isSubmitting}
-                                                loading={isSubmitting}
-                                                leftIcon={!isSubmitting ? <SendIcon /> : undefined}
+                                                disabled={isSubmitting || isImageUploading}
+                                                loading={isSubmitting || isImageUploading}
+                                                leftIcon={!isSubmitting && !isImageUploading ? <SendIcon /> : undefined}
                                                 size="sm"
                                             >
-                                                {isSubmitting ? "Submitting..." : t('submitVenue')}
+                                                {isImageUploading ? "Uploading image..." : isSubmitting ? "Submitting..." : isEditMode ? "Submit Changes" : t('submitVenue')}
                                             </Button>
                                         )}
                                     </div>
