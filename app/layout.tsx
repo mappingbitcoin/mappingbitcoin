@@ -1,8 +1,9 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Oswald } from "next/font/google";
 import React from "react";
 
 import { routing } from "@/i18n/routing";
+import { publicEnv } from "@/lib/Environment";
 
 import "@/app/globals.css";
 
@@ -10,6 +11,10 @@ const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
+  metadataBase: new URL(publicEnv.siteUrl),
+};
 
 export const viewport: Viewport = {
   width: "device-width",

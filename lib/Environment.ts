@@ -63,11 +63,6 @@ export const publicEnv = {
      */
     gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
 
-    /**
-     * Google Maps API key for photos
-     * Used for Place Photos API on client side
-     */
-    googleMapsPhotoKey: process.env.NEXT_PUBLIC_MAP_API_KEY_PHOTO,
 } as const;
 
 // =============================================================================
@@ -109,14 +104,6 @@ export const serverEnv = {
      */
     get recaptchaSecretKey(): string | undefined {
         return requiredInProduction("RECAPTCHA_SECRET_KEY", process.env.RECAPTCHA_SECRET_KEY);
-    },
-
-    /**
-     * Google Maps API key for backend
-     * Used for server-side Google Maps API calls
-     */
-    get googleMapsApiKey(): string | undefined {
-        return process.env.GOOGLE_MAPS_APIKEY_BE;
     },
 
     /**

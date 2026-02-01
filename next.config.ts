@@ -17,11 +17,6 @@ const nextConfig: NextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'maps.googleapis.com',
-                pathname: '/maps/api/place/photo',
-            },
-            {
-                protocol: 'https',
                 hostname: 'drive.google.com',
                 pathname: '/uc',
             },
