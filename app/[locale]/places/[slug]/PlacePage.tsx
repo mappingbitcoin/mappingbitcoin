@@ -6,7 +6,7 @@ import maplibregl from 'maplibre-gl';
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import Image from "next/image";
-import {EnrichedVenue, GoogleReview} from "@/models/Overpass";
+import {EnrichedVenue} from "@/models/Overpass";
 import {parseTags, formatOpeningHours} from "@/utils/OsmHelpers";
 import {Link} from '@/i18n/navigation';
 import { NewsletterCTA } from "@/components/common";
@@ -20,7 +20,6 @@ import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {getFormattedAddress} from "@/utils/AddressUtils";
-import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import moment from 'moment';
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
@@ -46,8 +45,6 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
     const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "about">("overview");
     const [imageError, setImageError] = useState(false);
 
-    const {place} = useGooglePlaceMatch(venue);
-
     useEffect(() => {
         setIsMounted(true);
     }, []);
@@ -63,54 +60,23 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
         return getLocalizedCountryName(locale, venue.country)
     }, [locale, venue.country])
 
-    const address = useMemo(() => place?.address ?? getFormattedAddress(locale, venue), [locale, venue, place]);
+    const address = useMemo(() => getFormattedAddress(locale, venue), [locale, venue]);
 
-    const score = useMemo(() => place?.rating ?? venue.rating ?? 0, [place, venue.rating]);
-    const totalRatings = useMemo(() => place?.userRatingsTotal ?? 0, [place]);
+    const score = useMemo(() => venue.rating ?? 0, [venue.rating]);
 
-    const reviewsList = useMemo(() => place?.reviews && place.reviews.length > 0 ? (
-        place.reviews.map((r: GoogleReview, i: number) => (
-            <div key={i} className="bg-primary-light p-4 rounded-card border border-border-light">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-white">{r.author_name || "Anonymous"}</span>
-                    <span className="text-xs text-text-light">{r.relative_time_description}</span>
-                </div>
-                <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                        <StarIcon key={i} className={`w-4 h-4 ${i < r.rating ? 'text-amber-400' : 'text-gray-600'}`} />
-                    ))}
-                </div>
-                {r.text && <p className="text-sm text-text-light leading-relaxed">{r.text}</p>}
-            </div>
-        ))
-    ) : null, [place]);
-
-    const {featuredPhoto} = useMemo(() => {
-        // First priority: OSM image tag
+    // Featured photo from OSM image tag
+    const featuredPhoto = useMemo(() => {
         if (venue.tags?.image) {
-            return { featuredPhoto: venue.tags.image };
+            return venue.tags.image;
         }
-        // Second priority: Google Places photos
-        if (place?.photos && place.photos.length > 0) {
-            const photoUrls = place.photos.map((photo: { photo_reference: string; }) => {
-                const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
-                photoUrl.searchParams.set('maxheight', '400');
-                photoUrl.searchParams.set('photo_reference', photo.photo_reference);
-                photoUrl.searchParams.set('key', String(process.env.NEXT_PUBLIC_MAP_API_KEY_PHOTO));
-                return photoUrl.toString()
-            })
-            return {featuredPhoto: photoUrls[0]}
-        } else return {featuredPhoto: null}
-    }, [place, venue.tags?.image]);
+        return null;
+    }, [venue.tags?.image]);
 
     const googleMapLink = useMemo(() => {
-        if (place?.placeId) {
-            return `https://www.google.com/maps/place/?q=place_id:${place.placeId}`;
-        }
         const { lat, lon } = venue;
         const query = address && address.length > 0 ? encodeURIComponent(address) : `${lat},${lon}`;
         return `https://www.google.com/maps/search/?api=1&query=${query}`;
-    }, [venue, place, address]);
+    }, [venue, address]);
 
     const categoryLabel = venue.subcategory && venue.category
         ? getSubcategoryLabel(locale, venue.category, venue.subcategory)
@@ -137,37 +103,37 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                     {/* Breadcrumb */}
                     <nav aria-label="Breadcrumb" className="mb-6">
                         <ol className="flex flex-wrap list-none gap-2 text-sm [&_li]:after:content-['/'] [&_li]:after:ml-2 [&_li]:after:text-white/50 [&_li:last-child]:after:content-[''] [&_li:last-child]:after:m-0 [&_a]:text-white/80 [&_a]:no-underline [&_a]:transition-colors [&_a:hover]:text-white [&_span]:text-white">
-                            <li>
-                                <Link href="/countries">{t('breadcrumb.home')}</Link>
-                            </li>
-                            <li>
-                                {(venue.city || venue.subcategory) && countryLabel ? (
-                                    <Link href={`/${getLocalizedCountrySlug(countryLabel, locale)}`}>
-                                        {countryLabel}
-                                    </Link>
-                                ) : (
-                                    <span>{countryLabel}</span>
-                                )}
-                            </li>
-                            {venue.city && countryLabel && (
                                 <li>
-                                    {venue.subcategory ? (
-                                        <Link href={`/${getLocalizedCitySlug(countryLabel, venue.city, locale)}`}>
-                                            {deslugify(venue.city)}
+                                    <Link href="/countries">{t('breadcrumb.home')}</Link>
+                                </li>
+                                <li>
+                                    {(venue.city || venue.subcategory) && countryLabel ? (
+                                        <Link href={`/${getLocalizedCountrySlug(countryLabel, locale)}`}>
+                                            {countryLabel}
                                         </Link>
                                     ) : (
-                                        <span>{deslugify(venue.city)}</span>
+                                        <span>{countryLabel}</span>
                                     )}
                                 </li>
-                            )}
-                            {venue.subcategory && venue.category && countryLabel && (
-                                <li>
-                                    <Link href={`/${getLocalizedCountryCategorySlug(countryLabel, venue.subcategory, locale)}`}>
-                                        {getSubcategoryLabel(locale, venue.category, venue.subcategory)}
-                                    </Link>
-                                </li>
-                            )}
-                        </ol>
+                                {venue.city && countryLabel && (
+                                    <li>
+                                        {venue.subcategory ? (
+                                            <Link href={`/${getLocalizedCitySlug(countryLabel, venue.city, locale)}`}>
+                                                {deslugify(venue.city)}
+                                            </Link>
+                                        ) : (
+                                            <span>{deslugify(venue.city)}</span>
+                                        )}
+                                    </li>
+                                )}
+                                {venue.subcategory && venue.category && countryLabel && (
+                                    <li>
+                                        <Link href={`/${getLocalizedCountryCategorySlug(countryLabel, venue.subcategory, locale)}`}>
+                                            {getSubcategoryLabel(locale, venue.category, venue.subcategory)}
+                                        </Link>
+                                    </li>
+                                )}
+                            </ol>
                     </nav>
 
                     {/* Venue Title & Quick Info */}
@@ -197,7 +163,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                 {score > 0 && (
                                     <span className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 py-1.5 px-3 rounded-full text-sm">
                                         <StarIcon className="w-4 h-4" />
-                                        {score.toFixed(1)} {totalRatings > 0 && `(${totalRatings})`}
+                                        {score.toFixed(1)}
                                     </span>
                                 )}
                             </div>
@@ -486,30 +452,12 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
                                     {/* Reviews Tab */}
                                     {activeTab === 'reviews' && (
-                                        <div className="space-y-4">
-                                            {score > 0 && (
-                                                <div className="flex items-center gap-4 pb-4 border-b border-border-light">
-                                                    <div className="text-4xl font-bold text-white">{score.toFixed(1)}</div>
-                                                    <div>
-                                                        <div className="flex items-center gap-0.5 mb-1">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <StarIcon key={i} className={`w-5 h-5 ${i < Math.round(score) ? 'text-amber-400' : 'text-gray-600'}`} />
-                                                            ))}
-                                                        </div>
-                                                        <p className="text-sm text-text-light">{totalRatings} {tMap('tabs.reviews')}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {reviewsList ? (
-                                                <div className="space-y-3">
-                                                    {reviewsList}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-8">
-                                                    <ChatIcon className="w-12 h-12 mx-auto text-text-light mb-3" />
-                                                    <p className="text-text-light">{tMap('noReviews')}</p>
-                                                </div>
-                                            )}
+                                        <div className="text-center py-12">
+                                            <ChatIcon className="w-12 h-12 mx-auto text-text-light mb-4" />
+                                            <h3 className="text-lg font-semibold text-white mb-2">Reviews Coming Soon</h3>
+                                            <p className="text-text-light text-sm max-w-md mx-auto">
+                                                We're working on a community-driven review system. Stay tuned!
+                                            </p>
                                         </div>
                                     )}
 

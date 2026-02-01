@@ -6,12 +6,11 @@ import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {useLocale} from "next-intl";
 import {Locale} from "@/i18n/types";
 import { CategoryChip, Button, TabButton, TextLink } from "@/components/ui";
-import {useGooglePlaceMatch} from "@/hooks/useGooglePlaceMatch";
 import OpeningHoursDisplay from "../OpeningHoursDisplay";
 import Image from "next/image";
 import {getSubcategoryLabel, PLACE_CATEGORIES} from "@/constants/PlaceCategories";
 import { useTranslations } from "next-intl";
-import {EnrichedVenue, GoogleReview} from "@/models/Overpass";
+import {EnrichedVenue} from "@/models/Overpass";
 import {parseTags} from "@/utils/OsmHelpers";
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import moment from 'moment'
@@ -32,74 +31,26 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
     const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "about">("overview");
     const [imageError, setImageError] = useState(false);
 
-    const {place} = useGooglePlaceMatch(venue);
+    const score = useMemo(() => venue.rating ?? 0, [venue.rating]);
 
-    const score = useMemo(() => place?.rating ?? 0, [place])
-    const totalRatings = useMemo(() => place?.userRatingsTotal ?? 0, [place])
-
-    const reviewsList = useMemo(() => place?.reviews && place.reviews.length > 0 ? (
-        place.reviews.map((r: GoogleReview, i: number) => {
-            return (
-                <div key={i} className="bg-surface-light p-3 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] [&_strong]:text-sm [&_strong]:text-text [&_p]:text-[13px] [&_p]:text-text-light [&_p]:mt-1">
-                    <strong>{r.author_name || "Anonymous"}</strong>
-                    <div className="text-lg">
-                        {[...Array(5)].map((_, i) => {
-                            const filled = i + 1 <= Math.floor(r.rating);
-                            const partial = i < r.rating && i + 1 > r.rating;
-                            return (
-                                <span
-                                    key={i}
-                                    className={`${filled ? 'text-[#f5a623]' : partial ? 'bg-gradient-to-r from-[#f5a623] from-50% to-[#949494] to-50% bg-clip-text text-transparent' : 'text-[#949494]'}`}
-                                >
-                                ★
-                              </span>
-                            );
-                        })}
-                    </div>
-                    <p>{r.text}</p>
-                    <p>{r.relative_time_description}</p>
-                </div>
-            )
-        })
-    ) : (
-        <p>{t("noReviews")}</p>
-    ), [place, t])
-
-    const address = useMemo(() => place?.address ?? getFormattedAddress(locale, venue), [locale, venue, place]);
+    const address = useMemo(() => getFormattedAddress(locale, venue), [locale, venue]);
 
     const googleMapLink = useMemo(() => {
-        if (place?.placeId) {
-            return `https://www.google.com/maps/place/?q=place_id:${place.placeId}`;
-        }
-
         const { lat, lon } = venue;
         const query = address && address.length > 0 ? encodeURIComponent(address) : `${lat},${lon}`;
         return `https://www.google.com/maps/search/?api=1&query=${query}`;
-    }, [venue, place, address]);
+    }, [venue, address]);
 
-    const {featuredPhoto} = useMemo(() => {
-        // First priority: OSM image tag
+    // Featured photo from OSM image tag
+    const featuredPhoto = useMemo(() => {
         if (venue.tags?.image) {
-            return { featuredPhoto: venue.tags.image };
+            return venue.tags.image;
         }
-        // Second priority: Google Places photos
-        if (place?.photos && place.photos.length > 0) {
-            const photoUrls = place.photos.map((photo: { photo_reference: string; }) => {
-                const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
-                photoUrl.searchParams.set('maxheight', '400');
-                photoUrl.searchParams.set('photo_reference', photo.photo_reference);
-                photoUrl.searchParams.set('key', String(process.env.NEXT_PUBLIC_MAP_API_KEY_PHOTO));
-                return photoUrl.toString()
-            })
-
-            return {featuredPhoto: photoUrls[0], photos: photoUrls.length > 1 ? photoUrls.slice(1) : null}
-
-        } else return {featuredPhoto: null}
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, venue.tags?.image])
+        return null;
+    }, [venue.tags?.image]);
 
     const {paymentMethods, name, contact, openingHours, source, description,
-        descriptionsByLocale, note, notesByLocale,specialTags, amenitiesTags} = useMemo(() => {
+        descriptionsByLocale, note, notesByLocale, specialTags, amenitiesTags} = useMemo(() => {
         return parseTags(venue.tags);
     }, [venue]);
 
@@ -112,7 +63,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                         <Image
                             src={featuredPhoto}
                             className="h-full w-full object-cover"
-                            alt={name ?? place?.label ?? 'Venue'}
+                            alt={name ?? 'Venue'}
                             fill
                             loading={'lazy'}
                             unoptimized
@@ -150,25 +101,27 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                         })}
                     </div>
 
-                    <div className="flex flex-col gap-1 mt-3">
-                        <div className="text-lg">
-                            {[...Array(5)].map((_, i) => {
-                                const filled = i + 1 <= Math.floor(score);
-                                const partial = i < score && i + 1 > score;
-                                return (
-                                    <span
-                                        key={i}
-                                        className={`${filled ? 'text-accent' : partial ? 'bg-gradient-to-r from-accent from-50% to-text-light to-50% bg-clip-text text-transparent' : 'text-text-light'}`}
-                                    >
-                    ★
-                  </span>
-                                );
-                            })}
+                    {score > 0 && (
+                        <div className="flex flex-col gap-1 mt-3">
+                            <div className="text-lg">
+                                {[...Array(5)].map((_, i) => {
+                                    const filled = i + 1 <= Math.floor(score);
+                                    const partial = i < score && i + 1 > score;
+                                    return (
+                                        <span
+                                            key={i}
+                                            className={`${filled ? 'text-accent' : partial ? 'bg-gradient-to-r from-accent from-50% to-text-light to-50% bg-clip-text text-transparent' : 'text-text-light'}`}
+                                        >
+                        ★
+                      </span>
+                                    );
+                                })}
+                            </div>
+                            <div className="text-[13px] text-text-light">
+                                {score.toFixed(1)}
+                            </div>
                         </div>
-                        <div className="text-[13px] text-text-light">
-                            {score.toFixed(1)} · {totalRatings} {t("tabs.reviews")}
-                        </div>
-                    </div>
+                    )}
 
                     <div className="relative my-4 flex w-full">
                         <Button href={googleMapLink} external variant="soft" color="accent" size="sm" leftIcon={<PinIcon />}>
@@ -303,10 +256,12 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                     )}
 
                     {activeTab === "reviews" && (
-                        <div className="flex flex-col gap-4">
-                            <div className="flex flex-col gap-3">
-                                {reviewsList}
-                            </div>
+                        <div className="text-center py-8">
+                            <div className="text-4xl mb-3">💬</div>
+                            <h3 className="text-base font-semibold text-white mb-2">Reviews Coming Soon</h3>
+                            <p className="text-text-light text-sm">
+                                We're working on a community-driven review system.
+                            </p>
                         </div>
                     )}
 

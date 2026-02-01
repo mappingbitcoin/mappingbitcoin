@@ -29,15 +29,6 @@ export type OverpassResponse = {
     elements: OverpassElement[];
 };
 
-export interface GoogleReview {
-    author_name: string;
-    rating: number;
-    relative_time_description: string;
-    text: string;
-    time: number;
-    profile_photo_url?: string;
-}
-
 export type EnrichedVenue<T extends PlaceCategory = PlaceCategory> = OverpassElement & {
     id: number;
     lat: number;
@@ -61,12 +52,7 @@ export type EnrichedVenue<T extends PlaceCategory = PlaceCategory> = OverpassEle
 
     aiUpdatedAt?: string; // Timestamp of AI fallback enrichment if needed
 
-    // Google Places data (on-demand)
-    placeId?: string;
-    googleFormattedAddress?: string;
+    // Rating (from OSM or other sources)
     rating?: number;
-    userRatingsTotal?: number;
-    reviews?: GoogleReview[];
-    googleEnrichedAt?: string; // Timestamp of Google data fetch
 };
 
