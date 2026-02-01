@@ -4,7 +4,8 @@ import path from "path";
 import { EnrichedVenue } from "@/models/Overpass";
 import { getCitiesCache } from "@/app/api/cache/CitiesCache";
 import { getAdmin1Name } from "@/app/api/cache/Admin1Cache";
-import { TAG_CATEGORY_MAP } from "@/constants/PlaceOsmDictionary";
+import { TAG_CATEGORY_MAP, PLACE_TO_OSM_TAG_KEY } from "@/constants/PlaceOsmDictionary";
+import { PLACE_SUBTYPE_MAP, PlaceCategory, matchPlaceSubcategory } from "@/constants/PlaceCategories";
 import { refreshVenueCache } from "@/app/api/cache/VenueCache";
 import { refreshLocationCache } from "@/app/api/cache/LocationCache";
 import { refreshTileCache } from "@/app/api/cache/TileCache";
@@ -86,6 +87,9 @@ async function enrichVenue(
     }
 
     if ((!existing?.category || !existing.subcategory) && v.tags) {
+        let categoryMatched = false;
+
+        // First try: TAG_CATEGORY_MAP lookup (standard OSM tag mapping)
         for (const [key, value] of Object.entries(v.tags)) {
             const tag = `${key}:${value}`;
             const match = TAG_CATEGORY_MAP[tag];
@@ -94,7 +98,44 @@ async function enrichVenue(
                 v.subcategory = match.subcategory;
                 v.enrichedCategoryAt = new Date().toISOString();
                 updated = true;
+                categoryMatched = true;
                 break;
+            }
+        }
+
+        // Second try: Use custom 'category' tag from MappingBitcoin submissions
+        // When venues are created via our platform, we store category in the tags
+        if (!categoryMatched && v.tags.category) {
+            const categoryTag = v.tags.category as string;
+
+            // Validate it's a known category
+            if (categoryTag in PLACE_SUBTYPE_MAP) {
+                v.category = categoryTag as PlaceCategory;
+
+                // Try to find subcategory from OSM tags (amenity, shop, tourism, etc.)
+                // These are the keys used in PLACE_TO_OSM_TAG_KEY
+                const osmTagKeys = ['amenity', 'shop', 'tourism', 'leisure', 'office', 'craft', 'healthcare', 'place'];
+                for (const tagKey of osmTagKeys) {
+                    const tagValue = v.tags[tagKey];
+                    if (tagValue) {
+                        // Check if this value is a valid subcategory using matchPlaceSubcategory
+                        const subcatMatch = matchPlaceSubcategory(tagValue);
+                        if (subcatMatch && subcatMatch.category === categoryTag) {
+                            v.subcategory = subcatMatch.subcategory;
+                            break;
+                        }
+                        // Also check if the value directly exists in the category's subcategories
+                        const validSubcats = PLACE_SUBTYPE_MAP[categoryTag as PlaceCategory];
+                        if (validSubcats && (validSubcats as readonly string[]).includes(tagValue)) {
+                            // Safe cast: tagValue was validated against validSubcats
+                            v.subcategory = tagValue as typeof v.subcategory;
+                            break;
+                        }
+                    }
+                }
+
+                v.enrichedCategoryAt = new Date().toISOString();
+                updated = true;
             }
         }
     }
