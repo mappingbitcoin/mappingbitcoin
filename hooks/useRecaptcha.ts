@@ -67,12 +67,14 @@ let loadingPromise: Promise<void> | null = null;
  * Script is loaded lazily - only when preload() is called or getToken() is requested
  */
 export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaReturn {
-    const [isReady, setIsReady] = useState(() => Boolean(window.grecaptcha));
+    const [isReady, setIsReady] = useState(() =>
+        typeof window !== "undefined" && Boolean(window.grecaptcha)
+    );
     const isConfigured = Boolean(publicEnv.recaptchaSiteKey);
     const loadingRef = useRef(false);
 
     const ensureLoaded = useCallback(async (): Promise<boolean> => {
-        if (!isConfigured) return false;
+        if (!isConfigured || typeof window === "undefined") return false;
         if (window.grecaptcha) {
             setIsReady(true);
             return true;
@@ -93,6 +95,7 @@ export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaRetur
     }, [isConfigured]);
 
     const preload = useCallback(() => {
+        if (typeof window === "undefined") return;
         if (isConfigured && !window.grecaptcha && !loadingRef.current) {
             ensureLoaded();
         }
