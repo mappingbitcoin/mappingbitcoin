@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button from "@/components/ui/Button";
 import ToggleButton from "@/components/ui/ToggleButton";
 import AssetUploader from "./AssetUploader";
@@ -63,6 +64,11 @@ export default function AssetsTab() {
 
     // Edit modal
     const [editingAsset, setEditingAsset] = useState<MarketingAsset | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<MarketingAsset | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchAssets = useCallback(async () => {
         if (!authToken) return;
@@ -199,13 +205,14 @@ export default function AssetsTab() {
         }
     };
 
-    const handleDelete = async (asset: MarketingAsset) => {
-        if (!confirm(t("confirm.deleteAsset", { name: asset.filename }))) {
-            return;
-        }
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/marketing/assets/${asset.id}`, {
+            const response = await fetch(`/api/admin/marketing/assets/${deleteTarget.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -215,9 +222,12 @@ export default function AssetsTab() {
                 throw new Error(data.error || t("errors.failedToDelete"));
             }
 
+            setDeleteTarget(null);
             fetchAssets();
         } catch (err) {
-            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
+            setDeleteError(err instanceof Error ? err.message : t("errors.failedToDelete"));
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -345,7 +355,7 @@ export default function AssetsTab() {
                                         {t("common.edit")}
                                     </Button>
                                     <Button
-                                        onClick={() => handleDelete(asset)}
+                                        onClick={() => setDeleteTarget(asset)}
                                         variant="ghost"
                                         color="danger"
                                         size="xs"
@@ -598,6 +608,33 @@ export default function AssetsTab() {
                     </div>
                 </div>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title={t("assets.deleteTitle")}
+                description={t("confirm.deleteAsset", { name: deleteTarget?.filename || "" })}
+                preview={
+                    deleteTarget ? (
+                        <div className="flex items-center gap-3">
+                            {getFileIcon(deleteTarget.mimeType)}
+                            <div>
+                                <p className="text-white text-sm font-medium">{deleteTarget.filename}</p>
+                                <p className="text-xs text-text-light">{formatFileSize(deleteTarget.size)}</p>
+                            </div>
+                        </div>
+                    ) : undefined
+                }
+                confirmText={t("common.delete")}
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

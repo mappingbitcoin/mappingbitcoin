@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button, { IconButton } from "@/components/ui/Button";
 import ToggleButton from "@/components/ui/ToggleButton";
 import TagInput from "./TagInput";
@@ -29,6 +30,11 @@ export default function HashtagsTab() {
     });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<HashtagSet | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchHashtagSets = useCallback(async () => {
         if (!authToken) return;
@@ -146,13 +152,14 @@ export default function HashtagsTab() {
         }
     };
 
-    const handleDelete = async (set: HashtagSet) => {
-        if (!confirm(t("confirm.deleteHashtagSet", { name: set.name }))) {
-            return;
-        }
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/marketing/hashtags/${set.id}`, {
+            const response = await fetch(`/api/admin/marketing/hashtags/${deleteTarget.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -162,9 +169,12 @@ export default function HashtagsTab() {
                 throw new Error(data.error || t("errors.failedToDelete"));
             }
 
+            setDeleteTarget(null);
             fetchHashtagSets();
         } catch (err) {
-            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
+            setDeleteError(err instanceof Error ? err.message : t("errors.failedToDelete"));
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -238,7 +248,7 @@ export default function HashtagsTab() {
                                         size="sm"
                                     />
                                     <IconButton
-                                        onClick={() => handleDelete(set)}
+                                        onClick={() => setDeleteTarget(set)}
                                         icon={<TrashIcon />}
                                         aria-label="Delete"
                                         variant="ghost"
@@ -367,6 +377,37 @@ export default function HashtagsTab() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title={t("hashtags.deleteTitle")}
+                description={t("confirm.deleteHashtagSet", { name: deleteTarget?.name || "" })}
+                preview={
+                    deleteTarget ? (
+                        <div>
+                            <p className="text-white text-sm font-medium">{deleteTarget.name}</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                                {deleteTarget.hashtags.slice(0, 5).map((tag, i) => (
+                                    <span key={i} className="text-xs text-accent">#{tag}</span>
+                                ))}
+                                {deleteTarget.hashtags.length > 5 && (
+                                    <span className="text-xs text-text-light">+{deleteTarget.hashtags.length - 5} more</span>
+                                )}
+                            </div>
+                        </div>
+                    ) : undefined
+                }
+                confirmText={t("common.delete")}
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

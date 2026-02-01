@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
+import AlertModal from "@/components/ui/Modal/AlertModal";
 import Button, { IconButton } from "@/components/ui/Button";
 import ToggleButton from "@/components/ui/ToggleButton";
 import { SearchIcon, CloseIcon, PlusIcon, UsersIcon, BanIcon } from "@/assets/icons/ui";
@@ -71,6 +73,14 @@ export default function UsersPage() {
     const [bulkBanning, setBulkBanning] = useState(false);
     const [bulkBanError, setBulkBanError] = useState<string | null>(null);
     const [bulkBanResult, setBulkBanResult] = useState<string | null>(null);
+
+    // Unban modal state
+    const [unbanTarget, setUnbanTarget] = useState<User | null>(null);
+    const [unbanning, setUnbanning] = useState(false);
+    const [unbanError, setUnbanError] = useState<string | null>(null);
+
+    // Alert modal state
+    const [alertModal, setAlertModal] = useState<{ title: string; message: string; variant: "error" | "success" } | null>(null);
 
     // Debounce search query
     useEffect(() => {
@@ -168,14 +178,14 @@ export default function UsersPage() {
         }
     };
 
-    const handleUnban = async (user: User) => {
-        if (!authToken) return;
-        if (!confirm(`Are you sure you want to unban ${user.name || user.pubkey.slice(0, 16)}...?`)) {
-            return;
-        }
+    const handleUnban = async () => {
+        if (!authToken || !unbanTarget) return;
+
+        setUnbanning(true);
+        setUnbanError(null);
 
         try {
-            const response = await fetch(`/api/admin/users/${user.pubkey}`, {
+            const response = await fetch(`/api/admin/users/${unbanTarget.pubkey}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -189,9 +199,12 @@ export default function UsersPage() {
                 throw new Error(data.error || "Failed to unban user");
             }
 
+            setUnbanTarget(null);
             fetchUsers();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to unban user");
+            setUnbanError(err instanceof Error ? err.message : "Failed to unban user");
+        } finally {
+            setUnbanning(false);
         }
     };
 
@@ -508,7 +521,7 @@ export default function UsersPage() {
                                         <td className="px-4 py-3 text-right">
                                             {user.bannedAt ? (
                                                 <Button
-                                                    onClick={() => handleUnban(user)}
+                                                    onClick={() => setUnbanTarget(user)}
                                                     variant="ghost"
                                                     color="success"
                                                     size="sm"
@@ -777,6 +790,56 @@ export default function UsersPage() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Unban Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!unbanTarget}
+                onClose={() => {
+                    setUnbanTarget(null);
+                    setUnbanError(null);
+                }}
+                onConfirm={handleUnban}
+                title="Unban User"
+                description={`Are you sure you want to unban ${getUserDisplayName(unbanTarget) || unbanTarget?.pubkey.slice(0, 16)}...? They will be able to submit reviews and claim venues again.`}
+                preview={
+                    unbanTarget ? (
+                        <div className="flex items-center gap-3">
+                            {unbanTarget.picture ? (
+                                <img
+                                    src={unbanTarget.picture}
+                                    alt=""
+                                    className="w-8 h-8 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center">
+                                    <UsersIcon className="w-4 h-4 text-text-light" />
+                                </div>
+                            )}
+                            <div>
+                                <p className="text-white text-sm font-medium">
+                                    {getUserDisplayName(unbanTarget) || "Anonymous"}
+                                </p>
+                                <code className="text-xs text-text-light">
+                                    {unbanTarget.pubkey.slice(0, 16)}...
+                                </code>
+                            </div>
+                        </div>
+                    ) : undefined
+                }
+                confirmText="Unban User"
+                loading={unbanning}
+                error={unbanError}
+                variant="info"
+            />
+
+            {/* Alert Modal */}
+            <AlertModal
+                isOpen={!!alertModal}
+                onClose={() => setAlertModal(null)}
+                title={alertModal?.title || ""}
+                message={alertModal?.message || ""}
+                variant={alertModal?.variant || "error"}
+            />
         </div>
     );
 }

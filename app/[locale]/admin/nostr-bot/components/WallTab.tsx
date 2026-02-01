@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
-import { RefreshIcon, ExternalLinkIcon } from "@/assets/icons/ui";
+import { RefreshIcon, ExternalLinkIcon, TrashIcon } from "@/assets/icons";
 import Button from "@/components/ui/Button";
+import TextLink from "@/components/ui/TextLink";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 
 interface NostrPost {
     id: string;
@@ -18,6 +20,9 @@ export default function WallTab() {
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<NostrPost[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [postToDelete, setPostToDelete] = useState<NostrPost | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchPosts = useCallback(async () => {
         if (!authToken) return;
@@ -44,6 +49,41 @@ export default function WallTab() {
     useEffect(() => {
         fetchPosts();
     }, [fetchPosts]);
+
+    const handleDelete = async () => {
+        if (!postToDelete || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
+
+        try {
+            const res = await fetch("/api/admin/nostr-bot/posts", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    eventId: postToDelete.id,
+                    reason: "Deleted by admin",
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete post");
+            }
+
+            // Remove from local state
+            setPosts((prev) => prev.filter((p) => p.id !== postToDelete.id));
+            setPostToDelete(null);
+        } catch (err) {
+            setDeleteError(err instanceof Error ? err.message : "Failed to delete post");
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     const formatDate = (timestamp: number) => {
         const date = new Date(timestamp * 1000);
@@ -141,17 +181,25 @@ export default function WallTab() {
                                             </div>
                                         )}
 
-                                        <div className="flex items-center gap-4 mt-3 text-xs text-text-light">
-                                            <span>{formatDate(post.created_at)}</span>
-                                            <a
+                                        <div className="flex items-center gap-4 mt-3 text-xs">
+                                            <span className="text-text-light">{formatDate(post.created_at)}</span>
+                                            <TextLink
                                                 href={getNostrClientUrl(post.id)}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1 text-accent hover:text-accent-light transition-colors"
+                                                external
+                                                className="inline-flex items-center gap-1 text-xs"
                                             >
                                                 View on Nostr
                                                 <ExternalLinkIcon className="w-3 h-3" />
-                                            </a>
+                                            </TextLink>
+                                            <Button
+                                                onClick={() => setPostToDelete(post)}
+                                                variant="ghost"
+                                                color="danger"
+                                                size="xs"
+                                                leftIcon={<TrashIcon className="w-3 h-3" />}
+                                            >
+                                                Delete
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -160,6 +208,30 @@ export default function WallTab() {
                     })}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!postToDelete}
+                onClose={() => {
+                    setPostToDelete(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title="Delete Post"
+                description="Are you sure you want to delete this post? This will publish a NIP-09 deletion event to all relays."
+                preview={
+                    postToDelete ? (
+                        <p className="text-sm text-white whitespace-pre-wrap break-words">
+                            {postToDelete.content.slice(0, 200)}
+                            {postToDelete.content.length > 200 && "..."}
+                        </p>
+                    ) : undefined
+                }
+                confirmText="Delete Post"
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

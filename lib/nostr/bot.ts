@@ -6,16 +6,7 @@
 
 import { serverEnv, publicEnv } from "@/lib/Environment";
 import { getPublicKey, signEvent, getEventHash, hexToNpub, NostrEvent } from "./crypto";
-import WebSocket, { type Data as WebSocketData } from "ws";
-
-// Nostr relays to publish to
-const PUBLISH_RELAYS = [
-    "wss://relay.mappingbitcoin.com",
-    "wss://relay.damus.io",
-    "wss://relay.nostr.band",
-    "wss://nos.lol",
-    "wss://relay.primal.net",
-];
+import { publishEventToRelays, NOSTR_RELAYS } from "./actions";
 
 // ============================================================================
 // Message Templates - New Venue (30 variations)
@@ -124,71 +115,6 @@ function maskEmail(email: string): string {
     return `${maskedLocal}@${domain}`;
 }
 
-async function publishToRelays(event: NostrEvent): Promise<void> {
-    const promises = PUBLISH_RELAYS.map(async (relay) => {
-        try {
-            const ws = await connectWithTimeout(relay, 5000);
-            return new Promise<void>((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    ws.close();
-                    reject(new Error("Publish timeout"));
-                }, 10000);
-
-                ws.on("message", (data: WebSocketData) => {
-                    try {
-                        const parsed = JSON.parse(data.toString());
-                        if (parsed[0] === "OK" && parsed[1] === event.id) {
-                            clearTimeout(timeout);
-                            ws.close();
-                            resolve();
-                        }
-                    } catch {
-                        // Ignore parse errors
-                    }
-                });
-
-                ws.on("error", () => {
-                    clearTimeout(timeout);
-                    ws.close();
-                    reject(new Error("WebSocket error"));
-                });
-
-                ws.send(JSON.stringify(["EVENT", event]));
-            });
-        } catch (error) {
-            console.error(`Failed to publish to ${relay}:`, error);
-            throw error;
-        }
-    });
-
-    // Wait for at least one relay to accept (Promise.any polyfill for older Node)
-    const results = await Promise.allSettled(promises);
-    const succeeded = results.some((r) => r.status === "fulfilled");
-    if (!succeeded) {
-        console.error("Failed to publish to any relay");
-    }
-}
-
-async function connectWithTimeout(url: string, timeout: number): Promise<WebSocket> {
-    return new Promise((resolve, reject) => {
-        const ws = new WebSocket(url);
-        const timer = setTimeout(() => {
-            ws.close();
-            reject(new Error("Connection timeout"));
-        }, timeout);
-
-        ws.on("open", () => {
-            clearTimeout(timer);
-            resolve(ws);
-        });
-
-        ws.on("error", () => {
-            clearTimeout(timer);
-            reject(new Error("Connection failed"));
-        });
-    });
-}
-
 // ============================================================================
 // Public API
 // ============================================================================
@@ -262,9 +188,14 @@ export async function announceNewVenue(
         event.id = getEventHash(event);
         event.sig = await signEvent(event, privateKey);
 
-        await publishToRelays(event);
+        const result = await publishEventToRelays(event);
 
-        console.log(`[NostrBot] New venue announced: ${venue.name} (${event.id})`);
+        if (result.successCount === 0) {
+            console.error("[NostrBot] Failed to publish to any relay");
+            return { success: false, error: "Failed to publish to any relay" };
+        }
+
+        console.log(`[NostrBot] New venue announced: ${venue.name} (${event.id}) - ${result.successCount}/${NOSTR_RELAYS.length} relays`);
         return { success: true, eventId: event.id };
     } catch (error) {
         console.error("[NostrBot] Failed to announce new venue:", error);
@@ -299,22 +230,39 @@ export async function announceVerification(
             .replace("{url}", url);
 
         const tags: string[][] = [
+            // Hashtags for discoverability
             ["t", "bitcoin"],
             ["t", "bitcoinmerchant"],
             ["t", "mappingbitcoin"],
             ["t", "verified"],
+
+            // Reference URL to the verified place
             ["r", url],
+
+            // OpenStreetMap ID reference
+            ["i", `osm:${venue.osmId}`],
+
+            // Verifier - the user who verified ownership (p tag with role marker)
+            ["p", verification.ownerPubkey, "", "verifier"],
+
+            // Venue metadata for easy parsing
+            ["venue", venue.name || "Unknown", venue.osmId],
+
+            // Verification method used
+            ["method", verification.method, verification.detail || ""],
+
+            // Location data
+            ["location", venue.city || "", venue.country || ""],
         ];
 
-        // Add OSM reference tag
-        tags.push(["osm", venue.osmId]);
-
-        // Tag the business owner
-        tags.push(["p", verification.ownerPubkey]);
-
-        // Add location tag if available
+        // Add country hashtag for location-based discovery
         if (venue.country) {
             tags.push(["t", venue.country.toLowerCase().replace(/\s+/g, "")]);
+        }
+
+        // Add city hashtag if available
+        if (venue.city) {
+            tags.push(["t", venue.city.toLowerCase().replace(/\s+/g, "")]);
         }
 
         const event: NostrEvent = {
@@ -328,9 +276,14 @@ export async function announceVerification(
         event.id = getEventHash(event);
         event.sig = await signEvent(event, privateKey);
 
-        await publishToRelays(event);
+        const result = await publishEventToRelays(event);
 
-        console.log(`[NostrBot] Verification announced: ${venue.name} (${event.id})`);
+        if (result.successCount === 0) {
+            console.error("[NostrBot] Failed to publish to any relay");
+            return { success: false, error: "Failed to publish to any relay" };
+        }
+
+        console.log(`[NostrBot] Verification announced: ${venue.name} (${event.id}) - ${result.successCount}/${NOSTR_RELAYS.length} relays`);
         return { success: true, eventId: event.id };
     } catch (error) {
         console.error("[NostrBot] Failed to announce verification:", error);
@@ -347,3 +300,9 @@ export function getBotNpub(): string | null {
     const pubkey = getPublicKey(privateKey);
     return hexToNpub(pubkey);
 }
+
+/**
+ * Publish a deletion event (NIP-09) to revoke a verification announcement
+ * Re-exports from actions.ts for backwards compatibility
+ */
+export { deleteNostrEvent as deleteVerificationEvent } from "./actions";
