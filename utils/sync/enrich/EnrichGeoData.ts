@@ -162,11 +162,42 @@ export async function enrichGeoData() {
         return;
     }
 
+    // Load BitcoinVenues.json as source of truth for which venues should exist
+    // This syncs deletions from OSM diffs that were applied to BitcoinVenues.json
+    let sourceVenueIds: Set<number> | null = null;
+    if (fsSync.existsSync(FALLBACK_FILE)) {
+        const sourceRaw = await fs.readFile(FALLBACK_FILE, "utf8");
+        const sourceVenues = JSON.parse(sourceRaw) as EnrichedVenue[];
+        sourceVenueIds = new Set(sourceVenues.map(v => v.id));
+    }
+
     const byId = new Map<number, EnrichedVenue>(venues.map(v => [v.id, v]));
 
+    // Remove venues that no longer exist in BitcoinVenues.json (deleted from OSM)
+    let removedCount = 0;
+    if (sourceVenueIds) {
+        for (const [id] of byId) {
+            if (!sourceVenueIds.has(id)) {
+                byId.delete(id);
+                logs.push(`🗑️ Removed ${id} (deleted from OSM)`);
+                removedCount++;
+            }
+        }
+        if (removedCount > 0) {
+            console.log(`🗑️ Synced ${removedCount} deletions from BitcoinVenues.json`);
+        }
+    }
+
     const batchFiles = await getBatchFiles();
-    if (batchFiles.length === 0) {
+    if (batchFiles.length === 0 && removedCount === 0) {
         console.log("🟰 No geo enrichment batches found.");
+        return;
+    }
+
+    // If we have deletions but no new batches, still save the changes
+    if (batchFiles.length === 0 && removedCount > 0) {
+        await saveAndRefresh(Array.from(byId.values()), logs);
+        console.log(`✅ Synced ${removedCount} deletions.`);
         return;
     }
 
@@ -190,9 +221,12 @@ export async function enrichGeoData() {
         console.log(`🗂️ Processed ${file} (${enrichedInFile} enriched).`);
     }
 
-    if (enrichedCount > 0) {
+    if (enrichedCount > 0 || removedCount > 0) {
         await saveAndRefresh(Array.from(byId.values()), logs);
-        console.log(`✅ Enriched ${enrichedCount} venues from queue.`);
+        const parts = [];
+        if (enrichedCount > 0) parts.push(`enriched ${enrichedCount}`);
+        if (removedCount > 0) parts.push(`removed ${removedCount}`);
+        console.log(`✅ ${parts.join(", ")} venues.`);
     } else {
         console.log("🟰 No venues enriched from queue.");
     }

@@ -22,6 +22,7 @@ import {
     ShieldCheckIcon,
     EditIcon,
     MenuIcon,
+    RefreshIcon,
 } from "@/assets/icons/ui";
 import { NostrIcon } from "@/assets/icons/social";
 import Button, { IconButton } from "@/components/ui/Button";
@@ -64,6 +65,11 @@ const navSections: NavSection[] = [
                 href: "/admin/nostr-bot",
                 label: "Nostr Bot",
                 icon: <NostrIcon className="w-5 h-5" />,
+            },
+            {
+                href: "/admin/map-sync",
+                label: "Map Sync",
+                icon: <RefreshIcon className="w-5 h-5" />,
             },
         ],
     },
