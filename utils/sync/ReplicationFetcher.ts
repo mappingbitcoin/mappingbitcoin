@@ -24,12 +24,49 @@ async function fetchWithTimeout(url: string, timeoutMs = DEFAULT_TIMEOUT_MS): Pr
 }
 
 export async function initOsmReplicationState() {
-    if (!existsSync(STATE_FILE)) {
-        try {
-            console.log('📦 osm-replication.state not found. Downloading from storage...');
-            await downloadFromStorage('osm-replication.state', STATE_FILE, AssetType.SYNC);
-        } catch (err) {
-            console.warn('⚠️ Could not download osm-replication.state from storage:', err);
+    // Always check storage for the latest state to prevent reprocessing after migrations
+    const TEMP_STATE_FILE = path.join(DATA_DIR, 'osm-replication.state.remote');
+
+    try {
+        // 1. Download the remote state from Hetzner Storage
+        await downloadFromStorage('osm-replication.state', TEMP_STATE_FILE, AssetType.SYNC);
+
+        // 2. Parse the remote state
+        const remoteRaw = await fs.readFile(TEMP_STATE_FILE, 'utf-8');
+        const remoteState = JSON.parse(remoteRaw);
+        const remoteSequence = remoteState.sequenceNumber || 0;
+
+        // 3. Get local state if it exists
+        let localSequence = 0;
+        if (existsSync(STATE_FILE)) {
+            try {
+                const localRaw = await fs.readFile(STATE_FILE, 'utf-8');
+                const localState = JSON.parse(localRaw);
+                localSequence = localState.sequenceNumber || 0;
+            } catch {
+                // Local file corrupted, use 0
+            }
+        }
+
+        // 4. Use whichever state has the higher sequence number
+        if (remoteSequence > localSequence) {
+            console.log(`📦 Storage has newer state (${remoteSequence} > ${localSequence}). Using remote state.`);
+            await fs.copyFile(TEMP_STATE_FILE, STATE_FILE);
+        } else if (localSequence > remoteSequence) {
+            console.log(`📦 Local state is newer (${localSequence} > ${remoteSequence}). Keeping local state.`);
+        } else {
+            console.log(`📦 State synced at sequence #${localSequence}`);
+        }
+
+        // 5. Cleanup temp file
+        await fs.unlink(TEMP_STATE_FILE).catch(() => {});
+
+    } catch (err) {
+        // Storage not available or empty - check if we have local state
+        if (!existsSync(STATE_FILE)) {
+            console.warn('⚠️ No state in storage or locally. Starting fresh.');
+        } else {
+            console.log('📦 Could not fetch from storage, using local state.');
         }
     }
 }
