@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
                 },
                 venue: {
                     select: {
-                        osmId: true,
+                        id: true,
                     },
                 },
             },
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
         // Map and filter claims with venue data
         let verifiedPlaces = allClaims.map((claim) => {
-            const osmId = claim.venue.osmId;
+            const osmId = claim.venue.id;
 
             // Parse osmId to get numeric ID (format: "node/123456" or just "123456")
             const parts = osmId.split("/");

@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         // Check if venue is already verified
         const existingVerified = await prisma.claim.findFirst({
             where: {
-                venue: { osmId },
+                venue: { id: osmId },
                 status: "VERIFIED",
                 revokedAt: null,
             },
@@ -130,9 +130,9 @@ export async function POST(request: NextRequest) {
         const claim = await prisma.$transaction(async (tx) => {
             // Upsert venue record
             const venueRecord = await tx.venue.upsert({
-                where: { osmId },
+                where: { id: osmId },
                 update: {},
-                create: { osmId },
+                create: { id: osmId },
             });
 
             // Upsert user record
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
             message: "Venue verified successfully",
             claim: {
                 id: claim.id,
-                osmId: claim.venue.osmId,
+                osmId: claim.venue.id,
                 method: claim.method,
                 status: claim.status,
                 verifiedAt: claim.verifiedAt?.toISOString(),

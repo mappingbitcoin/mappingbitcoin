@@ -56,9 +56,9 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
 
     const review = await prisma.$transaction(async (tx) => {
         const venue = await tx.venue.upsert({
-            where: { osmId },
+            where: { id: osmId },
             update: {},
-            create: { osmId },
+            create: { id: osmId },
         });
 
         await tx.user.upsert({
@@ -118,7 +118,7 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
 
 export async function getReviewsByOsmId(osmId: string) {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             reviews: {
                 include: {
@@ -262,7 +262,7 @@ export async function getReviewsWithTrustByOsmId(
     includeBlocked: boolean = false
 ): Promise<ReviewsWithTrustResult> {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             reviews: {
                 where: includeBlocked

@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         let results: VerifiedPlaceResult[] = [];
 
         for (const claim of verifiedClaims) {
-            const numericId = extractNumericOsmId(claim.venue.osmId);
+            const numericId = extractNumericOsmId(claim.venue.id);
             const venue = venueMap.get(numericId);
 
             if (!venue) continue;
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
             results.push({
                 claimId: claim.id,
                 venueId: venue.id,
-                osmId: claim.venue.osmId,
+                osmId: claim.venue.id,
                 name: venue.tags?.name || "Unknown",
                 city: venue.city,
                 state: venue.state,

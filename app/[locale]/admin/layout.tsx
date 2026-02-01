@@ -77,11 +77,6 @@ const navSections: NavSection[] = [
         title: "Moderation",
         items: [
             {
-                href: "/admin/reviews",
-                label: "Reviews",
-                icon: <StarOutlineIcon className="w-5 h-5" />,
-            },
-            {
                 href: "/admin/places",
                 label: "Places",
                 icon: <PinIcon className="w-5 h-5" />,
@@ -91,11 +86,17 @@ const navSections: NavSection[] = [
                 label: "Users",
                 icon: <UsersIcon className="w-5 h-5" />,
             },
-            {
-                href: "/admin/reports",
-                label: "Reports",
-                icon: <WarningIcon className="w-5 h-5" />,
-            },
+            // TODO: Add these pages when implemented
+            // {
+            //     href: "/admin/reviews",
+            //     label: "Reviews",
+            //     icon: <StarOutlineIcon className="w-5 h-5" />,
+            // },
+            // {
+            //     href: "/admin/reports",
+            //     label: "Reports",
+            //     icon: <WarningIcon className="w-5 h-5" />,
+            // },
         ],
     },
 ];
