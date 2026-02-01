@@ -195,15 +195,6 @@ function buildLocalBusinessSchema(venue: EnrichedVenue, locale: Locale) {
         schema.openingHours = venue.tags.opening_hours;
     }
 
-    // Add rating if available
-    if (venue.rating && venue.userRatingsTotal) {
-        schema.aggregateRating = {
-            "@type": "AggregateRating",
-            "ratingValue": venue.rating,
-            "reviewCount": venue.userRatingsTotal
-        };
-    }
-
     // Add cuisine for restaurants
     if (venue.tags?.cuisine) {
         schema.servesCuisine = venue.tags.cuisine.split(";").map(c => c.trim());
