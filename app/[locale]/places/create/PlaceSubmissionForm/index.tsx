@@ -345,6 +345,13 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
         try {
             const token = await getRecaptchaToken();
 
+            if (!token) {
+                toast.error("Security verification failed. Please refresh and try again.");
+                console.error("[PlaceSubmissionForm] reCAPTCHA token is null");
+                setIsSubmitting(false);
+                return;
+            }
+
             if (isEditMode && venue) {
                 // Edit mode - PUT to update existing venue
                 const res = await fetch(`/api/places/${venue.slug || venue.id}`, {
@@ -357,6 +364,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                     toast.success("Changes submitted to OpenStreetMap!");
                     router.push(`/places/${venue.slug || venue.id}`);
                 } else {
+                    console.error("[PlaceSubmissionForm] Edit failed:", json);
                     toast.error(json.error || "Failed to submit changes");
                 }
             } else {
