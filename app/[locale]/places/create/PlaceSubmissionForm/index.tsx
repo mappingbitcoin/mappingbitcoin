@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState, FormEvent, useRef } from "react";
 import toast from 'react-hot-toast';
-import Script from "next/script";
 import { useRouter } from '@/i18n/navigation';
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
@@ -37,6 +36,7 @@ import {
 } from "@/components/place-form";
 import { useAddressAutocomplete, reverseGeocode } from "@/hooks/useAddressAutocomplete";
 import { useVenueSearch, fetchVenueDetails } from "@/hooks/useVenueSearch";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import {
     CheckmarkIcon,
     SpinnerIcon,
@@ -47,8 +47,7 @@ import {
     ChevronRightIcon,
     SendIcon,
 } from "@/assets/icons";
-import Button from "@/components/ui/Button";
-import TagRemoveButton from "@/components/ui/TagRemoveButton";
+import Button, { TagRemoveButton } from "@/components/ui/Button";
 
 const OpeningHoursPicker = dynamic(
     () => import("@/components/forms/OpeningHoursPicker"),
@@ -143,6 +142,9 @@ export default function VenueSubmissionForm() {
         isLoading: venueLoading,
         clearSuggestions: clearVenueSuggestions,
     } = useVenueSearch({ debounceMs: 300, limit: 6 });
+
+    // reCAPTCHA - loads lazily when getToken is called
+    const { getToken: getRecaptchaToken, preload: preloadRecaptcha } = useRecaptcha({ action: "submit" });
 
     useOnClickOutside([venueSelectorRef], () => clearVenueSuggestions());
     useOnClickOutside([addressSelectorRef], () => clearAddressSuggestions());
@@ -276,7 +278,7 @@ export default function VenueSubmissionForm() {
         }
         setIsSubmitting(true);
         try {
-            const token = await grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: "submit" });
+            const token = await getRecaptchaToken();
             const res = await fetch("/api/places", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -319,8 +321,6 @@ export default function VenueSubmissionForm() {
 
     return (
         <>
-            <Script src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`} strategy="afterInteractive" />
-
             {/* Hero Section */}
             <div className="w-full bg-gradient-primary pt-24 pb-10 px-8 max-md:px-4">
                 <div className="max-w-6xl mx-auto">

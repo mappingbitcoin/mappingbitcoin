@@ -6,7 +6,10 @@ import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button, { IconButton } from "@/components/ui/Button";
-import TagInput from "./TagInput";
+import Select from "@/components/ui/Select";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
+import TagInput from "@/components/ui/TagInput";
 import type { ExamplePost, SocialNetwork } from "../types";
 import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
 import { EditIcon, TrashIcon } from "@/assets/icons/ui";
@@ -206,18 +209,14 @@ export default function ExamplePostsTab() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <select
-                        value={selectedNetwork}
-                        onChange={(e) => setSelectedNetwork(e.target.value as SocialNetwork | "")}
-                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
-                    >
-                        <option value="">{t("posts.allNetworks")}</option>
-                        {SOCIAL_NETWORKS.map((network) => (
-                            <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
-                        ))}
-                    </select>
-                </div>
+                <Select
+                    value={selectedNetwork}
+                    onChange={(e) => setSelectedNetwork(e.target.value as SocialNetwork | "")}
+                    size="md"
+                    fullWidth={false}
+                    placeholder={t("posts.allNetworks")}
+                    options={SOCIAL_NETWORKS.map((network) => ({ value: network, label: SOCIAL_NETWORK_LABELS[network] }))}
+                />
                 <Button onClick={openCreateModal}>
                     {t("posts.addButton")}
                 </Button>
@@ -271,63 +270,48 @@ export default function ExamplePostsTab() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("posts.fields.socialNetwork")}
-                        </label>
-                        <select
+                    <FormField label={t("posts.fields.socialNetwork")} required>
+                        <Select
                             value={formData.socialNetwork}
                             onChange={(e) => setFormData({ ...formData, socialNetwork: e.target.value as SocialNetwork })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
+                            placeholder={t("posts.placeholders.selectNetwork")}
+                            options={SOCIAL_NETWORKS.map((network) => ({ value: network, label: SOCIAL_NETWORK_LABELS[network] }))}
                             required
-                        >
-                            <option value="">{t("posts.placeholders.selectNetwork")}</option>
-                            {SOCIAL_NETWORKS.map((network) => (
-                                <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
-                            ))}
-                        </select>
-                    </div>
+                        />
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("posts.fields.content")}
-                        </label>
-                        <textarea
+                    <FormField
+                        label={t("posts.fields.content")}
+                        helpText={`${formData.content.length} ${t("posts.characters")}`}
+                        required
+                    >
+                        <Textarea
                             value={formData.content}
                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                             placeholder={t("posts.placeholders.content")}
                             rows={6}
-                            className="w-full px-4 py-3 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none font-mono text-sm"
+                            className="font-mono"
                             required
                         />
-                        <p className="text-xs text-text-light mt-1">
-                            {formData.content.length} {t("posts.characters")}
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("posts.fields.hashtags")}
-                        </label>
+                    <FormField label={t("posts.fields.hashtags")}>
                         <TagInput
                             tags={formData.hashtags}
                             onChange={(tags) => setFormData({ ...formData, hashtags: tags })}
                             placeholder={t("posts.placeholders.hashtags")}
+                            tagPrefix="#"
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("posts.fields.notes")}
-                        </label>
-                        <textarea
+                    <FormField label={t("posts.fields.notes")}>
+                        <Textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             placeholder={t("posts.placeholders.notes")}
                             rows={2}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

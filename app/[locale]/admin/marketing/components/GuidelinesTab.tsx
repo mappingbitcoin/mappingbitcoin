@@ -5,8 +5,7 @@ import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import type { MarketingGuidelines } from "../types";
 import { CheckmarkIcon, CloseIcon, StarIcon } from "@/assets/icons/ui";
-import Button, { IconButton } from "@/components/ui/Button";
-import TagRemoveButton from "@/components/ui/TagRemoveButton";
+import Button, { IconButton, TagRemoveButton } from "@/components/ui/Button";
 
 export default function GuidelinesTab() {
     const t = useTranslations("admin.marketing");

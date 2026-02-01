@@ -6,6 +6,10 @@ import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import FormField from "@/components/ui/FormField";
+import Checkbox from "@/components/ui/Checkbox";
 import type { MarketingStat } from "../types";
 
 export default function StatsTab() {
@@ -214,26 +218,21 @@ export default function StatsTab() {
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-4">
-                    <select
+                    <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
-                    >
-                        <option value="">{t("statsTab.allCategories")}</option>
-                        {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
+                        size="md"
+                        fullWidth={false}
+                        placeholder={t("statsTab.allCategories")}
+                        options={categories.map((cat) => ({ value: cat, label: cat }))}
+                    />
 
-                    <label className="flex items-center gap-2 text-sm text-text-light">
-                        <input
-                            type="checkbox"
-                            checked={showExpired}
-                            onChange={(e) => setShowExpired(e.target.checked)}
-                            className="w-4 h-4 rounded border-border-light bg-surface-light text-accent focus:ring-primary"
-                        />
-                        {t("statsTab.showExpired")}
-                    </label>
+                    <Checkbox
+                        checked={showExpired}
+                        onChange={(e) => setShowExpired(e.target.checked)}
+                        label={t("statsTab.showExpired")}
+                        size="md"
+                    />
                 </div>
                 <Button onClick={openCreateModal}>
                     {t("statsTab.addButton")}
@@ -336,45 +335,33 @@ export default function StatsTab() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("statsTab.fields.label")}
-                        </label>
-                        <input
+                    <FormField label={t("statsTab.fields.label")} required>
+                        <Input
                             type="text"
                             value={formData.label}
                             onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                             placeholder={t("statsTab.placeholders.label")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("statsTab.fields.value")}
-                        </label>
-                        <input
+                    <FormField label={t("statsTab.fields.value")} required>
+                        <Input
                             type="text"
                             value={formData.value}
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                             placeholder={t("statsTab.placeholders.value")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("statsTab.fields.category")}
-                        </label>
-                        <input
+                    <FormField label={t("statsTab.fields.category")} required>
+                        <Input
                             type="text"
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                             placeholder={t("statsTab.placeholders.category")}
                             list="stat-category-suggestions"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
                         <datalist id="stat-category-suggestions">
@@ -382,35 +369,24 @@ export default function StatsTab() {
                                 <option key={cat} value={cat} />
                             ))}
                         </datalist>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("statsTab.fields.sourceOptional")}
-                        </label>
-                        <input
+                    <FormField label={t("statsTab.fields.sourceOptional")}>
+                        <Input
                             type="text"
                             value={formData.source}
                             onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                             placeholder={t("statsTab.placeholders.source")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("statsTab.fields.expiresOptional")}
-                        </label>
-                        <input
+                    <FormField label={t("statsTab.fields.expiresOptional")} helpText={t("statsTab.expiresHelper")}>
+                        <Input
                             type="date"
                             value={formData.expiresAt}
                             onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
                         />
-                        <p className="text-xs text-text-light mt-1">
-                            {t("statsTab.expiresHelper")}
-                        </p>
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

@@ -4,10 +4,12 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { SendIcon, PlusIcon, CloseIcon, SearchIcon, CircleCheckIcon, PinIcon } from "@/assets/icons/ui";
-import Button, { IconButton } from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
+import Button, { IconButton, ToggleButton, TagRemoveButton } from "@/components/ui/Button";
 import DropdownItem from "@/components/ui/DropdownItem";
-import TagRemoveButton from "@/components/ui/TagRemoveButton";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
+import Checkbox from "@/components/ui/Checkbox";
 
 type PostType = "manual" | "new" | "verified" | "created";
 type PlaceFilter = "all" | "verified" | "unverified";
@@ -405,25 +407,20 @@ export default function PostTab() {
                         </div>
                     ) : (
                         <div ref={dropdownRef} className="relative">
-                            <div className="relative">
-                                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" />
-                                <input
-                                    type="text"
-                                    value={placeQuery}
-                                    onChange={(e) => {
-                                        setPlaceQuery(e.target.value);
-                                        setShowPlaceDropdown(true);
-                                    }}
-                                    onFocus={() => setShowPlaceDropdown(true)}
-                                    placeholder="Search for a place..."
-                                    className="w-full pl-10 pr-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
-                                />
-                                {searchingPlaces && (
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-accent" />
-                                    </div>
-                                )}
-                            </div>
+                            <Input
+                                type="text"
+                                value={placeQuery}
+                                onChange={(e) => {
+                                    setPlaceQuery(e.target.value);
+                                    setShowPlaceDropdown(true);
+                                }}
+                                onFocus={() => setShowPlaceDropdown(true)}
+                                placeholder="Search for a place..."
+                                leftIcon={<SearchIcon className="w-4 h-4" />}
+                                rightIcon={searchingPlaces ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-accent" />
+                                ) : undefined}
+                            />
 
                             {/* Dropdown */}
                             {showPlaceDropdown && places.length > 0 && (
@@ -454,18 +451,12 @@ export default function PostTab() {
 
                     {/* Template Toggle */}
                     {selectedPlace && (
-                        <div className="mt-4 flex items-center gap-3">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={useTemplate}
-                                    onChange={(e) => setUseTemplate(e.target.checked)}
-                                    className="w-4 h-4 rounded border-border-light bg-surface-light text-accent focus:ring-accent focus:ring-offset-0"
-                                />
-                                <span className="text-sm text-text-light">
-                                    Use random template (1 of 30 variations)
-                                </span>
-                            </label>
+                        <div className="mt-4">
+                            <Checkbox
+                                checked={useTemplate}
+                                onChange={(e) => setUseTemplate(e.target.checked)}
+                                label="Use random template (1 of 30 variations)"
+                            />
                         </div>
                     )}
                 </div>
@@ -480,9 +471,15 @@ export default function PostTab() {
                 <div className="space-y-4">
                     {/* Content textarea - only shown if manual or not using template */}
                     {(!isPlaceBasedPost || !useTemplate) && (
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">Content</label>
-                            <textarea
+                        <FormField
+                            label="Content"
+                            helpText={
+                                <span className={characterCount > maxChars * 0.9 ? "text-amber-400" : ""}>
+                                    {characterCount}/{maxChars}
+                                </span>
+                            }
+                        >
+                            <Textarea
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 placeholder={
@@ -492,20 +489,8 @@ export default function PostTab() {
                                 }
                                 rows={6}
                                 maxLength={maxChars}
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent resize-none"
                             />
-                            <div className="flex justify-end mt-1">
-                                <span
-                                    className={`text-xs ${
-                                        characterCount > maxChars * 0.9
-                                            ? "text-amber-400"
-                                            : "text-text-light"
-                                    }`}
-                                >
-                                    {characterCount}/{maxChars}
-                                </span>
-                            </div>
-                        </div>
+                        </FormField>
                     )}
 
                     {/* Template preview for place-based posts */}
@@ -525,10 +510,9 @@ export default function PostTab() {
 
                     {/* Hashtags - shown for manual or when not using template */}
                     {(!isPlaceBasedPost || !useTemplate) && (
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">Hashtags</label>
+                        <FormField label="Hashtags">
                             <div className="flex gap-2">
-                                <input
+                                <Input
                                     type="text"
                                     value={hashtagInput}
                                     onChange={(e) => setHashtagInput(e.target.value)}
@@ -539,7 +523,8 @@ export default function PostTab() {
                                         }
                                     }}
                                     placeholder="bitcoin"
-                                    className="flex-1 px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
+                                    fullWidth={false}
+                                    className="flex-1"
                                 />
                                 <IconButton
                                     onClick={addHashtag}
@@ -566,7 +551,7 @@ export default function PostTab() {
                                     ))}
                                 </div>
                             )}
-                        </div>
+                        </FormField>
                     )}
 
                     {/* Tags info for template posts */}
@@ -610,21 +595,17 @@ export default function PostTab() {
 
                     {/* URL Reference - only for manual posts */}
                     {!isPlaceBasedPost && (
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">
-                                URL Reference (optional)
-                            </label>
-                            <input
+                        <FormField
+                            label="URL Reference (optional)"
+                            helpText='Will be added as an "r" tag for client link previews'
+                        >
+                            <Input
                                 type="url"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
                                 placeholder="https://mappingbitcoin.com/..."
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                             />
-                            <p className="text-xs text-text-light mt-1">
-                                Will be added as an &quot;r&quot; tag for client link previews
-                            </p>
-                        </div>
+                        </FormField>
                     )}
 
                     {/* Submit */}

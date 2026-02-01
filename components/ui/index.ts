@@ -1,11 +1,7 @@
-export { default as Button, ButtonPrimary, ButtonSecondary, ButtonDanger, ButtonGhost, ButtonSoft, IconButton } from './Button';
-export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize, IconButtonProps } from './Button';
+export { default as Button, ButtonPrimary, ButtonSecondary, ButtonDanger, ButtonGhost, ButtonSoft, IconButton, ToggleButton, TagRemoveButton } from './Button';
+export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize, IconButtonProps, ToggleButtonProps, TagRemoveButtonProps } from './Button';
 export { default as TabButton } from './TabButton';
 export type { TabButtonProps } from './TabButton';
-export { default as ToggleButton } from './ToggleButton';
-export type { ToggleButtonProps } from './ToggleButton';
-export { default as TagRemoveButton } from './TagRemoveButton';
-export type { TagRemoveButtonProps } from './TagRemoveButton';
 export { default as DropdownItem } from './DropdownItem';
 export type { DropdownItemProps } from './DropdownItem';
 export { default as AccordionButton } from './AccordionButton';

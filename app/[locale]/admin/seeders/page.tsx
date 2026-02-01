@@ -6,6 +6,8 @@ import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import AlertModal from "@/components/ui/Modal/AlertModal";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import FormField from "@/components/ui/FormField";
 
 interface Seeder {
     id: string;
@@ -273,47 +275,35 @@ export default function SeedersPage() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Pubkey (hex)
-                        </label>
-                        <input
+                    <FormField label="Pubkey (hex)" required>
+                        <Input
                             type="text"
                             value={formData.pubkey}
                             onChange={(e) => setFormData({ ...formData, pubkey: e.target.value })}
                             disabled={!!editingSeeder}
                             placeholder="64-character hex pubkey"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Region
-                        </label>
-                        <input
+                    <FormField label="Region" required>
+                        <Input
                             type="text"
                             value={formData.region}
                             onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                             placeholder="e.g., north-america, europe, asia"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Label (optional)
-                        </label>
-                        <input
+                    <FormField label="Label (optional)">
+                        <Input
                             type="text"
                             value={formData.label}
                             onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                             placeholder="e.g., Bitcoin Beach, BTC Prague"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

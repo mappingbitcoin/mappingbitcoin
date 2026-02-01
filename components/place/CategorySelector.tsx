@@ -18,8 +18,7 @@ import {
     CheckmarkIcon,
     PlusIcon,
 } from "@/assets/icons";
-import TagRemoveButton from "@/components/ui/TagRemoveButton";
-import Button from "@/components/ui/Button";
+import Button, { TagRemoveButton } from "@/components/ui/Button";
 import DropdownItem from "@/components/ui/DropdownItem";
 
 interface CategorySelectorProps {

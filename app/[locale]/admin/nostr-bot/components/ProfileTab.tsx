@@ -6,6 +6,9 @@ import Image from "next/image";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { CopyIcon, RefreshIcon, CheckmarkIcon, UploadIcon, CloseIcon } from "@/assets/icons/ui";
 import Button, { IconButton } from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
 
 interface Profile {
     name?: string;
@@ -255,12 +258,12 @@ export default function ProfileTab() {
                                 >
                                     {uploadingPicture ? "Uploading..." : "Upload Picture"}
                                 </Button>
-                                <input
+                                <Input
                                     type="url"
                                     value={form.picture || ""}
                                     onChange={(e) => setForm({ ...form, picture: e.target.value })}
                                     placeholder="Or paste URL..."
-                                    className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm placeholder-text-light/50 focus:outline-none focus:border-accent"
+                                    size="sm"
                                 />
                                 {form.picture && (
                                     <Button
@@ -313,12 +316,14 @@ export default function ProfileTab() {
                                 >
                                     {uploadingBanner ? "Uploading..." : "Upload Banner"}
                                 </Button>
-                                <input
+                                <Input
                                     type="url"
                                     value={form.banner || ""}
                                     onChange={(e) => setForm({ ...form, banner: e.target.value })}
                                     placeholder="Or paste URL..."
-                                    className="flex-1 px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm placeholder-text-light/50 focus:outline-none focus:border-accent"
+                                    size="sm"
+                                    fullWidth={false}
+                                    className="flex-1"
                                 />
                             </div>
                             {form.banner && (
@@ -356,72 +361,60 @@ export default function ProfileTab() {
 
                 <div className="grid gap-4">
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">Name</label>
-                            <input
+                        <FormField label="Name">
+                            <Input
                                 type="text"
                                 value={form.name || ""}
                                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                                 placeholder="mappingbitcoin"
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                             />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">Display Name</label>
-                            <input
+                        </FormField>
+                        <FormField label="Display Name">
+                            <Input
                                 type="text"
                                 value={form.display_name || ""}
                                 onChange={(e) => setForm({ ...form, display_name: e.target.value })}
                                 placeholder="Mapping Bitcoin"
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                             />
-                        </div>
+                        </FormField>
                     </div>
 
-                    <div>
-                        <label className="block text-sm text-text-light mb-1">About</label>
-                        <textarea
+                    <FormField label="About">
+                        <Textarea
                             value={form.about || ""}
                             onChange={(e) => setForm({ ...form, about: e.target.value })}
                             placeholder="Description of the bot..."
                             rows={3}
-                            className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">Website</label>
-                            <input
+                        <FormField label="Website">
+                            <Input
                                 type="url"
                                 value={form.website || ""}
                                 onChange={(e) => setForm({ ...form, website: e.target.value })}
                                 placeholder="https://mappingbitcoin.com"
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                             />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-text-light mb-1">NIP-05</label>
-                            <input
+                        </FormField>
+                        <FormField label="NIP-05">
+                            <Input
                                 type="text"
                                 value={form.nip05 || ""}
                                 onChange={(e) => setForm({ ...form, nip05: e.target.value })}
                                 placeholder="bot@mappingbitcoin.com"
-                                className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                             />
-                        </div>
+                        </FormField>
                     </div>
 
-                    <div>
-                        <label className="block text-sm text-text-light mb-1">Lightning Address (lud16)</label>
-                        <input
+                    <FormField label="Lightning Address (lud16)">
+                        <Input
                             type="text"
                             value={form.lud16 || ""}
                             onChange={(e) => setForm({ ...form, lud16: e.target.value })}
                             placeholder="bot@mappingbitcoin.com"
-                            className="w-full px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                         />
-                    </div>
+                    </FormField>
                 </div>
 
                 <div className="mt-6 flex justify-end">

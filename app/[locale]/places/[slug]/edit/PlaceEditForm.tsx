@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState, FormEvent } from "react";
 import toast from 'react-hot-toast';
-import Script from "next/script";
 import { useRouter } from '@/i18n/navigation';
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,6 +28,7 @@ import {
 } from "@/components/place-form";
 import { InfoCircleIcon, UserIcon, SpinnerIcon, CheckmarkIcon } from "@/assets/icons/ui";
 import Button from "@/components/ui/Button";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 // Dynamically import components that may have SSR issues
 const OpeningHoursPicker = dynamic(
@@ -91,6 +91,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [form, setForm] = useState<VenueForm>(() => venueToForm(venue));
+    const { getToken: getRecaptchaToken } = useRecaptcha({ action: "submit" });
 
     const { name: venueName } = parseTags(venue.tags);
 
@@ -109,7 +110,7 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
         setIsSubmitting(true);
 
         try {
-            const token = await grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: "submit" });
+            const token = await getRecaptchaToken();
 
             const res = await fetch(`/api/places/${venue.slug || venue.id}`, {
                 method: "PUT",
@@ -134,11 +135,6 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
 
     return (
         <>
-            <Script
-                src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-                strategy="lazyOnload"
-            />
-
             {/* Hero Section */}
             <section className="w-full bg-gradient-primary pt-20 pb-10 px-8 max-md:px-4">
                 <div className="max-w-3xl mx-auto">

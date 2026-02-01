@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
-import Button, { IconButton } from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
-import TagInput from "./TagInput";
+import Button, { IconButton, ToggleButton } from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
+import TagInput from "@/components/ui/TagInput";
 import type { HashtagSet, SocialNetwork } from "../types";
 import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
 import { EditIcon, TrashIcon } from "@/assets/icons/ui";
@@ -302,36 +304,26 @@ export default function HashtagsTab() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("hashtags.fields.name")}
-                        </label>
-                        <input
+                    <FormField label={t("hashtags.fields.name")} required>
+                        <Input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder={t("hashtags.placeholders.name")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("hashtags.fields.hashtags")}
-                        </label>
+                    <FormField label={t("hashtags.fields.hashtags")} helpText={t("hashtags.pressEnter")} required>
                         <TagInput
                             tags={formData.hashtags}
                             onChange={(tags) => setFormData({ ...formData, hashtags: tags })}
                             placeholder={t("hashtags.placeholders.hashtags")}
+                            tagPrefix="#"
                         />
-                        <p className="text-xs text-text-light mt-1">{t("hashtags.pressEnter")}</p>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">
-                            {t("hashtags.fields.socialNetworks")}
-                        </label>
+                    <FormField label={t("hashtags.fields.socialNetworks")}>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
                                 <ToggleButton
@@ -343,20 +335,16 @@ export default function HashtagsTab() {
                                 </ToggleButton>
                             ))}
                         </div>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            {t("hashtags.fields.description")}
-                        </label>
-                        <textarea
+                    <FormField label={t("hashtags.fields.description")}>
+                        <Textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder={t("hashtags.placeholders.description")}
                             rows={2}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

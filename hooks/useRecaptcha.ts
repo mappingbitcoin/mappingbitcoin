@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { publicEnv } from "@/lib/Environment";
 
 interface UseRecaptchaOptions {
@@ -15,37 +15,31 @@ interface UseRecaptchaReturn {
     getToken: () => Promise<string | null>;
     /** Whether reCAPTCHA is configured (site key exists) */
     isConfigured: boolean;
+    /** Preload reCAPTCHA script (call on user interaction like focus) */
+    preload: () => void;
 }
 
 /**
- * Hook for using Google reCAPTCHA v3
- * Handles script loading and token generation
+ * Load the reCAPTCHA script dynamically
+ * Returns a promise that resolves when grecaptcha is ready
  */
-export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaReturn {
-    const [isReady, setIsReady] = useState(false);
-    const isConfigured = Boolean(publicEnv.recaptchaSiteKey);
-
-    useEffect(() => {
-        if (!isConfigured) {
-            return;
-        }
-
-        // Check if already loaded
+function loadRecaptchaScript(): Promise<void> {
+    return new Promise((resolve) => {
+        // Already loaded
         if (window.grecaptcha) {
-            setIsReady(true);
+            resolve();
             return;
         }
 
-        // Check if script is already in DOM
+        // Script already in DOM, wait for it
         if (document.querySelector(`script[src*="recaptcha"]`)) {
-            // Wait for it to load
             const checkReady = setInterval(() => {
                 if (window.grecaptcha) {
-                    setIsReady(true);
                     clearInterval(checkReady);
+                    resolve();
                 }
             }, 100);
-            return () => clearInterval(checkReady);
+            return;
         }
 
         // Load the script
@@ -54,21 +48,62 @@ export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaRetur
         script.async = true;
         script.defer = true;
         script.onload = () => {
-            // grecaptcha.ready may still need time
             const checkReady = setInterval(() => {
                 if (window.grecaptcha) {
-                    setIsReady(true);
                     clearInterval(checkReady);
+                    resolve();
                 }
             }, 100);
         };
         document.head.appendChild(script);
+    });
+}
+
+// Shared loading promise to prevent multiple loads
+let loadingPromise: Promise<void> | null = null;
+
+/**
+ * Hook for using Google reCAPTCHA v3
+ * Script is loaded lazily - only when preload() is called or getToken() is requested
+ */
+export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaReturn {
+    const [isReady, setIsReady] = useState(() => Boolean(window.grecaptcha));
+    const isConfigured = Boolean(publicEnv.recaptchaSiteKey);
+    const loadingRef = useRef(false);
+
+    const ensureLoaded = useCallback(async (): Promise<boolean> => {
+        if (!isConfigured) return false;
+        if (window.grecaptcha) {
+            setIsReady(true);
+            return true;
+        }
+
+        if (loadingRef.current) {
+            // Already loading, wait for it
+            await loadingPromise;
+            setIsReady(true);
+            return true;
+        }
+
+        loadingRef.current = true;
+        loadingPromise = loadRecaptchaScript();
+        await loadingPromise;
+        setIsReady(true);
+        return true;
     }, [isConfigured]);
 
-    const getToken = useCallback(async (): Promise<string | null> => {
-        if (!isConfigured || !isReady || !window.grecaptcha) {
-            return null;
+    const preload = useCallback(() => {
+        if (isConfigured && !window.grecaptcha && !loadingRef.current) {
+            ensureLoaded();
         }
+    }, [isConfigured, ensureLoaded]);
+
+    const getToken = useCallback(async (): Promise<string | null> => {
+        if (!isConfigured) return null;
+
+        // Ensure script is loaded
+        const loaded = await ensureLoaded();
+        if (!loaded || !window.grecaptcha) return null;
 
         return new Promise((resolve) => {
             window.grecaptcha!.ready(async () => {
@@ -84,7 +119,7 @@ export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaRetur
                 }
             });
         });
-    }, [action, isConfigured, isReady]);
+    }, [action, isConfigured, ensureLoaded]);
 
-    return { isReady, getToken, isConfigured };
+    return { isReady, getToken, isConfigured, preload };
 }
