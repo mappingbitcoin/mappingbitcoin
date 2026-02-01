@@ -17,44 +17,42 @@ const BLOSSOM_SERVERS = [
 interface VenueImageUploaderProps {
     value?: string;
     onChange: (url: string | undefined) => void;
+    onUploadingChange?: (uploading: boolean) => void;
     disabled?: boolean;
+    compact?: boolean;
 }
 
-// Extend window for NIP-07
-declare global {
-    interface Window {
-        nostr?: {
-            getPublicKey: () => Promise<string>;
-            signEvent: (event: {
-                kind: number;
-                created_at: number;
-                tags: string[][];
-                content: string;
-            }) => Promise<{
-                id: string;
-                pubkey: string;
-                created_at: number;
-                kind: number;
-                tags: string[][];
-                content: string;
-                sig: string;
-            }>;
-        };
-    }
+interface BlossomSignedEvent {
+    id: string;
+    pubkey: string;
+    created_at: number;
+    kind: number;
+    tags: string[][];
+    content: string;
+    sig: string;
 }
 
 export default function VenueImageUploader({
     value,
     onChange,
+    onUploadingChange,
     disabled = false,
+    compact = false,
 }: VenueImageUploaderProps) {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [dragOver, setDragOver] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Local preview while uploading
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { user } = useNostrAuth();
+
+    // Notify parent of uploading state changes
+    const setUploadingState = useCallback((isUploading: boolean) => {
+        setUploading(isUploading);
+        onUploadingChange?.(isUploading);
+    }, [onUploadingChange]);
 
     // Calculate SHA-256 hash of file bytes
     const calculateHash = async (arrayBuffer: ArrayBuffer): Promise<string> => {
@@ -69,7 +67,7 @@ export default function VenueImageUploader({
             throw new Error("Nostr extension not found. Please install a NIP-07 compatible extension like Alby or nos2x.");
         }
 
-        const pubkey = await window.nostr.getPublicKey();
+        await window.nostr.getPublicKey();
 
         const event = {
             kind: 24242, // Blossom auth event kind
@@ -82,7 +80,7 @@ export default function VenueImageUploader({
             content: "Upload venue image",
         };
 
-        const signedEvent = await window.nostr.signEvent(event);
+        const signedEvent = await window.nostr.signEvent(event) as BlossomSignedEvent;
 
         // Return base64 encoded event
         return btoa(JSON.stringify(signedEvent));
@@ -166,23 +164,48 @@ export default function VenueImageUploader({
         throw new Error("Failed to upload to any Blossom server. Please try again.");
     };
 
+    // Create local preview from file
+    const createPreview = useCallback((file: File) => {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        return url;
+    }, []);
+
+    // Clear local preview
+    const clearPreview = useCallback(() => {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
+    }, [previewUrl]);
+
     // Process the upload after validation
     const processUpload = useCallback(async (file: File) => {
-        setUploading(true);
+        setUploadingState(true);
+        setError(null);
+
+        // Create local preview immediately
+        createPreview(file);
+
         try {
             const url = await uploadToBlossom(file);
+            console.log("[VenueImageUploader] Upload successful:", url);
+            clearPreview();
             onChange(url);
         } catch (err) {
+            console.error("[VenueImageUploader] Upload error:", err);
             setError(err instanceof Error ? err.message : "Upload failed");
+            clearPreview();
         } finally {
-            setUploading(false);
+            setUploadingState(false);
             setPendingFile(null);
         }
-    }, [onChange]);
+    }, [onChange, setUploadingState, createPreview, clearPreview]);
 
     // Handle file selection
     const handleFile = useCallback(async (file: File) => {
         setError(null);
+        console.log("[VenueImageUploader] File selected:", file.name, file.type, file.size);
 
         // Validate file type
         const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -200,13 +223,17 @@ export default function VenueImageUploader({
 
         // Check for NIP-07 extension - show login modal if not available
         if (!window.nostr) {
+            console.log("[VenueImageUploader] No Nostr extension, showing login modal");
+            // Still create preview
+            createPreview(file);
             setPendingFile(file);
             setShowLoginModal(true);
             return;
         }
 
+        console.log("[VenueImageUploader] Starting upload...");
         await processUpload(file);
-    }, [processUpload]);
+    }, [processUpload, createPreview]);
 
     // Handle successful login - continue with pending upload
     const handleLoginSuccess = useCallback(() => {
@@ -246,12 +273,6 @@ export default function VenueImageUploader({
         setDragOver(false);
     };
 
-    // Remove image
-    const handleRemove = () => {
-        onChange(undefined);
-        setError(null);
-    };
-
     // Click to select
     const handleClick = () => {
         if (!disabled && !uploading) {
@@ -259,31 +280,51 @@ export default function VenueImageUploader({
         }
     };
 
-    return (
-        <div className="space-y-2">
-            <label className="block text-sm font-medium text-text-light">
-                Venue Image (optional)
-            </label>
+    // The image to display (uploaded value or local preview)
+    const displayImage = value || previewUrl;
 
-            {value ? (
-                // Image preview
-                <div className="relative rounded-lg overflow-hidden border border-border-light bg-surface-light">
+    // Handle remove - clear both value and preview
+    const handleRemoveImage = () => {
+        clearPreview();
+        onChange(undefined);
+        setError(null);
+    };
+
+    return (
+        <div className={compact ? "space-y-1" : "space-y-2"}>
+            {!compact && (
+                <label className="block text-sm font-medium text-white">
+                    Venue Image <span className="text-text-light font-normal">(optional)</span>
+                </label>
+            )}
+
+            {displayImage ? (
+                // Image preview (either uploaded or local preview while uploading)
+                <div className={`relative rounded-lg overflow-hidden border border-border-light bg-surface-light ${compact ? "h-28" : "h-48"}`}>
                     <img
-                        src={value}
+                        src={displayImage}
                         alt="Venue"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-full object-cover"
                     />
-                    {!disabled && (
-                        <IconButton
+                    {/* Uploading overlay */}
+                    {uploading && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <div className="flex flex-col items-center gap-2">
+                                <SpinnerIcon className="w-8 h-8 text-white animate-spin" />
+                                <p className="text-sm text-white font-medium">Uploading...</p>
+                            </div>
+                        </div>
+                    )}
+                    {/* Remove button - only show when not uploading */}
+                    {!disabled && !uploading && (
+                        <button
                             type="button"
-                            onClick={handleRemove}
-                            icon={<CloseIcon className="w-4 h-4" />}
+                            onClick={handleRemoveImage}
+                            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-red-500 flex items-center justify-center transition-colors"
                             aria-label="Remove image"
-                            variant="solid"
-                            color="neutral"
-                            size="sm"
-                            className="absolute top-2 right-2 !bg-black/60 hover:!bg-black/80"
-                        />
+                        >
+                            <CloseIcon className="w-4 h-4 text-white" />
+                        </button>
                     )}
                 </div>
             ) : (
@@ -293,56 +334,55 @@ export default function VenueImageUploader({
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
-                    className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                    className={`relative border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
+                        compact ? "p-3 h-28 flex items-center justify-center" : "p-6"
+                    } ${
                         dragOver
-                            ? "border-primary bg-primary/10"
-                            : "border-border-light hover:border-primary/50 hover:bg-surface-light"
-                    } ${disabled || uploading ? "opacity-50 cursor-not-allowed" : ""}`}
+                            ? "border-accent bg-accent/10"
+                            : "border-border-light hover:border-accent/50 hover:bg-surface-light"
+                    } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                     <input
                         ref={fileInputRef}
                         type="file"
                         accept="image/jpeg,image/png,image/gif,image/webp"
                         onChange={handleInputChange}
-                        disabled={disabled || uploading}
+                        disabled={disabled}
                         className="hidden"
                     />
 
-                    {uploading ? (
-                        <div className="flex flex-col items-center gap-2">
-                            <SpinnerIcon className="w-8 h-8 text-primary animate-spin" />
-                            <p className="text-sm text-text-light">Uploading to Blossom...</p>
+                    <div className="flex flex-col items-center gap-1">
+                        <div className={`${compact ? "p-2" : "p-3"} bg-surface-light rounded-full`}>
+                            <PhotoIcon className={`${compact ? "w-4 h-4" : "w-6 h-6"} text-text-light`} />
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="p-3 bg-surface-light rounded-full">
-                                <PhotoIcon className="w-6 h-6 text-text-light" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-white">
-                                    <span className="text-primary hover:text-primary-light">Click to upload</span>
-                                    {" "}or drag and drop
-                                </p>
+                        <div>
+                            <p className={`${compact ? "text-xs" : "text-sm"} text-white`}>
+                                <span className="text-accent hover:text-accent-light">{compact ? "Upload" : "Click to upload"}</span>
+                                {!compact && " or drag"}
+                            </p>
+                            {!compact && (
                                 <p className="text-xs text-text-light mt-1">
                                     JPEG, PNG, GIF or WebP (max 5MB)
                                 </p>
-                            </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
             )}
 
             {error && (
-                <p className="text-sm text-red-400">{error}</p>
+                <p className={`${compact ? "text-xs" : "text-sm"} text-red-400`}>{error}</p>
             )}
 
-            <p className="text-xs text-text-light">
-                {user ? (
-                    "Image will be stored on Blossom and added to the OSM entry."
-                ) : (
-                    "Login with Nostr to upload images. They will be stored on Blossom."
-                )}
-            </p>
+            {!compact && (
+                <p className="text-xs text-text-light">
+                    {user ? (
+                        "Image will be stored on Blossom and added to the OSM entry."
+                    ) : (
+                        "Login with Nostr to upload images."
+                    )}
+                </p>
+            )}
 
             {/* Nostr Login Modal */}
             <LoginModal
