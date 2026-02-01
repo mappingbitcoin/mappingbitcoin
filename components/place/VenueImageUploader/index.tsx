@@ -221,12 +221,21 @@ export default function VenueImageUploader({
             return;
         }
 
-        // Check for NIP-07 extension - show login modal if not available
+        // Check for NIP-07 extension
         if (!window.nostr) {
-            console.log("[VenueImageUploader] No Nostr extension, showing login modal");
-            // Still create preview
+            console.log("[VenueImageUploader] No Nostr extension detected");
+            // Create preview so user sees the image
             createPreview(file);
             setPendingFile(file);
+
+            if (user) {
+                // User is logged in but doesn't have the browser extension
+                // Show error explaining they need to install an extension
+                setError("To upload images, please install a Nostr browser extension like Alby or nos2x, then refresh the page.");
+                return;
+            }
+
+            // User is not logged in - show login modal
             setShowLoginModal(true);
             return;
         }
@@ -377,7 +386,9 @@ export default function VenueImageUploader({
             {!compact && (
                 <p className="text-xs text-text-light">
                     {user ? (
-                        "Image will be stored on Blossom and added to the OSM entry."
+                        typeof window !== "undefined" && window.nostr
+                            ? "Image will be stored on Blossom and added to the OSM entry."
+                            : "Requires a Nostr browser extension (Alby, nos2x) to sign uploads."
                     ) : (
                         "Login with Nostr to upload images."
                     )}
