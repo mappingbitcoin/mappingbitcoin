@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { PageSection } from "@/components/layout";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import {
     VerifiedBadgeIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     SpinnerIcon,
     LocationPinIcon,
+    SearchIcon,
+    CloseIcon,
 } from "@/assets/icons/ui";
 
 interface VerifiedPlace {
@@ -57,19 +59,28 @@ const METHOD_LABELS: Record<string, string> = {
 };
 
 export default function VerifiedPlacesClient() {
-    const t = useTranslations();
     const [places, setPlaces] = useState<VerifiedPlace[]>([]);
     const [pagination, setPagination] = useState<PaginationInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [searchInput, setSearchInput] = useState("");
 
-    const fetchPlaces = useCallback(async (page: number) => {
+    const fetchPlaces = useCallback(async (page: number, searchQuery: string) => {
         setLoading(true);
         setError(null);
 
         try {
-            const res = await fetch(`/api/verified-places?page=${page}&limit=20`);
+            const params = new URLSearchParams({
+                page: String(page),
+                limit: "20",
+            });
+            if (searchQuery) {
+                params.set("search", searchQuery);
+            }
+
+            const res = await fetch(`/api/verified-places?${params}`);
             const data = await res.json();
 
             if (!data.success) {
@@ -86,8 +97,20 @@ export default function VerifiedPlacesClient() {
     }, []);
 
     useEffect(() => {
-        fetchPlaces(currentPage);
-    }, [currentPage, fetchPlaces]);
+        fetchPlaces(currentPage, search);
+    }, [currentPage, search, fetchPlaces]);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        setSearch(searchInput);
+    };
+
+    const clearSearch = () => {
+        setSearchInput("");
+        setSearch("");
+        setCurrentPage(1);
+    };
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
@@ -110,9 +133,9 @@ export default function VerifiedPlacesClient() {
 
     return (
         <PageSection padding="large" background="gradient" className="min-h-screen">
-            <div className="max-w-container mx-auto">
+            <div className="max-w-4xl mx-auto">
                 {/* Header */}
-                <div className="mb-10">
+                <div className="mb-8">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
                             <VerifiedBadgeIcon className="w-6 h-6 text-green-400" />
@@ -123,15 +146,49 @@ export default function VerifiedPlacesClient() {
                     </div>
                     <p className="text-lg text-text-light max-w-2xl">
                         Browse all verified Bitcoin-accepting businesses. Each place has been
-                        verified by its owner through email or domain verification, ensuring
-                        authenticity and trust.
+                        verified by its owner through email or domain verification.
                     </p>
-                    {pagination && (
+                </div>
+
+                {/* Search Bar */}
+                <div className="mb-6">
+                    <form onSubmit={handleSearch} className="flex gap-2">
+                        <div className="relative flex-1">
+                            <Input
+                                type="text"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                placeholder="Search by name, city, country, or category..."
+                                className="pl-10"
+                            />
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light pointer-events-none" />
+                            {searchInput && (
+                                <button
+                                    type="button"
+                                    onClick={clearSearch}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-white transition-colors"
+                                >
+                                    <CloseIcon className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                        <Button type="submit" disabled={loading}>
+                            Search
+                        </Button>
+                    </form>
+                    {search && pagination && (
                         <p className="text-sm text-text-light mt-2">
-                            {pagination.totalCount.toLocaleString()} verified places
+                            Found {pagination.totalCount.toLocaleString()} result{pagination.totalCount !== 1 ? "s" : ""} for "{search}"
                         </p>
                     )}
                 </div>
+
+                {/* Stats */}
+                {!search && pagination && (
+                    <div className="mb-6 text-sm text-text-light">
+                        {pagination.totalCount.toLocaleString()} verified places
+                    </div>
+                )}
 
                 {/* Loading State */}
                 {loading && (
@@ -144,7 +201,7 @@ export default function VerifiedPlacesClient() {
                 {error && !loading && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
                         <p className="text-red-400 mb-4">{error}</p>
-                        <Button onClick={() => fetchPlaces(currentPage)} variant="outline" color="danger">
+                        <Button onClick={() => fetchPlaces(currentPage, search)} variant="outline" color="danger">
                             Try Again
                         </Button>
                     </div>
@@ -154,85 +211,94 @@ export default function VerifiedPlacesClient() {
                 {!loading && !error && places.length === 0 && (
                     <div className="text-center py-20">
                         <VerifiedBadgeIcon className="w-16 h-16 text-text-light mx-auto mb-4" />
-                        <h2 className="text-xl font-semibold text-white mb-2">No Verified Places Yet</h2>
+                        <h2 className="text-xl font-semibold text-white mb-2">
+                            {search ? "No Results Found" : "No Verified Places Yet"}
+                        </h2>
                         <p className="text-text-light">
-                            Be the first to verify your business!
+                            {search
+                                ? `No verified places match "${search}". Try a different search term.`
+                                : "Be the first to verify your business!"
+                            }
                         </p>
+                        {search && (
+                            <Button onClick={clearSearch} variant="ghost" className="mt-4">
+                                Clear Search
+                            </Button>
+                        )}
                     </div>
                 )}
 
-                {/* Places Grid */}
+                {/* Places List */}
                 {!loading && !error && places.length > 0 && (
                     <>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="space-y-3">
                             {places.map((place) => (
                                 <Link
                                     key={place.id}
                                     href={`/places/${place.venue.slug}`}
-                                    className="group bg-surface rounded-xl border border-border-light p-5 hover:border-accent/50 hover:bg-surface-light transition-all duration-200 no-underline"
+                                    className="group flex items-center gap-4 bg-surface rounded-xl border border-border-light p-4 hover:border-accent/50 hover:bg-surface-light transition-all duration-200 no-underline"
                                 >
-                                    {/* Venue Name & Badge */}
-                                    <div className="flex items-start justify-between gap-3 mb-3">
-                                        <h3 className="text-lg font-semibold text-white group-hover:text-accent transition-colors line-clamp-2">
-                                            {place.venue.name}
-                                        </h3>
-                                        <VerifiedBadgeIcon className="w-5 h-5 text-green-400 shrink-0" />
+                                    {/* Verified Badge */}
+                                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                                        <VerifiedBadgeIcon className="w-5 h-5 text-green-400" />
                                     </div>
 
-                                    {/* Location */}
-                                    {(place.venue.city || place.venue.country) && (
-                                        <div className="flex items-center gap-1.5 text-sm text-text-light mb-3">
-                                            <LocationPinIcon className="w-4 h-4" />
-                                            <span>
-                                                {[place.venue.city, place.venue.country]
-                                                    .filter(Boolean)
-                                                    .join(", ")}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* Verification Info */}
-                                    <div className="pt-3 border-t border-border-light space-y-2">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-text-light">Verified via</span>
-                                            <span className="text-white font-medium">
-                                                {METHOD_LABELS[place.method] || place.method}
-                                                {place.domainVerified && (
-                                                    <span className="text-text-light ml-1">
-                                                        ({place.domainVerified})
-                                                    </span>
-                                                )}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-text-light">Date</span>
-                                            <span className="text-white">
-                                                {formatDate(place.verifiedAt)}
-                                            </span>
-                                        </div>
-
-                                        {/* Verifier */}
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-text-light">Verifier</span>
-                                            <div className="flex items-center gap-2">
-                                                {place.verifier.picture ? (
-                                                    <Image
-                                                        src={place.verifier.picture}
-                                                        alt=""
-                                                        width={20}
-                                                        height={20}
-                                                        className="rounded-full"
-                                                    />
-                                                ) : (
-                                                    <div className="w-5 h-5 rounded-full bg-accent/20" />
-                                                )}
-                                                <span className="text-white font-mono text-xs">
-                                                    {place.verifier.displayName || truncateNpub(place.verifier.npub)}
+                                    {/* Main Content */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="text-white font-semibold group-hover:text-accent transition-colors truncate">
+                                                {place.venue.name}
+                                            </h3>
+                                            {place.venue.category && (
+                                                <span className="text-xs bg-surface-light text-text-light px-2 py-0.5 rounded-full shrink-0">
+                                                    {place.venue.category}
                                                 </span>
-                                            </div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-4 text-sm text-text-light">
+                                            {(place.venue.city || place.venue.country) && (
+                                                <span className="flex items-center gap-1">
+                                                    <LocationPinIcon className="w-3.5 h-3.5" />
+                                                    {[place.venue.city, place.venue.country]
+                                                        .filter(Boolean)
+                                                        .join(", ")}
+                                                </span>
+                                            )}
+                                            <span className="hidden sm:inline">
+                                                Verified {formatDate(place.verifiedAt)}
+                                            </span>
                                         </div>
                                     </div>
+
+                                    {/* Verification Method & Verifier */}
+                                    <div className="hidden md:flex items-center gap-4 shrink-0">
+                                        <div className="text-right">
+                                            <p className="text-xs text-text-light">Via</p>
+                                            <p className="text-sm text-white font-medium">
+                                                {METHOD_LABELS[place.method] || place.method}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {place.verifier.picture ? (
+                                                <Image
+                                                    src={place.verifier.picture}
+                                                    alt=""
+                                                    width={32}
+                                                    height={32}
+                                                    className="rounded-full"
+                                                />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+                                                    <span className="text-xs text-accent font-medium">
+                                                        {(place.verifier.displayName || "?")[0].toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Arrow */}
+                                    <ChevronRightIcon className="w-5 h-5 text-text-light group-hover:text-accent transition-colors shrink-0" />
                                 </Link>
                             ))}
                         </div>

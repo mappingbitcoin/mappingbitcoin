@@ -44,6 +44,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
     const locale = useLocale() as Locale
     const [isMounted, setIsMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "about">("overview");
+    const [imageError, setImageError] = useState(false);
 
     const {place} = useGooglePlaceMatch(venue);
 
@@ -85,6 +86,11 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
     ) : null, [place]);
 
     const {featuredPhoto} = useMemo(() => {
+        // First priority: OSM image tag
+        if (venue.tags?.image) {
+            return { featuredPhoto: venue.tags.image };
+        }
+        // Second priority: Google Places photos
         if (place?.photos && place.photos.length > 0) {
             const photoUrls = place.photos.map((photo: { photo_reference: string; }) => {
                 const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
@@ -95,7 +101,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
             })
             return {featuredPhoto: photoUrls[0]}
         } else return {featuredPhoto: null}
-    }, [place]);
+    }, [place, venue.tags?.image]);
 
     const googleMapLink = useMemo(() => {
         if (place?.placeId) {
@@ -167,6 +173,19 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                     {/* Venue Title & Quick Info */}
                     <div className="flex items-end justify-between gap-8 max-md:flex-col max-md:items-start">
                         <div className="flex-1">
+                            {/* Featured Photo - small, above name */}
+                            {featuredPhoto && !imageError && (
+                                <div className="relative h-[120px] w-[200px] rounded-lg overflow-hidden shadow-medium mb-4">
+                                    <Image
+                                        src={featuredPhoto}
+                                        alt={name || 'Venue photo'}
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
+                                        onError={() => setImageError(true)}
+                                    />
+                                </div>
+                            )}
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{name || 'Unnamed Venue'}</h1>
 
                             <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -293,19 +312,6 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
                         {/* Left Column - Information */}
                         <div className="space-y-6">
-                            {/* Featured Photo */}
-                            {featuredPhoto && (
-                                <div className="relative h-[300px] rounded-card overflow-hidden shadow-medium">
-                                    <Image
-                                        src={featuredPhoto}
-                                        alt={name || 'Venue photo'}
-                                        fill
-                                        className="object-cover"
-                                        unoptimized
-                                    />
-                                </div>
-                            )}
-
                             {/* Tabs */}
                             <div className="bg-surface rounded-card border border-border-light overflow-hidden">
                                 <nav className="flex border-b border-border-light">
@@ -335,6 +341,20 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                         <div>
                                                             <p className="text-xs text-text-light uppercase tracking-wide mb-1">Address</p>
                                                             <p className="text-white">{address}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {contact?.website && (
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                                                            <WebsiteIcon className="w-5 h-5 text-accent" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs text-text-light uppercase tracking-wide mb-1">Website</p>
+                                                            <TextLink href={contact.website} external variant="accent" className="break-all">
+                                                                {contact.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                                                            </TextLink>
                                                         </div>
                                                     </div>
                                                 )}

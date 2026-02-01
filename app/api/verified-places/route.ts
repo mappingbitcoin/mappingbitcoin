@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
-import { getVenueCache } from "@/app/api/cache/VenueCache";
+import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import { hexToNpub } from "@/lib/nostr/crypto";
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -14,18 +14,10 @@ export async function GET(req: NextRequest) {
             MAX_PAGE_SIZE,
             Math.max(1, parseInt(searchParams.get("limit") || String(DEFAULT_PAGE_SIZE), 10))
         );
-        const skip = (page - 1) * limit;
+        const search = searchParams.get("search")?.toLowerCase().trim() || "";
 
-        // Get total count of verified claims
-        const totalCount = await prisma.claim.count({
-            where: {
-                status: "VERIFIED",
-                revokedAt: null,
-            },
-        });
-
-        // Fetch verified claims with user data
-        const claims = await prisma.claim.findMany({
+        // Fetch all verified claims with user data
+        const allClaims = await prisma.claim.findMany({
             where: {
                 status: "VERIFIED",
                 revokedAt: null,
@@ -47,16 +39,21 @@ export async function GET(req: NextRequest) {
             orderBy: {
                 verifiedAt: "desc",
             },
-            skip,
-            take: limit,
         });
 
         // Get venue details from cache
-        const venueCache = getVenueCache();
+        const venueCache = await getVenueCache();
+        const indexMap = await getVenueIndexMap();
 
-        const verifiedPlaces = claims.map((claim) => {
+        // Map and filter claims with venue data
+        let verifiedPlaces = allClaims.map((claim) => {
             const osmId = claim.venue.osmId;
-            const venue = venueCache?.[osmId];
+
+            // Parse osmId to get numeric ID (format: "node/123456" or just "123456")
+            const parts = osmId.split("/");
+            const numericId = parseInt(parts[1] || parts[0], 10);
+            const venueIndex = indexMap[numericId];
+            const venue = venueIndex !== undefined ? venueCache[venueIndex] : null;
 
             return {
                 id: claim.id,
@@ -96,11 +93,32 @@ export async function GET(req: NextRequest) {
             };
         });
 
+        // Apply search filter if provided
+        if (search) {
+            verifiedPlaces = verifiedPlaces.filter((place) => {
+                const name = place.venue.name?.toLowerCase() || "";
+                const city = place.venue.city?.toLowerCase() || "";
+                const country = place.venue.country?.toLowerCase() || "";
+                const category = place.venue.category?.toLowerCase() || "";
+
+                return (
+                    name.includes(search) ||
+                    city.includes(search) ||
+                    country.includes(search) ||
+                    category.includes(search)
+                );
+            });
+        }
+
+        // Calculate pagination
+        const totalCount = verifiedPlaces.length;
         const totalPages = Math.ceil(totalCount / limit);
+        const skip = (page - 1) * limit;
+        const paginatedPlaces = verifiedPlaces.slice(skip, skip + limit);
 
         return NextResponse.json({
             success: true,
-            data: verifiedPlaces,
+            data: paginatedPlaces,
             pagination: {
                 page,
                 limit,
