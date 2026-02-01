@@ -16,9 +16,9 @@ export async function createClaim(input: CreateClaimInput) {
 
     return prisma.$transaction(async (tx) => {
         const venue = await tx.venue.upsert({
-            where: { osmId },
+            where: { id: osmId },
             update: {},
-            create: { osmId },
+            create: { id: osmId },
         });
 
         await tx.user.upsert({
@@ -60,7 +60,7 @@ export async function incrementClaimAttempts(claimId: string) {
 
 export async function getPendingClaimsByOsmId(osmId: string) {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             claims: {
                 where: { status: "PENDING" },
@@ -75,7 +75,7 @@ export async function getPendingClaimsByOsmId(osmId: string) {
 
 export async function getVerifiedClaimByOsmId(osmId: string) {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             claims: {
                 where: { status: "VERIFIED" },
@@ -101,7 +101,7 @@ export async function getClaimsByPubkey(pubkey: string) {
  */
 export async function getActiveVerifiedClaimByOsmId(osmId: string) {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             claims: {
                 where: {

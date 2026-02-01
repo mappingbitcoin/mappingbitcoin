@@ -2,14 +2,14 @@ import prisma from "../prisma";
 
 export async function getOrCreateVenue(osmId: string) {
     return prisma.venue.upsert({
-        where: { osmId },
+        where: { id: osmId },
         update: {},
-        create: { osmId },
+        create: { id: osmId },
     });
 }
 
 export async function getVenueByOsmId(osmId: string) {
     return prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
     });
 }

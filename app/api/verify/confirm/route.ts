@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get the email from venue cache - NOT from client
-        const numericId = parseOsmIdNumber(claim.venue.osmId);
+        const numericId = parseOsmIdNumber(claim.venue.id);
         if (!numericId) {
             return NextResponse.json(
                 { error: "Invalid venue ID" },

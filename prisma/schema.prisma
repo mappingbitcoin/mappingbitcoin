@@ -11,16 +11,15 @@ datasource db {
 
 // Venues table - exists only for FK integrity
 // No venue data stored here — that's in memory
+// ID is the OSM ID (e.g., "node/123456" or "way/789")
 model Venue {
-  id        String   @id @default(cuid())
-  osmId     String   @unique @map("osm_id")
+  id        String   @id // OSM ID as primary key
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
   claims  Claim[]
   reviews Review[]
 
-  @@index([osmId])
   @@map("venues")
 }
 

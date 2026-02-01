@@ -57,9 +57,9 @@ export async function initiateEmailVerification(
 
     // Ensure venue exists
     const venue = await prisma.venue.upsert({
-        where: { osmId },
+        where: { id: osmId },
         update: {},
-        create: { osmId },
+        create: { id: osmId },
     });
 
     // Check for existing pending EMAIL claim from this user for this venue
@@ -175,7 +175,7 @@ export async function verifyEmailCode(
     // Announce verification on Nostr and store the event ID
     announceVerification(
         {
-            osmId: updatedClaim.venue.osmId,
+            osmId: updatedClaim.venue.id,
             name: "Verified Merchant", // Name will be fetched from cache if needed
         },
         {
@@ -204,7 +204,7 @@ export async function checkAndRevokeIfEmailChanged(
     currentEmail: string
 ): Promise<{ revoked: boolean; claimId?: string }> {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             claims: {
                 where: {
@@ -263,7 +263,7 @@ export interface VerificationStatusResult {
  */
 export async function getVerificationStatus(osmId: string): Promise<VerificationStatusResult> {
     const venue = await prisma.venue.findUnique({
-        where: { osmId },
+        where: { id: osmId },
         include: {
             claims: {
                 where: {
@@ -366,9 +366,9 @@ export async function initiateDomainVerification(
 
     // Ensure venue exists
     const venue = await prisma.venue.upsert({
-        where: { osmId },
+        where: { id: osmId },
         update: {},
-        create: { osmId },
+        create: { id: osmId },
     });
 
     // Check for existing pending domain claim from this user for this venue
@@ -515,7 +515,7 @@ export async function checkDomainVerification(
             // Announce verification on Nostr and store the event ID
             announceVerification(
                 {
-                    osmId: updatedClaim.venue.osmId,
+                    osmId: updatedClaim.venue.id,
                     name: "Verified Merchant", // Name will be fetched from cache if needed
                 },
                 {
@@ -580,7 +580,7 @@ export async function getClaimsForUser(pubkey: string): Promise<Array<{
 
     return claims.map(claim => ({
         id: claim.id,
-        osmId: claim.venue.osmId,
+        osmId: claim.venue.id,
         status: claim.status,
         method: claim.method,
         createdAt: claim.createdAt,

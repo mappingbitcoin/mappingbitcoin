@@ -222,7 +222,7 @@ export async function checkDuplicates(
     const existingReview = await prisma.review.findFirst({
         where: {
             authorPubkey: authorPubkey.toLowerCase(),
-            venue: { osmId },
+            venue: { id: osmId },
         },
     });
 

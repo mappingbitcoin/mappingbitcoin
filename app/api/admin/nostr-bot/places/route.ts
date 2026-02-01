@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
             for (const claim of verifiedClaims) {
                 // Extract numeric ID from osmId format (e.g., "node/123456" -> "123456")
-                const numericId = extractNumericOsmId(claim.venue.osmId);
+                const numericId = extractNumericOsmId(claim.venue.id);
                 const venue = venueMap.get(numericId);
                 if (!venue) continue;
 
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
         const verifiedClaims = await prisma.claim.findMany({
             where: {
                 venue: {
-                    osmId: {
+                    id: {
                         in: osmIds,
                     },
                 },
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
 
         // Create a map of numeric osmId -> claim (for easy lookup by venue.id)
         const claimMap = new Map<string, typeof verifiedClaims[number]>(
-            verifiedClaims.map((claim) => [extractNumericOsmId(claim.venue.osmId), claim])
+            verifiedClaims.map((claim) => [extractNumericOsmId(claim.venue.id), claim])
         );
 
         // Build results with verification info
