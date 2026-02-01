@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNostrAuth, useNpub } from "@/contexts/NostrAuthContext";
 import NavBarSearch from "./NavBarSearch";
 import { LoginModal } from "@/components/auth";
+import UserAvatar from "@/components/ui/UserAvatar";
 import {
-    CheckmarkIcon,
     BadgeCheckIcon,
     SettingsIcon,
     ShieldCheckIcon,
@@ -19,154 +19,13 @@ import {
     MenuIcon,
     CloseIcon,
 } from "@/assets/icons/ui";
-import Button, { IconButton } from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
 
 const menuItems = [
     'map',
     'countries',
     'contact',
 ]
-
-interface NostrProfile {
-    name?: string;
-    display_name?: string;
-    picture?: string;
-    about?: string;
-    nip05?: string;
-}
-
-interface SeederInfo {
-    label: string | null;
-    region: string;
-}
-
-// Fetch user profile from relays (NIP-01 kind:0)
-async function fetchNostrProfile(pubkey: string): Promise<NostrProfile | null> {
-    const relays = [
-        "wss://relay.damus.io",
-        "wss://relay.nostr.band",
-        "wss://nos.lol",
-        "wss://relay.snort.social",
-    ];
-
-    for (const relayUrl of relays) {
-        try {
-            const profile = await fetchProfileFromRelay(relayUrl, pubkey);
-            if (profile) return profile;
-        } catch (e) {
-            console.warn(`Failed to fetch profile from ${relayUrl}:`, e);
-        }
-    }
-    return null;
-}
-
-function fetchProfileFromRelay(relayUrl: string, pubkey: string): Promise<NostrProfile | null> {
-    return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-            ws.close();
-            resolve(null);
-        }, 5000);
-
-        const ws = new WebSocket(relayUrl);
-
-        ws.onopen = () => {
-            const subId = `profile-${Date.now()}`;
-            ws.send(JSON.stringify(["REQ", subId, {
-                kinds: [0],
-                authors: [pubkey],
-                limit: 1,
-            }]));
-        };
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data[0] === "EVENT" && data[2]?.kind === 0) {
-                    clearTimeout(timeout);
-                    ws.close();
-                    const content = JSON.parse(data[2].content);
-                    resolve(content);
-                } else if (data[0] === "EOSE") {
-                    clearTimeout(timeout);
-                    ws.close();
-                    resolve(null);
-                }
-            } catch {
-                // Ignore parse errors
-            }
-        };
-
-        ws.onerror = () => {
-            clearTimeout(timeout);
-            resolve(null);
-        };
-    });
-}
-
-// Fetch seeder status from API
-async function fetchSeederStatus(pubkey: string): Promise<{ isSeeder: boolean; seeder: SeederInfo | null }> {
-    try {
-        const response = await fetch(`/api/user/seeder-status?pubkey=${pubkey}`);
-        if (response.ok) {
-            return await response.json();
-        }
-    } catch (e) {
-        console.warn("Failed to fetch seeder status:", e);
-    }
-    return { isSeeder: false, seeder: null };
-}
-
-const UserAvatar = ({ pubkey, picture, name, isSeeder }: { pubkey: string; picture?: string; name?: string; isSeeder?: boolean }) => {
-    // Generate a deterministic color based on pubkey
-    const hue = parseInt(pubkey.slice(0, 8), 16) % 360;
-    const initial = name ? name.charAt(0).toUpperCase() : pubkey.slice(0, 2).toUpperCase();
-
-    const ringClass = isSeeder
-        ? "ring-2 ring-green-400 group-hover:ring-green-300"
-        : "ring-2 ring-transparent group-hover:ring-accent/50";
-
-    if (picture) {
-        return (
-            <div className="relative">
-                <div className={`w-9 h-9 rounded-full overflow-hidden ${ringClass} transition-all`}>
-                    <img
-                        src={picture}
-                        alt={name || "User"}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            // Fallback to colored circle if image fails
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).parentElement!.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center text-white text-xs font-bold" style="background-color: hsl(${hue}, 60%, 45%)">${initial}</div>
-                            `;
-                        }}
-                    />
-                </div>
-                {isSeeder && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
-                        <CheckmarkIcon className="w-2.5 h-2.5 text-white" />
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    return (
-        <div className="relative">
-            <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold ${ringClass} transition-all`}
-                style={{ backgroundColor: `hsl(${hue}, 60%, 45%)` }}
-            >
-                {initial}
-            </div>
-            {isSeeder && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-primary">
-                    <CheckmarkIcon className="w-2.5 h-2.5 text-white" />
-                </div>
-            )}
-        </div>
-    );
-};
 
 const NavBar = () => {
     const pathname = usePathname()
@@ -176,10 +35,8 @@ const NavBar = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const t = useTranslations("menu");
-    const { user, logout, isAdmin } = useNostrAuth();
+    const { user, profile, isSeeder, seederInfo, logout, isAdmin } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
-    const [profile, setProfile] = useState<NostrProfile | null>(null);
-    const [seederInfo, setSeederInfo] = useState<{ isSeeder: boolean; seeder: SeederInfo | null }>({ isSeeder: false, seeder: null });
 
     // Check if we're on the map page (which has its own search)
     const isMapPage = pathname === "/map" || pathname?.endsWith("/map");
@@ -194,17 +51,6 @@ const NavBar = () => {
     const closeMenu = () => {
         setMenuOpen(false);
     };
-
-    // Fetch user profile and seeder status when logged in
-    useEffect(() => {
-        if (user?.pubkey) {
-            fetchNostrProfile(user.pubkey).then(setProfile);
-            fetchSeederStatus(user.pubkey).then(setSeederInfo);
-        } else {
-            setProfile(null);
-            setSeederInfo({ isSeeder: false, seeder: null });
-        }
-    }, [user?.pubkey]);
 
     // Close user menu when clicking outside
     useEffect(() => {
@@ -233,7 +79,7 @@ const NavBar = () => {
 
     return (
         <motion.nav
-            className="w-full py-1 px-6 md:px-8 bg-primary/90 text-white fixed top-0 z-1000 backdrop-blur-[20px] border-b border-white/10"
+            className="w-full py-1 px-6 md:px-8 text-white fixed top-0 z-1000 backdrop-blur-sm border-b border-white/5"
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -329,7 +175,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
-                                                isSeeder={seederInfo.isSeeder}
+                                                isSeeder={isSeeder}
                                             />
                                         </motion.button>
 
@@ -348,7 +194,7 @@ const NavBar = () => {
                                                                 pubkey={user.pubkey}
                                                                 picture={profile?.picture}
                                                                 name={profile?.name}
-                                                                isSeeder={seederInfo.isSeeder}
+                                                                isSeeder={isSeeder}
                                                             />
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-sm font-medium text-white truncate">
@@ -367,10 +213,10 @@ const NavBar = () => {
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-wrap gap-2 mt-2">
-                                                            {seederInfo.isSeeder && (
+                                                            {isSeeder && (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
                                                                     <BadgeCheckIcon className="w-3 h-3" />
-                                                                    {seederInfo.seeder?.label || 'Community Seeder'}
+                                                                    {seederInfo?.label || 'Community Seeder'}
                                                                 </span>
                                                             )}
                                                             {user.mode === 'read' && (
@@ -492,7 +338,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
-                                                isSeeder={seederInfo.isSeeder}
+                                                isSeeder={isSeeder}
                                             />
                                             <div>
                                                 <p className="text-sm text-white font-medium">
@@ -504,10 +350,10 @@ const NavBar = () => {
                                                     </p>
                                                 )}
                                                 <div className="flex flex-wrap gap-2 mt-1">
-                                                    {seederInfo.isSeeder && (
+                                                    {isSeeder && (
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
                                                             <BadgeCheckIcon className="w-3 h-3" />
-                                                            {seederInfo.seeder?.label || 'Community Seeder'}
+                                                            {seederInfo?.label || 'Community Seeder'}
                                                         </span>
                                                     )}
                                                     {user.mode === 'read' && (
