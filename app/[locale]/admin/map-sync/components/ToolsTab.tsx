@@ -4,98 +4,15 @@ import { useState } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { TrashIcon, WarningIcon, CheckmarkIcon, SearchIcon } from "@/assets/icons/ui";
-
-interface OrphanedVenue {
-    id: number;
-    name: string;
-    city: string;
-    country: string;
-    category: string;
-}
-
-interface PreviewData {
-    enrichedCount: number;
-    sourceCount: number;
-    orphanedCount: number;
-    orphanedVenues: OrphanedVenue[];
-    actions: string[];
-}
-
-interface ExecuteResult {
-    success: boolean;
-    message: string;
-    removedCount?: number;
-    fixedCount?: number;
-}
-
-interface FixableVenue {
-    id: number;
-    name: string;
-    city: string;
-    country: string;
-    currentCategory: string | null;
-    currentSubcategory: string | null;
-    tagCategory: string;
-    tagSubcategory: string | null;
-    reason: string;
-}
-
-interface CategoryFixPreviewData {
-    totalVenues: number;
-    fixableCount: number;
-    fixableVenues: FixableVenue[];
-    hasMore: boolean;
-    actions: string[];
-}
-
-function ToolCard({
-    title,
-    description,
-    note,
-    icon,
-    children,
-    variant = "default",
-}: {
-    title: string;
-    description: string;
-    note?: { text: string; date: string };
-    icon: React.ReactNode;
-    children: React.ReactNode;
-    variant?: "default" | "warning";
-}) {
-    const variantClasses = {
-        default: "border-border-light",
-        warning: "border-yellow-500/30",
-    };
-
-    return (
-        <div className={`bg-surface rounded-xl border ${variantClasses[variant]} p-6`}>
-            <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    {icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-                    <p className="text-text-light text-sm mb-4">{description}</p>
-
-                    {note && (
-                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-4">
-                            <p className="text-yellow-400 text-xs">
-                                <span className="font-medium">Note:</span> {note.text}
-                            </p>
-                            <p className="text-yellow-400/70 text-xs mt-1">
-                                Issue discovered: {note.date}
-                            </p>
-                        </div>
-                    )}
-
-                    {children}
-                </div>
-            </div>
-        </div>
-    );
-}
+import { TrashIcon, WarningIcon, CheckmarkIcon, SearchIcon, RefreshIcon, SettingsIcon } from "@/assets/icons/ui";
+import ToolCard from "./ToolCard";
+import SyncStateModal from "./SyncStateModal";
+import {
+    PreviewData,
+    ExecuteResult,
+    CategoryFixPreviewData,
+    SyncStateData,
+} from "./types";
 
 export default function ToolsTab() {
     const { authToken } = useNostrAuth();
@@ -117,6 +34,15 @@ export default function ToolsTab() {
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [categoryExecuteLoading, setCategoryExecuteLoading] = useState(false);
     const [categoryExecuteResult, setCategoryExecuteResult] = useState<ExecuteResult | null>(null);
+
+    // Sync state management
+    const [syncStateLoading, setSyncStateLoading] = useState(false);
+    const [syncStateData, setSyncStateData] = useState<SyncStateData | null>(null);
+    const [syncStateError, setSyncStateError] = useState<string | null>(null);
+    const [showSyncStateModal, setShowSyncStateModal] = useState(false);
+    const [syncStateUpdating, setSyncStateUpdating] = useState(false);
+    const [syncStateResult, setSyncStateResult] = useState<ExecuteResult | null>(null);
+    const [editSequenceNumber, setEditSequenceNumber] = useState<string>("");
 
     const handlePreview = async () => {
         if (!authToken) return;
@@ -283,6 +209,152 @@ export default function ToolsTab() {
         }
     };
 
+    // Sync state handlers
+    const handleLoadSyncState = async () => {
+        if (!authToken) return;
+
+        setSyncStateLoading(true);
+        setSyncStateError(null);
+        setSyncStateData(null);
+        setSyncStateResult(null);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/sync-state", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setSyncStateError(data.error || "Failed to load sync state");
+                return;
+            }
+
+            setSyncStateData(data);
+            // Pre-fill the edit field with the higher sequence number
+            const localSeq = data.replicationState.local?.sequenceNumber || 0;
+            const storageSeq = data.replicationState.storage?.sequenceNumber || 0;
+            setEditSequenceNumber(String(Math.max(localSeq, storageSeq)));
+            setShowSyncStateModal(true);
+        } catch (err) {
+            setSyncStateError(err instanceof Error ? err.message : "Failed to load sync state");
+        } finally {
+            setSyncStateLoading(false);
+        }
+    };
+
+    const handleUpdateSequenceNumber = async () => {
+        if (!authToken) return;
+
+        const sequenceNumber = parseInt(editSequenceNumber, 10);
+        if (isNaN(sequenceNumber) || sequenceNumber < 0) {
+            setSyncStateResult({
+                success: false,
+                message: "Please enter a valid sequence number (positive integer)",
+            });
+            return;
+        }
+
+        setSyncStateUpdating(true);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/sync-state", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    replicationState: { sequenceNumber },
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setSyncStateResult({
+                    success: false,
+                    message: data.error || "Failed to update sync state",
+                });
+                return;
+            }
+
+            setSyncStateResult({
+                success: true,
+                message: `Sequence number updated to #${sequenceNumber}`,
+            });
+
+            // Reload state after successful update
+            setTimeout(() => {
+                handleLoadSyncState();
+            }, 1500);
+        } catch (err) {
+            setSyncStateResult({
+                success: false,
+                message: err instanceof Error ? err.message : "Failed to update sync state",
+            });
+        } finally {
+            setSyncStateUpdating(false);
+        }
+    };
+
+    const handleSyncFromStorage = async () => {
+        if (!authToken || !syncStateData?.replicationState.storage) return;
+
+        const storageSeq = syncStateData.replicationState.storage.sequenceNumber;
+        setEditSequenceNumber(String(storageSeq));
+
+        setSyncStateUpdating(true);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/sync-state", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    replicationState: { sequenceNumber: storageSeq },
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setSyncStateResult({
+                    success: false,
+                    message: data.error || "Failed to sync from storage",
+                });
+                return;
+            }
+
+            setSyncStateResult({
+                success: true,
+                message: `Synced local state to storage sequence #${storageSeq}`,
+            });
+
+            // Reload state after successful update
+            setTimeout(() => {
+                handleLoadSyncState();
+            }, 1500);
+        } catch (err) {
+            setSyncStateResult({
+                success: false,
+                message: err instanceof Error ? err.message : "Failed to sync from storage",
+            });
+        } finally {
+            setSyncStateUpdating(false);
+        }
+    };
+
+    const closeSyncStateModal = () => {
+        if (!syncStateUpdating) {
+            setShowSyncStateModal(false);
+            setSyncStateData(null);
+            setSyncStateResult(null);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Info Banner */}
@@ -355,6 +427,33 @@ export default function ToolsTab() {
                         leftIcon={!categoryPreviewLoading ? <SearchIcon className="w-4 h-4" /> : undefined}
                     >
                         {categoryPreviewLoading ? "Analyzing..." : "Find Fixable Venues"}
+                    </Button>
+                </ToolCard>
+
+                {/* Sync State Management Tool */}
+                <ToolCard
+                    title="Manage Sync State"
+                    description="View and update the OSM replication state (sequence number) and sync data. Use this to recover from state resets after migrations or to manually adjust the sync position."
+                    icon={<SettingsIcon className="w-6 h-6 text-accent" />}
+                >
+                    {syncStateError && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                            <div className="flex items-center gap-2">
+                                <WarningIcon className="w-4 h-4 text-red-400" />
+                                <p className="text-red-400 text-sm">{syncStateError}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <Button
+                        onClick={handleLoadSyncState}
+                        color="primary"
+                        size="sm"
+                        disabled={syncStateLoading}
+                        loading={syncStateLoading}
+                        leftIcon={!syncStateLoading ? <RefreshIcon className="w-4 h-4" /> : undefined}
+                    >
+                        {syncStateLoading ? "Loading..." : "View Sync State"}
                     </Button>
                 </ToolCard>
             </div>
@@ -669,6 +768,20 @@ export default function ToolsTab() {
                     </div>
                 </div>
             </Modal>
+
+            {/* Sync State Modal */}
+            <SyncStateModal
+                isOpen={showSyncStateModal}
+                onClose={closeSyncStateModal}
+                onRefresh={handleLoadSyncState}
+                syncStateData={syncStateData}
+                syncStateResult={syncStateResult}
+                syncStateUpdating={syncStateUpdating}
+                editSequenceNumber={editSequenceNumber}
+                onEditSequenceNumber={setEditSequenceNumber}
+                onUpdateSequenceNumber={handleUpdateSequenceNumber}
+                onSyncFromStorage={handleSyncFromStorage}
+            />
         </div>
     );
 }
