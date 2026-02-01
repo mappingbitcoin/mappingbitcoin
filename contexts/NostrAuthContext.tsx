@@ -10,6 +10,19 @@ interface NostrUser {
     method: "nsec" | "npub" | "extension" | "bunker";
 }
 
+export interface NostrProfile {
+    name?: string;
+    display_name?: string;
+    picture?: string;
+    about?: string;
+    nip05?: string;
+}
+
+export interface SeederInfo {
+    label: string | null;
+    region: string;
+}
+
 interface AuthenticateOptions {
     /** If true, don't throw errors for user-interaction-required scenarios */
     silent?: boolean;
@@ -17,6 +30,9 @@ interface AuthenticateOptions {
 
 interface NostrAuthContextType {
     user: NostrUser | null;
+    profile: NostrProfile | null;
+    isSeeder: boolean;
+    seederInfo: SeederInfo | null;
     isLoading: boolean;
     error: string | null;
     authToken: string | null;
@@ -161,8 +177,87 @@ async function checkAdminStatus(authToken: string): Promise<boolean> {
     return false;
 }
 
+// Fetch user profile from relays (NIP-01 kind:0)
+const PROFILE_RELAYS = [
+    "wss://relay.damus.io",
+    "wss://relay.nostr.band",
+    "wss://nos.lol",
+    "wss://relay.snort.social",
+];
+
+function fetchProfileFromRelay(relayUrl: string, pubkey: string): Promise<NostrProfile | null> {
+    return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+            ws.close();
+            resolve(null);
+        }, 5000);
+
+        const ws = new WebSocket(relayUrl);
+
+        ws.onopen = () => {
+            const subId = `profile-${Date.now()}`;
+            ws.send(JSON.stringify(["REQ", subId, {
+                kinds: [0],
+                authors: [pubkey],
+                limit: 1,
+            }]));
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data[0] === "EVENT" && data[2]?.kind === 0) {
+                    clearTimeout(timeout);
+                    ws.close();
+                    const content = JSON.parse(data[2].content);
+                    resolve(content);
+                } else if (data[0] === "EOSE") {
+                    clearTimeout(timeout);
+                    ws.close();
+                    resolve(null);
+                }
+            } catch {
+                // Ignore parse errors
+            }
+        };
+
+        ws.onerror = () => {
+            clearTimeout(timeout);
+            resolve(null);
+        };
+    });
+}
+
+async function fetchNostrProfile(pubkey: string): Promise<NostrProfile | null> {
+    for (const relayUrl of PROFILE_RELAYS) {
+        try {
+            const profile = await fetchProfileFromRelay(relayUrl, pubkey);
+            if (profile) return profile;
+        } catch (e) {
+            console.warn(`Failed to fetch profile from ${relayUrl}:`, e);
+        }
+    }
+    return null;
+}
+
+// Fetch seeder status from API
+async function fetchSeederStatus(pubkey: string): Promise<{ isSeeder: boolean; seeder: SeederInfo | null }> {
+    try {
+        const response = await fetch(`/api/user/seeder-status?pubkey=${pubkey}`);
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.warn("Failed to fetch seeder status:", e);
+    }
+    return { isSeeder: false, seeder: null };
+}
+
 export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<NostrUser | null>(null);
+    const [profile, setProfile] = useState<NostrProfile | null>(null);
+    const [isSeeder, setIsSeeder] = useState(false);
+    const [seederInfo, setSeederInfo] = useState<SeederInfo | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [authToken, setAuthToken] = useState<string | null>(null);
@@ -226,6 +321,21 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
             setIsAdminLoading(false);
         }
     }, [authToken, user?.pubkey]);
+
+    // Fetch user profile and seeder status when user changes
+    useEffect(() => {
+        if (user?.pubkey) {
+            fetchNostrProfile(user.pubkey).then(setProfile);
+            fetchSeederStatus(user.pubkey).then(({ isSeeder, seeder }) => {
+                setIsSeeder(isSeeder);
+                setSeederInfo(seeder);
+            });
+        } else {
+            setProfile(null);
+            setIsSeeder(false);
+            setSeederInfo(null);
+        }
+    }, [user?.pubkey]);
 
     const loginWithKey = useCallback(async (key: string) => {
         setIsLoading(true);
@@ -346,6 +456,9 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
 
     const logout = useCallback(() => {
         setUser(null);
+        setProfile(null);
+        setIsSeeder(false);
+        setSeederInfo(null);
         setAuthToken(null);
         setIsAdmin(false);
         sessionStorage.removeItem("nostr_privkey");
@@ -464,6 +577,9 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         <NostrAuthContext.Provider
             value={{
                 user,
+                profile,
+                isSeeder,
+                seederInfo,
                 isLoading,
                 error,
                 authToken,
