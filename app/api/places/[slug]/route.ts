@@ -109,8 +109,20 @@ async function fetchVenueFromChangeset(changesetId: number) {
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+    console.log("[PUT /api/places] Request received");
     const { slug } = await params;
-    const { venue, captcha } = await request.json();
+    console.log("[PUT /api/places] Slug:", slug);
+
+    let body;
+    try {
+        body = await request.json();
+        console.log("[PUT /api/places] Body parsed, has captcha:", !!body.captcha, "has venue:", !!body.venue);
+    } catch (e) {
+        console.error("[PUT /api/places] Failed to parse body:", e);
+        return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const { venue, captcha } = body;
 
     if (!slug) return buildResponse('Missing venue slug or ID', 400);
 
