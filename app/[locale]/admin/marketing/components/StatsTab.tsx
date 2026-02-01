@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button from "@/components/ui/Button";
 import type { MarketingStat } from "../types";
 
@@ -29,6 +30,11 @@ export default function StatsTab() {
     });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<MarketingStat | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchStats = useCallback(async () => {
         if (!authToken) return;
@@ -149,13 +155,14 @@ export default function StatsTab() {
         }
     };
 
-    const handleDelete = async (stat: MarketingStat) => {
-        if (!confirm(t("confirm.deleteStat", { name: stat.label }))) {
-            return;
-        }
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/marketing/stats/${stat.id}`, {
+            const response = await fetch(`/api/admin/marketing/stats/${deleteTarget.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -165,9 +172,12 @@ export default function StatsTab() {
                 throw new Error(data.error || t("errors.failedToDelete"));
             }
 
+            setDeleteTarget(null);
             fetchStats();
         } catch (err) {
-            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
+            setDeleteError(err instanceof Error ? err.message : t("errors.failedToDelete"));
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -296,7 +306,7 @@ export default function StatsTab() {
                                                 {t("common.edit")}
                                             </Button>
                                             <Button
-                                                onClick={() => handleDelete(stat)}
+                                                onClick={() => setDeleteTarget(stat)}
                                                 variant="ghost"
                                                 color="danger"
                                                 size="xs"
@@ -421,6 +431,33 @@ export default function StatsTab() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title={t("statsTab.deleteTitle")}
+                description={t("confirm.deleteStat", { name: deleteTarget?.label || "" })}
+                preview={
+                    deleteTarget ? (
+                        <div>
+                            <p className="text-white text-sm font-medium">{deleteTarget.label}</p>
+                            <p className="text-xs text-accent">{deleteTarget.value}</p>
+                            {deleteTarget.category && (
+                                <p className="text-xs text-text-light">{deleteTarget.category}</p>
+                            )}
+                        </div>
+                    ) : undefined
+                }
+                confirmText={t("common.delete")}
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

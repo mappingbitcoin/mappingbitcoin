@@ -2,16 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/middleware/adminAuth";
 import { serverEnv, publicEnv } from "@/lib/Environment";
 import { getPublicKey, getEventHash, signEvent, hexToNpub, NostrEvent } from "@/lib/nostr/crypto";
+import { NOSTR_RELAYS } from "@/lib/nostr/config";
 import WebSocket from "ws";
-
-// Prioritize our own relay first
-const RELAYS = [
-    "wss://relay.mappingbitcoin.com",
-    "wss://relay.damus.io",
-    "wss://nos.lol",
-    "wss://relay.primal.net",
-    "wss://relay.nostr.band",
-];
 
 interface NostrProfile {
     name?: string;
@@ -284,7 +276,7 @@ async function publishToRelays(event: NostrEvent, privateKey: string): Promise<{
 
     // Publish to all relays in parallel
     const results = await Promise.all(
-        RELAYS.map(async (relay) => {
+        NOSTR_RELAYS.map(async (relay) => {
             const ok = await publishToRelay(event, relay, privateKey);
             return { relay, ok };
         })
@@ -328,7 +320,7 @@ export async function GET(request: NextRequest) {
 
         // Try to fetch profile from relays (prioritizing our own relay)
         let profile: NostrProfile | null = null;
-        for (const relay of RELAYS) {
+        for (const relay of NOSTR_RELAYS) {
             profile = await fetchProfileFromRelay(pubkey, relay, privateKey);
             if (profile) {
                 console.log(`[NostrBot] Got profile from ${relay}`);
@@ -344,7 +336,7 @@ export async function GET(request: NextRequest) {
             pubkey,
             npub,
             profile: profile || {},
-            relays: RELAYS,
+            relays: NOSTR_RELAYS,
         });
     } catch (error) {
         console.error("[NostrBot] Failed to fetch bot profile:", error);

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button, { IconButton } from "@/components/ui/Button";
 import TagInput from "./TagInput";
 import type { ExamplePost, SocialNetwork } from "../types";
@@ -29,6 +30,11 @@ export default function ExamplePostsTab() {
     });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<ExamplePost | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchPosts = useCallback(async () => {
         if (!authToken) return;
@@ -149,13 +155,14 @@ export default function ExamplePostsTab() {
         }
     };
 
-    const handleDelete = async (post: ExamplePost) => {
-        if (!confirm(t("confirm.deletePost"))) {
-            return;
-        }
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/marketing/posts/${post.id}`, {
+            const response = await fetch(`/api/admin/marketing/posts/${deleteTarget.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -165,9 +172,12 @@ export default function ExamplePostsTab() {
                 throw new Error(data.error || t("errors.failedToDelete"));
             }
 
+            setDeleteTarget(null);
             fetchPosts();
         } catch (err) {
-            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
+            setDeleteError(err instanceof Error ? err.message : t("errors.failedToDelete"));
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -222,7 +232,7 @@ export default function ExamplePostsTab() {
                 // Single network view
                 <div className="space-y-4">
                     {groupedPosts[selectedNetwork]?.map((post) => (
-                        <PostCard key={post.id} post={post} onEdit={openEditModal} onDelete={handleDelete} />
+                        <PostCard key={post.id} post={post} onEdit={openEditModal} onDelete={setDeleteTarget} />
                     ))}
                 </div>
             ) : (
@@ -239,7 +249,7 @@ export default function ExamplePostsTab() {
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {groupedPosts[network].map((post) => (
-                                    <PostCard key={post.id} post={post} onEdit={openEditModal} onDelete={handleDelete} />
+                                    <PostCard key={post.id} post={post} onEdit={openEditModal} onDelete={setDeleteTarget} />
                                 ))}
                             </div>
                         </div>
@@ -338,6 +348,34 @@ export default function ExamplePostsTab() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title={t("posts.deleteTitle")}
+                description={t("confirm.deletePost")}
+                preview={
+                    deleteTarget ? (
+                        <div>
+                            <span className="px-2 py-0.5 bg-primary/20 text-accent rounded text-xs font-medium">
+                                {SOCIAL_NETWORK_LABELS[deleteTarget.socialNetwork]}
+                            </span>
+                            <p className="text-white text-sm mt-2 whitespace-pre-wrap line-clamp-3">
+                                {deleteTarget.content}
+                            </p>
+                        </div>
+                    ) : undefined
+                }
+                confirmText={t("common.delete")}
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

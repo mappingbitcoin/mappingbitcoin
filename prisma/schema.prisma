@@ -73,6 +73,9 @@ model Claim {
   nextCheckAt          DateTime?   @map("next_check_at") // When next check is allowed (rate limiting)
   checkCount           Int         @default(0) @map("check_count") // Number of checks performed
 
+  // Nostr event tracking
+  nostrEventId         String?     @map("nostr_event_id") // Event ID of the verification announcement
+
   // Relations
   venue   Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
   claimer User  @relation(fields: [claimerPubkey], references: [pubkey], onDelete: Cascade)

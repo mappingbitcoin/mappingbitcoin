@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
+import AlertModal from "@/components/ui/Modal/AlertModal";
 import Button from "@/components/ui/Button";
 import type { MarketingLink } from "../types";
 
@@ -22,6 +24,11 @@ export default function LinksTab() {
     const [formData, setFormData] = useState({ title: "", url: "", description: "", category: "" });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<MarketingLink | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const fetchLinks = useCallback(async () => {
         if (!authToken) return;
@@ -113,11 +120,14 @@ export default function LinksTab() {
         }
     };
 
-    const handleDelete = async (link: MarketingLink) => {
-        if (!confirm(t("confirm.deleteLink", { name: link.title }))) return;
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/marketing/links/${link.id}`, {
+            const response = await fetch(`/api/admin/marketing/links/${deleteTarget.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -127,9 +137,12 @@ export default function LinksTab() {
                 throw new Error(data.error || t("errors.failedToDelete"));
             }
 
+            setDeleteTarget(null);
             fetchLinks();
         } catch (err) {
-            alert(err instanceof Error ? err.message : t("errors.failedToDelete"));
+            setDeleteError(err instanceof Error ? err.message : t("errors.failedToDelete"));
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -218,7 +231,7 @@ export default function LinksTab() {
                                             {t("common.edit")}
                                         </Button>
                                         <Button
-                                            onClick={() => handleDelete(link)}
+                                            onClick={() => setDeleteTarget(link)}
                                             variant="ghost"
                                             color="danger"
                                             size="xs"
@@ -316,6 +329,30 @@ export default function LinksTab() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title={t("links.deleteTitle")}
+                description={t("confirm.deleteLink", { name: deleteTarget?.title || "" })}
+                preview={
+                    deleteTarget ? (
+                        <div>
+                            <p className="text-white text-sm font-medium">{deleteTarget.title}</p>
+                            <p className="text-xs text-accent truncate">{deleteTarget.url}</p>
+                        </div>
+                    ) : undefined
+                }
+                confirmText={t("common.delete")}
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
         </div>
     );
 }

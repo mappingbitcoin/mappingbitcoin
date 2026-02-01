@@ -16,8 +16,10 @@ import {
     WarningIcon,
     CopyIcon,
     RefreshIcon,
+    TrashIcon,
 } from "@/assets/icons";
-import Button, { IconButton } from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 
 interface Claim {
     id: string;
@@ -47,6 +49,8 @@ export default function MyVerificationsClient() {
     const [checkingClaim, setCheckingClaim] = useState<string | null>(null);
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [removingClaim, setRemovingClaim] = useState<string | null>(null);
+    const [claimToRemove, setClaimToRemove] = useState<Claim | null>(null);
 
     const fetchClaims = useCallback(async () => {
         if (!authToken) return;
@@ -148,6 +152,37 @@ export default function MyVerificationsClient() {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
+    };
+
+    const handleRemoveVerification = async () => {
+        if (!claimToRemove || !authToken) return;
+
+        setRemovingClaim(claimToRemove.id);
+        try {
+            const response = await fetch("/api/verify/remove", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({ claimId: claimToRemove.id }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Remove from local state
+                setClaims(prev => prev.filter(c => c.id !== claimToRemove.id));
+                setClaimToRemove(null);
+            } else {
+                setError(data.error || "Failed to remove verification");
+            }
+        } catch (err) {
+            console.error("Failed to remove verification:", err);
+            setError("Failed to remove verification");
+        } finally {
+            setRemovingClaim(null);
+        }
     };
 
     const formatDate = (dateStr: string) => {
@@ -307,6 +342,21 @@ export default function MyVerificationsClient() {
                                                 )}
                                             </div>
                                         </div>
+
+                                        {/* Remove button for verified claims */}
+                                        {claim.status === "VERIFIED" && (
+                                            <div className="shrink-0">
+                                                <Button
+                                                    onClick={() => setClaimToRemove(claim)}
+                                                    variant="ghost"
+                                                    color="danger"
+                                                    size="sm"
+                                                    leftIcon={<TrashIcon className="w-4 h-4" />}
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Domain verification details */}
@@ -353,6 +403,19 @@ export default function MyVerificationsClient() {
                         </div>
                     )}
                 </motion.div>
+
+                {/* Remove Verification Confirmation Modal */}
+                <ConfirmModal
+                    isOpen={!!claimToRemove}
+                    onClose={() => setClaimToRemove(null)}
+                    onConfirm={handleRemoveVerification}
+                    title="Remove Verification"
+                    description={`Are you sure you want to remove the verification for ${claimToRemove?.venueName}? This will revoke your ownership claim and delete the verification announcement from Nostr. This action cannot be undone.`}
+                    confirmText="Remove Verification"
+                    loading={removingClaim === claimToRemove?.id}
+                    error={error}
+                    variant="danger"
+                />
             </div>
         </div>
     );

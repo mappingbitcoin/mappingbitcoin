@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
+import AlertModal from "@/components/ui/Modal/AlertModal";
 import Button from "@/components/ui/Button";
 
 interface Seeder {
@@ -30,6 +32,14 @@ export default function SeedersPage() {
     });
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteTarget, setDeleteTarget] = useState<Seeder | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    // Alert modal state
+    const [alertModal, setAlertModal] = useState<{ title: string; message: string; variant: "error" | "success" } | null>(null);
 
     const fetchSeeders = useCallback(async () => {
         if (!authToken) return;
@@ -134,13 +144,14 @@ export default function SeedersPage() {
         }
     };
 
-    const handleDelete = async (seeder: Seeder) => {
-        if (!confirm(`Are you sure you want to delete seeder ${seeder.label || seeder.pubkey.slice(0, 16)}...?`)) {
-            return;
-        }
+    const handleDelete = async () => {
+        if (!deleteTarget || !authToken) return;
+
+        setDeleting(true);
+        setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/admin/seeders/${seeder.pubkey}`, {
+            const response = await fetch(`/api/admin/seeders/${deleteTarget.pubkey}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -150,9 +161,12 @@ export default function SeedersPage() {
                 throw new Error(data.error || "Failed to delete seeder");
             }
 
+            setDeleteTarget(null);
             fetchSeeders();
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete seeder");
+            setDeleteError(err instanceof Error ? err.message : "Failed to delete seeder");
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -229,7 +243,7 @@ export default function SeedersPage() {
                                                 Edit
                                             </Button>
                                             <Button
-                                                onClick={() => handleDelete(seeder)}
+                                                onClick={() => setDeleteTarget(seeder)}
                                                 variant="ghost"
                                                 color="danger"
                                                 size="xs"
@@ -321,6 +335,46 @@ export default function SeedersPage() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                onClose={() => {
+                    setDeleteTarget(null);
+                    setDeleteError(null);
+                }}
+                onConfirm={handleDelete}
+                title="Delete Seeder"
+                description={`Are you sure you want to delete this community seeder? This will remove them from the trust graph.`}
+                preview={
+                    deleteTarget ? (
+                        <div>
+                            <p className="text-white text-sm font-medium">
+                                {deleteTarget.label || "Unnamed Seeder"}
+                            </p>
+                            <code className="text-xs text-text-light">
+                                {deleteTarget.pubkey.slice(0, 16)}...
+                            </code>
+                            <p className="text-xs text-text-light mt-1">
+                                Region: {deleteTarget.region}
+                            </p>
+                        </div>
+                    ) : undefined
+                }
+                confirmText="Delete Seeder"
+                loading={deleting}
+                error={deleteError}
+                variant="danger"
+            />
+
+            {/* Alert Modal */}
+            <AlertModal
+                isOpen={!!alertModal}
+                onClose={() => setAlertModal(null)}
+                title={alertModal?.title || ""}
+                message={alertModal?.message || ""}
+                variant={alertModal?.variant || "error"}
+            />
         </div>
     );
 }

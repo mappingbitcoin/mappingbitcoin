@@ -172,7 +172,7 @@ export async function verifyEmailCode(
         },
     });
 
-    // Announce verification on Nostr (non-blocking)
+    // Announce verification on Nostr and store the event ID
     announceVerification(
         {
             osmId: updatedClaim.venue.osmId,
@@ -183,7 +183,14 @@ export async function verifyEmailCode(
             detail: email,
             ownerPubkey: updatedClaim.claimerPubkey,
         }
-    ).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
+    ).then(async (result) => {
+        if (result.success && result.eventId) {
+            await prisma.claim.update({
+                where: { id: claimId },
+                data: { nostrEventId: result.eventId },
+            });
+        }
+    }).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
 
     return { success: true };
 }
@@ -505,7 +512,7 @@ export async function checkDomainVerification(
                 },
             });
 
-            // Announce verification on Nostr (non-blocking)
+            // Announce verification on Nostr and store the event ID
             announceVerification(
                 {
                     osmId: updatedClaim.venue.osmId,
@@ -516,7 +523,14 @@ export async function checkDomainVerification(
                     detail: claim.domainToVerify || undefined,
                     ownerPubkey: updatedClaim.claimerPubkey,
                 }
-            ).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
+            ).then(async (result) => {
+                if (result.success && result.eventId) {
+                    await prisma.claim.update({
+                        where: { id: claimId },
+                        data: { nostrEventId: result.eventId },
+                    });
+                }
+            }).catch((err) => console.error("[NostrBot] Verification announcement failed:", err));
 
             return { success: true, verified: true };
         }
@@ -556,7 +570,10 @@ export async function getClaimsForUser(pubkey: string): Promise<Array<{
     checkCount: number;
 }>> {
     const claims = await prisma.claim.findMany({
-        where: { claimerPubkey: pubkey },
+        where: {
+            claimerPubkey: pubkey,
+            revokedAt: null, // Exclude revoked claims
+        },
         include: { venue: true },
         orderBy: { createdAt: 'desc' },
     });

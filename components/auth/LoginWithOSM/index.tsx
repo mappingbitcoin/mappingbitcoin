@@ -1,19 +1,25 @@
 "use client";
 
-import {Link, usePathname} from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { OSMIcon } from "@/assets/icons/social";
+import Button from "@/components/ui/Button";
 
 export default function LoginWithOSM() {
     const pathname = usePathname();
 
-    const loginUrl = `/api/auth/osm?returnTo=${encodeURIComponent(pathname)}`;
+    const handleLogin = () => {
+        // Use window.location for API routes to avoid i18n Link handling
+        window.location.href = `/api/auth/osm?returnTo=${encodeURIComponent(pathname)}`;
+    };
 
     return (
-        <Link href={loginUrl}>
-            <button>
-                <OSMIcon className="w-4 h-4 inline-block" />
-                {' '}CONNECT WITH OSM
-            </button>
-        </Link>
+        <Button
+            onClick={handleLogin}
+            variant="outline"
+            color="neutral"
+            leftIcon={<OSMIcon className="w-4 h-4" />}
+        >
+            Connect with OSM
+        </Button>
     );
 }
