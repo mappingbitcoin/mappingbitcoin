@@ -15,8 +15,7 @@ import {
     AI_MODEL_LABELS,
 } from "../types";
 import { BoltIcon, RefreshIcon, CheckmarkIcon, CloseIcon } from "@/assets/icons/ui";
-import Button from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
+import Button, { ToggleButton } from "@/components/ui/Button";
 
 export default function GenerationConfigTab() {
     const t = useTranslations("admin.marketing");

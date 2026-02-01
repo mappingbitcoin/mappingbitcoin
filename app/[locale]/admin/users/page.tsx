@@ -5,8 +5,10 @@ import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import AlertModal from "@/components/ui/Modal/AlertModal";
-import Button, { IconButton } from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
+import Button, { IconButton, ToggleButton } from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
 import { SearchIcon, CloseIcon, PlusIcon, UsersIcon, BanIcon } from "@/assets/icons/ui";
 
 interface User {
@@ -383,25 +385,23 @@ export default function UsersPage() {
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light" />
-                    <input
+                    <Input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search by pubkey, name, or NIP-05..."
-                        className="w-full pl-10 pr-10 py-2.5 bg-surface border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
+                        leftIcon={<SearchIcon className="w-5 h-5" />}
+                        rightIcon={searchQuery ? (
+                            <IconButton
+                                onClick={() => setSearchQuery("")}
+                                icon={<CloseIcon className="w-4 h-4" />}
+                                aria-label="Clear search"
+                                variant="ghost"
+                                color="neutral"
+                                size="xs"
+                            />
+                        ) : undefined}
                     />
-                    {searchQuery && (
-                        <IconButton
-                            onClick={() => setSearchQuery("")}
-                            icon={<CloseIcon className="w-4 h-4" />}
-                            aria-label="Clear search"
-                            variant="ghost"
-                            color="neutral"
-                            size="xs"
-                            className="absolute right-2 top-1/2 -translate-y-1/2"
-                        />
-                    )}
                 </div>
                 <div className="flex gap-2">
                     {(["all", "active", "banned"] as FilterType[]).map((f) => (
@@ -621,18 +621,14 @@ export default function UsersPage() {
                         Banning this user will prevent them from submitting reviews or claiming venues.
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Reason for ban
-                        </label>
-                        <textarea
+                    <FormField label="Reason for ban">
+                        <Textarea
                             value={banReason}
                             onChange={(e) => setBanReason(e.target.value)}
                             placeholder="e.g., Spam, Harassment, Fake reviews..."
                             rows={3}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button
@@ -669,35 +665,29 @@ export default function UsersPage() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Pubkey / npub
-                        </label>
-                        <input
+                    <FormField
+                        label="Pubkey / npub"
+                        helpText="If the user doesn't exist yet, a new record will be created with banned status."
+                        required
+                    >
+                        <Input
                             type="text"
                             value={addBanPubkey}
                             onChange={(e) => setAddBanPubkey(e.target.value)}
                             placeholder="npub1... or 64-char hex pubkey"
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary font-mono text-sm"
+                            className="font-mono"
                             required
                         />
-                        <p className="text-xs text-text-light mt-1">
-                            If the user doesn&apos;t exist yet, a new record will be created with banned status.
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Reason for ban
-                        </label>
-                        <textarea
+                    <FormField label="Reason for ban">
+                        <Textarea
                             value={addBanReason}
                             onChange={(e) => setAddBanReason(e.target.value)}
                             placeholder="e.g., Spam, Known bad actor..."
                             rows={3}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button
@@ -740,35 +730,29 @@ export default function UsersPage() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Pubkeys to ban
-                        </label>
-                        <textarea
+                    <FormField
+                        label="Pubkeys to ban"
+                        helpText="Max 100 pubkeys per request. Both hex and npub formats are accepted."
+                        required
+                    >
+                        <Textarea
                             value={bulkBanList}
                             onChange={(e) => setBulkBanList(e.target.value)}
                             placeholder="Enter pubkeys or npubs, one per line, or separated by commas..."
                             rows={8}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none font-mono text-sm"
+                            className="font-mono"
                             required
                         />
-                        <p className="text-xs text-text-light mt-1">
-                            Max 100 pubkeys per request. Both hex and npub formats are accepted.
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Reason for ban
-                        </label>
-                        <input
+                    <FormField label="Reason for ban">
+                        <Input
                             type="text"
                             value={bulkBanReason}
                             onChange={(e) => setBulkBanReason(e.target.value)}
                             placeholder="e.g., Known spam ring, Bot network..."
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

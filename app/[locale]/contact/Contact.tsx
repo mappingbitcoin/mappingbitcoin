@@ -52,7 +52,7 @@ const Contact: React.FC = () => {
     });
     const [status, setStatus] = useState<ContactStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    const { getToken, isConfigured } = useRecaptcha({ action: "contact_form" });
+    const { getToken, isConfigured, preload } = useRecaptcha({ action: "contact_form" });
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -137,6 +137,7 @@ const Contact: React.FC = () => {
                                 placeholder={t("form.namePlaceholder")}
                                 value={formData.name}
                                 onChange={handleChange}
+                                onFocus={preload}
                                 required
                                 className="w-full py-3 px-4 text-base bg-primary-light text-white border border-border-light rounded-btn transition-all focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 placeholder:text-text-light"
                             />

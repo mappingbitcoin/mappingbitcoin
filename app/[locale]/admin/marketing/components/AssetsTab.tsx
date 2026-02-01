@@ -6,9 +6,12 @@ import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
 import Button from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
+import { ToggleButton } from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import FormField from "@/components/ui/FormField";
+import TagInput from "@/components/ui/TagInput";
 import AssetUploader from "./AssetUploader";
-import TagInput from "./TagInput";
 import type { MarketingAsset, SocialNetwork, PostType, ContentTopic } from "../types";
 import { SOCIAL_NETWORKS, POST_TYPES, CONTENT_TOPICS, SOCIAL_NETWORK_LABELS, POST_TYPE_LABELS, CONTENT_TOPIC_LABELS } from "../types";
 import { PhotoIcon, VideoIcon, FileIcon, DocumentIcon, CheckmarkIcon } from "@/assets/icons/ui";
@@ -260,38 +263,32 @@ export default function AssetsTab() {
             {/* Filters and Actions */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-3">
-                    <select
+                    <Select
                         value={filterNetwork}
                         onChange={(e) => setFilterNetwork(e.target.value as SocialNetwork | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
-                    >
-                        <option value="">{t("assets.allNetworks")}</option>
-                        {SOCIAL_NETWORKS.map((network) => (
-                            <option key={network} value={network}>{SOCIAL_NETWORK_LABELS[network]}</option>
-                        ))}
-                    </select>
+                        size="sm"
+                        fullWidth={false}
+                        placeholder={t("assets.allNetworks")}
+                        options={SOCIAL_NETWORKS.map((network) => ({ value: network, label: SOCIAL_NETWORK_LABELS[network] }))}
+                    />
 
-                    <select
+                    <Select
                         value={filterType}
                         onChange={(e) => setFilterType(e.target.value as PostType | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
-                    >
-                        <option value="">{t("assets.allTypes")}</option>
-                        {POST_TYPES.map((type) => (
-                            <option key={type} value={type}>{POST_TYPE_LABELS[type]}</option>
-                        ))}
-                    </select>
+                        size="sm"
+                        fullWidth={false}
+                        placeholder={t("assets.allTypes")}
+                        options={POST_TYPES.map((type) => ({ value: type, label: POST_TYPE_LABELS[type] }))}
+                    />
 
-                    <select
+                    <Select
                         value={filterTopic}
                         onChange={(e) => setFilterTopic(e.target.value as ContentTopic | "")}
-                        className="px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white text-sm focus:outline-none focus:border-accent"
-                    >
-                        <option value="">{t("assets.allTopics")}</option>
-                        {CONTENT_TOPICS.map((topic) => (
-                            <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
-                        ))}
-                    </select>
+                        size="sm"
+                        fullWidth={false}
+                        placeholder={t("assets.allTopics")}
+                        options={CONTENT_TOPICS.map((topic) => ({ value: topic, label: CONTENT_TOPIC_LABELS[topic] }))}
+                    />
                 </div>
 
                 <Button onClick={openUploadModal}>
@@ -404,8 +401,7 @@ export default function AssetsTab() {
                     {uploadedFile && (
                         <>
                             {/* Social Networks */}
-                            <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
+                            <FormField label={t("assets.fields.socialNetworks")}>
                                 <div className="flex flex-wrap gap-2">
                                     {SOCIAL_NETWORKS.map((network) => (
                                         <ToggleButton
@@ -417,11 +413,10 @@ export default function AssetsTab() {
                                         </ToggleButton>
                                     ))}
                                 </div>
-                            </div>
+                            </FormField>
 
                             {/* Post Types */}
-                            <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
+                            <FormField label={t("assets.fields.postTypes")}>
                                 <div className="flex flex-wrap gap-2">
                                     {POST_TYPES.map((type) => (
                                         <ToggleButton
@@ -433,44 +428,36 @@ export default function AssetsTab() {
                                         </ToggleButton>
                                     ))}
                                 </div>
-                            </div>
+                            </FormField>
 
                             {/* Topic */}
-                            <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.topic")}</label>
-                                <select
+                            <FormField label={t("assets.fields.topic")}>
+                                <Select
                                     value={assetFormData.topic}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
-                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
-                                >
-                                    <option value="">{t("assets.placeholders.selectTopic")}</option>
-                                    {CONTENT_TOPICS.map((topic) => (
-                                        <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
-                                    ))}
-                                </select>
-                            </div>
+                                    placeholder={t("assets.placeholders.selectTopic")}
+                                    options={CONTENT_TOPICS.map((topic) => ({ value: topic, label: CONTENT_TOPIC_LABELS[topic] }))}
+                                />
+                            </FormField>
 
                             {/* Custom Tags */}
-                            <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.customTags")}</label>
+                            <FormField label={t("assets.fields.customTags")}>
                                 <TagInput
                                     tags={assetFormData.customTags}
                                     onChange={(tags) => setAssetFormData({ ...assetFormData, customTags: tags })}
                                     placeholder={t("assets.placeholders.customTags")}
                                 />
-                            </div>
+                            </FormField>
 
                             {/* Alt Text */}
-                            <div>
-                                <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.altText")}</label>
-                                <input
+                            <FormField label={t("assets.fields.altText")}>
+                                <Input
                                     type="text"
                                     value={assetFormData.altText}
                                     onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
                                     placeholder={t("assets.placeholders.altText")}
-                                    className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                                 />
-                            </div>
+                            </FormField>
                         </>
                     )}
 
@@ -521,8 +508,7 @@ export default function AssetsTab() {
                     )}
 
                     {/* Social Networks */}
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.socialNetworks")}</label>
+                    <FormField label={t("assets.fields.socialNetworks")}>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
                                 <ToggleButton
@@ -534,11 +520,10 @@ export default function AssetsTab() {
                                 </ToggleButton>
                             ))}
                         </div>
-                    </div>
+                    </FormField>
 
                     {/* Post Types */}
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.postTypes")}</label>
+                    <FormField label={t("assets.fields.postTypes")}>
                         <div className="flex flex-wrap gap-2">
                             {POST_TYPES.map((type) => (
                                 <ToggleButton
@@ -550,44 +535,36 @@ export default function AssetsTab() {
                                 </ToggleButton>
                             ))}
                         </div>
-                    </div>
+                    </FormField>
 
                     {/* Topic */}
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.topic")}</label>
-                        <select
+                    <FormField label={t("assets.fields.topic")}>
+                        <Select
                             value={assetFormData.topic}
                             onChange={(e) => setAssetFormData({ ...assetFormData, topic: e.target.value as ContentTopic | "" })}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
-                        >
-                            <option value="">{t("assets.placeholders.selectTopic")}</option>
-                            {CONTENT_TOPICS.map((topic) => (
-                                <option key={topic} value={topic}>{CONTENT_TOPIC_LABELS[topic]}</option>
-                            ))}
-                        </select>
-                    </div>
+                            placeholder={t("assets.placeholders.selectTopic")}
+                            options={CONTENT_TOPICS.map((topic) => ({ value: topic, label: CONTENT_TOPIC_LABELS[topic] }))}
+                        />
+                    </FormField>
 
                     {/* Custom Tags */}
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.customTags")}</label>
+                    <FormField label={t("assets.fields.customTags")}>
                         <TagInput
                             tags={assetFormData.customTags}
                             onChange={(tags) => setAssetFormData({ ...assetFormData, customTags: tags })}
                             placeholder={t("assets.placeholders.customTags")}
                         />
-                    </div>
+                    </FormField>
 
                     {/* Alt Text */}
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-2">{t("assets.fields.altText")}</label>
-                        <input
+                    <FormField label={t("assets.fields.altText")}>
+                        <Input
                             type="text"
                             value={assetFormData.altText}
                             onChange={(e) => setAssetFormData({ ...assetFormData, altText: e.target.value })}
                             placeholder={t("assets.placeholders.altText")}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button

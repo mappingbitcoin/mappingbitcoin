@@ -22,7 +22,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
     const [email, setEmail] = useState("");
     const [status, setStatus] = useState<SubscribeStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    const { getToken, isReady } = useRecaptcha({ action: "newsletter_subscribe" });
+    const { getToken, isReady, preload } = useRecaptcha({ action: "newsletter_subscribe" });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -95,6 +95,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onFocus={preload}
                     placeholder={t("placeholder")}
                     required
                     className="flex-1 py-2.5 px-4 text-sm bg-white/5 text-white border border-white/10 rounded-lg placeholder:text-white/30 focus:outline-none focus:border-orange-500/50 transition-colors"

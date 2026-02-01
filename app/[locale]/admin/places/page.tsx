@@ -4,9 +4,11 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
-import Button, { IconButton } from "@/components/ui/Button";
-import ToggleButton from "@/components/ui/ToggleButton";
+import Button, { IconButton, ToggleButton } from "@/components/ui/Button";
 import DropdownItem from "@/components/ui/DropdownItem";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import FormField from "@/components/ui/FormField";
 import { SearchIcon, ShieldCheckIcon, CloseIcon, PlusIcon, SpinnerIcon } from "@/assets/icons/ui";
 
 interface VerifiedPlace {
@@ -367,16 +369,13 @@ export default function PlacesPage() {
             </div>
 
             {/* Search */}
-            <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light" />
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by venue name, city, or country..."
-                    className="w-full pl-10 pr-10 py-2.5 bg-surface border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary"
-                />
-                {searchQuery && (
+            <Input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by venue name, city, or country..."
+                leftIcon={<SearchIcon className="w-5 h-5" />}
+                rightIcon={searchQuery ? (
                     <IconButton
                         onClick={() => setSearchQuery("")}
                         icon={<CloseIcon className="w-4 h-4" />}
@@ -384,10 +383,9 @@ export default function PlacesPage() {
                         variant="ghost"
                         color="neutral"
                         size="xs"
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
                     />
-                )}
-            </div>
+                ) : undefined}
+            />
 
             {/* Places Table */}
             <div className="bg-surface rounded-xl border border-border-light overflow-hidden">
@@ -558,18 +556,14 @@ export default function PlacesPage() {
                         will need to re-verify ownership to regain verified status.
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-text-light mb-1">
-                            Reason for revocation
-                        </label>
-                        <textarea
+                    <FormField label="Reason for revocation">
+                        <Textarea
                             value={revokeReason}
                             onChange={(e) => setRevokeReason(e.target.value)}
                             placeholder="e.g., Business closed, ownership changed, fraudulent claim..."
                             rows={3}
-                            className="w-full px-4 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-primary resize-none"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end space-x-3 pt-4">
                         <Button
@@ -608,86 +602,87 @@ export default function PlacesPage() {
 
                     {/* Place Search */}
                     <div ref={placeSearchRef}>
-                        <label className="block text-sm font-medium text-white mb-2">
-                            Select Venue
-                        </label>
-                        {selectedPlace ? (
-                            <div className="flex items-center justify-between bg-green-500/10 rounded-lg p-3 border border-green-500/30">
-                                <div>
-                                    <p className="text-white font-medium">{selectedPlace.name}</p>
-                                    <p className="text-gray-300 text-sm">
-                                        {selectedPlace.city}, {selectedPlace.country}
-                                    </p>
-                                </div>
-                                <IconButton
-                                    onClick={() => setSelectedPlace(null)}
-                                    icon={<CloseIcon className="w-4 h-4" />}
-                                    aria-label="Clear selection"
-                                    variant="ghost"
-                                    color="neutral"
-                                    size="xs"
-                                />
-                            </div>
-                        ) : (
-                            <div className="relative">
-                                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    value={placeSearchQuery}
-                                    onChange={(e) => setPlaceSearchQuery(e.target.value)}
-                                    placeholder="Search for a venue..."
-                                    className="w-full pl-9 pr-9 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent"
-                                />
-                                {placeSearchLoading && (
-                                    <SpinnerIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
-                                )}
-
-                                {/* Search Results Dropdown */}
-                                {placeSearchResults.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                                        {placeSearchResults.map((place) => (
-                                            <DropdownItem
-                                                key={place.id}
-                                                onClick={() => selectPlace(place)}
-                                                className="py-2.5 border-b border-gray-700 last:border-b-0"
-                                            >
-                                                <div>
-                                                    <p className="text-white font-medium text-sm">{place.name}</p>
-                                                    <p className="text-gray-400 text-xs">
-                                                        {place.city}, {place.country}
-                                                        {place.category && ` • ${place.category}`}
-                                                    </p>
-                                                </div>
-                                            </DropdownItem>
-                                        ))}
+                        <FormField label="Select Venue" required>
+                            {selectedPlace ? (
+                                <div className="flex items-center justify-between bg-green-500/10 rounded-lg p-3 border border-green-500/30">
+                                    <div>
+                                        <p className="text-white font-medium">{selectedPlace.name}</p>
+                                        <p className="text-text-light text-sm">
+                                            {selectedPlace.city}, {selectedPlace.country}
+                                        </p>
                                     </div>
-                                )}
-                            </div>
-                        )}
+                                    <IconButton
+                                        onClick={() => setSelectedPlace(null)}
+                                        icon={<CloseIcon className="w-4 h-4" />}
+                                        aria-label="Clear selection"
+                                        variant="ghost"
+                                        color="neutral"
+                                        size="xs"
+                                    />
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        value={placeSearchQuery}
+                                        onChange={(e) => setPlaceSearchQuery(e.target.value)}
+                                        placeholder="Search for a venue..."
+                                        leftIcon={<SearchIcon className="w-4 h-4" />}
+                                        rightIcon={placeSearchLoading ? (
+                                            <SpinnerIcon className="w-4 h-4 animate-spin" />
+                                        ) : undefined}
+                                    />
+
+                                    {/* Search Results Dropdown */}
+                                    {placeSearchResults.length > 0 && (
+                                        <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border-light rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                                            {placeSearchResults.map((place) => (
+                                                <DropdownItem
+                                                    key={place.id}
+                                                    onClick={() => selectPlace(place)}
+                                                    className="py-2.5 border-b border-border-light last:border-b-0"
+                                                >
+                                                    <div>
+                                                        <p className="text-white font-medium text-sm">{place.name}</p>
+                                                        <p className="text-text-light text-xs">
+                                                            {place.city}, {place.country}
+                                                            {place.category && ` • ${place.category}`}
+                                                        </p>
+                                                    </div>
+                                                </DropdownItem>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </FormField>
                     </div>
 
                     {/* Owner Pubkey */}
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-2">
-                            Owner Pubkey / npub
-                        </label>
-                        <input
+                    <FormField
+                        label="Owner Pubkey / npub"
+                        helpText="The Nostr public key of the venue owner"
+                        required
+                    >
+                        <Input
                             type="text"
                             value={verifyPubkey}
                             onChange={(e) => setVerifyPubkey(e.target.value)}
                             placeholder="npub1... or 64-char hex pubkey"
-                            className="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent font-mono text-sm"
+                            className="font-mono"
                         />
-                        <p className="text-xs text-gray-400 mt-1.5">
-                            The Nostr public key of the venue owner
-                        </p>
-                    </div>
+                    </FormField>
 
                     {/* Verification Method */}
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-2">
-                            Verification Method
-                        </label>
+                    <FormField
+                        label="Verification Method"
+                        helpText={
+                            verifyMethod === "PHYSICAL" ? "Verified in person at the physical location" :
+                            verifyMethod === "PHONE" ? "Verified via phone call to the business" :
+                            verifyMethod === "EMAIL" ? "Verified via email correspondence" :
+                            "Verified via domain ownership proof"
+                        }
+                    >
                         <div className="grid grid-cols-2 gap-2">
                             {(["PHYSICAL", "PHONE", "EMAIL", "DOMAIN"] as VerificationMethod[]).map((method) => (
                                 <ToggleButton
@@ -700,15 +695,9 @@ export default function PlacesPage() {
                                 </ToggleButton>
                             ))}
                         </div>
-                        <p className="text-xs text-gray-400 mt-2">
-                            {verifyMethod === "PHYSICAL" && "Verified in person at the physical location"}
-                            {verifyMethod === "PHONE" && "Verified via phone call to the business"}
-                            {verifyMethod === "EMAIL" && "Verified via email correspondence"}
-                            {verifyMethod === "DOMAIN" && "Verified via domain ownership proof"}
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div className="flex justify-end space-x-3 pt-4 border-t border-gray-700 mt-2">
+                    <div className="flex justify-end space-x-3 pt-4 border-t border-border-light mt-2">
                         <Button
                             type="button"
                             onClick={closeVerifyModal}

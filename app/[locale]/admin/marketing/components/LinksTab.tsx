@@ -5,8 +5,11 @@ import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
 import ConfirmModal from "@/components/ui/Modal/ConfirmModal";
-import AlertModal from "@/components/ui/Modal/AlertModal";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import Select from "@/components/ui/Select";
+import FormField from "@/components/ui/FormField";
 import type { MarketingLink } from "../types";
 
 export default function LinksTab() {
@@ -166,16 +169,14 @@ export default function LinksTab() {
         <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <select
+                <Select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-3 py-1.5 text-sm bg-surface-light border border-border-light rounded-lg text-white focus:outline-none focus:border-accent"
-                >
-                    <option value="">{t("links.allCategories")}</option>
-                    {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                </select>
+                    size="sm"
+                    fullWidth={false}
+                    placeholder={t("links.allCategories")}
+                    options={categories.map((cat) => ({ value: cat, label: cat }))}
+                />
                 <Button onClick={openCreateModal} size="sm">
                     {t("links.addButton")}
                 </Button>
@@ -255,50 +256,46 @@ export default function LinksTab() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-xs font-medium text-text-light mb-1">{t("links.fields.title")}</label>
-                        <input
+                    <FormField label={t("links.fields.title")} labelSize="xs" required>
+                        <Input
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             placeholder={t("links.placeholders.title")}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
+                            size="sm"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-xs font-medium text-text-light mb-1">{t("links.fields.url")}</label>
-                        <input
+                    <FormField label={t("links.fields.url")} labelSize="xs" required>
+                        <Input
                             type="url"
                             value={formData.url}
                             onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                             placeholder={t("links.placeholders.url")}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
+                            size="sm"
                             required
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-xs font-medium text-text-light mb-1">{t("links.fields.description")}</label>
-                        <textarea
+                    <FormField label={t("links.fields.description")} labelSize="xs">
+                        <Textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder={t("links.placeholders.description")}
                             rows={2}
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent resize-none"
+                            size="sm"
                         />
-                    </div>
+                    </FormField>
 
-                    <div>
-                        <label className="block text-xs font-medium text-text-light mb-1">{t("links.fields.category")}</label>
-                        <input
+                    <FormField label={t("links.fields.category")} labelSize="xs" required>
+                        <Input
                             type="text"
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                             placeholder={t("links.placeholders.category")}
                             list="category-suggestions"
-                            className="w-full px-3 py-2 text-sm bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
+                            size="sm"
                             required
                         />
                         <datalist id="category-suggestions">
@@ -306,7 +303,7 @@ export default function LinksTab() {
                                 <option key={cat} value={cat} />
                             ))}
                         </datalist>
-                    </div>
+                    </FormField>
 
                     <div className="flex justify-end gap-2 pt-2">
                         <Button
