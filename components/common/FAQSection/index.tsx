@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ReactNode, useState } from "react";
 import { ChevronDownIcon } from "@/assets/icons/ui";
+import AccordionButton from "@/components/ui/AccordionButton";
 
 type FAQEntry = {
     question: string;
@@ -60,15 +61,13 @@ export default function FAQSection({
                                 key={i}
                                 className="bg-surface rounded-card border border-border-light shadow-soft overflow-hidden transition-shadow duration-200 hover:shadow-medium"
                             >
-                                <button
+                                <AccordionButton
+                                    expanded={isOpen}
+                                    expandIcon={<ChevronDownIcon className="w-5 h-5" />}
                                     onClick={() => toggleFaq(i)}
-                                    className="w-full flex items-center justify-between gap-4 p-4 text-left cursor-pointer"
                                 >
-                                    <span className="font-medium text-text-dark pr-4">{renderedQ}</span>
-                                    <span className={`text-accent transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                                        <ChevronDownIcon className="w-5 h-5" />
-                                    </span>
-                                </button>
+                                    {renderedQ}
+                                </AccordionButton>
 
                                 <div
                                     className={`overflow-hidden transition-all duration-300 ease-in-out ${

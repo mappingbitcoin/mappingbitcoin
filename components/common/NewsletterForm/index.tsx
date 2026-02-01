@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CheckmarkIcon } from "@/assets/icons/ui";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { isValidEmail } from "@/utils/validation";
+import Button from "@/components/ui/Button";
 
 type SubscribeStatus = "idle" | "loading" | "success" | "error" | "already";
 
@@ -98,13 +99,15 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
                     required
                     className="flex-1 py-2.5 px-4 text-sm bg-white/5 text-white border border-white/10 rounded-lg placeholder:text-white/30 focus:outline-none focus:border-orange-500/50 transition-colors"
                 />
-                <button
+                <Button
                     type="submit"
                     disabled={status === "loading"}
-                    className="px-5 py-2.5 text-sm font-medium bg-orange-500/10 border border-orange-500 text-white rounded-lg hover:bg-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                    loading={status === "loading"}
+                    variant="outline"
+                    size="sm"
                 >
                     {status === "loading" ? "..." : t("button")}
-                </button>
+                </Button>
             </form>
             {status === "error" && (
                 <p className="mt-2 text-xs text-red-400">{errorMessage}</p>

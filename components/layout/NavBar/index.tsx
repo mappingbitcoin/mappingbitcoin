@@ -19,6 +19,7 @@ import {
     MenuIcon,
     CloseIcon,
 } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
 
 const menuItems = [
     'map',
@@ -398,26 +399,30 @@ const NavBar = () => {
                                                             <ShieldCheckIcon className="w-4 h-4" />
                                                             {t('myVerifications')}
                                                         </Link>
-                                                        <button
+                                                        <Button
                                                             onClick={handleLogout}
-                                                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+                                                            variant="ghost"
+                                                            color="neutral"
+                                                            size="sm"
+                                                            leftIcon={<LogoutIcon />}
+                                                            fullWidth
+                                                            className="justify-start"
                                                         >
-                                                            <LogoutIcon className="w-4 h-4" />
                                                             {t('logout')}
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
                                     </div>
                                 ) : (
-                                    <button
+                                    <Button
                                         onClick={() => setShowLoginModal(true)}
-                                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
+                                        leftIcon={<LoginIcon />}
+                                        size="sm"
                                     >
-                                        <LoginIcon className="w-4 h-4" />
                                         {t('login')}
-                                    </button>
+                                    </Button>
                                 )}
                             </motion.div>
                         </div>
@@ -531,25 +536,27 @@ const NavBar = () => {
                                             <ShieldCheckIcon className="w-5 h-5" />
                                             {t('myVerifications')}
                                         </Link>
-                                        <button
+                                        <Button
                                             onClick={handleLogout}
-                                            className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white/80 bg-white/5 border border-white/20 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                                            variant="outline"
+                                            color="neutral"
+                                            size="lg"
+                                            leftIcon={<LogoutIcon />}
                                         >
-                                            <LogoutIcon className="w-5 h-5" />
                                             {t('logout')}
-                                        </button>
+                                        </Button>
                                     </div>
                                 ) : (
-                                    <button
+                                    <Button
                                         onClick={() => {
                                             closeMenu();
                                             setShowLoginModal(true);
                                         }}
-                                        className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-accent border border-accent rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
+                                        size="lg"
+                                        leftIcon={<LoginIcon />}
                                     >
-                                        <LoginIcon className="w-5 h-5" />
                                         {t('login')}
-                                    </button>
+                                    </Button>
                                 )}
                             </motion.div>
 

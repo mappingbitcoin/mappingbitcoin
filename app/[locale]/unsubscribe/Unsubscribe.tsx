@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PageSection } from "@/components/layout";
-import { Link } from "@/i18n/navigation";
 import { CircleWarningIcon, CircleXIcon, CircleCheckIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
+import { TextLink } from "@/components/ui";
 
 interface SubscriptionList {
     slug: string;
@@ -109,12 +110,9 @@ const Unsubscribe: React.FC = () => {
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("noToken.title")}</h1>
                     <p className="text-text-light mb-6">{t("noToken.description")}</p>
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent/10 border-2 border-accent rounded-btn text-white font-semibold hover:bg-accent/20 transition-colors"
-                    >
+                    <Button href="/" variant="outline" color="accent">
                         {t("backHome")}
-                    </Link>
+                    </Button>
                 </div>
             </PageSection>
         );
@@ -142,12 +140,9 @@ const Unsubscribe: React.FC = () => {
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("error")}</h1>
                     <p className="text-text-light mb-6">{errorMessage}</p>
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent/10 border-2 border-accent rounded-btn text-white font-semibold hover:bg-accent/20 transition-colors"
-                    >
+                    <Button href="/" variant="outline" color="accent">
                         {t("backHome")}
-                    </Link>
+                    </Button>
                 </div>
             </PageSection>
         );
@@ -163,12 +158,9 @@ const Unsubscribe: React.FC = () => {
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-4">{t("success.title")}</h1>
                     <p className="text-text-light mb-6">{t("success.description")}</p>
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent/10 border-2 border-accent rounded-btn text-white font-semibold hover:bg-accent/20 transition-colors"
-                    >
+                    <Button href="/" variant="outline" color="accent">
                         {t("backHome")}
-                    </Link>
+                    </Button>
                 </div>
             </PageSection>
         );
@@ -201,34 +193,40 @@ const Unsubscribe: React.FC = () => {
                                         })}
                                     </p>
                                 </div>
-                                <button
+                                <Button
                                     onClick={() => handleUnsubscribe(list.slug)}
                                     disabled={unsubscribing !== null}
-                                    className="px-4 py-2 text-sm font-medium text-red-400 border border-red-400/30 rounded-btn hover:bg-red-400/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    loading={unsubscribing === list.slug}
+                                    variant="outline"
+                                    color="danger"
+                                    size="sm"
                                 >
                                     {unsubscribing === list.slug ? t("unsubscribing") : t("unsubscribe")}
-                                </button>
+                                </Button>
                             </div>
                         ))}
                     </div>
 
                     {subscriber && subscriber.lists.length > 1 && (
                         <div className="p-4 border-t border-border-light bg-primary-light/50">
-                            <button
+                            <Button
                                 onClick={() => handleUnsubscribe()}
                                 disabled={unsubscribing !== null}
-                                className="w-full py-3 text-sm font-semibold text-red-400 border border-red-400/30 rounded-btn hover:bg-red-400/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                loading={unsubscribing === "all"}
+                                variant="outline"
+                                color="danger"
+                                fullWidth
                             >
                                 {unsubscribing === "all" ? t("unsubscribing") : t("unsubscribeAll")}
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>
 
                 <div className="mt-8 text-center">
-                    <Link href="/" className="text-accent hover:underline">
+                    <TextLink href="/" variant="accent">
                         {t("backHome")}
-                    </Link>
+                    </TextLink>
                 </div>
             </div>
         </PageSection>

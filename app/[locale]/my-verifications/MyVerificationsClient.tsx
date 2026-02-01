@@ -17,6 +17,7 @@ import {
     CopyIcon,
     RefreshIcon,
 } from "@/assets/icons";
+import Button, { IconButton } from "@/components/ui/Button";
 
 interface Claim {
     id: string;
@@ -191,13 +192,12 @@ export default function MyVerificationsClient() {
                         <p className="text-text-light mb-6">
                             {t("pleaseLogin")}
                         </p>
-                        <button
+                        <Button
                             onClick={() => setShowLoginModal(true)}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors cursor-pointer"
+                            leftIcon={<LoginIcon className="w-5 h-5" />}
                         >
-                            <LoginIcon className="w-5 h-5" />
                             {tMenu("login")}
-                        </button>
+                        </Button>
                     </div>
                     <LoginModal
                         isOpen={showLoginModal}
@@ -328,28 +328,20 @@ export default function MyVerificationsClient() {
                                                 </button>
                                             </div>
                                             <div className="mt-3 flex items-center gap-3">
-                                                <button
+                                                <Button
                                                     onClick={() => handleCheckDomain(claim.id)}
                                                     disabled={checkingClaim === claim.id || !!cooldowns[claim.id]}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    loading={checkingClaim === claim.id}
+                                                    size="sm"
+                                                    leftIcon={cooldowns[claim.id] ? <ClockIcon className="w-4 h-4" /> : <RefreshIcon className="w-4 h-4" />}
                                                 >
-                                                    {checkingClaim === claim.id ? (
-                                                        <>
-                                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                            Checking...
-                                                        </>
-                                                    ) : cooldowns[claim.id] ? (
-                                                        <>
-                                                            <ClockIcon className="w-4 h-4" />
-                                                            Wait {cooldowns[claim.id]}s
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <RefreshIcon className="w-4 h-4" />
-                                                            Check Now
-                                                        </>
-                                                    )}
-                                                </button>
+                                                    {checkingClaim === claim.id
+                                                        ? "Checking..."
+                                                        : cooldowns[claim.id]
+                                                            ? `Wait ${cooldowns[claim.id]}s`
+                                                            : "Check Now"
+                                                    }
+                                                </Button>
                                                 <span className="text-xs text-text-light">
                                                     Checks: {claim.checkCount}
                                                 </span>

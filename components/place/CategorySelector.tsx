@@ -18,6 +18,9 @@ import {
     CheckmarkIcon,
     PlusIcon,
 } from "@/assets/icons";
+import TagRemoveButton from "@/components/ui/TagRemoveButton";
+import Button from "@/components/ui/Button";
+import DropdownItem from "@/components/ui/DropdownItem";
 
 interface CategorySelectorProps {
     category: PlaceCategory | '';
@@ -185,13 +188,11 @@ export default function CategorySelector({
                                 ) : (
                                     getCategoryLabel(category as PlaceCategory)
                                 )}
-                                <button
-                                    type="button"
+                                <TagRemoveButton
                                     onClick={handleClear}
-                                    className="ml-1 hover:text-accent-dark transition-colors"
-                                >
-                                    <CloseIcon className="w-4 h-4" />
-                                </button>
+                                    aria-label="Clear category"
+                                    className="ml-1"
+                                />
                             </span>
                         )}
                     </div>
@@ -330,13 +331,13 @@ export default function CategorySelector({
                                                 }
                                             }}
                                         />
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={handleSuggestSubmit}
-                                            className="px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-dark transition-colors"
+                                            size="sm"
                                         >
                                             Add
-                                        </button>
+                                        </Button>
                                     </div>
                                     <p className="text-xs text-text-light mt-1.5">
                                         Suggestions are reviewed before being added

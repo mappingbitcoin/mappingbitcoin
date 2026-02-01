@@ -47,6 +47,8 @@ import {
     ChevronRightIcon,
     SendIcon,
 } from "@/assets/icons";
+import Button from "@/components/ui/Button";
+import TagRemoveButton from "@/components/ui/TagRemoveButton";
 
 const OpeningHoursPicker = dynamic(
     () => import("@/components/forms/OpeningHoursPicker"),
@@ -58,12 +60,18 @@ const SocialLinksEditor = dynamic(
     { ssr: false }
 );
 
+const VenueImageUploader = dynamic(
+    () => import("@/components/place/VenueImageUploader"),
+    { ssr: false }
+);
+
 const EMPTY_FORM: VenueForm = {
     name: "",
     category: "",
     subcategory: "",
     additionalTags: {},
     about: '',
+    image: undefined,
     lat: "",
     lon: "",
     address: {
@@ -418,9 +426,11 @@ export default function VenueSubmissionForm() {
                                                         {suggestedSubcategories.map((s) => (
                                                             <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 bg-accent/20 text-accent rounded text-xs">
                                                                 {s}
-                                                                <button type="button" onClick={() => setSuggestedSubcategories(suggestedSubcategories.filter(x => x !== s))} className="hover:text-white">
-                                                                    <CloseIcon className="w-3 h-3" />
-                                                                </button>
+                                                                <TagRemoveButton
+                                                                    onClick={() => setSuggestedSubcategories(suggestedSubcategories.filter(x => x !== s))}
+                                                                    className="hover:text-white"
+                                                                    aria-label={`Remove ${s}`}
+                                                                />
                                                             </span>
                                                         ))}
                                                     </div>
@@ -434,6 +444,12 @@ export default function VenueSubmissionForm() {
                                                 onChange={(e) => setForm(prev => ({ ...prev, about: e.target.value }))}
                                                 rows={2}
                                                 placeholder="Brief description..."
+                                            />
+
+                                            {/* Venue Image */}
+                                            <VenueImageUploader
+                                                value={form.image}
+                                                onChange={(url) => setForm(prev => ({ ...prev, image: url }))}
                                             />
 
                                             {/* Additional Tags */}
@@ -583,36 +599,30 @@ export default function VenueSubmissionForm() {
                                 <div className="border-t border-border-light px-5 py-3 bg-surface-light/50 flex items-center justify-between">
                                     <div>
                                         {step > 1 ? (
-                                            <button type="button" onClick={() => changeStep(step - 1)} className="text-sm text-text-light hover:text-white flex items-center gap-1">
-                                                <ChevronLeftIcon className="w-4 h-4" />
+                                            <Button type="button" onClick={() => changeStep(step - 1)} variant="ghost" color="neutral" size="sm" leftIcon={<ChevronLeftIcon />}>
                                                 {t('backButton')}
-                                            </button>
+                                            </Button>
                                         ) : (
-                                            <button type="button" onClick={handleReset} className="text-sm text-text-light hover:text-red-500">{t('resetButton')}</button>
+                                            <Button type="button" onClick={handleReset} variant="ghost" color="danger" size="sm">{t('resetButton')}</Button>
                                         )}
                                     </div>
                                     <div>
                                         {step < 3 ? (
-                                            <button type="button" onClick={() => changeStep(step + 1)} className="bg-accent hover:bg-accent-dark text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center gap-1">
+                                            <Button type="button" onClick={() => changeStep(step + 1)} size="sm" rightIcon={<ChevronRightIcon />}>
                                                 {t('nextButton')}
-                                                <ChevronRightIcon className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         ) : !user ? (
                                             <LoginWithOSM />
                                         ) : (
-                                            <button type="submit" disabled={isSubmitting} className="bg-accent hover:bg-accent-dark text-white py-2 px-4 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-1.5">
-                                                {isSubmitting ? (
-                                                    <>
-                                                        <SpinnerIcon className="animate-spin w-4 h-4" />
-                                                        Submitting...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <SendIcon className="w-4 h-4" />
-                                                        {t('submitVenue')}
-                                                    </>
-                                                )}
-                                            </button>
+                                            <Button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                loading={isSubmitting}
+                                                leftIcon={!isSubmitting ? <SendIcon /> : undefined}
+                                                size="sm"
+                                            >
+                                                {isSubmitting ? "Submitting..." : t('submitVenue')}
+                                            </Button>
                                         )}
                                     </div>
                                 </div>

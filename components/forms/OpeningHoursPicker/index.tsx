@@ -4,6 +4,7 @@ import React from "react";
 import { Day, DayHours, DAYS } from "@/utils/OpeningHoursParser";
 import { stringifyOpeningHours } from "@/utils/OpeningHoursParser";
 import { CheckmarkIcon, PlusIcon, CloseIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 
 const clonePreset = (value: DayHours[]): DayHours[] =>
     value.map(({ day, hours }) => ({
@@ -129,13 +130,15 @@ export default function OpeningHoursPicker({ value, onChange }: OpeningHoursPick
                     );
                 })}
                 {value.length > 0 && (
-                    <button
+                    <Button
                         type="button"
                         onClick={handleClear}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-text-light hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                        variant="ghost"
+                        color="danger"
+                        size="xs"
                     >
                         Clear
-                    </button>
+                    </Button>
                 )}
             </div>
 

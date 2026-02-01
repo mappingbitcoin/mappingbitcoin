@@ -15,6 +15,8 @@ import {
     AI_MODEL_LABELS,
 } from "../types";
 import { BoltIcon, RefreshIcon, CheckmarkIcon, CloseIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
+import ToggleButton from "@/components/ui/ToggleButton";
 
 export default function GenerationConfigTab() {
     const t = useTranslations("admin.marketing");
@@ -271,17 +273,14 @@ export default function GenerationConfigTab() {
                         <label className="block text-sm text-text-light mb-2">AI Model</label>
                         <div className="flex gap-3">
                             {AI_MODELS.map((model) => (
-                                <button
+                                <ToggleButton
                                     key={model}
+                                    selected={aiModel === model}
                                     onClick={() => setAiModel(model)}
-                                    className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                                        aiModel === model
-                                            ? "bg-accent text-white"
-                                            : "bg-surface-light text-text-light hover:text-white"
-                                    }`}
+                                    size="md"
                                 >
                                     {AI_MODEL_LABELS[model]}
-                                </button>
+                                </ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -351,17 +350,14 @@ export default function GenerationConfigTab() {
                         <label className="block text-sm text-text-light mb-2">Active Days</label>
                         <div className="flex flex-wrap gap-2">
                             {DAYS_OF_WEEK.map((day) => (
-                                <button
+                                <ToggleButton
                                     key={day}
+                                    selected={activeDays.includes(day)}
                                     onClick={() => toggleDay(day)}
-                                    className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                                        activeDays.includes(day)
-                                            ? "bg-accent text-white"
-                                            : "bg-surface-light text-text-light hover:text-white"
-                                    }`}
+                                    size="md"
                                 >
                                     {DAY_LABELS[day]}
-                                </button>
+                                </ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -402,13 +398,15 @@ export default function GenerationConfigTab() {
                 )}
 
                 <div className="mt-4">
-                    <button
+                    <Button
                         onClick={handleTrigger}
                         disabled={triggering || !webhookUrl}
-                        className="px-4 py-2 bg-purple-500 hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+                        loading={triggering}
+                        color="primary"
+                        size="sm"
                     >
                         {triggering ? "Triggering..." : "Trigger Webhook Now"}
-                    </button>
+                    </Button>
                     <p className="text-xs text-text-light mt-2">
                         This will send all seed content (guidelines, links, assets, hashtags, example posts, stats) to the webhook.
                     </p>
@@ -417,13 +415,13 @@ export default function GenerationConfigTab() {
 
             {/* Save Button */}
             <div className="flex justify-end">
-                <button
+                <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-6 py-2 bg-accent hover:bg-accent-light disabled:opacity-50 text-white rounded-lg text-sm transition-colors"
+                    loading={saving}
                 >
                     {saving ? "Saving..." : "Save Configuration"}
-                </button>
+                </Button>
             </div>
         </div>
     );

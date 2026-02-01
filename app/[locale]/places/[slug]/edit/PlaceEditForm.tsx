@@ -28,6 +28,7 @@ import {
     LocationSection,
 } from "@/components/place-form";
 import { InfoCircleIcon, UserIcon, SpinnerIcon, CheckmarkIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 
 // Dynamically import components that may have SSR issues
 const OpeningHoursPicker = dynamic(
@@ -37,6 +38,11 @@ const OpeningHoursPicker = dynamic(
 
 const SocialLinksEditor = dynamic(
     () => import("@/components/place/SocialLinksEditor"),
+    { ssr: false }
+);
+
+const VenueImageUploader = dynamic(
+    () => import("@/components/place/VenueImageUploader"),
     { ssr: false }
 );
 
@@ -50,6 +56,7 @@ function venueToForm(venue: EnrichedVenue): VenueForm {
         subcategory: match?.subcategory || venue.subcategory || "",
         additionalTags: {},
         about: description || '',
+        image: venue.tags?.image || undefined,
         lat: String(venue.lat),
         lon: String(venue.lon),
         address: {
@@ -225,6 +232,11 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
                                         rows={3}
                                         placeholder="Brief description of the venue..."
                                     />
+
+                                    <VenueImageUploader
+                                        value={form.image}
+                                        onChange={(url) => setForm(prev => ({ ...prev, image: url }))}
+                                    />
                                 </div>
                             </FormSection>
 
@@ -321,29 +333,21 @@ export default function VenueEditForm({ venue }: { venue: EnrichedVenue }) {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Link
+                                        <Button
                                             href={`/places/${venue.slug || venue.id}`}
-                                            className="px-5 py-2.5 text-sm font-medium text-text-light hover:text-white transition-colors no-underline"
+                                            variant="ghost"
+                                            color="neutral"
                                         >
                                             Cancel
-                                        </Link>
-                                        <button
+                                        </Button>
+                                        <Button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="bg-accent hover:bg-accent-dark text-white py-2.5 px-6 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm hover:shadow-md"
+                                            loading={isSubmitting}
+                                            leftIcon={!isSubmitting ? <CheckmarkIcon /> : undefined}
                                         >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <SpinnerIcon className="animate-spin w-4 h-4" />
-                                                    Submitting...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <CheckmarkIcon className="w-4 h-4" />
-                                                    Submit Changes
-                                                </>
-                                            )}
-                                        </button>
+                                            {isSubmitting ? "Submitting..." : "Submit Changes"}
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button, { IconButton } from "@/components/ui/Button";
+import ToggleButton from "@/components/ui/ToggleButton";
 import TagInput from "./TagInput";
 import type { HashtagSet, SocialNetwork } from "../types";
 import { SOCIAL_NETWORKS, SOCIAL_NETWORK_LABELS } from "../types";
@@ -202,12 +204,9 @@ export default function HashtagsTab() {
                 <p className="text-text-light">
                     {t("hashtags.description")}
                 </p>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openCreateModal}>
                     {t("hashtags.addButton")}
-                </button>
+                </Button>
             </div>
 
             {/* Hashtag Sets */}
@@ -229,19 +228,23 @@ export default function HashtagsTab() {
                                         <p className="text-sm text-text-light mt-1">{set.description}</p>
                                     )}
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
+                                <div className="flex gap-1">
+                                    <IconButton
                                         onClick={() => openEditModal(set)}
-                                        className="p-2 text-text-light hover:text-accent transition-colors"
-                                    >
-                                        <EditIcon className="w-4 h-4" />
-                                    </button>
-                                    <button
+                                        icon={<EditIcon />}
+                                        aria-label="Edit"
+                                        variant="ghost"
+                                        color="accent"
+                                        size="sm"
+                                    />
+                                    <IconButton
                                         onClick={() => handleDelete(set)}
-                                        className="p-2 text-text-light hover:text-red-400 transition-colors"
-                                    >
-                                        <TrashIcon className="w-4 h-4" />
-                                    </button>
+                                        icon={<TrashIcon />}
+                                        aria-label="Delete"
+                                        variant="ghost"
+                                        color="danger"
+                                        size="sm"
+                                    />
                                 </div>
                             </div>
 
@@ -321,18 +324,13 @@ export default function HashtagsTab() {
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {SOCIAL_NETWORKS.map((network) => (
-                                <button
+                                <ToggleButton
                                     key={network}
-                                    type="button"
+                                    selected={formData.socialNetworks.includes(network)}
                                     onClick={() => toggleNetwork(network)}
-                                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                        formData.socialNetworks.includes(network)
-                                            ? "bg-blue-500/30 text-blue-400 border border-blue-500/50"
-                                            : "bg-surface-light text-text-light border border-transparent hover:border-border-light"
-                                    }`}
                                 >
                                     {SOCIAL_NETWORK_LABELS[network]}
-                                </button>
+                                </ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -351,20 +349,21 @@ export default function HashtagsTab() {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
                         >
                             {submitting ? t("common.saving") : editingSet ? t("common.update") : t("hashtags.addSet")}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>

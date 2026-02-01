@@ -13,6 +13,8 @@ import {
     CloseIcon,
 } from "@/assets/icons/ui";
 import { BuildingIcon } from "@/assets/icons/location";
+import { IconButton } from "@/components/ui/Button";
+import DropdownItem from "@/components/ui/DropdownItem";
 import { getLocalizedCountrySlug, getLocalizedCitySlug } from "@/utils/SlugUtils";
 
 interface NavBarSearchProps {
@@ -219,17 +221,20 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
                     </div>
                 )}
                 {query && (
-                    <button
+                    <IconButton
                         onClick={() => {
                             setQuery("");
                             setResults([]);
                             setIsOpen(false);
                             inputRef.current?.focus();
                         }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-white/50 hover:text-white/80 transition-colors"
-                    >
-                        <CloseIcon className="w-4 h-4" />
-                    </button>
+                        icon={<CloseIcon className="w-4 h-4" />}
+                        aria-label="Clear search"
+                        variant="ghost"
+                        color="neutral"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2"
+                    />
                 )}
             </div>
 
@@ -254,28 +259,27 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
                                     .map((result, idx) => {
                                         const globalIdx = results.indexOf(result);
                                         return (
-                                            <button
+                                            <DropdownItem
                                                 key={`venue-${idx}`}
                                                 onClick={() => handleSelect(result)}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                                                    selectedIndex === globalIdx
-                                                        ? "bg-accent/20 text-white"
-                                                        : "hover:bg-white/5 text-white/80"
-                                                }`}
+                                                highlighted={selectedIndex === globalIdx}
+                                                icon={getResultIcon(result.resultType)}
+                                                className="py-2.5"
                                             >
-                                                {getResultIcon(result.resultType)}
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium truncate">{result.label}</p>
-                                                    <p className="text-xs text-text-light truncate">
-                                                        {getResultSubtitle(result)}
-                                                    </p>
+                                                <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-medium truncate">{result.label}</p>
+                                                        <p className="text-xs text-text-light truncate">
+                                                            {getResultSubtitle(result)}
+                                                        </p>
+                                                    </div>
+                                                    {result.distance && (
+                                                        <span className="text-xs text-text-light shrink-0">
+                                                            {result.distance.toFixed(1)} km
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {result.distance && (
-                                                    <span className="text-xs text-text-light">
-                                                        {result.distance.toFixed(1)} km
-                                                    </span>
-                                                )}
-                                            </button>
+                                            </DropdownItem>
                                         );
                                     })}
                             </div>
@@ -292,28 +296,27 @@ export default function NavBarSearch({ placeholder = "Search venues...", onClose
                                     .map((result, idx) => {
                                         const globalIdx = results.indexOf(result);
                                         return (
-                                            <button
+                                            <DropdownItem
                                                 key={`location-${idx}`}
                                                 onClick={() => handleSelect(result)}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                                                    selectedIndex === globalIdx
-                                                        ? "bg-accent/20 text-white"
-                                                        : "hover:bg-white/5 text-white/80"
-                                                }`}
+                                                highlighted={selectedIndex === globalIdx}
+                                                icon={getResultIcon(result.resultType)}
+                                                className="py-2.5"
                                             >
-                                                {getResultIcon(result.resultType)}
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium truncate">{result.label}</p>
-                                                    <p className="text-xs text-text-light truncate">
-                                                        {getResultSubtitle(result)}
-                                                    </p>
+                                                <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-medium truncate">{result.label}</p>
+                                                        <p className="text-xs text-text-light truncate">
+                                                            {getResultSubtitle(result)}
+                                                        </p>
+                                                    </div>
+                                                    {result.distance && (
+                                                        <span className="text-xs text-text-light shrink-0">
+                                                            {result.distance.toFixed(1)} km
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {result.distance && (
-                                                    <span className="text-xs text-text-light">
-                                                        {result.distance.toFixed(1)} km
-                                                    </span>
-                                                )}
-                                            </button>
+                                            </DropdownItem>
                                         );
                                     })}
                             </div>

@@ -65,6 +65,9 @@ export function buildTagsFromForm(form: VenueForm): Record<string, string> {
     // Opening hours
     if (form.opening_hours?.trim()) tags.opening_hours = escape(form.opening_hours);
 
+    // Image (Blossom URL)
+    if (form.image?.trim()) tags.image = form.image.trim();
+
     // Additional tags
     Object.entries(form.additionalTags || {}).forEach(([key, value]) => {
         if (!value?.trim()) return;

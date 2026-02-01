@@ -4,6 +4,7 @@ import { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloseIcon } from "@/assets/icons/ui";
+import { IconButton } from "@/components/ui/Button";
 
 interface ModalProps {
     isOpen: boolean;
@@ -57,26 +58,30 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
                         {title && (
                             <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
                                 <h2 className="text-lg font-semibold text-white">{title}</h2>
-                                <button
+                                <IconButton
                                     onClick={onClose}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-light text-text-light hover:text-white hover:bg-primary-light transition-colors"
+                                    icon={<CloseIcon className="w-4 h-4" />}
                                     aria-label="Close"
-                                >
-                                    <CloseIcon className="w-4 h-4" />
-                                </button>
+                                    variant="ghost"
+                                    color="neutral"
+                                    size="sm"
+                                    className="!rounded-full"
+                                />
                             </div>
                         )}
 
                         {/* Content */}
                         <div className={title ? "" : "pt-4"}>
                             {!title && (
-                                <button
+                                <IconButton
                                     onClick={onClose}
-                                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-surface-light text-text-light hover:text-white hover:bg-primary-light transition-colors z-10"
+                                    icon={<CloseIcon className="w-4 h-4" />}
                                     aria-label="Close"
-                                >
-                                    <CloseIcon className="w-4 h-4" />
-                                </button>
+                                    variant="ghost"
+                                    color="neutral"
+                                    size="sm"
+                                    className="absolute top-3 right-3 z-10 !rounded-full"
+                                />
                             )}
                             {children}
                         </div>

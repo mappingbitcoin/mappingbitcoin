@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
 import { getLocalizedCitySlug } from "@/utils/SlugUtils";
 import { SearchIcon, PlusIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 import type { CityWithCount } from "../PlacesDirectoryWrapper";
 
 interface CitiesSidebarProps {
@@ -95,12 +96,15 @@ export default function CitiesSidebar({ country, availableCities }: CitiesSideba
                 </div>
 
                 {hasMore && (
-                    <button
+                    <Button
                         onClick={() => setCitiesShown(prev => prev + 10)}
-                        className="mt-3 text-xs text-accent hover:text-accent-dark transition-colors cursor-pointer"
+                        variant="ghost"
+                        color="accent"
+                        size="xs"
+                        className="mt-3"
                     >
                         {t("countries.filters.showMore")} (+{Math.min(10, filteredCities.length - citiesShown)})
-                    </button>
+                    </Button>
                 )}
 
                 {citySearch && filteredCities.length === 0 && (

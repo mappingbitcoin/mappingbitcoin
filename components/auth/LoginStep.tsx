@@ -16,6 +16,7 @@ import {
     UserAddIcon,
     ExternalLinkIcon,
 } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
 
 export interface LoginStepProps {
     /** Callback to report errors to parent */
@@ -288,12 +289,14 @@ export default function LoginStep({
                         className="p-4 bg-surface-light border border-border-light rounded-lg space-y-3"
                     >
                         <div className="flex items-center gap-2 mb-2">
-                            <button
+                            <IconButton
                                 onClick={handleBack}
-                                className="p-1 hover:bg-primary-light rounded transition-colors"
-                            >
-                                <ChevronLeftIcon className="w-5 h-5 text-text-light" />
-                            </button>
+                                icon={<ChevronLeftIcon />}
+                                aria-label="Go back"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                            />
                             <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center">
                                 <KeyIcon className="w-4 h-4 text-orange-400" />
                             </div>
@@ -309,13 +312,14 @@ export default function LoginStep({
                         <p className="text-xs text-text-light">
                             {t("methods.key.hint")}
                         </p>
-                        <button
+                        <Button
                             onClick={handleKeyLogin}
                             disabled={isLoading || !keyInput.trim()}
-                            className="w-full py-2 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            loading={isLoading}
+                            fullWidth
                         >
                             {isLoading ? t("actions.connecting") : t("actions.continue")}
-                        </button>
+                        </Button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -352,12 +356,14 @@ export default function LoginStep({
                         className="p-4 bg-surface-light border border-border-light rounded-lg space-y-3"
                     >
                         <div className="flex items-center gap-2 mb-2">
-                            <button
+                            <IconButton
                                 onClick={handleBack}
-                                className="p-1 hover:bg-primary-light rounded transition-colors"
-                            >
-                                <ChevronLeftIcon className="w-5 h-5 text-text-light" />
-                            </button>
+                                icon={<ChevronLeftIcon />}
+                                aria-label="Go back"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                            />
                             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                                 <BunkerIcon className="w-4 h-4 text-blue-400" />
                             </div>
@@ -445,13 +451,14 @@ export default function LoginStep({
                                     placeholder={t("bunkerInput.placeholder")}
                                     className="w-full p-3 bg-primary-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                                 />
-                                <button
+                                <Button
                                     onClick={handleBunkerLogin}
                                     disabled={isLoading || !bunkerUrl.trim()}
-                                    className="w-full py-2 px-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    loading={isLoading}
+                                    fullWidth
                                 >
                                     {isLoading ? t("actions.connecting") : t("actions.connect")}
-                                </button>
+                                </Button>
                             </div>
                         )}
                     </motion.div>

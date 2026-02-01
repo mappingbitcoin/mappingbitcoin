@@ -11,6 +11,7 @@ import { getContinentName } from '@brixtol/country-continent';
 import { getLocalizedCountryName } from "@/utils/CountryUtils";
 import { Place } from "@/models/Place";
 import { FAQSection, NewsletterCTA } from "@/components/common";
+import TabButton from "@/components/ui/TabButton";
 import Image from 'next/image'
 
 interface RegionData {
@@ -62,14 +63,11 @@ export default function CountriesPage({ countries }: { countries: Record<string,
                 {/* Tabs */}
                 <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-0">
                     {output.map(({ region, totalCount }) => (
-                        <button
+                        <TabButton
                             key={region}
-                            className={`py-3 px-5 text-[15px] font-medium cursor-pointer border-none bg-transparent flex items-center gap-2 -mb-px transition-all duration-200 ${
-                                activeTab === region
-                                    ? 'text-accent border-b-2 border-accent'
-                                    : 'text-text-light border-b-2 border-transparent hover:text-white'
-                            }`}
+                            active={activeTab === region}
                             onClick={() => setActiveTab(region)}
+                            className="flex-none px-5 text-[15px] flex items-center gap-2"
                         >
                             {region}
                             <span className={`py-0.5 px-2 rounded-xl text-[13px] font-semibold ${
@@ -79,7 +77,7 @@ export default function CountriesPage({ countries }: { countries: Record<string,
                             }`}>
                                 {totalCount.toLocaleString()}
                             </span>
-                        </button>
+                        </TabButton>
                     ))}
                 </div>
 

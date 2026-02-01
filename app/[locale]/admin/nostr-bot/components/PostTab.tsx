@@ -4,6 +4,10 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { SendIcon, PlusIcon, CloseIcon, SearchIcon, CircleCheckIcon, PinIcon } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
+import ToggleButton from "@/components/ui/ToggleButton";
+import DropdownItem from "@/components/ui/DropdownItem";
+import TagRemoveButton from "@/components/ui/TagRemoveButton";
 
 type PostType = "manual" | "new" | "verified" | "created";
 type PlaceFilter = "all" | "verified" | "unverified";
@@ -346,36 +350,24 @@ export default function PostTab() {
                     {/* Filter tabs for verified status */}
                     {postType !== "verified" && (
                         <div className="flex gap-2 mb-4">
-                            <button
+                            <ToggleButton
+                                selected={placeFilter === "all"}
                                 onClick={() => setPlaceFilter("all")}
-                                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                                    placeFilter === "all"
-                                        ? "bg-accent text-white"
-                                        : "bg-surface-light text-text-light hover:bg-border-light"
-                                }`}
                             >
                                 All Places
-                            </button>
-                            <button
+                            </ToggleButton>
+                            <ToggleButton
+                                selected={placeFilter === "verified"}
                                 onClick={() => setPlaceFilter("verified")}
-                                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                                    placeFilter === "verified"
-                                        ? "bg-green-500 text-white"
-                                        : "bg-surface-light text-text-light hover:bg-border-light"
-                                }`}
                             >
                                 Verified Only
-                            </button>
-                            <button
+                            </ToggleButton>
+                            <ToggleButton
+                                selected={placeFilter === "unverified"}
                                 onClick={() => setPlaceFilter("unverified")}
-                                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                                    placeFilter === "unverified"
-                                        ? "bg-amber-500 text-white"
-                                        : "bg-surface-light text-text-light hover:bg-border-light"
-                                }`}
                             >
                                 Unverified Only
-                            </button>
+                            </ToggleButton>
                         </div>
                     )}
 
@@ -402,12 +394,14 @@ export default function PostTab() {
                                     {selectedPlace.category && ` • ${selectedPlace.category}`}
                                 </p>
                             </div>
-                            <button
+                            <IconButton
                                 onClick={clearSelectedPlace}
-                                className="p-2 hover:bg-border-light rounded-lg transition-colors"
-                            >
-                                <CloseIcon className="w-4 h-4 text-text-light" />
-                            </button>
+                                icon={<CloseIcon />}
+                                aria-label="Clear selection"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                            />
                         </div>
                     ) : (
                         <div ref={dropdownRef} className="relative">
@@ -435,21 +429,23 @@ export default function PostTab() {
                             {showPlaceDropdown && places.length > 0 && (
                                 <div className="absolute z-10 w-full mt-1 bg-surface border border-border-light rounded-lg shadow-lg max-h-64 overflow-y-auto">
                                     {places.map((place) => (
-                                        <button
+                                        <DropdownItem
                                             key={place.osmId}
                                             onClick={() => selectPlace(place)}
-                                            className="w-full px-4 py-3 text-left hover:bg-surface-light transition-colors border-b border-border-light last:border-b-0"
+                                            className="py-3 border-b border-border-light last:border-b-0"
                                         >
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-white font-medium">{place.name}</span>
-                                                {place.isVerified && (
-                                                    <CircleCheckIcon className="w-4 h-4 text-green-400" />
-                                                )}
+                                            <div className="w-full">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-white font-medium">{place.name}</span>
+                                                    {place.isVerified && (
+                                                        <CircleCheckIcon className="w-4 h-4 text-green-400" />
+                                                    )}
+                                                </div>
+                                                <p className="text-sm text-text-light">
+                                                    {[place.city, place.country].filter(Boolean).join(", ")}
+                                                </p>
                                             </div>
-                                            <p className="text-sm text-text-light">
-                                                {[place.city, place.country].filter(Boolean).join(", ")}
-                                            </p>
-                                        </button>
+                                        </DropdownItem>
                                     ))}
                                 </div>
                             )}
@@ -545,12 +541,13 @@ export default function PostTab() {
                                     placeholder="bitcoin"
                                     className="flex-1 px-3 py-2 bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:border-accent"
                                 />
-                                <button
+                                <IconButton
                                     onClick={addHashtag}
-                                    className="px-3 py-2 bg-surface-light hover:bg-border-light border border-border-light rounded-lg transition-colors"
-                                >
-                                    <PlusIcon className="w-5 h-5 text-white" />
-                                </button>
+                                    icon={<PlusIcon />}
+                                    aria-label="Add hashtag"
+                                    variant="soft"
+                                    color="neutral"
+                                />
                             </div>
                             {hashtags.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
@@ -560,12 +557,11 @@ export default function PostTab() {
                                             className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent text-sm rounded"
                                         >
                                             #{tag}
-                                            <button
+                                            <TagRemoveButton
                                                 onClick={() => removeHashtag(tag)}
-                                                className="hover:text-white transition-colors"
-                                            >
-                                                <CloseIcon className="w-3 h-3" />
-                                            </button>
+                                                className="hover:text-white"
+                                                aria-label={`Remove ${tag}`}
+                                            />
                                         </span>
                                     ))}
                                 </div>
@@ -633,27 +629,18 @@ export default function PostTab() {
 
                     {/* Submit */}
                     <div className="flex justify-end pt-2">
-                        <button
+                        <Button
                             onClick={handleSubmit}
                             disabled={
                                 posting ||
                                 (postType === "manual" && !content.trim()) ||
                                 (isPlaceBasedPost && !selectedPlace)
                             }
-                            className="inline-flex items-center gap-2 px-6 py-2 bg-accent hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                            loading={posting}
+                            leftIcon={!posting ? <SendIcon /> : undefined}
                         >
-                            {posting ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
-                                    Posting...
-                                </>
-                            ) : (
-                                <>
-                                    <SendIcon className="w-4 h-4" />
-                                    Post to Nostr
-                                </>
-                            )}
-                        </button>
+                            {posting ? "Posting..." : "Post to Nostr"}
+                        </Button>
                     </div>
                 </div>
             </div>

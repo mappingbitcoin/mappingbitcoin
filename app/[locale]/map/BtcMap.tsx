@@ -28,6 +28,7 @@ import {loadClustersFromCache, updateClusterCache} from "@/utils/ClusterCacheHel
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import MapFAQ from "@/app/[locale]/map/MapFAQ";
 import { SunIcon, MoonIcon } from "@/assets/icons/ui";
+import Button from "@/components/ui/Button";
 
 function tile2lon(x: number, z: number) {
     return (x / 2 ** z) * 360 - 180;
@@ -972,8 +973,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                             </div>
 
                             <div className="flex justify-end">
-                                <button
-                                    className="bg-accent text-white border-none py-3 px-5 text-[0.95rem] rounded-lg cursor-pointer font-medium hover:bg-accent/80"
+                                <Button
                                     onClick={() => {
                                         navigator.geolocation.getCurrentPosition(
                                             ({ coords }) => {
@@ -990,7 +990,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                                     }}
                                 >
                                     Share My Location
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -1068,9 +1068,9 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         </div>
 
                         <div className="flex justify-end">
-                            <button className="bg-accent text-white border-none py-3 px-5 text-[0.95rem] rounded-lg cursor-pointer font-medium hover:bg-accent/80" onClick={() => setShowHelpPopup(false)}>
+                            <Button onClick={() => setShowHelpPopup(false)}>
                                 {t('helpPopup.closeButton')}
-                            </button>
+                            </Button>
                         </div>
                     </div>,
                     document.body

@@ -6,10 +6,9 @@ import { bytesToHex } from "@noble/hashes/utils.js";
 import { getPublicKey, getEventHash, signEvent, NostrEvent } from "@/lib/nostr/crypto";
 
 // Public Blossom servers to try (in order of preference)
-// Note: nostr.build is NOT a standard Blossom server, it has a different API
+// Note: nostr.build and files.v0l.io have different APIs and are excluded
 const BLOSSOM_SERVERS = [
     "https://blossom.primal.net",
-    "https://files.v0l.io",
     "https://blossom.oxtr.dev",
     "https://cdn.satellite.earth",
     "https://blossom.nostr.hu",

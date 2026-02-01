@@ -7,6 +7,7 @@ import VerifyOwnershipModal from "./VerifyOwnershipModal";
 import VerifiedBadge from "./VerifiedBadge";
 import { ShieldCheckIcon, PlusIcon } from "@/assets/icons/ui";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import Button from "@/components/ui/Button";
 
 interface VerifyOwnershipButtonProps {
     venue: EnrichedVenue;
@@ -104,14 +105,15 @@ export default function VerifyOwnershipButton({
                 />
                 {canAddMore && !compact && (
                     <>
-                        <button
+                        <Button
                             onClick={() => setIsModalOpen(true)}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:text-accent-dark transition-colors"
-                            title="Add another verification method"
+                            variant="ghost"
+                            color="accent"
+                            size="xs"
+                            leftIcon={<PlusIcon />}
                         >
-                            <PlusIcon className="w-3 h-3" />
                             Add
-                        </button>
+                        </Button>
                         <VerifyOwnershipModal
                             isOpen={isModalOpen}
                             onClose={handleModalClose}
@@ -130,13 +132,15 @@ export default function VerifyOwnershipButton({
     if (compact) {
         return (
             <>
-                <button
+                <Button
                     onClick={() => setIsModalOpen(true)}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-accent/20 text-accent text-xs font-medium rounded-full hover:bg-accent/30 transition-colors"
+                    variant="soft"
+                    color="accent"
+                    size="xs"
+                    leftIcon={<ShieldCheckIcon />}
                 >
-                    <ShieldCheckIcon className="w-3 h-3" />
                     Verify
-                </button>
+                </Button>
 
                 <VerifyOwnershipModal
                     isOpen={isModalOpen}
@@ -152,15 +156,14 @@ export default function VerifyOwnershipButton({
 
     return (
         <>
-            <motion.button
+            <Button
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/30 text-accent text-sm font-medium rounded-lg hover:bg-accent/20 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                variant="soft"
+                color="accent"
+                leftIcon={<ShieldCheckIcon />}
             >
-                <ShieldCheckIcon className="w-4 h-4" />
                 Verify Ownership
-            </motion.button>
+            </Button>
 
             <VerifyOwnershipModal
                 isOpen={isModalOpen}

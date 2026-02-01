@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
 import type { MarketingStat } from "../types";
 
 export default function StatsTab() {
@@ -224,12 +225,9 @@ export default function StatsTab() {
                         {t("statsTab.showExpired")}
                     </label>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors"
-                >
+                <Button onClick={openCreateModal}>
                     {t("statsTab.addButton")}
-                </button>
+                </Button>
             </div>
 
             {/* Stats Table */}
@@ -288,19 +286,23 @@ export default function StatsTab() {
                                                 <span className="text-text-light italic">{t("statsTab.never")}</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-right space-x-2">
-                                            <button
+                                        <td className="px-4 py-3 text-right space-x-1">
+                                            <Button
                                                 onClick={() => openEditModal(stat)}
-                                                className="px-3 py-1 text-sm text-accent hover:text-accent-light transition-colors"
+                                                variant="ghost"
+                                                color="accent"
+                                                size="xs"
                                             >
                                                 {t("common.edit")}
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 onClick={() => handleDelete(stat)}
-                                                className="px-3 py-1 text-sm text-red-400 hover:text-red-300 transition-colors"
+                                                variant="ghost"
+                                                color="danger"
+                                                size="xs"
                                             >
                                                 {t("common.delete")}
-                                            </button>
+                                            </Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -401,20 +403,21 @@ export default function StatsTab() {
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
-                        <button
+                        <Button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 text-text-light hover:text-white transition-colors"
+                            variant="ghost"
+                            color="neutral"
                         >
                             {t("common.cancel")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors disabled:opacity-50"
+                            loading={submitting}
                         >
                             {submitting ? t("common.saving") : editingStat ? t("common.update") : t("statsTab.addStat")}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>

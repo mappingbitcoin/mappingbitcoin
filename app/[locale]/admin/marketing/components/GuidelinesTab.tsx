@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import type { MarketingGuidelines } from "../types";
 import { CheckmarkIcon, CloseIcon, StarIcon } from "@/assets/icons/ui";
+import Button, { IconButton } from "@/components/ui/Button";
+import TagRemoveButton from "@/components/ui/TagRemoveButton";
 
 export default function GuidelinesTab() {
     const t = useTranslations("admin.marketing");
@@ -148,12 +150,10 @@ export default function GuidelinesTab() {
                                 className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent rounded-full text-xs"
                             >
                                 {value}
-                                <button
+                                <TagRemoveButton
                                     onClick={() => removeItem(brandValues, setBrandValues, index)}
-                                    className="hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
-                                >
-                                    <CloseIcon className="w-3 h-3" />
-                                </button>
+                                    aria-label={`Remove ${value}`}
+                                />
                             </span>
                         ))}
                     </div>
@@ -166,12 +166,13 @@ export default function GuidelinesTab() {
                             placeholder={t("guidelines.addValue")}
                             className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
-                        <button
+                        <Button
                             onClick={() => addItem(brandValues, setBrandValues, newValue, setNewValue)}
-                            className="px-3 py-1.5 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors text-xs"
+                            variant="soft"
+                            size="xs"
                         >
                             {t("common.add")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -190,12 +191,10 @@ export default function GuidelinesTab() {
                                 <span className="flex-1 px-2 py-1.5 bg-surface-light rounded text-white text-xs">
                                     {item}
                                 </span>
-                                <button
+                                <TagRemoveButton
                                     onClick={() => removeItem(doList, setDoList, index)}
-                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
-                                >
-                                    <CloseIcon className="w-3 h-3" />
-                                </button>
+                                    aria-label={`Remove ${item}`}
+                                />
                             </div>
                         ))}
                     </div>
@@ -208,12 +207,14 @@ export default function GuidelinesTab() {
                             placeholder={t("guidelines.addGuideline")}
                             className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
-                        <button
+                        <Button
                             onClick={() => addItem(doList, setDoList, newDo, setNewDo)}
-                            className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-xs"
+                            variant="soft"
+                            color="success"
+                            size="xs"
                         >
                             {t("common.add")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -229,12 +230,10 @@ export default function GuidelinesTab() {
                                 <span className="flex-1 px-2 py-1.5 bg-surface-light rounded text-white text-xs">
                                     {item}
                                 </span>
-                                <button
+                                <TagRemoveButton
                                     onClick={() => removeItem(dontList, setDontList, index)}
-                                    className="p-1 text-text-light hover:text-red-400 transition-colors opacity-50 hover:opacity-100"
-                                >
-                                    <CloseIcon className="w-3 h-3" />
-                                </button>
+                                    aria-label={`Remove ${item}`}
+                                />
                             </div>
                         ))}
                     </div>
@@ -247,12 +246,14 @@ export default function GuidelinesTab() {
                             placeholder={t("guidelines.addGuideline")}
                             className="flex-1 px-3 py-1.5 text-xs bg-surface-light border border-border-light rounded-lg text-white placeholder-text-light focus:outline-none focus:border-accent"
                         />
-                        <button
+                        <Button
                             onClick={() => addItem(dontList, setDontList, newDont, setNewDont)}
-                            className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors text-xs"
+                            variant="soft"
+                            color="danger"
+                            size="xs"
                         >
                             {t("common.add")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -264,13 +265,13 @@ export default function GuidelinesTab() {
                         {t("guidelines.updated")} {new Date(guidelines.updatedAt).toLocaleString()}
                     </p>
                 )}
-                <button
+                <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+                    loading={saving}
                 >
                     {saving ? t("common.saving") : t("guidelines.saveButton")}
-                </button>
+                </Button>
             </div>
         </div>
     );
