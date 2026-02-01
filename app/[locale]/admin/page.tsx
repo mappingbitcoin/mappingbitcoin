@@ -89,7 +89,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Seeders Card */}
                 <Link
                     href={"/admin/seeders"}
@@ -112,6 +112,18 @@ export default function AdminDashboard() {
                         {data?.stats.totalNodes?.toLocaleString() || 0}
                     </div>
                     <div className="text-sm text-primary mt-2">View graph &rarr;</div>
+                </Link>
+
+                {/* Map Sync Card */}
+                <Link
+                    href={"/admin/map-sync"}
+                    className="bg-surface rounded-xl border border-border-light p-6 hover:border-primary transition-colors"
+                >
+                    <div className="text-sm text-text-light mb-1">Map Sync</div>
+                    <div className="text-lg font-bold text-white mt-2">
+                        OSM Data Tools
+                    </div>
+                    <div className="text-sm text-primary mt-2">Manage sync &rarr;</div>
                 </Link>
 
                 {/* Build Status Card */}
