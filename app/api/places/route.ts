@@ -133,18 +133,37 @@ export async function POST(req: Request) {
 
     // 2. Validate CAPTCHA
     const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
-    const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-            secret: recaptchaSecretKey || "",
-            response: captcha,
-        }),
-    });
 
-    const result = await verify.json();
-    if (!result.success || result.score < 0.5) {
-        return NextResponse.json({ error: "CAPTCHA verification failed" }, { status: 403 });
+    if (!captcha) {
+        console.error("[POST /api/places] Missing CAPTCHA token");
+        return NextResponse.json({ error: "Security verification required. Please refresh the page." }, { status: 403 });
+    }
+
+    if (!recaptchaSecretKey) {
+        console.error("[POST /api/places] reCAPTCHA secret key not configured");
+        // Allow in development if no secret key
+        if (process.env.NODE_ENV !== "development") {
+            return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+        }
+    } else {
+        const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                secret: recaptchaSecretKey,
+                response: captcha,
+            }),
+        });
+
+        const result = await verify.json();
+        if (!result.success) {
+            console.error("[POST /api/places] reCAPTCHA verification failed:", result);
+            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
+        }
+        if (result.score < 0.5) {
+            console.error("[POST /api/places] reCAPTCHA score too low:", result.score);
+            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
+        }
     }
 
     // 3. Build XML for OSM
