@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/middleware/adminAuth";
 import prisma from "@/lib/db/prisma";
+import { bech32ToHex } from "@/lib/nostr/crypto";
 
 // Validate hex pubkey format
 function isValidHexPubkey(pubkey: string): boolean {
@@ -19,16 +20,9 @@ function normalizePublicKey(input: string): string | null {
 
     // If it starts with npub, try to decode
     if (trimmed.startsWith("npub1")) {
-        try {
-            const { bech32 } = require("bech32");
-            const decoded = bech32.decode(trimmed);
-            const pubkeyBytes = bech32.fromWords(decoded.words);
-            const hex = Buffer.from(pubkeyBytes).toString("hex");
-            if (isValidHexPubkey(hex)) {
-                return hex;
-            }
-        } catch {
-            return null;
+        const decoded = bech32ToHex(trimmed);
+        if (decoded && decoded.type === "npub" && isValidHexPubkey(decoded.hex)) {
+            return decoded.hex;
         }
     }
 
