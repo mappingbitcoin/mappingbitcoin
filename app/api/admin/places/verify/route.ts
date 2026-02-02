@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/middleware/adminAuth";
 import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import prisma from "@/lib/db/prisma";
 import type { ClaimMethod } from "@prisma/client";
+import { bech32ToHex } from "@/lib/nostr/crypto";
 
 interface ManualVerifyRequest {
     venueId: number; // The numeric OSM ID
@@ -25,17 +26,9 @@ function normalizePublicKey(input: string): string | null {
 
     // If it starts with npub, try to decode
     if (input.startsWith("npub1")) {
-        try {
-            // Use bech32 decoding for npub
-            const { bech32 } = require("bech32");
-            const decoded = bech32.decode(input);
-            const pubkeyBytes = bech32.fromWords(decoded.words);
-            const hex = Buffer.from(pubkeyBytes).toString("hex");
-            if (isValidHexPubkey(hex)) {
-                return hex;
-            }
-        } catch {
-            return null;
+        const decoded = bech32ToHex(input);
+        if (decoded && decoded.type === "npub" && isValidHexPubkey(decoded.hex)) {
+            return decoded.hex;
         }
     }
 
