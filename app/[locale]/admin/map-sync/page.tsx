@@ -5,12 +5,14 @@ import { RefreshIcon } from "@/assets/icons/ui";
 import TabButton from "@/components/ui/TabButton";
 import StatsTab from "./components/StatsTab";
 import ToolsTab from "./components/ToolsTab";
+import DatabaseTab from "./components/DatabaseTab";
 
-type TabType = "stats" | "tools";
+type TabType = "stats" | "tools" | "database";
 
 const tabs: { id: TabType; label: string }[] = [
     { id: "stats", label: "Stats" },
     { id: "tools", label: "Tools" },
+    { id: "database", label: "Database" },
 ];
 
 export default function MapSyncPage() {
@@ -51,6 +53,7 @@ export default function MapSyncPage() {
             <div>
                 {activeTab === "stats" && <StatsTab />}
                 {activeTab === "tools" && <ToolsTab />}
+                {activeTab === "database" && <DatabaseTab />}
             </div>
         </div>
     );
