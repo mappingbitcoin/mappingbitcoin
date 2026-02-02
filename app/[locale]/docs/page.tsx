@@ -5,6 +5,7 @@ import Script from "next/script";
 import { generateCanonical } from "@/i18n/seo";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
 export const generateMetadata = buildGeneratePageMetadata("docs");
 
 export default async function DocsPage({ params }: Localized) {

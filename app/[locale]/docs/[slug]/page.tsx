@@ -7,17 +7,13 @@ import { allDocs, getDocBySlug } from "../docsConfig";
 import { notFound } from "next/navigation";
 import { env } from "@/lib/Environment";
 
+export const dynamic = 'force-dynamic';
+
 interface DocsSlugParams {
     params: Promise<{
         locale: Locale;
         slug: string;
     }>;
-}
-
-export async function generateStaticParams() {
-    return allDocs.map((doc) => ({
-        slug: doc.slug,
-    }));
 }
 
 export async function generateMetadata({ params }: DocsSlugParams): Promise<Metadata> {
