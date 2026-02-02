@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 import { docsConfig } from "./docsConfig";
 import { useState } from "react";
 
 export default function DocsSidebar() {
     const pathname = usePathname();
+    const locale = useLocale();
     const [isOpen, setIsOpen] = useState(false);
 
     // Extract current slug from pathname
@@ -60,7 +62,7 @@ export default function DocsSidebar() {
                 <nav className="py-6 lg:py-8 lg:pr-8 lg:border-r lg:border-white/10">
                     <div className="mb-6">
                         <Link
-                            href="/docs"
+                            href={`/${locale}/docs`}
                             className="text-xl font-semibold text-white hover:text-accent transition-colors"
                             onClick={() => setIsOpen(false)}
                         >
@@ -79,7 +81,7 @@ export default function DocsSidebar() {
                                     return (
                                         <li key={item.slug}>
                                             <Link
-                                                href={`/docs/${item.slug}`}
+                                                href={`/${locale}/docs/${item.slug}`}
                                                 onClick={() => setIsOpen(false)}
                                                 className={`
                                                     block py-2 px-3 rounded-md text-sm transition-colors
