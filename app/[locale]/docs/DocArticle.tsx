@@ -104,7 +104,7 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
             <nav className="flex justify-between items-center mt-12 pt-8 border-t border-white/10">
                 {prev ? (
                     <Link
-                        href={`/docs/${prev.slug}`}
+                        href={`/${locale}/docs/${prev.slug}`}
                         className="group flex flex-col items-start"
                     >
                         <span className="text-xs text-gray-500 mb-1">Previous</span>
@@ -119,7 +119,7 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
 
                 {next ? (
                     <Link
-                        href={`/docs/${next.slug}`}
+                        href={`/${locale}/docs/${next.slug}`}
                         className="group flex flex-col items-end"
                     >
                         <span className="text-xs text-gray-500 mb-1">Next</span>
