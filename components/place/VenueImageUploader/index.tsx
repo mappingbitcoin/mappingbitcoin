@@ -282,11 +282,17 @@ export default function VenueImageUploader({
         setDragOver(false);
     };
 
-    // Click to select
+    // Click to select or show login
     const handleClick = () => {
-        if (!disabled && !uploading) {
-            fileInputRef.current?.click();
+        if (disabled || uploading) return;
+
+        // If user not logged in to Nostr or no extension, show login modal
+        if (!user || (typeof window !== "undefined" && !window.nostr)) {
+            setShowLoginModal(true);
+            return;
         }
+
+        fileInputRef.current?.click();
     };
 
     // The image to display (uploaded value or local preview)
@@ -340,9 +346,9 @@ export default function VenueImageUploader({
                 // Upload area
                 <div
                     onClick={handleClick}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
+                    onDrop={user && typeof window !== "undefined" && window.nostr ? handleDrop : undefined}
+                    onDragOver={user && typeof window !== "undefined" && window.nostr ? handleDragOver : undefined}
+                    onDragLeave={user && typeof window !== "undefined" && window.nostr ? handleDragLeave : undefined}
                     className={`relative border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
                         compact ? "p-3 h-28 flex items-center justify-center" : "p-6"
                     } ${
@@ -356,7 +362,7 @@ export default function VenueImageUploader({
                         type="file"
                         accept="image/jpeg,image/png,image/gif,image/webp"
                         onChange={handleInputChange}
-                        disabled={disabled}
+                        disabled={disabled || !user || (typeof window !== "undefined" && !window.nostr)}
                         className="hidden"
                     />
 
@@ -365,14 +371,31 @@ export default function VenueImageUploader({
                             <PhotoIcon className={`${compact ? "w-4 h-4" : "w-6 h-6"} text-text-light`} />
                         </div>
                         <div>
-                            <p className={`${compact ? "text-xs" : "text-sm"} text-white`}>
-                                <span className="text-accent hover:text-accent-light">{compact ? "Upload" : "Click to upload"}</span>
-                                {!compact && " or drag"}
-                            </p>
-                            {!compact && (
-                                <p className="text-xs text-text-light mt-1">
-                                    JPEG, PNG, GIF or WebP (max 5MB)
-                                </p>
+                            {!user || (typeof window !== "undefined" && !window.nostr) ? (
+                                <>
+                                    <p className={`${compact ? "text-xs" : "text-sm"} text-white`}>
+                                        <span className="text-accent hover:text-accent-light">
+                                            {compact ? "Login to upload" : "Click to login with Nostr"}
+                                        </span>
+                                    </p>
+                                    {!compact && (
+                                        <p className="text-xs text-text-light mt-1">
+                                            To upload a picture you need to log in with Nostr
+                                        </p>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <p className={`${compact ? "text-xs" : "text-sm"} text-white`}>
+                                        <span className="text-accent hover:text-accent-light">{compact ? "Upload" : "Click to upload"}</span>
+                                        {!compact && " or drag"}
+                                    </p>
+                                    {!compact && (
+                                        <p className="text-xs text-text-light mt-1">
+                                            JPEG, PNG, GIF or WebP (max 5MB)
+                                        </p>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
@@ -383,15 +406,9 @@ export default function VenueImageUploader({
                 <p className={`${compact ? "text-xs" : "text-sm"} text-red-400`}>{error}</p>
             )}
 
-            {!compact && (
+            {!compact && user && typeof window !== "undefined" && window.nostr && (
                 <p className="text-xs text-text-light">
-                    {user ? (
-                        typeof window !== "undefined" && window.nostr
-                            ? "Image will be stored on Blossom and added to the OSM entry."
-                            : "Requires a Nostr browser extension (Alby, nos2x) to sign uploads."
-                    ) : (
-                        "Login with Nostr to upload images."
-                    )}
+                    Image will be stored on Blossom and added to the OSM entry.
                 </p>
             )}
 
