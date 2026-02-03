@@ -51,9 +51,6 @@ export function buildTagsFromForm(form: VenueForm): Record<string, string> {
     Object.entries(form.payment).forEach(([key, val]) => {
         if (val) {
             tags[`payment:${key}`] = "yes";
-            if (key === "onchain" || key === "lightning") {
-                tags["payment:bitcoin"] = "yes";
-            }
         }
     });
 

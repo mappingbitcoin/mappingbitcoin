@@ -46,8 +46,6 @@ import {
     SearchIcon,
     DirectionsIcon,
     CloseIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
     SendIcon,
 } from "@/assets/icons";
 import Button, { TagRemoveButton } from "@/components/ui/Button";
@@ -152,7 +150,7 @@ const EMPTY_FORM: VenueForm = {
 
 const STORAGE_KEY = "venue_form_data";
 
-const STEPS = [
+const TABS = [
     { key: 1, label: 'About', desc: 'Basic info' },
     { key: 2, label: 'Location', desc: 'Address' },
     { key: 3, label: 'Details', desc: 'Hours & pay' }
@@ -163,12 +161,26 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
     const t = useTranslations('venues.form');
     const locale = useLocale() as Locale;
     const router = useRouter();
-    const [step, setStep] = useState<number>(1);
+    const [activeTab, setActiveTab] = useState<number>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isImageUploading, setIsImageUploading] = useState(false);
     const [suggestedSubcategories, setSuggestedSubcategories] = useState<string[]>([]);
 
     const isEditMode = Boolean(venue);
+
+    // Check if each section has its required fields filled
+    const isSectionComplete = (section: number, formData: VenueForm): boolean => {
+        switch (section) {
+            case 1: // About - requires name and category
+                return !!(formData.name?.trim() && formData.category && formData.subcategory);
+            case 2: // Location - requires coordinates
+                return !!(formData.lat && formData.lon);
+            case 3: // Details - optional, considered complete if any payment method selected
+                return formData.payment.onchain || formData.payment.lightning || formData.payment.lightning_contactless;
+            default:
+                return false;
+        }
+    };
 
     const [form, setForm] = useState<VenueForm>(() => {
         // In edit mode, initialize from venue
@@ -220,8 +232,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
 
     const parsedOpeningHours: DayHours[] = useMemo(() => parseOpeningHours(form.opening_hours), [form.opening_hours]);
 
-    function changeStep(newStep: number) {
-        setStep(newStep);
+    function changeTab(newTab: number) {
+        setActiveTab(newTab);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -435,37 +447,41 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                     <div className="flex gap-6 items-start">
                         {/* Main Form Card */}
                         <div className="flex-1 bg-surface rounded-2xl border border-border-light shadow-sm overflow-hidden">
-                            {/* Step Tabs */}
+                            {/* Section Tabs */}
                             <div className="flex border-b border-border-light">
-                                {STEPS.map((s) => (
-                                    <button
-                                        key={s.key}
-                                        type="button"
-                                        onClick={() => changeStep(s.key)}
-                                        className={`flex-1 py-3 px-2 transition-all relative ${step === s.key ? 'bg-accent/10' : 'hover:bg-surface-light'}`}
-                                    >
-                                        <div className="flex flex-col items-center gap-0.5">
-                                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${
-                                                step === s.key ? 'bg-accent text-white' :
-                                                step > s.key ? 'bg-green-500 text-white' : 'bg-surface-light text-text-light'
-                                            }`}>
-                                                {step > s.key ? (
-                                                    <CheckmarkIcon className="w-3.5 h-3.5" />
-                                                ) : s.key}
+                                {TABS.map((tab) => {
+                                    const isComplete = isSectionComplete(tab.key, form);
+                                    const isActive = activeTab === tab.key;
+                                    return (
+                                        <button
+                                            key={tab.key}
+                                            type="button"
+                                            onClick={() => changeTab(tab.key)}
+                                            className={`flex-1 py-3 px-2 transition-all relative ${isActive ? 'bg-accent/10' : 'hover:bg-surface-light'}`}
+                                        >
+                                            <div className="flex flex-col items-center gap-0.5">
+                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${
+                                                    isActive ? 'bg-accent text-white' :
+                                                    isComplete ? 'bg-green-500 text-white' : 'bg-surface-light text-text-light'
+                                                }`}>
+                                                    {isComplete && !isActive ? (
+                                                        <CheckmarkIcon className="w-3.5 h-3.5" />
+                                                    ) : tab.key}
+                                                </div>
+                                                <span className={`text-xs font-medium ${isActive ? 'text-accent' : isComplete ? 'text-green-400' : 'text-white'}`}>{tab.label}</span>
+                                                <span className="text-[10px] text-text-light hidden sm:block">{tab.desc}</span>
                                             </div>
-                                            <span className={`text-xs font-medium ${step === s.key ? 'text-accent' : 'text-white'}`}>{s.label}</span>
-                                            <span className="text-[10px] text-text-light hidden sm:block">{s.desc}</span>
-                                        </div>
-                                        {step === s.key && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
-                                    </button>
-                                ))}
+                                            {isActive && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
+                                        </button>
+                                    );
+                                })}
                             </div>
 
                             {/* Form Content */}
                             <form onSubmit={handleSubmit}>
                                 <div className="p-5 space-y-5">
-                                    {/* Step 1 */}
-                                    {step === 1 && (
+                                    {/* About Tab */}
+                                    {activeTab === 1 && (
                                         <>
                                             {/* Top row: Image on left, Name/Category on right - 50/50 */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -632,8 +648,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                         </>
                                     )}
 
-                                    {/* Step 2 */}
-                                    {step === 2 && (
+                                    {/* Location Tab */}
+                                    {activeTab === 2 && (
                                         <>
                                             <div className="relative">
                                                 <label className="text-sm font-medium text-white block mb-1">{t('searchAddress')}</label>
@@ -675,8 +691,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                         </>
                                     )}
 
-                                    {/* Step 3 */}
-                                    {step === 3 && (
+                                    {/* Details Tab */}
+                                    {activeTab === 3 && (
                                         <>
                                             <div>
                                                 <h3 className="text-sm font-medium text-white mb-3">{t('openingHours')}</h3>
@@ -707,11 +723,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                 {/* Footer */}
                                 <div className="border-t border-border-light px-5 py-3 bg-surface-light/50 flex items-center justify-between">
                                     <div>
-                                        {step > 1 ? (
-                                            <Button type="button" onClick={() => changeStep(step - 1)} variant="ghost" color="neutral" size="sm" leftIcon={<ChevronLeftIcon />}>
-                                                {t('backButton')}
-                                            </Button>
-                                        ) : isEditMode && venue ? (
+                                        {isEditMode && venue ? (
                                             <Button href={`/places/${venue.slug || venue.id}`} variant="ghost" color="neutral" size="sm">
                                                 Cancel
                                             </Button>
@@ -720,16 +732,12 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                         )}
                                     </div>
                                     <div>
-                                        {step < 3 ? (
-                                            <Button type="button" onClick={() => changeStep(step + 1)} size="sm" rightIcon={<ChevronRightIcon />}>
-                                                {t('nextButton')}
-                                            </Button>
-                                        ) : !user ? (
+                                        {!user ? (
                                             <LoginWithOSM />
                                         ) : (
                                             <Button
                                                 type="submit"
-                                                disabled={isSubmitting || isImageUploading}
+                                                disabled={isSubmitting || isImageUploading || !form.name?.trim() || !form.category || !form.subcategory || !form.lat || !form.lon}
                                                 loading={isSubmitting || isImageUploading}
                                                 leftIcon={!isSubmitting && !isImageUploading ? <SendIcon /> : undefined}
                                                 size="sm"
