@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
     const countryLabel = getLocalizedCountryName(locale, venue.country) || "";
     const match = venue.subcategory ? matchPlaceSubcategory(venue.subcategory) : null;
     const subcategory = match ? getSubcategoryLabel(locale, match.category, match.subcategory) ?? '' : venue.subcategory ?? '';
-    const nameSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const nameSlug = (name || '').toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
     // Payment method labels
     const paymentLabels = Object.entries(paymentMethods)
@@ -232,7 +232,8 @@ function buildLocalBusinessSchema(venue: EnrichedVenue, locale: Locale) {
 
 function buildBreadcrumbSchema(venue: EnrichedVenue, locale: Locale) {
     const { name } = parseTags(venue.tags);
-    const countryLabel = getLocalizedCountryName(locale, venue.country) || venue.country;
+    const countryLabel = getLocalizedCountryName(locale, venue.country) || venue.country || '';
+    const countrySlug = (venue.country || '').toLowerCase().replace(/\s+/g, '-');
 
     const items = [
         {
@@ -241,20 +242,24 @@ function buildBreadcrumbSchema(venue: EnrichedVenue, locale: Locale) {
             "name": "Home",
             "item": env.siteUrl
         },
-        {
+    ];
+
+    if (venue.country) {
+        items.push({
             "@type": "ListItem",
             "position": 2,
             "name": countryLabel,
-            "item": `${env.siteUrl}/bitcoin-shops-in-${venue.country.toLowerCase().replace(/\s+/g, '-')}`
-        },
-    ];
+            "item": `${env.siteUrl}/bitcoin-shops-in-${countrySlug}`
+        });
+    }
 
-    if (venue.city) {
+    if (venue.city && venue.country) {
+        const citySlug = venue.city.toLowerCase().replace(/\s+/g, '-');
         items.push({
             "@type": "ListItem",
-            "position": 3,
+            "position": items.length + 1,
             "name": venue.city,
-            "item": `${env.siteUrl}/bitcoin-shops-in-${venue.city.toLowerCase().replace(/\s+/g, '-')}-${venue.country.toLowerCase().replace(/\s+/g, '-')}`
+            "item": `${env.siteUrl}/bitcoin-shops-in-${citySlug}-${countrySlug}`
         });
     }
 

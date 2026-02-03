@@ -6,22 +6,25 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 function hasAnalyticsConsent(): boolean {
-    // Check Do Not Track
+    // Check Do Not Track browser setting
     if (navigator.doNotTrack === "1") return false;
 
-    // Check new consent system
+    // Check if user has explicitly made a choice
     const consent = localStorage.getItem("cookieConsent");
     if (consent) {
         try {
             const parsed = JSON.parse(consent);
-            return parsed.analytics === true;
+            // Only disable if user explicitly set analytics to false
+            return parsed.analytics !== false;
         } catch {
-            return false;
+            // If consent data is corrupted, allow analytics by default
+            return true;
         }
     }
 
-    // Fallback to legacy gaDisabled flag
-    return localStorage.getItem("gaDisabled") !== "true";
+    // No consent stored yet - allow analytics by default
+    // Analytics will only be disabled when user explicitly rejects cookies
+    return true;
 }
 
 export default function ClientOnlyAnalytics() {
