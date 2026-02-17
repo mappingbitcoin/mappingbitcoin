@@ -23,6 +23,7 @@ import {getFormattedAddress} from "@/utils/AddressUtils";
 import moment from 'moment';
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
+import { ReviewsSection } from "@/components/reviews";
 import {
     StarIcon,
     ChevronRightIcon,
@@ -452,13 +453,10 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
                                     {/* Reviews Tab */}
                                     {activeTab === 'reviews' && (
-                                        <div className="text-center py-12">
-                                            <ChatIcon className="w-12 h-12 mx-auto text-text-light mb-4" />
-                                            <h3 className="text-lg font-semibold text-white mb-2">Reviews Coming Soon</h3>
-                                            <p className="text-text-light text-sm max-w-md mx-auto">
-                                                We're working on a community-driven review system. Stay tuned!
-                                            </p>
-                                        </div>
+                                        <ReviewsSection
+                                            osmId={`${venue.type}/${venue.id}`}
+                                            venueSlug={`${venue.type}-${venue.id}`}
+                                        />
                                     )}
 
                                     {/* About Tab */}

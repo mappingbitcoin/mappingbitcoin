@@ -33,6 +33,7 @@ export const NOSTR_KINDS = {
  * - ["rating", "1-5"] - Star rating (1-5)
  * - ["g", "<geohash>"] - Location geohash for discovery
  * - ["t", "review"] - Category tag
+ * - ["image", "<url>"] - Optional image URL (Blossom)
  *
  * Content: Review text (markdown supported)
  */
@@ -41,6 +42,7 @@ export interface ReviewEventTags {
     rating?: string;  // "1" to "5"
     g?: string;       // Geohash
     t?: string;       // Category tag
+    image?: string;   // Image URL (Blossom)
 }
 
 /**
@@ -81,12 +83,31 @@ export function parseOsmIdFromTags(tags: string[][]): string | null {
 }
 
 /**
+ * Parse all image URLs from event tags (multiple "image" tags supported)
+ */
+export function parseImagesFromTags(tags: string[][]): string[] {
+    return tags
+        .filter(t => t[0] === "image" && t[1])
+        .map(t => t[1]);
+}
+
+/**
+ * @deprecated Use parseImagesFromTags for multiple image support
+ * Parse single image URL from event tags (for backwards compatibility)
+ */
+export function parseImageFromTags(tags: string[][]): string | null {
+    const imageTag = tags.find(t => t[0] === "image");
+    return imageTag?.[1] || null;
+}
+
+/**
  * Create tags for a review event
  */
 export function createReviewTags(
     osmId: string,
     rating?: number,
-    geohash?: string
+    geohash?: string,
+    imageUrls?: string[]
 ): string[][] {
     const tags: string[][] = [
         ["d", osmId],
@@ -99,6 +120,13 @@ export function createReviewTags(
 
     if (geohash) {
         tags.push(["g", geohash]);
+    }
+
+    // Add multiple image tags
+    if (imageUrls && imageUrls.length > 0) {
+        for (const url of imageUrls) {
+            tags.push(["image", url]);
+        }
     }
 
     return tags;

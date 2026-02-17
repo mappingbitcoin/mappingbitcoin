@@ -15,6 +15,10 @@ export interface IndexReviewInput {
         nip05?: string | null;
     };
     skipSpamCheck?: boolean;
+    // Image support (multiple images)
+    imageUrls?: string[];
+    thumbnailUrls?: string[];
+    thumbnailKeys?: string[];
 }
 
 export interface IndexReviewResult {
@@ -24,7 +28,7 @@ export interface IndexReviewResult {
 }
 
 export async function indexReview(input: IndexReviewInput): Promise<IndexReviewResult> {
-    const { eventId, osmId, authorPubkey, rating, content, eventCreatedAt, authorProfile, skipSpamCheck } = input;
+    const { eventId, osmId, authorPubkey, rating, content, eventCreatedAt, authorProfile, skipSpamCheck, imageUrls, thumbnailUrls, thumbnailKeys } = input;
 
     // Run spam check (unless skipped)
     let spamCheck: SpamCheckResult | null = null;
@@ -90,6 +94,9 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
                 spamScore: spamCheck?.score ?? null,
                 spamStatus,
                 spamReasons: spamCheck?.reasons ?? [],
+                imageUrls: imageUrls ?? [],
+                thumbnailUrls: thumbnailUrls ?? [],
+                thumbnailKeys: thumbnailKeys ?? [],
             },
             create: {
                 eventId,
@@ -101,6 +108,9 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
                 spamScore: spamCheck?.score ?? null,
                 spamStatus,
                 spamReasons: spamCheck?.reasons ?? [],
+                imageUrls: imageUrls ?? [],
+                thumbnailUrls: thumbnailUrls ?? [],
+                thumbnailKeys: thumbnailKeys ?? [],
             },
         });
     });
@@ -224,6 +234,9 @@ export interface ReviewWithTrust {
     eventCreatedAt: Date;
     indexedAt: Date;
     trustScore: number;
+    // Image support (multiple images)
+    imageUrls: string[];
+    thumbnailUrls: string[];
     author: {
         pubkey: string;
         name: string | null;
@@ -303,6 +316,8 @@ export async function getReviewsWithTrustByOsmId(
         eventCreatedAt: review.eventCreatedAt,
         indexedAt: review.indexedAt,
         trustScore: trustScores.get(review.authorPubkey.toLowerCase()) ?? 0.02,
+        imageUrls: review.imageUrls,
+        thumbnailUrls: review.thumbnailUrls,
         author: {
             pubkey: review.author.pubkey,
             name: review.author.name,

@@ -17,8 +17,13 @@ import moment from 'moment'
 import {deslugify} from "@/utils/StringUtils";
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
-import { PinIcon, GlobeIcon, ClockIcon } from "@/assets/icons/ui";
+import { PinIcon, GlobeIcon, ClockIcon, ChatIcon, SpinnerIcon, WarningIcon } from "@/assets/icons/ui";
 import { EmailIcon, PhoneIcon } from "@/assets/icons/contact";
+import { Link } from "@/i18n/navigation";
+import { StarRating, WeightedRating } from "@/components/reviews";
+import { useReviews } from "@/hooks/useReviews";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import { LoginModal } from "@/components/auth";
 
 type Props = {
     venue: EnrichedVenue;
@@ -256,13 +261,11 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                     )}
 
                     {activeTab === "reviews" && (
-                        <div className="text-center py-8">
-                            <div className="text-4xl mb-3">💬</div>
-                            <h3 className="text-base font-semibold text-white mb-2">Reviews Coming Soon</h3>
-                            <p className="text-text-light text-sm">
-                                We're working on a community-driven review system.
-                            </p>
-                        </div>
+                        <MapSidebarReviews
+                            osmId={`${venue.type}/${venue.id}`}
+                            venueSlug={`${venue.type}-${venue.id}`}
+                            placeSlug={venue.slug || `${venue.type}-${venue.id}`}
+                        />
                     )}
 
                     {activeTab === "about" && (
@@ -304,5 +307,267 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                 </div>
             </div>
         </>
+    );
+}
+
+/**
+ * Compact reviews section for the map sidebar
+ */
+function MapSidebarReviews({
+    osmId,
+    venueSlug,
+    placeSlug,
+}: {
+    osmId: string;
+    venueSlug: string;
+    placeSlug: string;
+}) {
+    const { user } = useNostrAuth();
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [content, setContent] = useState("");
+    const [formError, setFormError] = useState<string | null>(null);
+
+    const {
+        reviews,
+        weightedAverageRating,
+        simpleAverageRating,
+        totalReviews,
+        isLoading,
+        error,
+        submitReview,
+        isSubmitting,
+        submitError,
+    } = useReviews({ osmId, venueSlug });
+
+    const isLoggedIn = !!user;
+    const hasWriteAccess = user?.mode === "write";
+
+    const handleWriteReviewClick = () => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        if (!hasWriteAccess) {
+            setFormError("You need write access to submit reviews. Please log in with your nsec or browser extension.");
+            setShowReviewForm(true);
+            return;
+        }
+        setShowReviewForm(true);
+    };
+
+    const handleSubmitReview = async () => {
+        setFormError(null);
+
+        if (rating === 0) {
+            setFormError("Please select a rating");
+            return;
+        }
+
+        const success = await submitReview(rating, content || undefined);
+        if (success) {
+            setRating(0);
+            setContent("");
+            setShowReviewForm(false);
+        }
+    };
+
+    const handleCancelReview = () => {
+        setShowReviewForm(false);
+        setRating(0);
+        setContent("");
+        setFormError(null);
+    };
+
+    const handleLoginSuccess = () => {
+        setShowLoginModal(false);
+        setShowReviewForm(true);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center py-8">
+                <SpinnerIcon className="w-6 h-6 text-accent animate-spin" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-red-400 text-sm">{error}</p>
+            </div>
+        );
+    }
+
+    const displayError = formError || submitError;
+
+    // Inline review form
+    if (showReviewForm) {
+        return (
+            <div className="py-4 space-y-4">
+                <h3 className="text-base font-semibold text-white">Write a Review</h3>
+
+                {/* Rating */}
+                <div>
+                    <label className="block text-sm text-text-light mb-2">
+                        Your Rating <span className="text-red-400">*</span>
+                    </label>
+                    <StarRating value={rating} onChange={setRating} size="lg" />
+                </div>
+
+                {/* Content */}
+                <div>
+                    <label className="block text-sm text-text-light mb-2">
+                        Your Review <span className="text-text-light/60">(optional)</span>
+                    </label>
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="Share your experience..."
+                        rows={3}
+                        maxLength={1000}
+                        disabled={isSubmitting || !hasWriteAccess}
+                        className="w-full px-3 py-2 bg-surface border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:ring-2 focus:ring-accent resize-none text-sm disabled:opacity-50"
+                    />
+                </div>
+
+                {/* Error */}
+                {displayError && (
+                    <div className="flex items-center gap-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-xs">
+                        <WarningIcon className="w-4 h-4 flex-shrink-0" />
+                        <span>{displayError}</span>
+                    </div>
+                )}
+
+                {/* Buttons */}
+                <div className="flex gap-2">
+                    <button
+                        type="button"
+                        onClick={handleCancelReview}
+                        disabled={isSubmitting}
+                        className="flex-1 px-3 py-2 text-sm text-text-light hover:text-white transition-colors disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSubmitReview}
+                        disabled={isSubmitting || !hasWriteAccess}
+                        className="flex-1 px-3 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <SpinnerIcon className="w-4 h-4 animate-spin" />
+                                Submitting...
+                            </>
+                        ) : (
+                            "Submit"
+                        )}
+                    </button>
+                </div>
+
+                <LoginModal
+                    isOpen={showLoginModal}
+                    onClose={() => setShowLoginModal(false)}
+                    titleKey="title"
+                    descriptionKey="default"
+                    onSuccess={handleLoginSuccess}
+                />
+            </div>
+        );
+    }
+
+    if (totalReviews === 0) {
+        return (
+            <div className="text-center py-8">
+                <ChatIcon className="w-10 h-10 mx-auto text-text-light mb-3" />
+                <h3 className="text-base font-semibold text-white mb-2">No Reviews Yet</h3>
+                <p className="text-text-light text-sm mb-4">
+                    Be the first to share your experience!
+                </p>
+                <button
+                    type="button"
+                    onClick={handleWriteReviewClick}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                    Write a Review
+                </button>
+
+                <LoginModal
+                    isOpen={showLoginModal}
+                    onClose={() => setShowLoginModal(false)}
+                    titleKey="title"
+                    descriptionKey="default"
+                    onSuccess={handleLoginSuccess}
+                />
+            </div>
+        );
+    }
+
+    // Show summary with reviews
+    return (
+        <div className="py-4 space-y-4">
+            {/* Rating Summary */}
+            <div className="text-center">
+                <WeightedRating
+                    weightedRating={weightedAverageRating}
+                    simpleRating={simpleAverageRating}
+                    totalReviews={totalReviews}
+                />
+            </div>
+
+            {/* Preview of top reviews */}
+            <div className="space-y-3">
+                {reviews.slice(0, 2).map((review) => (
+                    <div
+                        key={review.eventId}
+                        className="bg-surface rounded-lg p-3 border border-border-light"
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            {review.rating !== null && (
+                                <StarRating value={review.rating} readOnly size="sm" />
+                            )}
+                            <span className="text-xs text-text-light">
+                                {review.author.name || review.authorPubkey.slice(0, 8) + "..."}
+                            </span>
+                        </div>
+                        {review.content && (
+                            <p className="text-sm text-text-light line-clamp-2">
+                                {review.content}
+                            </p>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-col gap-2">
+                <button
+                    type="button"
+                    onClick={handleWriteReviewClick}
+                    className="block w-full text-center px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                    Write a Review
+                </button>
+                {totalReviews > 2 && (
+                    <Link
+                        href={`/places/${placeSlug}?tab=reviews`}
+                        className="block text-center px-4 py-2 text-accent hover:text-accent-light text-sm font-medium transition-colors"
+                    >
+                        View All {totalReviews} Reviews
+                    </Link>
+                )}
+            </div>
+
+            <LoginModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                titleKey="title"
+                descriptionKey="default"
+                onSuccess={handleLoginSuccess}
+            />
+        </div>
     );
 }

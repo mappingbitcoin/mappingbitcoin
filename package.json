@@ -24,7 +24,8 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "seed:marketing": "npx tsx scripts/seed-marketing.ts"
+    "seed:marketing": "npx tsx scripts/seed-marketing.ts",
+    "listen:reviews": "tsx scripts/reviewListener.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.890.0",
