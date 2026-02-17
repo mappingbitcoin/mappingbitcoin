@@ -125,6 +125,11 @@ model Review {
   eventCreatedAt DateTime @map("event_created_at")
   indexedAt      DateTime @default(now()) @map("indexed_at")
 
+  // Image support (multiple images)
+  imageUrls       String[]  @default([]) @map("image_urls")       // Original Blossom URLs (full size)
+  thumbnailUrls   String[]  @default([]) @map("thumbnail_urls")   // Hetzner CDN URLs (optimized thumbnails)
+  thumbnailKeys   String[]  @default([]) @map("thumbnail_keys")   // Storage keys in Hetzner for cleanup
+
   // Spam filtering
   spamScore      Float?       @map("spam_score")      // 0-1, higher = more likely spam
   spamStatus     SpamStatus   @default(PENDING) @map("spam_status")
