@@ -9,6 +9,9 @@
  * or:    tsx scripts/reviewListener.ts
  */
 
+// Load environment variables from .env file
+import "dotenv/config";
+
 import WebSocket from "ws";
 import sharp from "sharp";
 import { randomUUID } from "crypto";
