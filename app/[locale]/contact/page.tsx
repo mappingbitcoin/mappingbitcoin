@@ -25,7 +25,7 @@ const ContactPage = async ({params}: Localized) => {
                   "url": canonical,
                   "isPartOf": {
                     "@type": "WebSite",
-                    "name": "MappingBitcoin.com",
+                    "name": "Mapping Bitcoin",
                     "url": "https://mappingbitcoin.com/"
                   },
                   "contactPoint": [

@@ -26,7 +26,7 @@ const MapPage = async ({ params }: Localized) => {
                         "description": metadata.description,
                         "isPartOf": {
                             "@type": "WebSite",
-                            "name": "MappingBitcoin.com",
+                            "name": "Mapping Bitcoin",
                             "url": "https://mappingbitcoin.com/"
                         },
                         "mainEntity": {

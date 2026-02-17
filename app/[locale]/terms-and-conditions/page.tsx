@@ -25,7 +25,7 @@ export default async function TermsAndConditionsPage({ params }: Localized) {
                         "url": canonical,
                         "isPartOf": {
                             "@type": "WebSite",
-                            "name": "MappingBitcoin.com",
+                            "name": "Mapping Bitcoin",
                             "url": "https://mappingbitcoin.com/"
                         }
                     })

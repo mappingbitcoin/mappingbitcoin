@@ -7,8 +7,8 @@ export type DocsPageKey = 'docs';
 const docsSeo: SEOModule<DocsPageKey> = {
     "docs": {
         en: {
-            title: "Documentation | MappingBitcoin.com",
-            description: "Learn how MappingBitcoin.com works: OSM synchronization, data enrichment, venue creation, Blossom image uploading, and place verification system.",
+            title: "Documentation | Mapping Bitcoin",
+            description: "Learn how Mapping Bitcoin works: OSM synchronization, data enrichment, venue creation, Blossom image uploading, and place verification system.",
             keywords: [
                 "bitcoin documentation",
                 "bitcoin merchant directory docs",
@@ -17,11 +17,11 @@ const docsSeo: SEOModule<DocsPageKey> = {
                 "blossom protocol",
                 "place verification",
                 "bitcoin venue creation",
-                "mappingbitcoin guide"
+                "mapping bitcoin guide"
             ],
             openGraph: {
-                title: "Documentation | MappingBitcoin.com",
-                description: "Complete guide to MappingBitcoin.com: OSM sync, data enrichment, venue submission, image hosting, and verification systems.",
+                title: "Documentation | Mapping Bitcoin",
+                description: "Complete guide to Mapping Bitcoin: OSM sync, data enrichment, venue submission, image hosting, and verification systems.",
                 url: generateCanonical("docs", "en"),
                 type: "website",
                 images: [
@@ -29,14 +29,14 @@ const docsSeo: SEOModule<DocsPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Documentation | MappingBitcoin.com"
+                        alt: "Documentation | Mapping Bitcoin"
                     }
                 ]
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Documentation | MappingBitcoin.com",
-                description: "Learn how MappingBitcoin.com works: OSM sync, data enrichment, venue creation, and place verification.",
+                title: "Documentation | Mapping Bitcoin",
+                description: "Learn how Mapping Bitcoin works: OSM sync, data enrichment, venue creation, and place verification.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },

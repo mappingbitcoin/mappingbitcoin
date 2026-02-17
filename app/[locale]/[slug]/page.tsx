@@ -150,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         canonical = `${env.siteUrl}/${alternates[locale]}`;
     }
 
-    const siteSuffix = " | MappingBitcoin.com";
+    const siteSuffix = " | Mapping Bitcoin";
 
     return {
         title: `${translatedTitle}${siteSuffix}`,

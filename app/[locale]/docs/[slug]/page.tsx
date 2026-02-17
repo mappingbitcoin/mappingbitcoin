@@ -22,15 +22,15 @@ export async function generateMetadata({ params }: DocsSlugParams): Promise<Meta
 
     if (!doc) {
         return {
-            title: "Not Found | Documentation | MappingBitcoin.com",
+            title: "Not Found | Documentation | Mapping Bitcoin",
         };
     }
 
     return {
-        title: `${doc.title} | Documentation | MappingBitcoin.com`,
+        title: `${doc.title} | Documentation | Mapping Bitcoin`,
         description: doc.description,
         openGraph: {
-            title: `${doc.title} | Documentation | MappingBitcoin.com`,
+            title: `${doc.title} | Documentation | Mapping Bitcoin`,
             description: doc.description,
             type: "article",
             images: [
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: DocsSlugParams): Promise<Meta
         },
         twitter: {
             card: "summary_large_image",
-            title: `${doc.title} | MappingBitcoin.com`,
+            title: `${doc.title} | Mapping Bitcoin`,
             description: doc.description,
         },
     };
@@ -74,7 +74,7 @@ export default async function DocsSlugPage({ params }: DocsSlugParams) {
                         "url": canonical,
                         "isPartOf": {
                             "@type": "WebSite",
-                            "name": "MappingBitcoin.com",
+                            "name": "Mapping Bitcoin",
                             "url": "https://mappingbitcoin.com/"
                         }
                     })

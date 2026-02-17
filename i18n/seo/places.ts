@@ -7,11 +7,11 @@ export type PlacesPageKey = 'place' | 'submit-place' | 'merchant-pages';
 const placesSeo: SEOModule<PlacesPageKey> = {
     place: {
         en: {
-            title: "{{name}} in {{city}} | MappingBitcoin.com",
+            title: "{{name}} in {{city}} | Mapping Bitcoin",
             description: "Discover {{name}}, a place in {{city}} where you can use Bitcoin.",
             keywords: [],
             openGraph: {
-                title: "{{name}} in {{city}} | MappingBitcoin.com",
+                title: "{{name}} in {{city}} | Mapping Bitcoin",
                 description: "Discover {{name}}, a place in {{city}} where you can use Bitcoin.",
                 url: generateCanonical("places", "en"),
                 type: "website",
@@ -20,13 +20,13 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Bitcoin Place | MappingBitcoin.com"
+                        alt: "Bitcoin Place | Mapping Bitcoin"
                     }
                 ]
             },
             twitter: {
                 card: "summary_large_image",
-                title: "{{name}} in {{city}} | MappingBitcoin.com",
+                title: "{{name}} in {{city}} | Mapping Bitcoin",
                 description: "Discover {{name}}, a place in {{city}} where you can use Bitcoin.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
@@ -34,7 +34,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
     },
     'submit-place': {
         en: {
-            title: "Submit a Bitcoin-Friendly Place | MappingBitcoin.com",
+            title: "Submit a Bitcoin-Friendly Place | Mapping Bitcoin",
             description: "Share Bitcoin-friendly businesses with the community. Submit accurate place details so others can spend Bitcoin nearby.",
             keywords: [
                 "submit bitcoin place",
@@ -44,7 +44,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 "bitcoin community map"
             ],
             openGraph: {
-                title: "Submit a Bitcoin-Friendly Place | MappingBitcoin.com",
+                title: "Submit a Bitcoin-Friendly Place | Mapping Bitcoin",
                 description: "Share Bitcoin-friendly businesses with the community.",
                 url: generateCanonical("places/create", "en"),
                 type: "website",
@@ -53,13 +53,13 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Submit a Bitcoin Place | MappingBitcoin.com"
+                        alt: "Submit a Bitcoin Place | Mapping Bitcoin"
                     }
                 ]
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Submit a Bitcoin-Friendly Place | MappingBitcoin.com",
+                title: "Submit a Bitcoin-Friendly Place | Mapping Bitcoin",
                 description: "Help others find places to spend Bitcoin by submitting a trusted place.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
@@ -67,7 +67,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
     },
     'merchant-pages': {
         en: {
-            title: "Bitcoin {{category}} in {{location}} | MappingBitcoin.com",
+            title: "Bitcoin {{category}} in {{location}} | Mapping Bitcoin",
             description: "Find Bitcoin-friendly {{category}} in {{location}}. Browse verified merchants accepting Bitcoin payments.",
             keywords: [
                 "bitcoin merchants",
@@ -77,7 +77,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                 "bitcoin directory"
             ],
             openGraph: {
-                title: "Bitcoin {{category}} in {{location}} | MappingBitcoin.com",
+                title: "Bitcoin {{category}} in {{location}} | Mapping Bitcoin",
                 description: "Find Bitcoin-friendly {{category}} in {{location}}. Browse verified merchants accepting Bitcoin payments.",
                 url: generateCanonical("", "en"),
                 type: "website",
@@ -86,13 +86,13 @@ const placesSeo: SEOModule<PlacesPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Bitcoin Merchants | MappingBitcoin.com"
+                        alt: "Bitcoin Merchants | Mapping Bitcoin"
                     }
                 ]
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Bitcoin {{category}} in {{location}} | MappingBitcoin.com",
+                title: "Bitcoin {{category}} in {{location}} | Mapping Bitcoin",
                 description: "Find Bitcoin-friendly {{category}} in {{location}}.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }

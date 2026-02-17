@@ -18,7 +18,7 @@ export default async function NotFound({ params }: Localized) {
         "description": metadata.description,
         "isPartOf": {
             "@type": "WebSite",
-            "name": "MappingBitcoin.com",
+            "name": "Mapping Bitcoin",
             "url": env.siteUrl
         }
     };

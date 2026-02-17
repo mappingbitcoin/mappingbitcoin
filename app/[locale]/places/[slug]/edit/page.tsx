@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
     const { name } = parseTags(venue.tags);
 
     return {
-        title: `Edit ${name} | MappingBitcoin`,
-        description: `Suggest edits for ${name} on MappingBitcoin.com`,
+        title: `Edit ${name} | Mapping Bitcoin`,
+        description: `Suggest edits for ${name} on Mapping Bitcoin`,
     };
 }
 

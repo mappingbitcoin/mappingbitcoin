@@ -96,7 +96,7 @@ const NavBar = () => {
                             <Link href="/">
                                 <Image
                                     src={'/mapping-bitcoin-logo.svg'}
-                                    alt={'MappingBitcoin.com'}
+                                    alt={'Mapping Bitcoin'}
                                     width={120} height={36}
                                 />
                             </Link>

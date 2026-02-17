@@ -99,7 +99,7 @@ const HomePage = async ({ params }: Localized) => {
                         "@context": "https://schema.org",
                         "@type": "Organization",
                         "@id": "https://mappingbitcoin.com/#organization",
-                        "name": "MappingBitcoin",
+                        "name": "Mapping Bitcoin",
                         "url": "https://mappingbitcoin.com",
                         "logo": "https://mappingbitcoin.com/assets/logo.png",
                         "description": "The largest open-source directory of Bitcoin-accepting merchants worldwide. Built on OpenStreetMap with Nostr-based verification.",
@@ -129,7 +129,7 @@ const HomePage = async ({ params }: Localized) => {
                         "@context": "https://schema.org",
                         "@type": "WebSite",
                         "@id": "https://mappingbitcoin.com/#website",
-                        "name": "MappingBitcoin.com",
+                        "name": "Mapping Bitcoin",
                         "url": "https://mappingbitcoin.com/",
                         "description": `Discover Bitcoin-accepting merchants worldwide. Interactive map with ${stats.totalVenues.toLocaleString()}+ venues across ${stats.countries}+ countries.`,
                         "publisher": {
@@ -156,7 +156,7 @@ const HomePage = async ({ params }: Localized) => {
                         "@context": "https://schema.org",
                         "@type": "ItemList",
                         "name": "Bitcoin Merchant Search Examples",
-                        "description": "Examples of searchable content on MappingBitcoin",
+                        "description": "Examples of searchable content on Mapping Bitcoin",
                         "itemListElement": [
                             {
                                 "@type": "ListItem",

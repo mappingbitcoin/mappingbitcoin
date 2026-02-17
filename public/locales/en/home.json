@@ -76,16 +76,16 @@
     "title": "Frequently Asked Questions",
     "questions": [
       {
-        "question": "What is MappingBitcoin?",
-        "answer": "MappingBitcoin is the largest open-source directory of Bitcoin-accepting merchants worldwide. We aggregate data from OpenStreetMap and allow businesses to verify their listings using Nostr, a decentralized identity protocol."
+        "question": "What is Mapping Bitcoin?",
+        "answer": "Mapping Bitcoin is the largest open-source directory of Bitcoin-accepting merchants worldwide. We aggregate data from OpenStreetMap and allow businesses to verify their listings using Nostr, a decentralized identity protocol."
       },
       {
         "question": "How do I add my business to the map?",
-        "answer": "You can add your business by clicking \"Add your business\" and filling out the form. Your listing will be submitted to OpenStreetMap, the world's largest open mapping project. Alternatively, you can add it directly on OpenStreetMap and it will appear on MappingBitcoin automatically."
+        "answer": "You can add your business by clicking \"Add your business\" and filling out the form. Your listing will be submitted to OpenStreetMap, the world's largest open mapping project. Alternatively, you can add it directly on OpenStreetMap and it will appear on Mapping Bitcoin automatically."
       },
       {
-        "question": "Is MappingBitcoin free to use?",
-        "answer": "Yes, MappingBitcoin is completely free for both users and businesses. We believe in open access to the Bitcoin economy."
+        "question": "Is Mapping Bitcoin free to use?",
+        "answer": "Yes, Mapping Bitcoin is completely free for both users and businesses. We believe in open access to the Bitcoin economy."
       },
       {
         "question": "What does it mean for a business to be \"verified\"?",

@@ -51,7 +51,7 @@ const Footer = () => {
                             <Link href="/">
                                 <Image
                                     src="/mapping-bitcoin-logo.svg"
-                                    alt="MappingBitcoin.com"
+                                    alt="Mapping Bitcoin"
                                     width={140}
                                     height={50}
                                 />

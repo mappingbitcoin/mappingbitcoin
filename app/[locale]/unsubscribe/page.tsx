@@ -30,12 +30,12 @@ const UnsubscribePage = async ({ params }: Localized) => {
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@type": "WebPage",
-                        "name": "Unsubscribe - MappingBitcoin",
+                        "name": "Unsubscribe - Mapping Bitcoin",
                         "description": "Manage your email subscriptions",
                         "url": canonical,
                         "isPartOf": {
                             "@type": "WebSite",
-                            "name": "MappingBitcoin.com",
+                            "name": "Mapping Bitcoin",
                             "url": "https://mappingbitcoin.com/"
                         }
                     }),

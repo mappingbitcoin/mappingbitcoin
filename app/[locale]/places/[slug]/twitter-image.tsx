@@ -7,7 +7,7 @@ import { Locale } from "@/i18n/types";
 
 export const runtime = "edge";
 
-export const alt = "Place on MappingBitcoin";
+export const alt = "Place on Mapping Bitcoin";
 export const size = {
     width: 1200,
     height: 630,
@@ -124,7 +124,7 @@ export default async function Image({
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={`data:image/png;base64,${Buffer.from(logoData).toString("base64")}`}
-                                alt="MappingBitcoin"
+                                alt="Mapping Bitcoin"
                                 width={54}
                                 height={50}
                                 style={{ width: 54, height: 50 }}
@@ -152,7 +152,7 @@ export default async function Image({
                                 letterSpacing: "-0.5px",
                             }}
                         >
-                            MappingBitcoin
+                            Mapping Bitcoin
                         </span>
                     </div>
 

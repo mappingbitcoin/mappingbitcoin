@@ -6,7 +6,7 @@ export type HomePageKey = 'home';
 const homeSeo: SEOModule<HomePageKey> = {
     home: {
         en: {
-            title: "The Bitcoin Economy, Mapped | MappingBitcoin.com",
+            title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
             description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source, community-driven directory of Bitcoin-accepting places worldwide.",
             keywords: [
                 "bitcoin map",
@@ -21,7 +21,7 @@ const homeSeo: SEOModule<HomePageKey> = {
                 "bitcoin worldwide"
             ],
             openGraph: {
-                title: "The Bitcoin Economy, Mapped | MappingBitcoin.com",
+                title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
                 description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source, community-driven directory of Bitcoin-accepting places worldwide.",
                 url: env.siteUrl,
                 type: "website",
@@ -30,13 +30,13 @@ const homeSeo: SEOModule<HomePageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "The Bitcoin Economy, Mapped - MappingBitcoin.com",
+                        alt: "The Bitcoin Economy, Mapped - Mapping Bitcoin",
                     },
                 ],
             },
             twitter: {
                 card: "summary_large_image",
-                title: "The Bitcoin Economy, Mapped | MappingBitcoin.com",
+                title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
                 description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source directory of Bitcoin-accepting places.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }

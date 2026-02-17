@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Login - MappingBitcoin",
-    "description": "Sign in to MappingBitcoin using your Nostr identity to add and manage Bitcoin-accepting locations."
+    "title": "Login - Mapping Bitcoin",
+    "description": "Sign in to Mapping Bitcoin using your Nostr identity to add and manage Bitcoin-accepting locations."
   },
   "heading": "Sign In",
-  "subheading": "Use your Nostr identity to access MappingBitcoin",
+  "subheading": "Use your Nostr identity to access Mapping Bitcoin",
   "modal": {
     "title": "Log In",
     "subtitle": "Sign in with your Nostr identity",
