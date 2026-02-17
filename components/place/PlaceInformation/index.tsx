@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo} from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {useLocale} from "next-intl";
@@ -17,13 +17,16 @@ import moment from 'moment'
 import {deslugify} from "@/utils/StringUtils";
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
-import { PinIcon, GlobeIcon, ClockIcon, ChatIcon, SpinnerIcon, WarningIcon } from "@/assets/icons/ui";
+import { PinIcon, GlobeIcon, ClockIcon, ChatIcon, SpinnerIcon, WarningIcon, PhotoIcon, CloseIcon } from "@/assets/icons/ui";
 import { EmailIcon, PhoneIcon } from "@/assets/icons/contact";
 import { Link } from "@/i18n/navigation";
 import { StarRating, WeightedRating } from "@/components/reviews";
 import { useReviews } from "@/hooks/useReviews";
+import { useBlossomUpload } from "@/hooks/useBlossomUpload";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { LoginModal } from "@/components/auth";
+
+const MAX_SIDEBAR_IMAGES = 3;
 
 type Props = {
     venue: EnrichedVenue;
@@ -310,6 +313,12 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
     );
 }
 
+interface UploadedImage {
+    id: string;
+    url: string;
+    previewUrl: string;
+}
+
 /**
  * Compact reviews section for the map sidebar
  */
@@ -329,6 +338,12 @@ function MapSidebarReviews({
     const [content, setContent] = useState("");
     const [formError, setFormError] = useState<string | null>(null);
 
+    // Image upload state
+    const [images, setImages] = useState<UploadedImage[]>([]);
+    const [uploadingCount, setUploadingCount] = useState(0);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { uploadFile, isUploading, error: uploadError, clearError: clearUploadError } = useBlossomUpload();
+
     const {
         reviews,
         weightedAverageRating,
@@ -343,6 +358,9 @@ function MapSidebarReviews({
 
     const isLoggedIn = !!user;
     const hasWriteAccess = user?.mode === "write";
+    const hasNostrExtension = typeof window !== "undefined" && !!window.nostr;
+    const canAddMoreImages = images.length < MAX_SIDEBAR_IMAGES && !isUploading;
+    const isAnyUploading = isUploading || uploadingCount > 0;
 
     const handleWriteReviewClick = () => {
         if (!isLoggedIn) {
@@ -365,10 +383,18 @@ function MapSidebarReviews({
             return;
         }
 
-        const success = await submitReview(rating, content || undefined);
+        const imageUrls = images.map(img => img.url).filter(Boolean);
+        const success = await submitReview(rating, content || undefined, imageUrls.length > 0 ? imageUrls : undefined);
         if (success) {
             setRating(0);
             setContent("");
+            // Clean up preview URLs
+            images.forEach(img => {
+                if (img.previewUrl.startsWith("blob:")) {
+                    URL.revokeObjectURL(img.previewUrl);
+                }
+            });
+            setImages([]);
             setShowReviewForm(false);
         }
     };
@@ -378,11 +404,85 @@ function MapSidebarReviews({
         setRating(0);
         setContent("");
         setFormError(null);
+        // Clean up preview URLs
+        images.forEach(img => {
+            if (img.previewUrl.startsWith("blob:")) {
+                URL.revokeObjectURL(img.previewUrl);
+            }
+        });
+        setImages([]);
+        clearUploadError();
     };
 
     const handleLoginSuccess = () => {
         setShowLoginModal(false);
         setShowReviewForm(true);
+    };
+
+    // Handle file selection
+    const handleFileSelect = async (files: FileList) => {
+        setFormError(null);
+        clearUploadError();
+
+        const filesToUpload = Array.from(files).slice(0, MAX_SIDEBAR_IMAGES - images.length);
+        if (filesToUpload.length === 0) {
+            setFormError(`Maximum ${MAX_SIDEBAR_IMAGES} images allowed`);
+            return;
+        }
+
+        setUploadingCount(filesToUpload.length);
+
+        for (const file of filesToUpload) {
+            const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+            if (!allowedTypes.includes(file.type)) {
+                setFormError("Invalid file type. Allowed: JPEG, PNG, GIF, WebP");
+                continue;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setFormError("File too large. Maximum size is 5MB");
+                continue;
+            }
+
+            const previewUrl = URL.createObjectURL(file);
+            const tempId = `temp-${Date.now()}-${Math.random()}`;
+            setImages(prev => [...prev, { id: tempId, url: "", previewUrl }]);
+
+            const url = await uploadFile(file);
+            if (url) {
+                setImages(prev => prev.map(img => img.id === tempId ? { ...img, url } : img));
+            } else {
+                setImages(prev => prev.filter(img => img.id !== tempId));
+                URL.revokeObjectURL(previewUrl);
+            }
+            setUploadingCount(prev => prev - 1);
+        }
+    };
+
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            handleFileSelect(files);
+        }
+        e.target.value = "";
+    };
+
+    const handleRemoveImage = (imageId: string) => {
+        setImages(prev => {
+            const img = prev.find(i => i.id === imageId);
+            if (img?.previewUrl.startsWith("blob:")) {
+                URL.revokeObjectURL(img.previewUrl);
+            }
+            return prev.filter(i => i.id !== imageId);
+        });
+    };
+
+    const handleAddImageClick = () => {
+        if (!canAddMoreImages || isSubmitting) return;
+        if (!hasNostrExtension) {
+            setFormError("To upload images, please install a Nostr browser extension like Alby or nos2x.");
+            return;
+        }
+        fileInputRef.current?.click();
     };
 
     if (isLoading) {
@@ -401,7 +501,7 @@ function MapSidebarReviews({
         );
     }
 
-    const displayError = formError || submitError;
+    const displayError = formError || submitError || uploadError;
 
     // Inline review form
     if (showReviewForm) {
@@ -428,9 +528,70 @@ function MapSidebarReviews({
                         placeholder="Share your experience..."
                         rows={3}
                         maxLength={1000}
-                        disabled={isSubmitting || !hasWriteAccess}
+                        disabled={isSubmitting || isAnyUploading || !hasWriteAccess}
                         className="w-full px-3 py-2 bg-surface border border-border-light rounded-lg text-white placeholder-text-light/50 focus:outline-none focus:ring-2 focus:ring-accent resize-none text-sm disabled:opacity-50"
                     />
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                    <label className="block text-sm text-text-light mb-2">
+                        Add Photos <span className="text-text-light/60">(optional)</span>
+                    </label>
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        onChange={handleFileInputChange}
+                        disabled={!canAddMoreImages || isSubmitting || !hasNostrExtension}
+                        multiple
+                        className="hidden"
+                    />
+
+                    <div className="flex flex-wrap gap-2">
+                        {images.map((image) => (
+                            <div
+                                key={image.id}
+                                className="relative rounded-lg overflow-hidden border border-border-light bg-surface h-16 w-16"
+                            >
+                                <img
+                                    src={image.previewUrl}
+                                    alt="Review"
+                                    className="w-full h-full object-cover"
+                                />
+                                {!image.url && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <SpinnerIcon className="w-4 h-4 text-white animate-spin" />
+                                    </div>
+                                )}
+                                {image.url && !isSubmitting && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveImage(image.id)}
+                                        className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/70 hover:bg-red-500 flex items-center justify-center transition-colors"
+                                        aria-label="Remove image"
+                                    >
+                                        <CloseIcon className="w-2.5 h-2.5 text-white" />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+
+                        {canAddMoreImages && (
+                            <button
+                                type="button"
+                                onClick={handleAddImageClick}
+                                disabled={isAnyUploading || isSubmitting}
+                                className="flex flex-col items-center justify-center h-16 w-16 border border-dashed border-border-light rounded-lg hover:border-accent/50 hover:bg-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <PhotoIcon className="w-4 h-4 text-text-light" />
+                                <span className="text-[10px] text-text-light mt-0.5">
+                                    {images.length === 0 ? "Add" : "+"}
+                                </span>
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Error */}
@@ -446,7 +607,7 @@ function MapSidebarReviews({
                     <button
                         type="button"
                         onClick={handleCancelReview}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isAnyUploading}
                         className="flex-1 px-3 py-2 text-sm text-text-light hover:text-white transition-colors disabled:opacity-50"
                     >
                         Cancel
@@ -454,13 +615,18 @@ function MapSidebarReviews({
                     <button
                         type="button"
                         onClick={handleSubmitReview}
-                        disabled={isSubmitting || !hasWriteAccess}
+                        disabled={isSubmitting || isAnyUploading || !hasWriteAccess}
                         className="flex-1 px-3 py-2 bg-accent hover:bg-accent-light text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {isSubmitting ? (
                             <>
                                 <SpinnerIcon className="w-4 h-4 animate-spin" />
                                 Submitting...
+                            </>
+                        ) : isAnyUploading ? (
+                            <>
+                                <SpinnerIcon className="w-4 h-4 animate-spin" />
+                                Uploading...
                             </>
                         ) : (
                             "Submit"

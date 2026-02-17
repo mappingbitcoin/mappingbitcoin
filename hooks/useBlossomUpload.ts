@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
+import { signEvent, getEventHash, getPublicKey } from "@/lib/nostr/crypto";
 
 // Blossom servers to try
 const BLOSSOM_SERVERS = [
@@ -30,9 +32,10 @@ interface UseBlossomUploadReturn {
 
 /**
  * Hook for uploading files to Blossom servers
- * Requires NIP-07 browser extension (Alby, nos2x, etc.)
+ * Supports all auth methods: extension, nsec, and bunker
  */
 export function useBlossomUpload(): UseBlossomUploadReturn {
+    const { user } = useNostrAuth();
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<string | null>(null);
@@ -46,15 +49,17 @@ export function useBlossomUpload(): UseBlossomUploadReturn {
         return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
     };
 
-    // Create and sign Blossom auth event using NIP-07
+    // Create and sign Blossom auth event based on auth method
     const createSignedAuthEvent = async (hash: string): Promise<string> => {
-        if (!window.nostr) {
-            throw new Error("Nostr extension not found. Please install a NIP-07 compatible extension like Alby or nos2x.");
+        if (!user) {
+            throw new Error("You must be logged in to upload images.");
         }
 
-        await window.nostr.getPublicKey();
+        if (user.mode !== "write") {
+            throw new Error("Write access is required to upload images. Please log in with nsec or a signing extension.");
+        }
 
-        const event = {
+        const eventTemplate = {
             kind: 24242, // Blossom auth event kind
             created_at: Math.floor(Date.now() / 1000),
             tags: [
@@ -65,7 +70,48 @@ export function useBlossomUpload(): UseBlossomUploadReturn {
             content: "Upload review image",
         };
 
-        const signedEvent = await window.nostr.signEvent(event) as BlossomSignedEvent;
+        let signedEvent: BlossomSignedEvent;
+
+        if (user.method === "extension") {
+            // Use NIP-07 browser extension
+            if (!window.nostr) {
+                throw new Error("Nostr extension not found. Please install a NIP-07 compatible extension like Alby or nos2x.");
+            }
+            signedEvent = await window.nostr.signEvent(eventTemplate) as BlossomSignedEvent;
+        } else if (user.method === "nsec") {
+            // Sign with stored private key
+            const privateKey = sessionStorage.getItem("nostr_privkey");
+            if (!privateKey) {
+                throw new Error("Private key not found. Please log in again.");
+            }
+
+            const pubkey = getPublicKey(privateKey);
+            const eventToSign = {
+                ...eventTemplate,
+                pubkey,
+            };
+            const id = getEventHash(eventToSign);
+            const sig = await signEvent(eventToSign, privateKey);
+
+            signedEvent = {
+                ...eventToSign,
+                id,
+                sig,
+            };
+        } else if (user.method === "bunker") {
+            // Try using extension if available (some bunker setups inject window.nostr)
+            if (window.nostr?.signEvent) {
+                try {
+                    signedEvent = await window.nostr.signEvent(eventTemplate) as BlossomSignedEvent;
+                } catch (e) {
+                    throw new Error("Bunker signing for image uploads is not yet supported. Please use a browser extension or nsec login.");
+                }
+            } else {
+                throw new Error("Bunker signing for image uploads is not yet supported. Please use a browser extension or nsec login.");
+            }
+        } else {
+            throw new Error("Unsupported auth method for image uploads.");
+        }
 
         // Return base64 encoded event
         return btoa(JSON.stringify(signedEvent));
@@ -166,9 +212,14 @@ export function useBlossomUpload(): UseBlossomUploadReturn {
             return null;
         }
 
-        // Check for NIP-07 extension
-        if (!window.nostr) {
-            setError("To upload images, please install a Nostr browser extension like Alby or nos2x.");
+        // Check auth status
+        if (!user) {
+            setError("You must be logged in to upload images.");
+            return null;
+        }
+
+        if (user.mode !== "write") {
+            setError("Write access is required to upload images. Please log in with nsec or a signing extension.");
             return null;
         }
 
@@ -191,7 +242,7 @@ export function useBlossomUpload(): UseBlossomUploadReturn {
             setIsUploading(false);
             setProgress(null);
         }
-    }, []);
+    }, [user]);
 
     return {
         uploadFile,
