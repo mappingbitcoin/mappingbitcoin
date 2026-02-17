@@ -1,7 +1,7 @@
 {
   "hero": {
     "title": "Verify Your Business",
-    "description": "Claim and verify your listing on MappingBitcoin to build trust with customers and unlock additional features."
+    "description": "Claim and verify your listing on Mapping Bitcoin to build trust with customers and unlock additional features."
   },
   "whyVerify": {
     "title": "Why Verify?",
@@ -30,7 +30,7 @@
       "req1": "Access to the email address listed on your venue",
       "req2": "A Nostr account to link the verification to your identity",
       "howItWorks": "How it works:",
-      "step1": "Find your business on MappingBitcoin and click \"Verify\"",
+      "step1": "Find your business on Mapping Bitcoin and click \"Verify\"",
       "step2": "Log in with your Nostr account",
       "step3": "We send a 6-digit code to your business email",
       "step4": "Enter the code to complete verification"
@@ -42,7 +42,7 @@
       "req1": "Access to your domain's DNS settings",
       "req2": "A Nostr account to link the verification to your identity",
       "howItWorks": "How it works:",
-      "step1": "Find your business on MappingBitcoin and click \"Verify\"",
+      "step1": "Find your business on Mapping Bitcoin and click \"Verify\"",
       "step2": "Log in with your Nostr account",
       "step3": "Copy the unique TXT record we provide",
       "step4": "Add it to your domain's DNS settings",

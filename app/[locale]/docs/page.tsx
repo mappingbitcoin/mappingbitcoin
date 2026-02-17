@@ -26,7 +26,7 @@ export default async function DocsPage({ params }: Localized) {
                         "url": canonical,
                         "isPartOf": {
                             "@type": "WebSite",
-                            "name": "MappingBitcoin.com",
+                            "name": "Mapping Bitcoin",
                             "url": "https://mappingbitcoin.com/"
                         }
                     })

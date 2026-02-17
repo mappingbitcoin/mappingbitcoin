@@ -16,7 +16,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "overview",
                 title: "Overview",
-                description: "Introduction to MappingBitcoin.com",
+                description: "Introduction to Mapping Bitcoin",
             },
         ],
     },

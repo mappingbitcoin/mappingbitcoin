@@ -7,18 +7,18 @@ export type ContactPageKey = 'contact';
 const contactSeo: SEOModule<ContactPageKey> = {
     contact: {
         en: {
-            title: "Contact | MappingBitcoin.com",
-            description: "MappingBitcoin.com is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
+            title: "Contact | Mapping Bitcoin",
+            description: "Mapping Bitcoin is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
             keywords: [
                 "contact Bitcoin",
                 "Bitcoin help",
                 "Bitcoin support",
-                "MappingBitcoin contact",
+                "Mapping Bitcoin contact",
                 "connect Bitcoin project"
             ],
             openGraph: {
-                title: "Contact | MappingBitcoin.com",
-                description: "MappingBitcoin.com is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
+                title: "Contact | Mapping Bitcoin",
+                description: "Mapping Bitcoin is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
                 url: generateCanonical('contact', 'en'),
                 type: "website",
                 images: [
@@ -26,14 +26,14 @@ const contactSeo: SEOModule<ContactPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Contact | MappingBitcoin.com",
+                        alt: "Contact | Mapping Bitcoin",
                     }
                 ]
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Contact | MappingBitcoin.com",
-                description: "MappingBitcoin.com is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
+                title: "Contact | Mapping Bitcoin",
+                description: "Mapping Bitcoin is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },

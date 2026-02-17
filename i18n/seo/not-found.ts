@@ -6,10 +6,10 @@ export type NotFoundPageKey = 'not-found';
 const notFoundSeo: SEOModule<NotFoundPageKey> = {
     'not-found': {
         en: {
-            title: "Page Not Found | MappingBitcoin.com",
+            title: "Page Not Found | Mapping Bitcoin",
             description: "This page doesn't exist, but you can still explore Bitcoin tools, guides, and places where it's accepted.",
             openGraph: {
-                title: "Page Not Found | MappingBitcoin.com",
+                title: "Page Not Found | Mapping Bitcoin",
                 description: "This page doesn't exist, but you can still explore Bitcoin tools, guides, and places where it's accepted.",
                 url: env.siteUrl,
                 type: "website",
@@ -18,13 +18,13 @@ const notFoundSeo: SEOModule<NotFoundPageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "Page Not Found | MappingBitcoin.com",
+                        alt: "Page Not Found | Mapping Bitcoin",
                     },
                 ],
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Page Not Found | MappingBitcoin.com",
+                title: "Page Not Found | Mapping Bitcoin",
                 description: "This page doesn't exist, but you can still explore Bitcoin tools, guides, and places where it's accepted.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             },
