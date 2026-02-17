@@ -148,11 +148,11 @@ jobs:
             cd /root/mappingbitcoin
             pm2 delete mappingbitcoin || true
             export PORT=4466
-            pm2 start "cd /root/mappingbitcoin && npm run start" --name mappingbitcoin
+            pm2 start npm --name mappingbitcoin --cwd /root/mappingbitcoin -- run start
 
             echo "🔁 Restarting review listener"
             pm2 delete review-listener || true
-            pm2 start "cd /root/mappingbitcoin && npm run listen:reviews" --name review-listener
+            pm2 start npm --name review-listener --cwd /root/mappingbitcoin -- run listen:reviews
             pm2 save
 
             echo "✅ Deployment complete with runtime data preserved"
