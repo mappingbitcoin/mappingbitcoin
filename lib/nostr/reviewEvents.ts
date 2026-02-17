@@ -3,7 +3,7 @@
  */
 
 import { NOSTR_KINDS, parseRatingFromTags, parseOsmIdFromTags, parseImagesFromTags } from "./constants";
-import type { IndexReviewInput, IndexReviewReplyInput } from "@/lib/db/services/reviews";
+import type { IndexReviewInput, IndexReviewReplyInput } from "../db/services/reviews";
 
 export interface NostrEvent {
     id: string;

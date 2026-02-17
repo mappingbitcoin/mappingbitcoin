@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "seed:marketing": "npx tsx scripts/seed-marketing.ts",
-    "listen:reviews": "tsx -r tsconfig-paths/register scripts/reviewListener.ts"
+    "listen:reviews": "tsx scripts/reviewListener.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.890.0",

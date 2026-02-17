@@ -1,6 +1,6 @@
 import prisma from "../prisma";
-import { getTrustScores } from "@/lib/trust/graphBuilder";
-import { checkReviewSpam, type SpamCheckResult } from "@/lib/spam/reviewFilter";
+import { getTrustScores } from "../../trust/graphBuilder";
+import { checkReviewSpam, type SpamCheckResult } from "../../spam/reviewFilter";
 
 export interface IndexReviewInput {
     eventId: string;

@@ -1,5 +1,5 @@
-import prisma from "@/lib/db/prisma";
-import { getTrustScore } from "@/lib/trust/graphBuilder";
+import prisma from "../db/prisma";
+import { getTrustScore } from "../trust/graphBuilder";
 
 /**
  * Spam filtering for reviews
