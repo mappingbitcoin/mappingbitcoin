@@ -1,4 +1,4 @@
-import prisma from "@/lib/db/prisma";
+import prisma from "../db/prisma";
 import * as WebSocketModule from "ws";
 const WebSocket = WebSocketModule.default || WebSocketModule;
 

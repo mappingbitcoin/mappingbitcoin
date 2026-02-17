@@ -9,7 +9,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Readable } from "stream";
 import fs from "fs/promises";
-import { serverEnv, isProduction } from "@/lib/Environment";
+import { serverEnv, isProduction } from "../Environment";
 
 /**
  * Asset types for organizing storage

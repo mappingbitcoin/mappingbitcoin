@@ -1,4 +1,4 @@
-import prisma from "@/lib/db/prisma";
+import prisma from "../db/prisma";
 import { getFollows, getFollowsBatch } from "./nostrFollows";
 
 // Default trust score for users not in the graph
