@@ -65,8 +65,8 @@ export function useNostrPublish(): UseNostrPublishReturn {
 
             if (user.method === "extension") {
                 // Use NIP-07 browser extension
-                if (!window.nostr) {
-                    setError("Nostr extension not found. Please install a NIP-07 compatible extension like Alby.");
+                if (!window.nostr?.signEvent) {
+                    setError("Nostr extension not found or doesn't support signing. Please install a NIP-07 compatible extension like Alby.");
                     return null;
                 }
 
@@ -91,11 +91,11 @@ export function useNostrPublish(): UseNostrPublishReturn {
                 // NIP-46 bunker signing
                 // For now, we'll use the extension if available, or show an error
                 // Full NIP-46 implementation would require maintaining the bunker connection
-                if (window.nostr) {
+                if (window.nostr?.signEvent) {
                     const signed = await window.nostr.signEvent(eventToSign) as SignedEvent;
                     signedEvent = signed;
                 } else {
-                    setError("Bunker signing requires a connected signer. Please use a browser extension instead.");
+                    setError("Bunker signing requires a connected signer. Please use a browser extension or log in with nsec.");
                     return null;
                 }
             } else {
