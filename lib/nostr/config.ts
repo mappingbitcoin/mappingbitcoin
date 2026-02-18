@@ -9,7 +9,6 @@
 export const NOSTR_RELAYS = [
     "wss://relay.mappingbitcoin.com",
     "wss://relay.damus.io",
-    "wss://relay.nostr.band",
     "wss://nos.lol",
     "wss://relay.primal.net",
 ] as const;
