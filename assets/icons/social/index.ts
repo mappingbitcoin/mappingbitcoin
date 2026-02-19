@@ -7,4 +7,5 @@ export { YouTubeIcon } from "./YouTubeIcon";
 export { TikTokIcon } from "./TikTokIcon";
 export { WhatsAppIcon } from "./WhatsAppIcon";
 export { NostrIcon } from "./NostrIcon";
+export { NostrWotIcon } from "./NostrWotIcon";
 export { OSMIcon } from "./OSMIcon";

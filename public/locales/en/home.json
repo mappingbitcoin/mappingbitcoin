@@ -59,12 +59,60 @@
       }
     }
   },
+  "community": {
+    "title": "Share Your Experience",
+    "description": "Help the Bitcoin community by sharing your experiences at merchants worldwide. Your reviews are stored on Nostr - decentralized and censorship-resistant.",
+    "features": {
+      "reviews": {
+        "title": "Write Reviews",
+        "description": "Share detailed feedback about your experience. Your review is signed with your Nostr key and belongs to you."
+      },
+      "ratings": {
+        "title": "Rate Venues",
+        "description": "Quick 1-5 star ratings weighted by Web of Trust. Trusted reviewers have more influence on aggregate scores."
+      },
+      "photos": {
+        "title": "Upload Photos",
+        "description": "Add up to 5 photos per review. Images are stored on Blossom, a decentralized storage network."
+      },
+      "navigate": {
+        "title": "Explore the Map",
+        "description": "Filter by payment type, category, or verification status. Find Bitcoin merchants near you or anywhere in the world."
+      }
+    },
+    "cta": {
+      "explore": "Explore Map",
+      "docs": "Learn More"
+    }
+  },
   "regions": {
     "title": "Explore by region"
   },
   "topCountries": {
     "title": "Top Bitcoin countries",
     "venues": "venues"
+  },
+  "wotIntegration": {
+    "title": "Web of Trust Integration",
+    "description": "We integrate with Nostr Web of Trust to provide enhanced trust signals for reviews and contributions. See who you can trust based on your social graph.",
+    "features": {
+      "trust": {
+        "title": "Trust-Based Reviews",
+        "description": "Reviews are weighted by trust distance. See opinions from people in your network first, not anonymous strangers."
+      },
+      "transparency": {
+        "title": "Transparent Reputation",
+        "description": "Every contributor has a verifiable Nostr identity. Track their history and see their trust score."
+      },
+      "spam": {
+        "title": "Spam Resistance",
+        "description": "Web of Trust naturally filters out spam and fake reviews. Real people, real opinions."
+      }
+    },
+    "cta": {
+      "install": "Install Extension",
+      "learnMore": "Learn More"
+    }
   },
   "newsletter": {
     "title": "Stay Updated",
@@ -84,16 +132,24 @@
         "answer": "You can add your business by clicking \"Add your business\" and filling out the form. Your listing will be submitted to OpenStreetMap, the world's largest open mapping project. Alternatively, you can add it directly on OpenStreetMap and it will appear on Mapping Bitcoin automatically."
       },
       {
-        "question": "Is Mapping Bitcoin free to use?",
-        "answer": "Yes, Mapping Bitcoin is completely free for both users and businesses. We believe in open access to the Bitcoin economy."
+        "question": "How do reviews and ratings work?",
+        "answer": "Reviews are published as Nostr events, making them decentralized and owned by you. Ratings are weighted by Web of Trust - reviews from trusted community members have more influence on aggregate scores than anonymous or new accounts. This provides Sybil-resistant ratings without centralized moderation."
+      },
+      {
+        "question": "What is Web of Trust and why does it matter?",
+        "answer": "Web of Trust (WoT) is a decentralized trust model based on your Nostr social graph. Trust flows through follow connections from community seeders. Reviews from people closer to your trust network are highlighted, and their ratings carry more weight. This helps filter spam and surface genuine community feedback."
+      },
+      {
+        "question": "Do I need a Nostr account to use Mapping Bitcoin?",
+        "answer": "You can browse the map and view venues without an account. To leave reviews, rate venues, or verify your business, you'll need to log in with a Nostr identity. You can use a browser extension (Alby, nos2x), enter your private key directly, or use a Nostr Connect bunker."
       },
       {
         "question": "What does it mean for a business to be \"verified\"?",
-        "answer": "Verified businesses have cryptographically proven ownership of their listing through email or domain verification. This is linked to their Nostr identity, providing trust without relying on any central authority."
+        "answer": "Verified businesses have cryptographically proven ownership of their listing through email or domain verification. This is linked to their Nostr identity, providing trust without relying on any central authority. Verified owners can also respond to reviews on their venue."
       },
       {
-        "question": "How accurate is the data?",
-        "answer": "Our data comes from OpenStreetMap, a community-maintained map. While we strive for accuracy, information can become outdated. We encourage users to report incorrect listings and businesses to verify their information."
+        "question": "Is Mapping Bitcoin free to use?",
+        "answer": "Yes, Mapping Bitcoin is completely free for both users and businesses. We believe in open access to the Bitcoin economy."
       },
       {
         "question": "Do you support Lightning Network?",

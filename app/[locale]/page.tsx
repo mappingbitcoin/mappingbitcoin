@@ -16,6 +16,8 @@ import {
     TopCountriesSection,
 } from "./HomeAnimatedSections";
 import { PoweredBySection } from "./HomePoweredBy";
+import { WotIntegrationSection } from "./HomeWotSection";
+import { CommunitySection } from "./HomeCommunitySection";
 
 export const generateMetadata = buildGeneratePageMetadata('home')
 
@@ -275,30 +277,82 @@ const HomePage = async ({ params }: Localized) => {
                     }}
                 />
 
-                {/* Section 4: How It Works */}
+                {/* Section 4: Community - Reviews & Ratings */}
+                <CommunitySection
+                    title={t("community.title")}
+                    description={t("community.description")}
+                    features={{
+                        reviews: {
+                            title: t("community.features.reviews.title"),
+                            description: t("community.features.reviews.description"),
+                        },
+                        ratings: {
+                            title: t("community.features.ratings.title"),
+                            description: t("community.features.ratings.description"),
+                        },
+                        photos: {
+                            title: t("community.features.photos.title"),
+                            description: t("community.features.photos.description"),
+                        },
+                        navigate: {
+                            title: t("community.features.navigate.title"),
+                            description: t("community.features.navigate.description"),
+                        },
+                    }}
+                    cta={{
+                        explore: t("community.cta.explore"),
+                        docs: t("community.cta.docs"),
+                    }}
+                />
+
+                {/* Section 5: How It Works */}
                 <HowItWorksSection
                     title={t("howItWorks.title")}
                     features={features}
                 />
 
-                {/* Section 5: Browse by Region */}
+                {/* Section 6: Browse by Region */}
                 <RegionsSection
                     title={t("regions.title")}
                     venuesLabel={t("topCountries.venues")}
                     regions={stats.regions}
                 />
 
-                {/* Section 6: Featured Countries */}
+                {/* Section 7: Featured Countries */}
                 <TopCountriesSection
                     title={t("topCountries.title")}
                     venuesLabel={t("topCountries.venues")}
                     countries={stats.topCountries}
                 />
 
-                {/* Section 7: FAQ */}
+                {/* Section 8: Web of Trust Integration */}
+                <WotIntegrationSection
+                    title={t("wotIntegration.title")}
+                    description={t("wotIntegration.description")}
+                    features={{
+                        trust: {
+                            title: t("wotIntegration.features.trust.title"),
+                            description: t("wotIntegration.features.trust.description"),
+                        },
+                        transparency: {
+                            title: t("wotIntegration.features.transparency.title"),
+                            description: t("wotIntegration.features.transparency.description"),
+                        },
+                        spam: {
+                            title: t("wotIntegration.features.spam.title"),
+                            description: t("wotIntegration.features.spam.description"),
+                        },
+                    }}
+                    cta={{
+                        install: t("wotIntegration.cta.install"),
+                        learnMore: t("wotIntegration.cta.learnMore"),
+                    }}
+                />
+
+                {/* Section 9: FAQ */}
                 <FAQSection translationKey="home.faq" />
 
-                {/* Section 8: Newsletter CTA */}
+                {/* Section 10: Newsletter CTA */}
                 <NewsletterCTA />
             </main>
         </>
