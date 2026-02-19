@@ -1,6 +1,6 @@
 # Nostr Integration
 
-MappingBitcoin.com integrates with the Nostr protocol for decentralized social features and announcements.
+MappingBitcoin integrates with the Nostr protocol for decentralized identity, reviews, and social features.
 
 ## What is Nostr?
 
@@ -9,13 +9,53 @@ Nostr (Notes and Other Stuff Transmitted by Relays) is a decentralized protocol 
 - **Censorship resistance** - No central authority can remove content
 - **User ownership** - You control your identity with cryptographic keys
 - **Interoperability** - Works across multiple clients and relays
-- **Transparency** - All announcements are publicly verifiable
+- **Transparency** - All actions are publicly verifiable
 
-## Current Integrations
+## Authentication
+
+Users can log in to MappingBitcoin using their Nostr identity.
+
+| Method | Description |
+|--------|-------------|
+| NIP-07 Extension | Alby, nos2x, Flamingo, and other browser extensions |
+| Private Key (nsec) | Direct nsec input (keys never leave your browser) |
+| NIP-46 Bunker | Remote signing via Nostr Connect |
+
+Your Nostr identity is used for reviews, verification, and all social features on the platform.
+
+## Reviews & Ratings
+
+Reviews are published as Nostr events, making them decentralized and portable.
+
+| Feature | Description |
+|---------|-------------|
+| Star Ratings | 1-5 star ratings for venues |
+| Text Reviews | Optional written feedback |
+| Image Attachments | Up to 5 images per review via Blossom |
+| Owner Replies | Verified venue owners can respond |
+
+Reviews are stored on Nostr relays and indexed locally for fast querying. Your reviews belong to you, not the platform.
+
+See [Reviews](/docs/reviews) for detailed documentation.
+
+## Web of Trust
+
+Reviews are weighted by Web of Trust (WoT) distance to provide Sybil-resistant ratings.
+
+| Feature | Description |
+|---------|-------------|
+| Trust Scoring | Reviews weighted by community trust |
+| WoT Distance | Visual badges show connection to trust network |
+| Spam Resistance | Low-trust reviews have minimal impact on ratings |
+| Filtering | Filter reviews by trust level |
+
+See [Web of Trust](/docs/web-of-trust) for detailed documentation.
+
+## Venue Announcements
+
+When venues are added or verified, announcements are published to Nostr.
 
 ### New Venue Announcements
-
-When a new Bitcoin-accepting venue is added to the platform, it's automatically announced on Nostr.
 
 | Event | Description |
 |-------|-------------|
@@ -24,11 +64,7 @@ When a new Bitcoin-accepting venue is added to the platform, it's automatically 
 | Visibility | Public on Nostr relays |
 | Purpose | Spread awareness of new Bitcoin merchants |
 
-This helps the Bitcoin community discover new places to spend their sats in real-time.
-
 ### Verification Announcements
-
-When a business owner verifies their venue, we announce it on Nostr.
 
 | Event | Description |
 |-------|-------------|
@@ -37,78 +73,15 @@ When a business owner verifies their venue, we announce it on Nostr.
 | Visibility | Public on Nostr relays |
 | Purpose | Build trust and social proof |
 
-Verification announcements create an immutable record of ownership claims that anyone can verify.
+## Custom Event Kinds
 
-### Authentication
+MappingBitcoin uses custom Nostr event kinds in the addressable replaceable range:
 
-Users can log in to MappingBitcoin.com using their Nostr identity.
-
-| Feature | Description |
-|---------|-------------|
-| Method | NIP-07 browser extension |
-| Extensions | Alby, nos2x, Flamingo, etc. |
-| Benefits | No password needed, use existing identity |
-| Used for | Verification, comments, reviews |
-
-## Coming Soon
-
-We're expanding Nostr integration to include more social features:
-
-### Comments
-
-> **In Development**
-
-- Leave comments on venue pages
-- Comments stored on Nostr relays
-- Portable across Nostr clients
-- Tied to your Nostr identity
-
-### Reviews
-
-> **In Development**
-
-- Detailed venue reviews
-- Stored as Nostr events
-- Verifiable authorship
-- Discoverable across the Nostr ecosystem
-
-### Ratings
-
-> **Planned**
-
-- Rate venues on multiple criteria
-- Aggregate ratings from Nostr events
-- Sybil-resistant through web of trust
-- Transparent scoring methodology
-
-### Reports
-
-> **Planned**
-
-- Report closed or incorrect venues
-- Community-driven data quality
-- Transparent moderation
-- Appeals via Nostr
-
-## Technical Details
-
-### Event Types
-
-| Feature | Nostr Kind | Status |
-|---------|------------|--------|
-| Announcements | Custom | Active |
-| Authentication | NIP-07 | Active |
-| Comments | TBD | Planned |
-| Reviews | TBD | Planned |
-| Ratings | TBD | Planned |
-
-### Relay Configuration
-
-Announcements are published to multiple relays for redundancy and reach.
-
-### Bot Account
-
-The MappingBitcoin.com bot publishes announcements from a dedicated Nostr account. Follow it to stay updated on new Bitcoin venues worldwide.
+| Kind | Purpose | Description |
+|------|---------|-------------|
+| 38381 | Venue Reviews | Star ratings (1-5) with optional text and images |
+| 38382 | Review Replies | Responses from verified venue owners only |
+| 38383 | Venue Claims | Business ownership verification claims |
 
 ## Why Nostr?
 
