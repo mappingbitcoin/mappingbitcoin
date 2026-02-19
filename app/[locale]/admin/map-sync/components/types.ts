@@ -56,3 +56,42 @@ export interface SyncStateData {
         storage: Record<string, string> | null;
     };
 }
+
+export interface GeoFixableVenue {
+    id: number;
+    name: string;
+    lat: number;
+    lon: number;
+    currentCity: string | null;
+    currentCountry: string | null;
+    currentState: string | null;
+    category: string;
+    missingFields: string[];
+}
+
+export interface GeoFixPreviewData {
+    totalVenues: number;
+    missingGeoCount: number;
+    missingGeoVenues: GeoFixableVenue[];
+    hasMore: boolean;
+    actions: string[];
+}
+
+export interface CacheStatus {
+    caches: {
+        venue: { loaded: boolean; count: number };
+        location: { loaded: boolean; countries: number };
+        tile: { loaded: boolean; features: number };
+    };
+    actions: string[];
+}
+
+export interface CacheRebuildResult {
+    message: string;
+    stats: {
+        venue: { count: number; duration: number };
+        location: { countries: number; duration: number };
+        tile: { features: number; duration: number };
+        totalDuration: number;
+    };
+}

@@ -83,6 +83,8 @@ async function enrichVenue(
             v.state = await getAdmin1Name(nearest.countryCode, nearest.admin1Code) || existing?.state;
             v.enrichedAt = new Date().toISOString();
             updated = true;
+        } else {
+            console.warn(`⚠️ Geo-enrichment failed for venue ${v.id} at (${v.lon}, ${v.lat}) - no nearest city found`);
         }
     }
 

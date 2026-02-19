@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { TrashIcon, WarningIcon, CheckmarkIcon, SearchIcon, RefreshIcon, SettingsIcon } from "@/assets/icons/ui";
+import { TrashIcon, WarningIcon, CheckmarkIcon, SearchIcon, RefreshIcon, SettingsIcon, GlobeIcon, DatabaseIcon } from "@/assets/icons/ui";
 import ToolCard from "./ToolCard";
 import SyncStateModal from "./SyncStateModal";
 import {
@@ -12,6 +12,9 @@ import {
     ExecuteResult,
     CategoryFixPreviewData,
     SyncStateData,
+    GeoFixPreviewData,
+    CacheStatus,
+    CacheRebuildResult,
 } from "./types";
 
 export default function ToolsTab() {
@@ -43,6 +46,22 @@ export default function ToolsTab() {
     const [syncStateUpdating, setSyncStateUpdating] = useState(false);
     const [syncStateResult, setSyncStateResult] = useState<ExecuteResult | null>(null);
     const [editSequenceNumber, setEditSequenceNumber] = useState<string>("");
+
+    // Geo fix state
+    const [geoPreviewLoading, setGeoPreviewLoading] = useState(false);
+    const [geoPreviewData, setGeoPreviewData] = useState<GeoFixPreviewData | null>(null);
+    const [geoPreviewError, setGeoPreviewError] = useState<string | null>(null);
+    const [showGeoModal, setShowGeoModal] = useState(false);
+    const [geoExecuteLoading, setGeoExecuteLoading] = useState(false);
+    const [geoExecuteResult, setGeoExecuteResult] = useState<ExecuteResult | null>(null);
+
+    // Cache rebuild state
+    const [cacheStatusLoading, setCacheStatusLoading] = useState(false);
+    const [cacheStatus, setCacheStatus] = useState<CacheStatus | null>(null);
+    const [cacheStatusError, setCacheStatusError] = useState<string | null>(null);
+    const [showCacheModal, setShowCacheModal] = useState(false);
+    const [cacheRebuildLoading, setCacheRebuildLoading] = useState(false);
+    const [cacheRebuildResult, setCacheRebuildResult] = useState<CacheRebuildResult | null>(null);
 
     const handlePreview = async () => {
         if (!authToken) return;
@@ -355,6 +374,163 @@ export default function ToolsTab() {
         }
     };
 
+    // Geo fix handlers
+    const handleGeoPreview = async () => {
+        if (!authToken) return;
+
+        setGeoPreviewLoading(true);
+        setGeoPreviewError(null);
+        setGeoPreviewData(null);
+        setGeoExecuteResult(null);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/fix-geo/preview", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setGeoPreviewError(data.error || "Failed to load preview");
+                return;
+            }
+
+            setGeoPreviewData(data);
+            setShowGeoModal(true);
+        } catch (err) {
+            setGeoPreviewError(err instanceof Error ? err.message : "Failed to load preview");
+        } finally {
+            setGeoPreviewLoading(false);
+        }
+    };
+
+    const handleGeoExecute = async () => {
+        if (!authToken) return;
+
+        setGeoExecuteLoading(true);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/fix-geo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setGeoExecuteResult({
+                    success: false,
+                    message: data.error || "Failed to fix geo data",
+                });
+                return;
+            }
+
+            setGeoExecuteResult({
+                success: true,
+                message: data.message || "Geo data fixed successfully",
+                fixedCount: data.fixedCount,
+            });
+
+            // Close modal after short delay to show success
+            setTimeout(() => {
+                setShowGeoModal(false);
+                setGeoPreviewData(null);
+            }, 2000);
+        } catch (err) {
+            setGeoExecuteResult({
+                success: false,
+                message: err instanceof Error ? err.message : "Failed to fix geo data",
+            });
+        } finally {
+            setGeoExecuteLoading(false);
+        }
+    };
+
+    const closeGeoModal = () => {
+        if (!geoExecuteLoading) {
+            setShowGeoModal(false);
+            setGeoPreviewData(null);
+            setGeoExecuteResult(null);
+        }
+    };
+
+    // Cache rebuild handlers
+    const handleCacheStatus = async () => {
+        if (!authToken) return;
+
+        setCacheStatusLoading(true);
+        setCacheStatusError(null);
+        setCacheStatus(null);
+        setCacheRebuildResult(null);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/rebuild-caches", {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setCacheStatusError(data.error || "Failed to load cache status");
+                return;
+            }
+
+            setCacheStatus(data);
+            setShowCacheModal(true);
+        } catch (err) {
+            setCacheStatusError(err instanceof Error ? err.message : "Failed to load cache status");
+        } finally {
+            setCacheStatusLoading(false);
+        }
+    };
+
+    const handleCacheRebuild = async () => {
+        if (!authToken) return;
+
+        setCacheRebuildLoading(true);
+
+        try {
+            const response = await fetch("/api/admin/map-sync/rebuild-caches", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setCacheRebuildResult(null);
+                setCacheStatusError(data.error || "Failed to rebuild caches");
+                return;
+            }
+
+            setCacheRebuildResult(data);
+
+            // Close modal after short delay to show success
+            setTimeout(() => {
+                setShowCacheModal(false);
+                setCacheStatus(null);
+            }, 3000);
+        } catch (err) {
+            setCacheStatusError(err instanceof Error ? err.message : "Failed to rebuild caches");
+        } finally {
+            setCacheRebuildLoading(false);
+        }
+    };
+
+    const closeCacheModal = () => {
+        if (!cacheRebuildLoading) {
+            setShowCacheModal(false);
+            setCacheStatus(null);
+            setCacheRebuildResult(null);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Info Banner */}
@@ -454,6 +630,65 @@ export default function ToolsTab() {
                         leftIcon={!syncStateLoading ? <RefreshIcon className="w-4 h-4" /> : undefined}
                     >
                         {syncStateLoading ? "Loading..." : "View Sync State"}
+                    </Button>
+                </ToolCard>
+
+                {/* Fix Missing Geo Data Tool */}
+                <ToolCard
+                    title="Fix Missing Geo Data"
+                    description="Find and fix venues that are missing country, city, or state fields. Uses the nearest city lookup to populate missing geo data so venues appear correctly on the map."
+                    note={{
+                        text: "This tool fixes venues that were not properly geo-enriched during the initial sync. Venues missing the country field are filtered out of the tile cache and won't appear on the map.",
+                        date: "February 19, 2026",
+                    }}
+                    icon={<GlobeIcon className="w-6 h-6 text-accent" />}
+                    variant="warning"
+                >
+                    {geoPreviewError && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                            <div className="flex items-center gap-2">
+                                <WarningIcon className="w-4 h-4 text-red-400" />
+                                <p className="text-red-400 text-sm">{geoPreviewError}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <Button
+                        onClick={handleGeoPreview}
+                        color="primary"
+                        size="sm"
+                        disabled={geoPreviewLoading}
+                        loading={geoPreviewLoading}
+                        leftIcon={!geoPreviewLoading ? <SearchIcon className="w-4 h-4" /> : undefined}
+                    >
+                        {geoPreviewLoading ? "Analyzing..." : "Find Missing Geo Data"}
+                    </Button>
+                </ToolCard>
+
+                {/* Rebuild Caches Tool */}
+                <ToolCard
+                    title="Rebuild Caches"
+                    description="Force rebuild all in-memory caches from EnrichedVenues.json. This includes VenueCache, LocationCache (country/state/city hierarchy), and TileCache (GeoJSON for map rendering)."
+                    icon={<DatabaseIcon className="w-6 h-6 text-accent" />}
+                >
+                    {cacheStatusError && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                            <div className="flex items-center gap-2">
+                                <WarningIcon className="w-4 h-4 text-red-400" />
+                                <p className="text-red-400 text-sm">{cacheStatusError}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <Button
+                        onClick={handleCacheStatus}
+                        color="primary"
+                        size="sm"
+                        disabled={cacheStatusLoading}
+                        loading={cacheStatusLoading}
+                        leftIcon={!cacheStatusLoading ? <RefreshIcon className="w-4 h-4" /> : undefined}
+                    >
+                        {cacheStatusLoading ? "Loading..." : "View Cache Status"}
                     </Button>
                 </ToolCard>
             </div>
@@ -782,6 +1017,291 @@ export default function ToolsTab() {
                 onUpdateSequenceNumber={handleUpdateSequenceNumber}
                 onSyncFromStorage={handleSyncFromStorage}
             />
+
+            {/* Geo Fix Modal */}
+            <Modal
+                isOpen={showGeoModal}
+                onClose={closeGeoModal}
+                title="Fix Missing Geo Data"
+                maxWidth="max-w-3xl"
+            >
+                <div className="p-6 space-y-6">
+                    {/* Success Result */}
+                    {geoExecuteResult?.success && (
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                    <CheckmarkIcon className="w-5 h-5 text-green-400" />
+                                </div>
+                                <div>
+                                    <p className="text-green-400 font-medium">{geoExecuteResult.message}</p>
+                                    {geoExecuteResult.fixedCount !== undefined && (
+                                        <p className="text-green-400/70 text-sm mt-1">
+                                            {geoExecuteResult.fixedCount} venue{geoExecuteResult.fixedCount !== 1 ? "s" : ""} fixed
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Error Result */}
+                    {geoExecuteResult && !geoExecuteResult.success && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                            <div className="flex items-center gap-2">
+                                <WarningIcon className="w-5 h-5 text-red-400" />
+                                <p className="text-red-400">{geoExecuteResult.message}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Preview Content */}
+                    {geoPreviewData && !geoExecuteResult?.success && (
+                        <>
+                            {/* Summary Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-surface-light rounded-lg p-3 text-center">
+                                    <p className="text-2xl font-bold text-white">{geoPreviewData.totalVenues.toLocaleString()}</p>
+                                    <p className="text-xs text-text-light">Total Venues</p>
+                                </div>
+                                <div className={`rounded-lg p-3 text-center ${geoPreviewData.missingGeoCount > 0 ? "bg-yellow-500/10" : "bg-green-500/10"}`}>
+                                    <p className={`text-2xl font-bold ${geoPreviewData.missingGeoCount > 0 ? "text-yellow-400" : "text-green-400"}`}>
+                                        {geoPreviewData.missingGeoCount}
+                                    </p>
+                                    <p className="text-xs text-text-light">Missing Geo Data</p>
+                                </div>
+                            </div>
+
+                            {geoPreviewData.missingGeoCount === 0 ? (
+                                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
+                                    <CheckmarkIcon className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                                    <p className="text-green-400 font-medium">All venues have complete geo data</p>
+                                    <p className="text-green-400/70 text-sm mt-1">
+                                        No venues need geo data fixes.
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Venues to be fixed */}
+                                    <div>
+                                        <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                                            <GlobeIcon className="w-4 h-4 text-yellow-400" />
+                                            Venues to be fixed ({geoPreviewData.missingGeoCount})
+                                            {geoPreviewData.hasMore && (
+                                                <span className="text-text-light text-xs ml-2">(showing first 100)</span>
+                                            )}
+                                        </h4>
+                                        <div className="bg-surface-light rounded-lg border border-border-light max-h-64 overflow-y-auto">
+                                            <table className="w-full text-sm">
+                                                <thead className="sticky top-0 bg-surface-light">
+                                                    <tr className="border-b border-border-light">
+                                                        <th className="px-3 py-2 text-left text-text-light font-medium">ID</th>
+                                                        <th className="px-3 py-2 text-left text-text-light font-medium">Name</th>
+                                                        <th className="px-3 py-2 text-left text-text-light font-medium">Coordinates</th>
+                                                        <th className="px-3 py-2 text-left text-text-light font-medium">Current Location</th>
+                                                        <th className="px-3 py-2 text-left text-text-light font-medium">Missing</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-border-light">
+                                                    {geoPreviewData.missingGeoVenues.map((venue) => (
+                                                        <tr key={venue.id} className="hover:bg-surface">
+                                                            <td className="px-3 py-2 text-text-light font-mono text-xs">{venue.id}</td>
+                                                            <td className="px-3 py-2 text-white max-w-[150px] truncate" title={venue.name}>{venue.name}</td>
+                                                            <td className="px-3 py-2 text-text-light text-xs">
+                                                                {venue.lat.toFixed(4)}, {venue.lon.toFixed(4)}
+                                                            </td>
+                                                            <td className="px-3 py-2 text-text-light text-xs">
+                                                                {venue.currentCity || "-"}, {venue.currentState || "-"}, {venue.currentCountry || "-"}
+                                                            </td>
+                                                            <td className="px-3 py-2 text-yellow-400 text-xs">
+                                                                {venue.missingFields.join(", ")}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {/* Actions that will be taken */}
+                                    <div>
+                                        <h4 className="text-white font-medium mb-3">Actions to be performed</h4>
+                                        <ul className="space-y-2">
+                                            {geoPreviewData.actions.map((action, idx) => (
+                                                <li key={idx} className="flex items-start gap-2 text-sm">
+                                                    <span className="w-5 h-5 rounded-full bg-accent/20 text-accent text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        {idx + 1}
+                                                    </span>
+                                                    <span className="text-text-light">{action}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                                        <div className="flex items-start gap-2">
+                                            <GlobeIcon className="w-4 h-4 text-blue-400 mt-0.5" />
+                                            <p className="text-blue-400 text-sm">
+                                                This will look up the nearest city from the cities database for each venue and populate the missing country, city, and state fields.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-3 pt-2 border-t border-border-light">
+                        <Button
+                            onClick={closeGeoModal}
+                            variant="ghost"
+                            color="neutral"
+                            disabled={geoExecuteLoading}
+                        >
+                            {geoExecuteResult?.success ? "Close" : "Cancel"}
+                        </Button>
+                        {geoPreviewData && geoPreviewData.missingGeoCount > 0 && !geoExecuteResult?.success && (
+                            <Button
+                                onClick={handleGeoExecute}
+                                color="primary"
+                                disabled={geoExecuteLoading}
+                                loading={geoExecuteLoading}
+                            >
+                                {geoExecuteLoading ? "Fixing..." : "Confirm & Fix"}
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Cache Rebuild Modal */}
+            <Modal
+                isOpen={showCacheModal}
+                onClose={closeCacheModal}
+                title="Rebuild Caches"
+                maxWidth="max-w-2xl"
+            >
+                <div className="p-6 space-y-6">
+                    {/* Success Result */}
+                    {cacheRebuildResult && (
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                    <CheckmarkIcon className="w-5 h-5 text-green-400" />
+                                </div>
+                                <div>
+                                    <p className="text-green-400 font-medium">{cacheRebuildResult.message}</p>
+                                    <p className="text-green-400/70 text-sm mt-1">
+                                        Total time: {cacheRebuildResult.stats.totalDuration}ms
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-green-500/10 rounded-lg p-3 text-center">
+                                    <p className="text-lg font-bold text-green-400">{cacheRebuildResult.stats.venue.count.toLocaleString()}</p>
+                                    <p className="text-xs text-green-400/70">Venues ({cacheRebuildResult.stats.venue.duration}ms)</p>
+                                </div>
+                                <div className="bg-green-500/10 rounded-lg p-3 text-center">
+                                    <p className="text-lg font-bold text-green-400">{cacheRebuildResult.stats.location.countries}</p>
+                                    <p className="text-xs text-green-400/70">Countries ({cacheRebuildResult.stats.location.duration}ms)</p>
+                                </div>
+                                <div className="bg-green-500/10 rounded-lg p-3 text-center">
+                                    <p className="text-lg font-bold text-green-400">{cacheRebuildResult.stats.tile.features.toLocaleString()}</p>
+                                    <p className="text-xs text-green-400/70">Tile Features ({cacheRebuildResult.stats.tile.duration}ms)</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Cache Status Content */}
+                    {cacheStatus && !cacheRebuildResult && (
+                        <>
+                            {/* Current Cache Stats */}
+                            <div>
+                                <h4 className="text-white font-medium mb-3">Current Cache Status</h4>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className={`rounded-lg p-3 text-center ${cacheStatus.caches.venue.loaded ? "bg-green-500/10" : "bg-red-500/10"}`}>
+                                        <p className={`text-2xl font-bold ${cacheStatus.caches.venue.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.venue.count.toLocaleString()}
+                                        </p>
+                                        <p className="text-xs text-text-light">VenueCache</p>
+                                        <p className={`text-xs ${cacheStatus.caches.venue.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.venue.loaded ? "Loaded" : "Empty"}
+                                        </p>
+                                    </div>
+                                    <div className={`rounded-lg p-3 text-center ${cacheStatus.caches.location.loaded ? "bg-green-500/10" : "bg-red-500/10"}`}>
+                                        <p className={`text-2xl font-bold ${cacheStatus.caches.location.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.location.countries}
+                                        </p>
+                                        <p className="text-xs text-text-light">LocationCache</p>
+                                        <p className={`text-xs ${cacheStatus.caches.location.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.location.loaded ? "Loaded" : "Empty"}
+                                        </p>
+                                    </div>
+                                    <div className={`rounded-lg p-3 text-center ${cacheStatus.caches.tile.loaded ? "bg-green-500/10" : "bg-red-500/10"}`}>
+                                        <p className={`text-2xl font-bold ${cacheStatus.caches.tile.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.tile.features.toLocaleString()}
+                                        </p>
+                                        <p className="text-xs text-text-light">TileCache</p>
+                                        <p className={`text-xs ${cacheStatus.caches.tile.loaded ? "text-green-400" : "text-red-400"}`}>
+                                            {cacheStatus.caches.tile.loaded ? "Loaded" : "Empty"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions that will be taken */}
+                            <div>
+                                <h4 className="text-white font-medium mb-3">Actions to be performed</h4>
+                                <ul className="space-y-2">
+                                    {cacheStatus.actions.map((action, idx) => (
+                                        <li key={idx} className="flex items-start gap-2 text-sm">
+                                            <span className="w-5 h-5 rounded-full bg-accent/20 text-accent text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                {idx + 1}
+                                            </span>
+                                            <span className="text-text-light">{action}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Info */}
+                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                                <div className="flex items-start gap-2">
+                                    <DatabaseIcon className="w-4 h-4 text-blue-400 mt-0.5" />
+                                    <p className="text-blue-400 text-sm">
+                                        Rebuilding caches will reload all venue data from EnrichedVenues.json and regenerate the map tile data. This is useful after manual data fixes or when caches become stale.
+                                    </p>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-3 pt-2 border-t border-border-light">
+                        <Button
+                            onClick={closeCacheModal}
+                            variant="ghost"
+                            color="neutral"
+                            disabled={cacheRebuildLoading}
+                        >
+                            {cacheRebuildResult ? "Close" : "Cancel"}
+                        </Button>
+                        {cacheStatus && !cacheRebuildResult && (
+                            <Button
+                                onClick={handleCacheRebuild}
+                                color="primary"
+                                disabled={cacheRebuildLoading}
+                                loading={cacheRebuildLoading}
+                            >
+                                {cacheRebuildLoading ? "Rebuilding..." : "Rebuild All Caches"}
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }
