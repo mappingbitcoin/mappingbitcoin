@@ -4,6 +4,7 @@ import { subscribeEmail } from "@/lib/db";
 import { contactFormLimiter } from "@/lib/rate-limiter";
 import { createWelcomeEmail, createSubscriberNotificationEmail } from "@/lib/email/templates";
 import { serverEnv, publicEnv } from "@/lib/Environment";
+import { validateEmail, checkBodySize } from "@/lib/validation";
 
 const resend = new Resend(serverEnv.resendApiKey);
 
@@ -61,20 +62,25 @@ function getClientIp(request: NextRequest): string {
     return "unknown";
 }
 
-function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
 export async function POST(request: NextRequest) {
+    // Check body size (max 10KB for subscribe form)
+    const bodySizeCheck = checkBodySize(request, 10 * 1024);
+    if (!bodySizeCheck.allowed) {
+        return NextResponse.json(
+            { error: bodySizeCheck.error },
+            { status: 413 }
+        );
+    }
+
     try {
         const body: SubscribeRequest = await request.json();
         const { email, list = "newsletter", recaptchaToken } = body;
 
         // Validate email
-        if (!email || !validateEmail(email)) {
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.valid) {
             return NextResponse.json(
-                { error: "Invalid email address" },
+                { error: emailValidation.error || "Invalid email address" },
                 { status: 400 }
             );
         }

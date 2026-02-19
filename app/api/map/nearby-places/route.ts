@@ -58,8 +58,8 @@ export async function GET(req: NextRequest) {
         }
 
         return Response.json({ results: elements });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        return Response.json({ error: err.message ?? 'Internal error' }, { status: 500 });
+    } catch (err) {
+        console.error("[GET /api/map/nearby-places] Error:", err);
+        return Response.json({ error: 'Failed to fetch nearby places. Please try again.' }, { status: 500 });
     }
 }

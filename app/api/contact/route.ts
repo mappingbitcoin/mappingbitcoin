@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { contactFormLimiter } from "@/lib/rate-limiter";
 import { createContactNotificationEmail } from "@/lib/email/templates";
 import { serverEnv } from "@/lib/Environment";
+import { validateEmail, sanitizeString, checkBodySize } from "@/lib/validation";
 
 const resend = new Resend(serverEnv.resendApiKey);
 
@@ -61,19 +62,16 @@ function getClientIp(request: NextRequest): string {
     return "unknown";
 }
 
-function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function sanitizeInput(input: string): string {
-    return input
-        .trim()
-        .replace(/<[^>]*>/g, "")
-        .substring(0, 5000);
-}
-
 export async function POST(request: NextRequest) {
+    // Check body size (max 50KB for contact form)
+    const bodySizeCheck = checkBodySize(request, 50 * 1024);
+    if (!bodySizeCheck.allowed) {
+        return NextResponse.json(
+            { error: bodySizeCheck.error },
+            { status: 413 }
+        );
+    }
+
     try {
         const body: ContactFormData = await request.json();
         const { name, email, message, recaptchaToken } = body;
@@ -86,9 +84,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!validateEmail(email)) {
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.valid) {
             return NextResponse.json(
-                { error: "Invalid email address" },
+                { error: emailValidation.error || "Invalid email address" },
                 { status: 400 }
             );
         }
@@ -126,8 +125,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Sanitize inputs
-        const sanitizedName = sanitizeInput(name);
-        const sanitizedMessage = sanitizeInput(message);
+        const sanitizedName = sanitizeString(name, 200);
+        const sanitizedMessage = sanitizeString(message, 5000);
 
         // Send email via Resend
         const contactEmail = createContactNotificationEmail(

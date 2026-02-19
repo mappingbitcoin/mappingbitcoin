@@ -16,6 +16,8 @@ interface ProcessImageResponse {
 // Thumbnail settings
 const THUMBNAIL_WIDTH = 400;
 const THUMBNAIL_QUALITY = 80;
+const MAX_IMAGE_SIZE = 50 * 1024 * 1024; // 50MB
+const FETCH_TIMEOUT_MS = 30000; // 30 seconds
 
 /**
  * POST /api/reviews/process-image
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
 
         if (!body.imageUrl || !body.reviewEventId) {
             return NextResponse.json(
-                { error: "Missing required fields: imageUrl, reviewEventId" },
+                { error: "Missing required fields" },
                 { status: 400 }
             );
         }
@@ -43,18 +45,43 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Fetch image from Blossom
+        // Only allow HTTPS URLs
+        if (url.protocol !== "https:") {
+            return NextResponse.json(
+                { error: "Only HTTPS URLs are allowed" },
+                { status: 400 }
+            );
+        }
+
+        // Fetch image from Blossom with timeout
         console.log(`[ProcessImage] Fetching image from ${body.imageUrl}`);
-        const response = await fetch(body.imageUrl, {
-            headers: {
-                "User-Agent": "MappingBitcoin/1.0",
-            },
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+        let response: Response;
+        try {
+            response = await fetch(body.imageUrl, {
+                headers: {
+                    "User-Agent": "MappingBitcoin/1.0",
+                },
+                signal: controller.signal,
+            });
+        } catch (err) {
+            if (err instanceof Error && err.name === "AbortError") {
+                return NextResponse.json(
+                    { error: "Image fetch timed out" },
+                    { status: 408 }
+                );
+            }
+            throw err;
+        } finally {
+            clearTimeout(timeoutId);
+        }
 
         if (!response.ok) {
             console.error(`[ProcessImage] Failed to fetch image: ${response.status}`);
             return NextResponse.json(
-                { error: `Failed to fetch image: ${response.status}` },
+                { error: "Failed to fetch image" },
                 { status: 400 }
             );
         }
@@ -68,16 +95,35 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check content length before downloading
+        const contentLength = response.headers.get("content-length");
+        if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
+            return NextResponse.json(
+                { error: "Image too large (max 50MB)" },
+                { status: 400 }
+            );
+        }
+
         // Get image buffer
         const imageBuffer = Buffer.from(await response.arrayBuffer());
 
-        // Create thumbnail using sharp
+        // Verify size after download (in case content-length was missing/wrong)
+        if (imageBuffer.length > MAX_IMAGE_SIZE) {
+            return NextResponse.json(
+                { error: "Image too large (max 50MB)" },
+                { status: 400 }
+            );
+        }
+
+        // Create thumbnail using sharp - strip EXIF metadata for privacy
         console.log(`[ProcessImage] Creating thumbnail (${THUMBNAIL_WIDTH}px width)`);
         const thumbnailBuffer = await sharp(imageBuffer)
             .resize(THUMBNAIL_WIDTH, null, {
                 fit: "inside",
                 withoutEnlargement: true,
             })
+            .rotate() // Auto-rotate based on EXIF, then strip
+            .withMetadata(false) // Strip all EXIF/metadata for privacy
             .webp({ quality: THUMBNAIL_QUALITY })
             .toBuffer();
 
@@ -92,7 +138,7 @@ export async function POST(request: NextRequest) {
             thumbnailBuffer,
             {
                 contentType: "image/webp",
-                cacheControl: "public, max-age=31536000", // 1 year cache
+                cacheControl: "public, max-age=2592000", // 30 days cache
             }
         );
 
@@ -133,7 +179,7 @@ async function getPublicUrl(key: string): Promise<string> {
         const url = await storage.getSignedDownloadUrl(
             AssetType.REVIEWS,
             key.replace(`${AssetType.REVIEWS}/`, ""),
-            { expiresIn: 31536000 } // 1 year
+            { expiresIn: 2592000 } // 30 days
         );
         return url;
     } catch {

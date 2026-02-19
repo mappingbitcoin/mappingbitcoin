@@ -17,6 +17,20 @@ type FAQSectionProps = {
     faqs?: FAQEntry[]; // Optional override of FAQ entries
 };
 
+/**
+ * Escape HTML entities to prevent XSS attacks
+ */
+function escapeHtml(str: string): string {
+    const htmlEscapes: Record<string, string> = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    };
+    return str.replace(/[&<>"']/g, (char) => htmlEscapes[char]);
+}
+
 export default function FAQSection({
     translationKey,
     substitutions = {},
@@ -32,7 +46,7 @@ export default function FAQSection({
 
     const renderWithPlaceholders = (template: string): string => {
         return template.replace(/\{(\w+)\}/g, (_, key) =>
-            substitutions[key] !== undefined ? String(substitutions[key]) : ""
+            substitutions[key] !== undefined ? escapeHtml(String(substitutions[key])) : ""
         );
     };
 

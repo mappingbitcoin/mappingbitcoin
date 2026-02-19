@@ -4,6 +4,7 @@ import { initiateEmailVerification, getVerificationStatus } from "@/lib/db/servi
 import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 import { parseTags } from "@/utils/OsmHelpers";
 import { isDevelopment } from "@/lib/Environment";
+import { validateEmail } from "@/lib/validation";
 
 interface InitiateRequest {
     osmId: string;
@@ -109,8 +110,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.valid) {
             return NextResponse.json(
                 { error: "Invalid email address found in venue data" },
                 { status: 400 }

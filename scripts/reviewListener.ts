@@ -58,13 +58,15 @@ async function processReviewImage(
 
         const imageBuffer = Buffer.from(await response.arrayBuffer());
 
-        // Create thumbnail
+        // Create thumbnail - strip EXIF metadata for privacy
         console.log(`[Listener] Creating thumbnail (${THUMBNAIL_WIDTH}px width)`);
         const thumbnailBuffer = await sharp(imageBuffer)
             .resize(THUMBNAIL_WIDTH, null, {
                 fit: "inside",
                 withoutEnlargement: true,
             })
+            .rotate() // Auto-rotate based on EXIF, then strip
+            .withMetadata(false) // Strip all EXIF/metadata for privacy
             .webp({ quality: THUMBNAIL_QUALITY })
             .toBuffer();
 
@@ -79,7 +81,7 @@ async function processReviewImage(
             thumbnailBuffer,
             {
                 contentType: "image/webp",
-                cacheControl: "public, max-age=31536000",
+                cacheControl: "public, max-age=2592000", // 30 days
             }
         );
 
@@ -94,7 +96,7 @@ async function processReviewImage(
             thumbnailUrl = await storage.getSignedDownloadUrl(
                 AssetType.REVIEWS,
                 filename,
-                { expiresIn: 31536000 }
+                { expiresIn: 2592000 } // 30 days
             );
         } catch {
             // Fallback: construct public URL
