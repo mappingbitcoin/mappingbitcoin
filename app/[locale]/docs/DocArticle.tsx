@@ -27,11 +27,13 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
                 return res.text();
             })
             .then((text) => {
-                setContent(text);
+                // Strip first H1 from content (we render title as H1 in component)
+                const strippedContent = text.replace(/^#\s+.+\n+/, '');
+                setContent(strippedContent);
                 setIsLoading(false);
             })
             .catch(() => {
-                setContent('# Not Found\n\nThis documentation page could not be found.');
+                setContent('This documentation page could not be found.');
                 setIsLoading(false);
             });
     }, [slug, locale]);
@@ -50,7 +52,10 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
     return (
         <div>
             {doc && (
-                <p className="text-gray-400 text-sm mb-4">{doc.description}</p>
+                <>
+                    <h1 className="text-3xl font-bold mb-4 text-white leading-tight">{doc.title}</h1>
+                    <p className="text-gray-400 text-sm mb-6">{doc.description}</p>
+                </>
             )}
 
             <article className="
