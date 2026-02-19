@@ -108,6 +108,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     } = useNostrAuth();
     const [authError, setAuthError] = useState<string | null>(null);
     const [isAuthenticating, setIsAuthenticating] = useState(false);
+    const [awaitingAdminCheck, setAwaitingAdminCheck] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const pathname = usePathname();
@@ -168,7 +169,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         setAuthError(null);
 
         try {
-            await authenticate();
+            const token = await authenticate();
+            if (token) {
+                // Keep loading state until admin check completes
+                setAwaitingAdminCheck(true);
+            }
         } catch (error) {
             console.error("Authentication failed:", error);
             setAuthError(error instanceof Error ? error.message : "Authentication failed");
@@ -177,8 +182,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         }
     };
 
-    // Loading state (including auto-authentication in progress)
-    if (authLoading || isAdminLoading || isAuthenticating) {
+    // Clear awaitingAdminCheck when admin loading completes
+    useEffect(() => {
+        if (awaitingAdminCheck && !isAdminLoading) {
+            setAwaitingAdminCheck(false);
+        }
+    }, [awaitingAdminCheck, isAdminLoading]);
+
+    // Loading state (including auto-authentication in progress and awaiting admin check)
+    if (authLoading || isAdminLoading || isAuthenticating || awaitingAdminCheck) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">
