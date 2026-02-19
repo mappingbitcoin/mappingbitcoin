@@ -64,7 +64,7 @@ Built on [Nostr](https://nostr.com) for decentralized identity and censorship-re
 
 ```bash
 # Clone the repository
-git clone https://github.com/ArcadeLabsInc/mappingbitcoin.git
+git clone https://github.com/mappingbitcoin/mappingbitcoin.git
 cd mappingbitcoin
 
 # Install dependencies
@@ -239,7 +239,7 @@ This project is open source. See [LICENSE](LICENSE) for details.
 
 - **Website**: [mappingbitcoin.com](https://mappingbitcoin.com)
 - **Nostr**: Follow us on Nostr (coming soon)
-- **GitHub**: [github.com/ArcadeLabsInc/mappingbitcoin](https://github.com/ArcadeLabsInc/mappingbitcoin)
+- **GitHub**: [github.com/mappingbitcoin/mappingbitcoin](https://github.com/mappingbitcoin/mappingbitcoin)
 
 ---
 

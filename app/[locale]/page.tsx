@@ -103,7 +103,7 @@ const HomePage = async ({ params }: Localized) => {
                         "@id": "https://mappingbitcoin.com/#website",
                         "name": "Mapping Bitcoin",
                         "url": "https://mappingbitcoin.com/",
-                        "description": `Discover Bitcoin-accepting merchants worldwide. Interactive map with ${stats.totalVenues.toLocaleString()}+ venues across ${stats.countries}+ countries.`,
+                        "description": "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
                         "publisher": {
                             "@id": "https://mappingbitcoin.com/#organization"
                         },

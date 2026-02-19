@@ -87,7 +87,7 @@ Mapping Bitcoin is an open project, and we're looking for people who want to hel
 
 ### Contribute Code
 
-We're open source and actively looking for developers. Whether you're into React, Nostr protocol, geospatial data, or API design, there's meaningful work to do. Check out our [GitHub](https://github.com/mappingbitcoin) or reach out directly.
+We're open source and actively looking for developers. Whether you're into React, Nostr protocol, geospatial data, or API design, there's meaningful work to do. Check out our [GitHub](https://github.com/mappingbitcoin/mappingbitcoin) or reach out directly.
 
 ### Add Places
 
@@ -106,7 +106,7 @@ Ambassadors will help onboard merchants, verify listings, organize local mapping
 Have ideas? Want to collaborate? Just want to say hi?
 
 - **Nostr**: [npub1mappingbitcoin...](https://nostr-wot.com/profile/npub1sadk0snzs0zk2vq96w7d88sag6292dfwzh4pycaf3uxs8r0dgm8qklrmdh)
-- **GitHub**: [github.com/mappingbitcoin](https://github.com/mappingbitcoin)
+- **GitHub**: [github.com/mappingbitcoin/mappingbitcoin](https://github.com/mappingbitcoin/mappingbitcoin)
 - **Email**: [satoshi@mappingbitcoin.com](mailto:satoshi@mappingbitcoin.com)
 
 We read everything. We respond to most things. We're excited to build this with you.

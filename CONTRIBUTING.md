@@ -54,7 +54,7 @@ git clone https://github.com/YOUR_USERNAME/mappingbitcoin.git
 cd mappingbitcoin
 
 # 3. Add upstream remote
-git remote add upstream https://github.com/ArcadeLabsInc/mappingbitcoin.git
+git remote add upstream https://github.com/mappingbitcoin/mappingbitcoin.git
 
 # 4. Install dependencies
 npm install
