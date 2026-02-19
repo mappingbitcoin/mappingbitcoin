@@ -58,17 +58,40 @@ const Footer = () => {
                             </Link>
                         </motion.div>
 
-                        {/* Resources Column */}
+                        {/* Explore Column */}
                         <div className="flex-[0_0_auto] min-w-37.5">
-                            <h3 className="text-base font-semibold mb-5 text-white">Resources</h3>
+                            <h3 className="text-base font-semibold mb-5 text-white">Explore</h3>
                             <ul className="list-none flex flex-col gap-3">
                                 {[
                                     { href: "/map", key: "menu.map" },
                                     { href: "/countries", key: "menu.countries" },
                                     { href: "/stats", label: "Stats" },
                                     { href: "/verified-places", label: "Verified Places" },
+                                ].map((item, index) => (
+                                    <motion.li
+                                        key={item.href}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                                    >
+                                        <Link href={item.href} className="text-white/60 no-underline text-[15px] transition-colors duration-200 hover:text-white/90">
+                                            {item.label || t(item.key!)}
+                                        </Link>
+                                    </motion.li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Company Column */}
+                        <div className="flex-[0_0_auto] min-w-37.5">
+                            <h3 className="text-base font-semibold mb-5 text-white">Company</h3>
+                            <ul className="list-none flex flex-col gap-3">
+                                {[
+                                    { href: "/blog", key: "menu.blog" },
+                                    { href: "/docs", key: "menu.docs" },
+                                    { href: "/contact", key: "menu.contact" },
                                     { href: "/verify-your-business", label: "Verify Your Business" },
-                                    { href: "/contact", key: "menu.contact" }
                                 ].map((item, index) => (
                                     <motion.li
                                         key={item.href}

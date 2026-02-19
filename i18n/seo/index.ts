@@ -10,6 +10,7 @@ import legalSeo, { type LegalPageKey } from "./legal";
 import notFoundSeo, { type NotFoundPageKey } from "./not-found";
 import verifyYourBusinessSeo, { type VerifyYourBusinessPageKey } from "./verify-your-business";
 import docsSeo, { type DocsPageKey } from "./docs";
+import blogSeo, { type BlogPageKey } from "./blog";
 
 // Re-export utilities
 export { generateCanonical } from "./utils";
@@ -24,7 +25,8 @@ export type PageKey =
     | LegalPageKey
     | NotFoundPageKey
     | VerifyYourBusinessPageKey
-    | DocsPageKey;
+    | DocsPageKey
+    | BlogPageKey;
 
 // Re-export types
 export type { Locale, LocalizedMetadata };
@@ -45,6 +47,7 @@ const seoContent: SEOMap<PageKey> = {
     ...notFoundSeo,
     ...verifyYourBusinessSeo,
     ...docsSeo,
+    ...blogSeo,
 };
 
 export default seoContent;

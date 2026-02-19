@@ -24,8 +24,6 @@ import Button from "@/components/ui/Button";
 const menuItems = [
     'map',
     'countries',
-    'docs',
-    'contact',
 ]
 
 const NavBar = () => {

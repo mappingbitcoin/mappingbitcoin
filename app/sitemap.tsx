@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 
 import { env } from "@/lib/Environment";
 import { allDocs } from "@/app/[locale]/docs/docsConfig";
+import { getAllBlogPosts } from "@/lib/blog/parser";
 
 export const revalidate = 3600; // revalidate sitemap every hour
 
@@ -13,6 +14,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${env.siteUrl}/docs/${doc.slug}`,
         lastModified: new Date().toISOString(),
         changeFrequency: "weekly" as const,
+        priority: 0.8,
+    }));
+
+    // Generate blog pages
+    const blogPosts = getAllBlogPosts('en');
+    const blogPages = blogPosts.map((post) => ({
+        url: `${env.siteUrl}/blog/${post.slug}`,
+        lastModified: new Date(post.date).toISOString(),
+        changeFrequency: "monthly" as const,
         priority: 0.8,
     }));
 
@@ -43,5 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         // Individual docs pages
         ...docsPages,
+        // Blog index
+        {
+            url: `${env.siteUrl}/blog`,
+            lastModified: new Date().toISOString(),
+            changeFrequency: "weekly",
+            priority: 0.9,
+        },
+        // Individual blog posts
+        ...blogPages,
     ] as MetadataRoute.Sitemap;
 }
