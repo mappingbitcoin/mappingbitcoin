@@ -80,8 +80,8 @@ export interface GeoFixPreviewData {
 export interface CacheStatus {
     caches: {
         venue: { loaded: boolean; count: number };
-        location: { loaded: boolean; countries: number };
-        tile: { loaded: boolean; features: number };
+        location: { loaded: boolean; countries: number; states: number; cities: number };
+        tile: { loaded: boolean; tilesAtZoom1: number };
     };
     actions: string[];
 }
@@ -90,8 +90,8 @@ export interface CacheRebuildResult {
     message: string;
     stats: {
         venue: { count: number; duration: number };
-        location: { countries: number; duration: number };
-        tile: { features: number; duration: number };
+        location: { countries: number; states: number; cities: number; duration: number };
+        tile: { tilesAtZoom1: number; duration: number };
         totalDuration: number;
     };
 }

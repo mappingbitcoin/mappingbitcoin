@@ -1208,8 +1208,8 @@ export default function ToolsTab() {
                                     <p className="text-xs text-green-400/70">Countries ({cacheRebuildResult.stats.location.duration}ms)</p>
                                 </div>
                                 <div className="bg-green-500/10 rounded-lg p-3 text-center">
-                                    <p className="text-lg font-bold text-green-400">{cacheRebuildResult.stats.tile.features.toLocaleString()}</p>
-                                    <p className="text-xs text-green-400/70">Tile Features ({cacheRebuildResult.stats.tile.duration}ms)</p>
+                                    <p className="text-lg font-bold text-green-400">{cacheRebuildResult.stats.tile.tilesAtZoom1.toLocaleString()}</p>
+                                    <p className="text-xs text-green-400/70">Tiles @ Zoom 1 ({cacheRebuildResult.stats.tile.duration}ms)</p>
                                 </div>
                             </div>
                         </div>
@@ -1242,9 +1242,9 @@ export default function ToolsTab() {
                                     </div>
                                     <div className={`rounded-lg p-3 text-center ${cacheStatus.caches.tile.loaded ? "bg-green-500/10" : "bg-red-500/10"}`}>
                                         <p className={`text-2xl font-bold ${cacheStatus.caches.tile.loaded ? "text-green-400" : "text-red-400"}`}>
-                                            {cacheStatus.caches.tile.features.toLocaleString()}
+                                            {cacheStatus.caches.tile.tilesAtZoom1.toLocaleString()}
                                         </p>
-                                        <p className="text-xs text-text-light">TileCache</p>
+                                        <p className="text-xs text-text-light">TileCache (Zoom 1)</p>
                                         <p className={`text-xs ${cacheStatus.caches.tile.loaded ? "text-green-400" : "text-red-400"}`}>
                                             {cacheStatus.caches.tile.loaded ? "Loaded" : "Empty"}
                                         </p>

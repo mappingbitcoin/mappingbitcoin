@@ -30,10 +30,13 @@ export async function GET(request: NextRequest) {
             return authResult.response;
         }
 
-        // Get current cache stats
-        const venueCache = getVenueCache();
-        const locationCache = getLocationCache();
-        const tileCache = getTileCache();
+        // Get current cache stats (all getters are async)
+        const venueCache = await getVenueCache();
+        const locationCache = await getLocationCache();
+        const tileCache = await getTileCache();
+
+        // TileCache is Record<zoomLevel, Tile[]> - count tiles at zoom 1 as representative
+        const tileFeaturesCount = tileCache[1]?.length ?? 0;
 
         return NextResponse.json({
             caches: {
@@ -42,18 +45,20 @@ export async function GET(request: NextRequest) {
                     count: venueCache.length,
                 },
                 location: {
-                    loaded: Object.keys(locationCache).length > 0,
-                    countries: Object.keys(locationCache).length,
+                    loaded: Object.keys(locationCache.countries).length > 0,
+                    countries: Object.keys(locationCache.countries).length,
+                    states: Object.keys(locationCache.states).length,
+                    cities: Object.keys(locationCache.cities).length,
                 },
                 tile: {
-                    loaded: tileCache.features.length > 0,
-                    features: tileCache.features.length,
+                    loaded: tileFeaturesCount > 0,
+                    tilesAtZoom1: tileFeaturesCount,
                 },
             },
             actions: [
                 "Clear and rebuild VenueCache from EnrichedVenues.json",
                 "Clear and rebuild LocationCache (country/state/city hierarchy)",
-                "Clear and rebuild TileCache (GeoJSON for map rendering)",
+                "Clear and rebuild TileCache (tiles for map rendering)",
             ],
         });
     } catch (error) {
@@ -82,24 +87,25 @@ export async function POST(request: NextRequest) {
         // Rebuild VenueCache
         const venueStart = Date.now();
         await refreshVenueCache();
-        const venueCache = getVenueCache();
+        const venueCache = await getVenueCache();
         const venueDuration = Date.now() - venueStart;
         logs.push(`✅ VenueCache rebuilt: ${venueCache.length} venues (${venueDuration}ms)`);
 
         // Rebuild LocationCache
         const locationStart = Date.now();
         await refreshLocationCache();
-        const locationCache = getLocationCache();
+        const locationCache = await getLocationCache();
         const locationDuration = Date.now() - locationStart;
-        const countryCount = Object.keys(locationCache).length;
+        const countryCount = Object.keys(locationCache.countries).length;
         logs.push(`✅ LocationCache rebuilt: ${countryCount} countries (${locationDuration}ms)`);
 
         // Rebuild TileCache
         const tileStart = Date.now();
         await refreshTileCache();
-        const tileCache = getTileCache();
+        const tileCache = await getTileCache();
         const tileDuration = Date.now() - tileStart;
-        logs.push(`✅ TileCache rebuilt: ${tileCache.features.length} features (${tileDuration}ms)`);
+        const tileFeaturesCount = tileCache[1]?.length ?? 0;
+        logs.push(`✅ TileCache rebuilt: ${tileFeaturesCount} tiles at zoom 1 (${tileDuration}ms)`);
 
         const totalDuration = Date.now() - startTime;
         logs.push(`Total rebuild time: ${totalDuration}ms`);
@@ -116,10 +122,12 @@ export async function POST(request: NextRequest) {
                 },
                 location: {
                     countries: countryCount,
+                    states: Object.keys(locationCache.states).length,
+                    cities: Object.keys(locationCache.cities).length,
                     duration: locationDuration,
                 },
                 tile: {
-                    features: tileCache.features.length,
+                    tilesAtZoom1: tileFeaturesCount,
                     duration: tileDuration,
                 },
                 totalDuration,
