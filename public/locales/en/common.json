@@ -3,6 +3,7 @@
     "map": "Map",
     "addPlace": "Add Place",
     "countries": "Countries",
+    "blog": "Blog",
     "docs": "Docs",
     "events": "Events",
     "learn": "Learn",
@@ -20,6 +21,8 @@
     "menu": {
       "map": "Map",
       "countries": "Countries",
+      "blog": "Blog",
+      "docs": "Docs",
       "learn": "Learn",
       "contact": "Contact",
       "privacy-policy": "Privacy Policy",

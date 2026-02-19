@@ -1,5 +1,6 @@
 export { useContainerSize } from "./useContainerSize";
 export { useDebouncedEffect } from "./useDebouncedEffect";
+export { useBlogSearch } from "./useBlogSearch";
 export { useVenueSearch } from "./useVenueSearch";
 export { useAddressAutocomplete } from "./useAddressAutocomplete";
 export { useOnClickOutside } from "./useOnClickOutside";
