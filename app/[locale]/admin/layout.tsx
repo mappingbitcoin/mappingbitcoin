@@ -86,17 +86,11 @@ const navSections: NavSection[] = [
                 label: "Users",
                 icon: <UsersIcon className="w-5 h-5" />,
             },
-            // TODO: Add these pages when implemented
-            // {
-            //     href: "/admin/reviews",
-            //     label: "Reviews",
-            //     icon: <StarOutlineIcon className="w-5 h-5" />,
-            // },
-            // {
-            //     href: "/admin/reports",
-            //     label: "Reports",
-            //     icon: <WarningIcon className="w-5 h-5" />,
-            // },
+            {
+                href: "/admin/reviews",
+                label: "Reviews",
+                icon: <StarOutlineIcon className="w-5 h-5" />,
+            },
         ],
     },
 ];
@@ -129,6 +123,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const handleCloseLoginModal = useCallback(() => setShowLoginModal(false), []);
 
     // Try automatic authentication for non-interactive methods (nsec)
+    // Dependencies intentionally limited to prevent auth loops on failure
     useEffect(() => {
         if (
             user &&
@@ -158,7 +153,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     setIsAuthenticating(false);
                 });
         }
-    }, [user, authToken, authLoading, isAuthenticating, requiresInteraction, authenticate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, authToken, authLoading, requiresInteraction]);
 
     // Reset auto-auth flag when user changes
     useEffect(() => {

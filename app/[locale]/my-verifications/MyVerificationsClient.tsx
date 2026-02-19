@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -52,10 +52,13 @@ export default function MyVerificationsClient() {
     const [removingClaim, setRemovingClaim] = useState<string | null>(null);
     const [claimToRemove, setClaimToRemove] = useState<Claim | null>(null);
     const [isAuthenticating, setIsAuthenticating] = useState(false);
+    const authAttemptedRef = useRef(false);
 
     // Auto-authenticate when user is logged in but doesn't have auth token
     useEffect(() => {
-        if (user && user.mode === "write" && !authToken && !isAuthenticating) {
+        // Only attempt once per user session
+        if (user && user.mode === "write" && !authToken && !isAuthenticating && !authAttemptedRef.current) {
+            authAttemptedRef.current = true;
             setIsAuthenticating(true);
             authenticate()
                 .catch((err) => {
@@ -64,7 +67,13 @@ export default function MyVerificationsClient() {
                 })
                 .finally(() => setIsAuthenticating(false));
         }
-    }, [user, authToken, authenticate, isAuthenticating]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, authToken]);
+
+    // Reset auth attempt flag when user changes
+    useEffect(() => {
+        authAttemptedRef.current = false;
+    }, [user?.pubkey]);
 
     const fetchClaims = useCallback(async () => {
         if (!authToken) return;
