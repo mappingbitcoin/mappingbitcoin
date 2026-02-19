@@ -8,7 +8,7 @@ const mapSeo: SEOModule<MapPageKey> = {
     map: {
         en: {
             title: "Interactive Bitcoin Map | Mapping Bitcoin",
-            description: "Browse thousands of Bitcoin-accepting venues worldwide. Cafés, shops, ATMs, and more. Search by location, filter by category, find where to spend Bitcoin.",
+            description: "Find Bitcoin-accepting places worldwide. Cafés, restaurants, shops, ATMs, and more. Search by location, filter by category, discover where to spend Bitcoin.",
             keywords: [
                 "bitcoin map",
                 "interactive bitcoin map",
@@ -17,11 +17,11 @@ const mapSeo: SEOModule<MapPageKey> = {
                 "bitcoin ATMs",
                 "spend bitcoin",
                 "bitcoin near me",
-                "bitcoin venues map"
+                "lightning network map"
             ],
             openGraph: {
                 title: "Interactive Bitcoin Map | Mapping Bitcoin",
-                description: "Browse thousands of Bitcoin-accepting venues worldwide. Cafés, shops, ATMs, and more. Find where to spend Bitcoin.",
+                description: "Find Bitcoin-accepting places worldwide. Cafés, restaurants, shops, ATMs, and more. Discover where to spend Bitcoin.",
                 url: generateCanonical('map', 'en'),
                 type: "website",
                 images: [
@@ -36,7 +36,7 @@ const mapSeo: SEOModule<MapPageKey> = {
             twitter: {
                 card: "summary_large_image",
                 title: "Interactive Bitcoin Map | Mapping Bitcoin",
-                description: "Browse thousands of Bitcoin-accepting venues worldwide. Find where to spend Bitcoin near you.",
+                description: "Find Bitcoin-accepting places worldwide. Cafés, restaurants, shops, ATMs, and more. Discover where to spend Bitcoin.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },

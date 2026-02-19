@@ -7,22 +7,22 @@ const homeSeo: SEOModule<HomePageKey> = {
     home: {
         en: {
             title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-            description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source, community-driven directory of Bitcoin-accepting places worldwide.",
+            description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
             keywords: [
                 "bitcoin map",
                 "bitcoin merchants",
                 "bitcoin directory",
                 "where to spend bitcoin",
                 "bitcoin locations",
-                "bitcoin venues",
+                "spend bitcoin",
                 "bitcoin economy",
                 "bitcoin adoption",
-                "bitcoin businesses",
-                "bitcoin worldwide"
+                "lightning network",
+                "bitcoin payments"
             ],
             openGraph: {
                 title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-                description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source, community-driven directory of Bitcoin-accepting places worldwide.",
+                description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
                 url: env.siteUrl,
                 type: "website",
                 images: [
@@ -37,7 +37,7 @@ const homeSeo: SEOModule<HomePageKey> = {
             twitter: {
                 card: "summary_large_image",
                 title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-                description: "Find where Bitcoin works. Explore 21,000+ venues across 150 countries. Open-source directory of Bitcoin-accepting places.",
+                description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },

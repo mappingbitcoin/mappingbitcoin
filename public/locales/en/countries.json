@@ -110,7 +110,7 @@
       },
       {
         "question": "Where can I find the code for this project?",
-        "answer": "The entire project is open source. We'll publish the repository soon. <a href=\"https://github.com/we-are-bitcoin\" target=\"_blank\" rel=\"noopener\">View the repository</a>."
+        "answer": "The entire project is open source. <a href=\"https://github.com/mappingbitcoin/mappingbitcoin\" target=\"_blank\" rel=\"noopener\">View the repository on GitHub</a>."
       }
     ]
   },

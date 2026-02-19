@@ -20,10 +20,10 @@ const organizationSchema = {
     "name": "Mapping Bitcoin",
     "url": "https://mappingbitcoin.com",
     "logo": "https://mappingbitcoin.com/assets/logo.png",
-    "description": "The largest open-source directory of Bitcoin-accepting merchants worldwide. Built on OpenStreetMap with Nostr-based verification.",
-    "foundingDate": "2024",
+    "description": "Open-source directory of Bitcoin-accepting merchants worldwide. Built on OpenStreetMap with places verification, reviews and ratings powered by Nostr and filtered by Web of Trust.",
+    "foundingDate": "2026",
     "sameAs": [
-        "https://github.com/AustinKelsworthy/mappingbitcoin"
+        "https://github.com/mappingbitcoin/mappingbitcoin"
     ],
     "contactPoint": {
         "@type": "ContactPage",
@@ -32,9 +32,9 @@ const organizationSchema = {
     "knowsAbout": [
         "Bitcoin",
         "Lightning Network",
-        "Cryptocurrency payments",
         "Bitcoin merchants",
-        "Nostr protocol"
+        "Nostr protocol",
+        "Nostr WoT"
     ]
 };
 
