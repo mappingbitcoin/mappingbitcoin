@@ -5,3 +5,4 @@ export { default as ReviewForm } from "./ReviewForm";
 export { default as ReplyForm } from "./ReplyForm";
 export { default as ReviewsSection } from "./ReviewsSection";
 export { default as TrustBadge, TrustIndicator, WeightedRating } from "./TrustBadge";
+export { default as WoTBadge } from "./WoTBadge";

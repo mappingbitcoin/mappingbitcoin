@@ -39,6 +39,10 @@ model User {
   bannedReason     String?   @map("banned_reason")
   bannedBy         String?   @map("banned_by") // Admin pubkey who banned
 
+  // Web of Trust cache
+  wotDistance    Int?       @map("wot_distance")
+  wotComputedAt  DateTime?  @map("wot_computed_at")
+
   // Relations
   claims        Claim[]
   reviews       Review[]
@@ -134,6 +138,11 @@ model Review {
   spamScore      Float?       @map("spam_score")      // 0-1, higher = more likely spam
   spamStatus     SpamStatus   @default(PENDING) @map("spam_status")
   spamReasons    String[]     @map("spam_reasons")    // Array of reasons if flagged
+
+  // Web of Trust
+  wotDistance    Int?       @map("wot_distance")    // Hops from bot pubkey
+  wotPathCount   Int?       @map("wot_path_count")  // Number of paths found
+  wotComputedAt  DateTime?  @map("wot_computed_at") // When computed
 
   // Relations
   venue   Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
