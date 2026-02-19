@@ -42,7 +42,7 @@ interface Claim {
 export default function MyVerificationsClient() {
     const t = useTranslations("login.myVerifications");
     const tMenu = useTranslations("menu");
-    const { authToken } = useNostrAuth();
+    const { authToken, user, authenticate } = useNostrAuth();
     const [claims, setClaims] = useState<Claim[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -51,6 +51,20 @@ export default function MyVerificationsClient() {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [removingClaim, setRemovingClaim] = useState<string | null>(null);
     const [claimToRemove, setClaimToRemove] = useState<Claim | null>(null);
+    const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+    // Auto-authenticate when user is logged in but doesn't have auth token
+    useEffect(() => {
+        if (user && user.mode === "write" && !authToken && !isAuthenticating) {
+            setIsAuthenticating(true);
+            authenticate()
+                .catch((err) => {
+                    console.error("Auto-authentication failed:", err);
+                    setError("Please sign the authentication request to view your verifications");
+                })
+                .finally(() => setIsAuthenticating(false));
+        }
+    }, [user, authToken, authenticate, isAuthenticating]);
 
     const fetchClaims = useCallback(async () => {
         if (!authToken) return;
@@ -215,7 +229,8 @@ export default function MyVerificationsClient() {
         return labels[method] || method;
     };
 
-    if (!authToken) {
+    // Not logged in at all
+    if (!user) {
         return (
             <div className="min-h-screen bg-primary pt-24 px-4">
                 <div className="max-w-2xl mx-auto">
@@ -232,6 +247,54 @@ export default function MyVerificationsClient() {
                             leftIcon={<LoginIcon className="w-5 h-5" />}
                         >
                             {tMenu("login")}
+                        </Button>
+                    </div>
+                    <LoginModal
+                        isOpen={showLoginModal}
+                        onClose={() => setShowLoginModal(false)}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    // Logged in but authenticating (getting auth token)
+    if (isAuthenticating || (!authToken && user.mode === "write")) {
+        return (
+            <div className="min-h-screen bg-primary pt-24 px-4">
+                <div className="max-w-2xl mx-auto">
+                    <div className="bg-surface rounded-2xl border border-border-light p-8 text-center">
+                        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                        </div>
+                        <h1 className="text-xl font-bold text-white mb-2">Authenticating...</h1>
+                        <p className="text-text-light">
+                            Please approve the signature request in your extension.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Read-only mode (npub)
+    if (!authToken) {
+        return (
+            <div className="min-h-screen bg-primary pt-24 px-4">
+                <div className="max-w-2xl mx-auto">
+                    <div className="bg-surface rounded-2xl border border-border-light p-8 text-center">
+                        <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <WarningIcon className="w-8 h-8 text-amber-400" />
+                        </div>
+                        <h1 className="text-xl font-bold text-white mb-2">Write Access Required</h1>
+                        <p className="text-text-light mb-6">
+                            You are logged in with read-only access (npub). To view and manage verifications, please log in with your private key or extension.
+                        </p>
+                        <Button
+                            onClick={() => setShowLoginModal(true)}
+                            leftIcon={<LoginIcon className="w-5 h-5" />}
+                        >
+                            Switch Account
                         </Button>
                     </div>
                     <LoginModal
