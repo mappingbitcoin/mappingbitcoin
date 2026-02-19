@@ -228,10 +228,9 @@ export default function ProfileTab() {
                                 {form.picture ? (
                                     <Image
                                         src={form.picture}
-                                        alt="Profile"
+                                        alt="Bot profile picture preview"
                                         fill
                                         className="object-cover"
-                                        unoptimized
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-text-light">
@@ -287,10 +286,9 @@ export default function ProfileTab() {
                                 {form.banner ? (
                                     <Image
                                         src={form.banner}
-                                        alt="Banner"
+                                        alt="Bot banner preview"
                                         fill
                                         className="object-cover"
-                                        unoptimized
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-text-light">

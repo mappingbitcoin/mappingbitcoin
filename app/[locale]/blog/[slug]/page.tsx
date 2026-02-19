@@ -2,12 +2,26 @@ import BlogArticle from "../BlogArticle";
 import { Locale } from "@/i18n/types";
 import Script from "next/script";
 import { generateCanonical } from "@/i18n/seo";
-import { getBlogPost, getBlogPostMeta, getPostAvailableLocales } from "@/lib/blog/parser";
+import { getBlogPost, getBlogPostMeta, getPostAvailableLocales, getBlogSlugs } from "@/lib/blog/parser";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { env } from "@/lib/Environment";
+import { routing } from "@/i18n/routing";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: revalidate every hour
+
+export function generateStaticParams() {
+    const params: { locale: string; slug: string }[] = [];
+
+    for (const locale of routing.locales) {
+        const slugs = getBlogSlugs(locale);
+        for (const slug of slugs) {
+            params.push({ locale, slug });
+        }
+    }
+
+    return params;
+}
 
 interface BlogPostPageProps {
     params: Promise<{
@@ -28,12 +42,28 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
     const canonical = generateCanonical(`blog/${slug}`, locale);
     const ogImageUrl = `${env.siteUrl}${post.ogImage}`;
+    const availableLocales = getPostAvailableLocales(slug);
+
+    // Build hreflang alternate links for available translations
+    const languages: Record<string, string> = {};
+    for (const loc of availableLocales) {
+        const localeUrl = generateCanonical(`blog/${slug}`, loc);
+        languages[loc] = localeUrl;
+    }
+    // Add x-default pointing to the default locale version
+    if (availableLocales.includes(routing.defaultLocale)) {
+        languages['x-default'] = generateCanonical(`blog/${slug}`, routing.defaultLocale);
+    }
 
     return {
         title: `${post.title} | MappingBitcoin Blog`,
         description: post.description,
         keywords: post.tags,
         authors: [{ name: post.author }],
+        alternates: {
+            canonical,
+            languages,
+        },
         openGraph: {
             title: post.title,
             description: post.description,

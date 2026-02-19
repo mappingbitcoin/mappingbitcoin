@@ -25,7 +25,7 @@ export function PoweredBySection({ label }: PoweredBySectionProps) {
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                 >
-                    <OSMIcon className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    <OSMIcon className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                     <span className="text-sm font-medium">OpenStreetMap</span>
                 </motion.a>
                 <span className="text-gray-600">+</span>
@@ -37,7 +37,7 @@ export function PoweredBySection({ label }: PoweredBySectionProps) {
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                 >
-                    <NostrIcon className="w-7 h-7 opacity-60 group-hover:opacity-100 transition-all" />
+                    <NostrIcon className="w-7 h-7 opacity-60 group-hover:opacity-100 transition-all" aria-hidden="true" />
                     <span className="text-sm font-medium">Nostr</span>
                 </motion.a>
                 <span className="text-gray-600">+</span>
@@ -49,7 +49,7 @@ export function PoweredBySection({ label }: PoweredBySectionProps) {
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                 >
-                    <NostrWotIcon className="w-6 h-6 opacity-60 group-hover:opacity-100 transition-all rounded" />
+                    <NostrWotIcon className="w-6 h-6 opacity-60 group-hover:opacity-100 transition-all rounded" aria-hidden="true" />
                     <span className="text-sm font-medium">Nostr WoT</span>
                 </motion.a>
             </div>

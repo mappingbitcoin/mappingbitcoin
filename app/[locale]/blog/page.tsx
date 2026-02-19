@@ -7,9 +7,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllBlogPosts, formatBlogDate } from "@/lib/blog/parser";
 import { env } from "@/lib/Environment";
+import { routing } from "@/i18n/routing";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: revalidate every hour
 export const generateMetadata = buildGeneratePageMetadata("blog");
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
 
 interface BlogPageProps extends Localized {
     searchParams: Promise<{

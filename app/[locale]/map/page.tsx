@@ -3,7 +3,7 @@ import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
 import { generateCanonical } from "@/i18n/seo";
 import Script from "next/script";
-import MapWrapper from "./MapWrapper";
+import MapClient from "./MapClient";
 
 export const generateMetadata = buildGeneratePageMetadata('map');
 
@@ -63,7 +63,7 @@ const MapPage = async ({ params }: Localized) => {
                     })
                 }}
             />
-            <MapWrapper metadata={metadata} />
+            <MapClient metadata={metadata} />
         </>
     );
 };

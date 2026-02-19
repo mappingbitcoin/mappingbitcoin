@@ -1,5 +1,6 @@
 import React, { cache, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 
 import { Footer, NavBar, PageTransition, BodyLockManager } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
@@ -10,6 +11,32 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { startBitcoinVenueCron } from "@/utils/sync/CronJob";
 import { getMessages } from "next-intl/server";
+
+// Organization schema for all pages
+const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://mappingbitcoin.com/#organization",
+    "name": "Mapping Bitcoin",
+    "url": "https://mappingbitcoin.com",
+    "logo": "https://mappingbitcoin.com/assets/logo.png",
+    "description": "The largest open-source directory of Bitcoin-accepting merchants worldwide. Built on OpenStreetMap with Nostr-based verification.",
+    "foundingDate": "2024",
+    "sameAs": [
+        "https://github.com/AustinKelsworthy/mappingbitcoin"
+    ],
+    "contactPoint": {
+        "@type": "ContactPage",
+        "url": "https://mappingbitcoin.com/contact"
+    },
+    "knowsAbout": [
+        "Bitcoin",
+        "Lightning Network",
+        "Cryptocurrency payments",
+        "Bitcoin merchants",
+        "Nostr protocol"
+    ]
+};
 
 const bootOnce = cache(async () => {
     startBitcoinVenueCron();      // Schedule recurring task
@@ -38,6 +65,11 @@ export default async function LocaleLayout({
         return (
           <NextIntlClientProvider locale={locale} messages={allMessages}>
             <NostrAuthProvider>
+              <Script
+                id="organization-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+              />
               <Toaster
                 position="bottom-right"
                 toastOptions={{

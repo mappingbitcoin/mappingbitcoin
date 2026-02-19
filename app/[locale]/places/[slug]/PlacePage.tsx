@@ -148,7 +148,6 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                         alt={name || 'Venue photo'}
                                         fill
                                         className="object-cover"
-                                        unoptimized
                                         onError={() => setImageError(true)}
                                     />
                                 </div>

@@ -165,3 +165,28 @@ export const LOCALE_NAMES: Record<string, string> = {
     ko: '한국어',
     zh: '中文',
 };
+
+/**
+ * Get related posts based on shared tags
+ */
+export function getRelatedPosts(slug: string, locale: string = 'en', limit: number = 3): BlogPostMeta[] {
+    const currentPost = getBlogPostMeta(slug, locale);
+    if (!currentPost) return [];
+
+    const allPosts = getAllBlogPosts(locale);
+    const currentTags = new Set(currentPost.tags.map(t => t.toLowerCase()));
+
+    // Score posts by number of shared tags
+    const scoredPosts = allPosts
+        .filter(post => post.slug !== slug) // Exclude current post
+        .map(post => {
+            const sharedTags = post.tags.filter(tag =>
+                currentTags.has(tag.toLowerCase())
+            ).length;
+            return { post, score: sharedTags };
+        })
+        .filter(({ score }) => score > 0) // Only include posts with at least one shared tag
+        .sort((a, b) => b.score - a.score); // Sort by most shared tags
+
+    return scoredPosts.slice(0, limit).map(({ post }) => post);
+}

@@ -16,3 +16,5 @@ Allow: /
 Disallow: /admin
 Disallow: /*/admin
 Disallow: /api/
+
+Sitemap: https://mappingbitcoin.com/sitemap.xml

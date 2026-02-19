@@ -25,7 +25,7 @@ export default function UserInfo() {
         <div className="flex flex-col items-start gap-3 p-4 rounded-lg bg-surface [&_p]:m-0 [&_p]:font-medium [&_img]:w-10 [&_img]:h-10 [&_img]:rounded-full [&_img]:object-cover [&_img]:border-2 [&_img]:border-border [&_a]:text-accent [&_a]:no-underline [&_a]:font-bold [&_a:hover]:underline">
             <p>Welcome, {user.display_name}</p>
             {image && <Image src={image}
-                             alt="avatar"
+                             alt={`${user.display_name}'s profile picture`}
                              width={100}
                              height={100}
                              onError={() => setImage(fallbackImage)}

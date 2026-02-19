@@ -110,6 +110,7 @@ const TopographicPattern: React.FC<TopographicPatternProps> = ({
                 preserveAspectRatio="xMidYMid slice"
                 className="w-full h-full"
                 style={{ minWidth: "100%", minHeight: "100%" }}
+                aria-hidden="true"
             >
                 {lines.map((line, index) => (
                     <path

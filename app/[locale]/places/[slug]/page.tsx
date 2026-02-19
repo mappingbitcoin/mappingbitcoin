@@ -153,6 +153,17 @@ function buildLocalBusinessSchema(venue: EnrichedVenue, locale: Locale) {
         },
     };
 
+    // Add aggregate rating if available
+    if (venue.rating && venue.rating > 0) {
+        schema.aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": venue.rating,
+            "bestRating": 5,
+            "worstRating": 1,
+            ...(venue.reviewCount && { "reviewCount": venue.reviewCount }),
+        };
+    }
+
     // Add address if available
     if (address?.street || venue.formattedAddress) {
         schema.address = {

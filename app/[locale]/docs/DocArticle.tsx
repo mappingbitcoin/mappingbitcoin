@@ -109,7 +109,7 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
                     >
                         <span className="text-xs text-gray-500 mb-1">Previous</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
                             {prev.title}
@@ -125,7 +125,7 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
                         <span className="text-xs text-gray-500 mb-1">Next</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
                             {next.title}
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </span>

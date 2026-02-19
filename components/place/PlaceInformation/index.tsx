@@ -71,10 +71,9 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                         <Image
                             src={featuredPhoto}
                             className="h-full w-full object-cover"
-                            alt={name ?? 'Venue'}
+                            alt={name ? `Photo of ${name}` : 'Venue photo'}
                             fill
                             loading={'lazy'}
-                            unoptimized
                             onError={() => setImageError(true)}
                         />
                     </div>

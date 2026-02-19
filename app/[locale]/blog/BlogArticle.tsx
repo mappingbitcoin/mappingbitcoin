@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAdjacentPosts, formatBlogDate, LOCALE_NAMES, type BlogPost } from "@/lib/blog/parser";
+import { getAdjacentPosts, getRelatedPosts, formatBlogDate, LOCALE_NAMES, type BlogPost } from "@/lib/blog/parser";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 
@@ -13,6 +13,7 @@ interface BlogArticleProps {
 
 export default function BlogArticle({ slug, locale, post, availableLocales }: BlogArticleProps) {
     const { prev, next } = getAdjacentPosts(slug, locale);
+    const relatedPosts = getRelatedPosts(slug, locale, 3);
     const hasMultipleLanguages = availableLocales.length > 1;
 
     return (
@@ -51,6 +52,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
+                                aria-hidden="true"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -133,6 +135,40 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                 </ReactMarkdown>
             </article>
 
+            {/* Related Posts */}
+            {relatedPosts.length > 0 && (
+                <section className="mt-12 pt-8 border-t border-white/10">
+                    <h2 className="text-lg font-semibold text-white mb-6">Related Posts</h2>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        {relatedPosts.map((relatedPost) => (
+                            <Link
+                                key={relatedPost.slug}
+                                href={`/blog/${relatedPost.slug}`}
+                                className="group block bg-white/5 rounded-lg overflow-hidden hover:bg-white/[0.07] transition-colors"
+                            >
+                                <div className="relative w-full aspect-[16/9]">
+                                    <Image
+                                        src={relatedPost.previewImage}
+                                        alt={relatedPost.featuredImageAlt}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        sizes="(max-width: 640px) 100vw, 240px"
+                                    />
+                                </div>
+                                <div className="p-3">
+                                    <h3 className="text-sm font-medium text-white group-hover:text-accent transition-colors line-clamp-2">
+                                        {relatedPost.title}
+                                    </h3>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {formatBlogDate(relatedPost.date, locale)}
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
+
             {/* Navigation */}
             <nav className="flex justify-between items-center mt-12 pt-8 border-t border-white/10">
                 {prev ? (
@@ -142,7 +178,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                     >
                         <span className="text-xs text-gray-500 mb-1">Previous</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
                             {prev.title}
@@ -158,7 +194,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                         <span className="text-xs text-gray-500 mb-1">Next</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
                             {next.title}
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </span>

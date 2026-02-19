@@ -282,7 +282,7 @@ export default function VerifiedPlacesClient() {
                                             {place.verifier.picture ? (
                                                 <Image
                                                     src={place.verifier.picture}
-                                                    alt=""
+                                                    alt={`${place.verifier.displayName || 'Verifier'}'s profile picture`}
                                                     width={32}
                                                     height={32}
                                                     className="rounded-full"
