@@ -26,6 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             weightedAverageRating: result.weightedAverageRating,
             simpleAverageRating: result.simpleAverageRating,
             totalReviews: result.totalReviews,
+            ownerPubkey: result.ownerPubkey,
         });
     } catch (error) {
         console.error("Error fetching reviews:", error);

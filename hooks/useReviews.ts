@@ -17,6 +17,8 @@ interface UseReviewsReturn {
     weightedAverageRating: number | null;
     simpleAverageRating: number | null;
     totalReviews: number;
+    /** Verified owner pubkey - only they can reply to reviews */
+    ownerPubkey: string | null;
     isLoading: boolean;
     error: string | null;
     submitReview: (rating: number, content?: string, imageUrls?: string[]) => Promise<boolean>;
@@ -34,6 +36,7 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
     const [weightedAverageRating, setWeightedAverageRating] = useState<number | null>(null);
     const [simpleAverageRating, setSimpleAverageRating] = useState<number | null>(null);
     const [totalReviews, setTotalReviews] = useState(0);
+    const [ownerPubkey, setOwnerPubkey] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
@@ -55,6 +58,7 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
             setWeightedAverageRating(data.weightedAverageRating);
             setSimpleAverageRating(data.simpleAverageRating);
             setTotalReviews(data.totalReviews);
+            setOwnerPubkey(data.ownerPubkey);
         } catch (err) {
             console.error("[useReviews] Fetch error:", err);
             setError(err instanceof Error ? err.message : "Failed to load reviews");
@@ -238,12 +242,13 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
             }
 
             // Optimistic update: add reply to the review
+            // Note: Only verified owners can reply, so isOwnerReply is always true
             const newReply = {
                 id: result.signedEvent.id,
                 eventId: result.signedEvent.id,
                 authorPubkey: user.pubkey,
                 content: content.trim(),
-                isOwnerReply: false,
+                isOwnerReply: true,
                 eventCreatedAt: new Date(result.signedEvent.created_at * 1000),
                 author: {
                     pubkey: user.pubkey,
@@ -274,6 +279,7 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
         weightedAverageRating,
         simpleAverageRating,
         totalReviews,
+        ownerPubkey,
         isLoading,
         error,
         submitReview,

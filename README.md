@@ -123,15 +123,24 @@ scripts/
 
 ## Nostr Integration
 
-MappingBitcoin uses custom Nostr event kinds:
+MappingBitcoin uses custom Nostr event kinds in the addressable replaceable range (38xxx):
 
-| Kind | Purpose |
-|------|---------|
-| 38381 | Venue Reviews |
-| 38382 | Review Replies |
-| 38383 | Venue Claims |
+| Kind | Purpose | Description |
+|------|---------|-------------|
+| 38381 | Venue Reviews | Star ratings (1-5) with optional text and images |
+| 38382 | Review Replies | Responses from verified venue owners only |
+| 38383 | Venue Claims | Business ownership verification claims |
 
 Reviews are published to Nostr relays, making them portable and censorship-resistant. Your reviews belong to you, not the platform.
+
+### Web of Trust
+
+Reviews are weighted by Web of Trust (WoT) distance from the Mapping Bitcoin community seeders. This provides:
+- Sybil-resistant ratings that prioritize trusted community members
+- Visual indicators showing reviewer connection to the trust network
+- Filtering options to show reviews from close connections only
+
+See [WoT Integration](docs/WOT_INTEGRATION.md) for technical details.
 
 ## Scripts
 
@@ -180,15 +189,33 @@ MappingBitcoin is evolving from a merchant directory into a comprehensive map of
 
 ## Contributing
 
-We welcome contributions! Whether it's code, translations, or adding venues to the map.
+We welcome contributions! Whether it's code, translations, documentation, or adding venues to the map.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+- Setting up your development environment
+- Code style and conventions
+- Submitting pull requests
+- Adding venues to the map
+- Reporting issues
 
-### Adding Venues
+### Quick Start for Contributors
+
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/mappingbitcoin.git
+cd mappingbitcoin
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Make changes, then commit
+git commit -m 'Add amazing feature'
+
+# Push and create PR
+git push origin feature/amazing-feature
+```
+
+### Adding Venues (No Code Required)
 
 The easiest way to contribute is by adding Bitcoin-accepting places:
 1. Visit [mappingbitcoin.com/map](https://mappingbitcoin.com/map)
@@ -197,7 +224,10 @@ The easiest way to contribute is by adding Bitcoin-accepting places:
 
 ## Documentation
 
+- [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute to the project
 - [Reviews System](docs/REVIEWS_SYSTEM.md) — How reviews, ratings, and trust work
+- [Web of Trust](docs/WOT_INTEGRATION.md) — WoT scoring and integration
+- [Security Audit](docs/SECURITY_AUDIT.md) — Security considerations
 - [AGENTS.md](AGENTS.md) — Development guidelines and patterns
 - [.env.example](.env.example) — Environment configuration
 

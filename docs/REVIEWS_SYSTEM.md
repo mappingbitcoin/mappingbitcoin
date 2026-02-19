@@ -133,10 +133,12 @@ Reviews are published as addressable Nostr events.
 
 ### Review Reply Event (kind 38382)
 
+**Important:** Only verified venue owners can reply to reviews. Replies from non-owners are filtered out and will not be indexed.
+
 ```json
 {
   "kind": 38382,
-  "pubkey": "<replier_pubkey_hex>",
+  "pubkey": "<verified_owner_pubkey_hex>",
   "created_at": 1700000000,
   "tags": [
     ["e", "<parent_review_event_id>"],
@@ -156,6 +158,12 @@ Reviews are published as addressable Nostr events.
 | `e` | Yes | Parent review event ID |
 | `p` | Yes | Parent review author pubkey |
 | `d` | No | OSM ID for context |
+
+**Reply Restrictions:**
+- Only the verified owner of the venue can reply to reviews
+- The owner must have completed verification (email or domain)
+- Replies from non-owners are rejected during indexing
+- The UI only shows the reply button to verified owners
 
 ---
 
@@ -204,6 +212,8 @@ enum SpamStatus {
 
 ### ReviewReply Model
 
+**Note:** Only verified venue owners can create replies. The `isOwnerReply` field is always `true` since non-owner replies are rejected.
+
 ```prisma
 model ReviewReply {
     id              String   @id @default(cuid())
@@ -211,9 +221,9 @@ model ReviewReply {
     review          Review   @relation(fields: [reviewId], references: [id])
     reviewId        String   @map("review_id")
     author          User?    @relation(fields: [authorPubkey], references: [pubkey])
-    authorPubkey    String   @map("author_pubkey")
+    authorPubkey    String   @map("author_pubkey")  // Must be verified owner
     content         String
-    isOwnerReply    Boolean  @default(false) @map("is_owner_reply")
+    isOwnerReply    Boolean  @default(true) @map("is_owner_reply")  // Always true
     eventCreatedAt  DateTime @map("event_created_at")
     indexedAt       DateTime @default(now()) @map("indexed_at")
 }
@@ -892,6 +902,88 @@ HETZNER_STORAGE_SECRET_KEY=...
 
 # Nostr Relays (configured in code)
 # See lib/nostr/config.ts
+```
+
+---
+
+## Reply System (Owner-Only)
+
+Review replies are restricted to verified venue owners only. This prevents spam and ensures that business responses come from legitimate representatives.
+
+### How It Works
+
+1. **Verification Check**
+   - When fetching reviews, the system checks for verified claims on the venue
+   - The verified owner's pubkey is returned with the reviews data
+   - Only replies from the verified owner are included in the response
+
+2. **UI Restrictions**
+   - The "Reply" button is only shown to the verified owner
+   - Non-owners cannot see or interact with the reply form
+   - The owner must be logged in with write access
+
+3. **Backend Validation**
+   - `indexReviewReply()` verifies the author is the venue owner
+   - Non-owner replies are rejected with an error
+   - All indexed replies have `isOwnerReply: true`
+
+### Reply Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      Reply Submission Flow                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. User views reviews for venue                                         │
+│         │                                                                │
+│         ▼                                                                │
+│  2. Check if user is verified owner                                      │
+│     GET /api/places/{slug}/reviews → ownerPubkey                         │
+│         │                                                                │
+│         ├─────────────────────────────────────────────────────────┐      │
+│         │ Not owner                                               │      │
+│         │ → Reply button hidden                                   │      │
+│         │ → Cannot interact with replies                          │      │
+│         └─────────────────────────────────────────────────────────┘      │
+│         │                                                                │
+│         │ Is owner                                                       │
+│         ▼                                                                │
+│  3. Show reply button, owner writes reply                                │
+│         │                                                                │
+│         ▼                                                                │
+│  4. Sign and publish kind 38382 event                                    │
+│         │                                                                │
+│         ▼                                                                │
+│  5. Index reply via API                                                  │
+│     POST /api/reviews/index                                              │
+│         │                                                                │
+│         ▼                                                                │
+│  6. Backend verifies owner via getVerificationStatus()                   │
+│         │                                                                │
+│         ├─────────────────────────────────────────────────────────┐      │
+│         │ Not verified owner                                      │      │
+│         │ → Reject with error                                     │      │
+│         │ → Reply not indexed                                     │      │
+│         └─────────────────────────────────────────────────────────┘      │
+│         │                                                                │
+│         │ Is verified owner                                              │
+│         ▼                                                                │
+│  7. Index reply with isOwnerReply=true                                   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### API Response with Owner Pubkey
+
+```json
+{
+  "osmId": "node/123456",
+  "reviews": [...],
+  "ownerPubkey": "abc123...",  // null if venue not verified
+  "weightedAverageRating": 4.5,
+  "simpleAverageRating": 4.2,
+  "totalReviews": 15
+}
 ```
 
 ---

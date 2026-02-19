@@ -9,14 +9,12 @@ import { useReviews } from "@/hooks/useReviews";
 interface ReviewsSectionProps {
     osmId: string;
     venueSlug: string;
-    ownerPubkey?: string;
     geohash?: string;
 }
 
 export default function ReviewsSection({
     osmId,
     venueSlug,
-    ownerPubkey,
     geohash,
 }: ReviewsSectionProps) {
     const {
@@ -24,6 +22,7 @@ export default function ReviewsSection({
         weightedAverageRating,
         simpleAverageRating,
         totalReviews,
+        ownerPubkey, // Verified owner from API - only they can reply
         isLoading,
         error,
         submitReview,

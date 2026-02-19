@@ -1,6 +1,7 @@
 import prisma from "../prisma";
 import { getTrustScores } from "../../trust/graphBuilder";
 import { checkReviewSpam, type SpamCheckResult } from "../../spam/reviewFilter";
+import { getVerificationStatus } from "./verification";
 
 export interface IndexReviewInput {
     eventId: string;
@@ -165,25 +166,33 @@ export interface IndexReviewReplyInput {
     reviewEventId: string;
     authorPubkey: string;
     content: string;
-    isOwnerReply?: boolean;
     eventCreatedAt: Date;
     authorProfile?: {
         name?: string | null;
         picture?: string | null;
         nip05?: string | null;
     };
+    // Note: isOwnerReply is always true since only verified owners can reply
 }
 
 export async function indexReviewReply(input: IndexReviewReplyInput) {
-    const { eventId, reviewEventId, authorPubkey, content, isOwnerReply, eventCreatedAt, authorProfile } = input;
+    const { eventId, reviewEventId, authorPubkey, content, eventCreatedAt, authorProfile } = input;
 
     return prisma.$transaction(async (tx) => {
         const review = await tx.review.findUnique({
             where: { eventId: reviewEventId },
+            include: { venue: true },
         });
 
         if (!review) {
             throw new Error(`Parent review not found: ${reviewEventId}`);
+        }
+
+        // Only allow replies from verified venue owners
+        const verificationStatus = await getVerificationStatus(review.venueId);
+        if (!verificationStatus.isVerified || verificationStatus.ownerPubkey?.toLowerCase() !== authorPubkey.toLowerCase()) {
+            console.log(`[Reviews] Rejected reply from non-owner ${authorPubkey.substring(0, 8)}... for venue ${review.venueId}`);
+            throw new Error("Only verified venue owners can reply to reviews");
         }
 
         await tx.user.upsert({
@@ -209,7 +218,7 @@ export async function indexReviewReply(input: IndexReviewReplyInput) {
             where: { eventId },
             update: {
                 content,
-                isOwnerReply: isOwnerReply ?? false,
+                isOwnerReply: true, // Always true since only owners can reply
                 eventCreatedAt,
                 indexedAt: new Date(),
             },
@@ -218,7 +227,7 @@ export async function indexReviewReply(input: IndexReviewReplyInput) {
                 reviewId: review.id,
                 authorPubkey,
                 content,
-                isOwnerReply: isOwnerReply ?? false,
+                isOwnerReply: true, // Always true since only owners can reply
                 eventCreatedAt,
             },
         });
@@ -268,16 +277,23 @@ export interface ReviewsWithTrustResult {
     weightedAverageRating: number | null;
     simpleAverageRating: number | null;
     totalReviews: number;
+    /** Verified owner pubkey (if venue is verified) - only they can reply to reviews */
+    ownerPubkey: string | null;
 }
 
 /**
  * Get reviews with trust scores for a venue
  * Returns reviews sorted by trust score (highest first) and calculates weighted average rating
+ * Only includes replies from the verified venue owner
  */
 export async function getReviewsWithTrustByOsmId(
     osmId: string,
     includeBlocked: boolean = false
 ): Promise<ReviewsWithTrustResult> {
+    // Get verified owner pubkey for this venue
+    const verificationStatus = await getVerificationStatus(osmId);
+    const ownerPubkey = verificationStatus.isVerified ? verificationStatus.ownerPubkey ?? null : null;
+
     const venue = await prisma.venue.findUnique({
         where: { id: osmId },
         include: {
@@ -288,6 +304,8 @@ export async function getReviewsWithTrustByOsmId(
                 include: {
                     author: true,
                     replies: {
+                        // Only include replies from the verified owner
+                        where: ownerPubkey ? { authorPubkey: ownerPubkey } : { id: "__never_match__" },
                         include: { author: true },
                         orderBy: { eventCreatedAt: "asc" },
                     },
@@ -303,6 +321,7 @@ export async function getReviewsWithTrustByOsmId(
             weightedAverageRating: null,
             simpleAverageRating: null,
             totalReviews: 0,
+            ownerPubkey,
         };
     }
 
@@ -378,6 +397,7 @@ export async function getReviewsWithTrustByOsmId(
         weightedAverageRating,
         simpleAverageRating,
         totalReviews: reviewsWithTrust.length,
+        ownerPubkey,
     };
 }
 
