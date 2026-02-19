@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import TrustBadge from "./TrustBadge";
+import WoTBadge from "./WoTBadge";
 import StarRating from "./StarRating";
 import { UserIcon, ChatIcon, ChevronDownIcon, CloseIcon, ChevronLeftIcon, ChevronRightIcon } from "@/assets/icons/ui";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
@@ -92,6 +93,9 @@ export default function ReviewCard({
                                 </span>
                             )}
                             <TrustBadge score={review.trustScore} size="sm" />
+                            {review.wotDistance !== null && (
+                                <WoTBadge distance={review.wotDistance} source="oracle" size="sm" />
+                            )}
                         </div>
                         {review.author.nip05 && (
                             <span className="text-xs text-text-light">{review.author.nip05}</span>

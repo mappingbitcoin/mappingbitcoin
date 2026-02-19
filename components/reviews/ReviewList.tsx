@@ -19,7 +19,8 @@ interface ReviewListProps {
     ownerPubkey?: string;
 }
 
-type SortOption = "trust" | "date";
+type SortOption = "trust" | "wot" | "date";
+type WoTFilter = "all" | "trusted" | "close";
 
 export default function ReviewList({
     reviews,
@@ -34,6 +35,10 @@ export default function ReviewList({
     ownerPubkey,
 }: ReviewListProps) {
     const [sortBy, setSortBy] = useState<SortOption>("trust");
+    const [wotFilter, setWotFilter] = useState<WoTFilter>("all");
+
+    // Check if any reviews have WoT data
+    const hasWoTData = reviews.some((r) => r.wotDistance !== null);
 
     if (isLoading) {
         return <ReviewListSkeleton />;
@@ -51,8 +56,24 @@ export default function ReviewList({
         return <EmptyState />;
     }
 
-    const sortedReviews = [...reviews].sort((a, b) => {
+    // Filter by WoT distance
+    const filteredReviews = reviews.filter((review) => {
+        if (wotFilter === "all") return true;
+        if (review.wotDistance === null) return false;
+        if (wotFilter === "trusted") return review.wotDistance <= 3; // Within 3 hops
+        if (wotFilter === "close") return review.wotDistance <= 2; // Within 2 hops
+        return true;
+    });
+
+    const sortedReviews = [...filteredReviews].sort((a, b) => {
         if (sortBy === "date") {
+            return new Date(b.eventCreatedAt).getTime() - new Date(a.eventCreatedAt).getTime();
+        }
+        if (sortBy === "wot") {
+            // Sort by WoT distance (closest first), null values last
+            const aWot = a.wotDistance ?? Infinity;
+            const bWot = b.wotDistance ?? Infinity;
+            if (aWot !== bWot) return aWot - bWot;
             return new Date(b.eventCreatedAt).getTime() - new Date(a.eventCreatedAt).getTime();
         }
         // Default: sort by trust score
@@ -72,32 +93,79 @@ export default function ReviewList({
                     totalReviews={totalReviews}
                 />
 
-                {/* Sort Selector */}
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-text-light">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                        className="bg-surface border border-border-light rounded-md px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
-                    >
-                        <option value="trust">Trust Score</option>
-                        <option value="date">Most Recent</option>
-                    </select>
+                {/* Sort and Filter Controls */}
+                <div className="flex items-center gap-4 flex-wrap">
+                    {/* WoT Filter - only show if we have WoT data */}
+                    {hasWoTData && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-text-light">Show:</span>
+                            <select
+                                value={wotFilter}
+                                onChange={(e) => setWotFilter(e.target.value as WoTFilter)}
+                                className="bg-surface border border-border-light rounded-md px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
+                            >
+                                <option value="all">All Reviews</option>
+                                <option value="trusted">Trusted (≤3 hops)</option>
+                                <option value="close">Close (≤2 hops)</option>
+                            </select>
+                        </div>
+                    )}
+
+                    {/* Sort Selector */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-text-light">Sort by:</span>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as SortOption)}
+                            className="bg-surface border border-border-light rounded-md px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
+                        >
+                            <option value="trust">Trust Score</option>
+                            {hasWoTData && <option value="wot">WoT Distance</option>}
+                            <option value="date">Most Recent</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
+            {/* Filter info */}
+            {wotFilter !== "all" && filteredReviews.length < reviews.length && (
+                <p className="text-sm text-text-light">
+                    Showing {filteredReviews.length} of {reviews.length} reviews
+                    <button
+                        type="button"
+                        onClick={() => setWotFilter("all")}
+                        className="ml-2 text-accent hover:text-accent-light"
+                    >
+                        Show all
+                    </button>
+                </p>
+            )}
+
             {/* Reviews List */}
             <div className="space-y-4">
-                {sortedReviews.map((review) => (
-                    <ReviewCard
-                        key={review.eventId}
-                        review={review}
-                        onReply={onReply}
-                        showReplyForm={activeReplyId === review.eventId}
-                        replyForm={activeReplyId === review.eventId ? replyForm : undefined}
-                        ownerPubkey={ownerPubkey}
-                    />
-                ))}
+                {sortedReviews.length === 0 && wotFilter !== "all" ? (
+                    <div className="text-center py-8 text-text-light">
+                        <p>No reviews match the current filter.</p>
+                        <button
+                            type="button"
+                            onClick={() => setWotFilter("all")}
+                            className="mt-2 text-accent hover:text-accent-light"
+                        >
+                            Show all reviews
+                        </button>
+                    </div>
+                ) : (
+                    sortedReviews.map((review) => (
+                        <ReviewCard
+                            key={review.eventId}
+                            review={review}
+                            onReply={onReply}
+                            showReplyForm={activeReplyId === review.eventId}
+                            replyForm={activeReplyId === review.eventId ? replyForm : undefined}
+                            ownerPubkey={ownerPubkey}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );

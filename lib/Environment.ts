@@ -121,6 +121,14 @@ export const serverEnv = {
         return process.env.MAPPING_BITCOIN_BOT_PRIVATE_KEY;
     },
 
+    /**
+     * Web of Trust Oracle URL
+     * Used for computing WoT distances for reviews
+     */
+    get wotOracleUrl(): string {
+        return process.env.WOT_ORACLE_URL || "https://wot-oracle.mappingbitcoin.com";
+    },
+
     // -------------------------------------------------------------------------
     // OpenStreetMap OAuth Configuration
     // -------------------------------------------------------------------------

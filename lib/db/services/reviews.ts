@@ -237,6 +237,10 @@ export interface ReviewWithTrust {
     // Image support (multiple images)
     imageUrls: string[];
     thumbnailUrls: string[];
+    // Web of Trust
+    wotDistance: number | null;
+    wotPathCount: number | null;
+    wotComputedAt: Date | null;
     author: {
         pubkey: string;
         name: string | null;
@@ -318,6 +322,9 @@ export async function getReviewsWithTrustByOsmId(
         trustScore: trustScores.get(review.authorPubkey.toLowerCase()) ?? 0.02,
         imageUrls: review.imageUrls,
         thumbnailUrls: review.thumbnailUrls,
+        wotDistance: review.wotDistance,
+        wotPathCount: review.wotPathCount,
+        wotComputedAt: review.wotComputedAt,
         author: {
             pubkey: review.author.pubkey,
             name: review.author.name,
@@ -485,4 +492,41 @@ export async function bulkBlockReviews(reviewIds: string[], reason?: string) {
     );
 
     return Promise.all(updates);
+}
+
+// ============================================
+// Web of Trust Functions
+// ============================================
+
+/**
+ * Update WoT distance for a review
+ */
+export async function updateReviewWoT(
+    eventId: string,
+    wotData: { hops: number | null; pathCount: number }
+): Promise<void> {
+    await prisma.review.update({
+        where: { eventId },
+        data: {
+            wotDistance: wotData.hops,
+            wotPathCount: wotData.pathCount,
+            wotComputedAt: new Date(),
+        },
+    });
+}
+
+/**
+ * Update WoT distance for a user (cached)
+ */
+export async function updateUserWoT(
+    pubkey: string,
+    wotDistance: number | null
+): Promise<void> {
+    await prisma.user.update({
+        where: { pubkey },
+        data: {
+            wotDistance,
+            wotComputedAt: new Date(),
+        },
+    });
 }

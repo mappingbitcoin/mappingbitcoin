@@ -18,8 +18,9 @@ import { randomUUID } from "crypto";
 import { NOSTR_KINDS } from "../lib/nostr/constants";
 import { NOSTR_RELAYS } from "../lib/nostr/config";
 import { parseReviewEvent, parseReplyEvent, type NostrEvent } from "../lib/nostr/reviewEvents";
-import { indexReview, indexReviewReply, type IndexReviewInput } from "../lib/db/services/reviews";
+import { indexReview, indexReviewReply, updateReviewWoT, type IndexReviewInput } from "../lib/db/services/reviews";
 import storage, { AssetType } from "../lib/storage";
+import { getWoTDistance } from "../lib/wot/oracleClient";
 
 // Configuration
 const RECONNECT_DELAY_MS = 5000;
@@ -183,6 +184,17 @@ async function processEvent(event: NostrEvent) {
                     console.log(`[Listener] Review ${event.id.slice(0, 8)}... was blocked (spam)`);
                 } else if (result.spamCheck?.action === "flag") {
                     console.log(`[Listener] Review ${event.id.slice(0, 8)}... was flagged for moderation`);
+                }
+
+                // Compute WoT distance for the reviewer
+                try {
+                    const wotResult = await getWoTDistance(review.authorPubkey);
+                    if (wotResult.hops !== null || wotResult.pathCount > 0) {
+                        await updateReviewWoT(review.eventId, wotResult);
+                        console.log(`[Listener] WoT distance for ${event.id.slice(0, 8)}...: ${wotResult.hops} hops`);
+                    }
+                } catch (wotError) {
+                    console.error(`[Listener] WoT computation failed:`, wotError);
                 }
             }
         } else if (event.kind === NOSTR_KINDS.REVIEW_REPLY) {
