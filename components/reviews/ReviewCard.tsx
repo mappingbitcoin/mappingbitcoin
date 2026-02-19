@@ -35,7 +35,9 @@ export default function ReviewCard({
         : review.content;
 
     const authorName = review.author.name || shortenPubkey(review.authorPubkey);
-    const canReply = user?.mode === "write";
+    // Only verified venue owners can reply to reviews
+    const isVerifiedOwner = ownerPubkey && user?.pubkey?.toLowerCase() === ownerPubkey.toLowerCase();
+    const canReply = user?.mode === "write" && isVerifiedOwner;
     const isOwner = ownerPubkey && review.authorPubkey.toLowerCase() === ownerPubkey.toLowerCase();
 
     // Use thumbnails for display, fall back to full images

@@ -20,6 +20,9 @@ model Venue {
   claims  Claim[]
   reviews Review[]
 
+  // Note: This unique constraint is redundant with @id but exists in the database
+  // and foreign keys depend on it. Keeping it to match database state.
+  @@unique([id], map: "venues_osm_id_key")
   @@map("venues")
 }
 
