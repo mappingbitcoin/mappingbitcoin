@@ -4,6 +4,7 @@ import * as secp256k1 from "@noble/secp256k1";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { hexToBytes } from "@noble/hashes/utils.js";
 import { verifyEvent } from "nostr-tools";
+import { checkRateLimit, getClientIP, rateLimiters } from "@/lib/rateLimit";
 
 // Configure secp256k1 with sha256 (required in v3)
 secp256k1.hashes.sha256 = sha256;
@@ -96,6 +97,24 @@ async function verifyEventSignature(
 }
 
 export async function POST(request: NextRequest) {
+    // Rate limiting
+    const clientIP = getClientIP(request);
+    const rateLimit = checkRateLimit(`auth:verify:${clientIP}`, rateLimiters.auth);
+
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: "Too many requests. Please try again later." },
+            {
+                status: 429,
+                headers: {
+                    "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
+                    "X-RateLimit-Limit": String(rateLimit.limit),
+                    "X-RateLimit-Remaining": String(rateLimit.remaining),
+                },
+            }
+        );
+    }
+
     try {
         const body: VerifyRequest = await request.json();
         const { pubkey, challenge, signature, signedEvent } = body;

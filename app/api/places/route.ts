@@ -191,8 +191,8 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({ ok: true, changesetId, nodeId });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        return NextResponse.json({ error: "Failed to upload to OSM: " + err.message }, { status: 500 });
+    } catch (err) {
+        console.error("[POST /api/places] Failed to upload to OSM:", err);
+        return NextResponse.json({ error: "Failed to upload venue to OpenStreetMap. Please try again." }, { status: 500 });
     }
 }

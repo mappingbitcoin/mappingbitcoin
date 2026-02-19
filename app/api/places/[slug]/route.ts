@@ -212,8 +212,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         await closeOsmChangeset(changesetId, token);
 
         return NextResponse.json({ ok: true, changesetId, nodeId: osmNodeId, slug: existingVenue.slug });
-    } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        return NextResponse.json({ error: "Failed to update venue on OSM: " + message }, { status: 500 });
+    } catch (err) {
+        console.error("[PUT /api/places/[slug]] Failed to update venue on OSM:", err);
+        return NextResponse.json({ error: "Failed to update venue on OpenStreetMap. Please try again." }, { status: 500 });
     }
 }
