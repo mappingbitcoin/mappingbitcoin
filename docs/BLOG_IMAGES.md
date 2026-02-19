@@ -2,29 +2,49 @@
 
 ## Overview
 
-Blog posts require images for social media previews (og:image, Twitter cards). SVG files must be converted to JPG because social platforms don't support SVG format.
+Blog posts use different image formats for different purposes:
+- **SVG** for website display (scalable, small file size)
+- **JPG** for social media previews (required by platforms)
 
-## Image Specifications
+## Image Types
 
-### Featured Image (og:image)
+### Featured Image (website display)
+- **Format**: SVG (preferred) or any web format
+- **Dimensions**: 1200 x 630 (aspect ratio)
+- **Use**: Displayed at the top of blog articles on the website
+
+### OG Image (social media)
 - **Dimensions**: 1200 x 630 pixels
-- **Format**: JPG
-- **Use**: Social media previews, main blog header
+- **Format**: JPG (required by social platforms)
+- **Use**: og:image, Twitter cards, link previews
 
-### Preview Image
+### Preview Image (blog listing)
 - **Dimensions**: 600 x 400 pixels
 - **Format**: JPG
-- **Use**: Blog listing cards, smaller previews
+- **Use**: Blog listing cards, thumbnails
 
 ## File Structure
 
 ```
 public/blog/images/
-├── {post-slug}-featured.svg    # Source file (keep for editing)
-├── {post-slug}-featured.jpg    # Converted for social previews
-├── {post-slug}-preview.svg     # Source file (keep for editing)
-└── {post-slug}-preview.jpg     # Converted for blog cards
+├── {post-slug}-featured.svg    # Website display (vector)
+├── {post-slug}-featured.jpg    # Social media preview (derived from SVG)
+├── {post-slug}-preview.svg     # Source for preview (optional)
+└── {post-slug}-preview.jpg     # Blog listing cards
 ```
+
+## Markdown Frontmatter
+
+```yaml
+---
+featuredImage: "/blog/images/{post-slug}-featured.svg"    # Displayed on website
+featuredImageAlt: "Description of the image"
+ogImage: "/blog/images/{post-slug}-featured.jpg"          # Social media preview
+previewImage: "/blog/images/{post-slug}-preview.jpg"      # Blog listing cards
+---
+```
+
+**Note**: If `ogImage` is not specified, it's automatically derived by replacing `.svg` with `.jpg` in the `featuredImage` path.
 
 ## Converting SVG to JPG
 
@@ -37,7 +57,7 @@ brew install imagemagick
 
 ### Conversion Commands
 
-**Featured image (1200x630):**
+**OG Image (1200x630):**
 ```bash
 magick -background "#0a0a0f" -density 150 \
   public/blog/images/{post-slug}-featured.svg \
@@ -66,31 +86,22 @@ magick -background "#0a0a0f" -density 150 \
 
 ### Quick Script
 
-Convert all SVGs for a post:
+Convert all images for a post:
 ```bash
 POST_SLUG="your-post-slug"
 BG_COLOR="#0a0a0f"
 
+# OG Image (for social media)
 magick -background "$BG_COLOR" -density 150 \
   "public/blog/images/${POST_SLUG}-featured.svg" \
   -flatten -resize 1200x630 -depth 8 -quality 90 \
   "public/blog/images/${POST_SLUG}-featured.jpg"
 
+# Preview Image (for blog listing)
 magick -background "$BG_COLOR" -density 150 \
   "public/blog/images/${POST_SLUG}-preview.svg" \
   -flatten -resize 600x400 -depth 8 -quality 90 \
   "public/blog/images/${POST_SLUG}-preview.jpg"
-```
-
-## Markdown Frontmatter
-
-Reference JPG files in your blog post frontmatter:
-```yaml
----
-featuredImage: "/blog/images/{post-slug}-featured.jpg"
-featuredImageAlt: "Description of the image"
-previewImage: "/blog/images/{post-slug}-preview.jpg"
----
 ```
 
 ## Troubleshooting
@@ -111,11 +122,15 @@ previewImage: "/blog/images/{post-slug}-preview.jpg"
 - Check `-depth 8` is set (12-bit can cause issues)
 - Verify color space with `magick identify -verbose file.jpg`
 
-## Why Not Use SVG Directly?
+## Why This Structure?
 
-Social media platforms (Twitter, Facebook, LinkedIn, etc.) require raster images for previews. They don't render SVG files. The `og:image` meta tag must point to a JPG or PNG file.
+**SVG for website:**
+- Scales perfectly on all screen sizes
+- Smaller file size
+- Crisp text and graphics
+- Easy to edit and maintain
 
-Keep the SVG source files for:
-- Easy editing (vector graphics scale perfectly)
-- Future modifications
-- Smaller file size in version control
+**JPG for social media:**
+- Required by Twitter, Facebook, LinkedIn, etc.
+- These platforms don't render SVG
+- The `og:image` meta tag must point to a raster image

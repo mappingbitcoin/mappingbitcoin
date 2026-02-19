@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     }
 
     const canonical = generateCanonical(`blog/${slug}`, locale);
-    const featuredImageUrl = `${env.siteUrl}${post.featuredImage}`;
+    const ogImageUrl = `${env.siteUrl}${post.ogImage}`;
 
     return {
         title: `${post.title} | MappingBitcoin Blog`,
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
             siteName: "MappingBitcoin",
             images: [
                 {
-                    url: featuredImageUrl,
+                    url: ogImageUrl,
                     width: 1200,
                     height: 630,
                     alt: post.featuredImageAlt,
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
             card: "summary_large_image",
             title: post.title,
             description: post.description,
-            images: [featuredImageUrl],
+            images: [ogImageUrl],
         },
     };
 }
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     }
 
     const canonical = generateCanonical(`blog/${slug}`, locale);
-    const featuredImageUrl = `${env.siteUrl}${post.featuredImage}`;
+    const ogImageUrl = `${env.siteUrl}${post.ogImage}`;
 
     // JSON-LD: BlogPosting schema
     const blogPostingSchema = {
@@ -98,7 +98,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         },
         "image": {
             "@type": "ImageObject",
-            "url": featuredImageUrl,
+            "url": ogImageUrl,
             "width": 1200,
             "height": 630,
         },

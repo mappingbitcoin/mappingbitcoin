@@ -12,7 +12,8 @@ export interface BlogPostMeta {
     tags: string[];
     featuredImage: string;
     featuredImageAlt: string;
-    previewImage: string;
+    ogImage: string;           // For social media previews (must be JPG/PNG)
+    previewImage: string;      // For blog listing cards
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -49,6 +50,10 @@ export function getBlogPost(slug: string, locale: string = 'en'): BlogPost | nul
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const { data, content } = matter(fileContent);
 
+    // For ogImage, prefer explicit ogImage, then derive JPG from featuredImage SVG, then use featuredImage as-is
+    const featuredImage = data.featuredImage || '/blog/images/default-featured.svg';
+    const ogImage = data.ogImage || featuredImage.replace(/\.svg$/, '.jpg');
+
     return {
         slug,
         title: data.title || slug,
@@ -57,9 +62,10 @@ export function getBlogPost(slug: string, locale: string = 'en'): BlogPost | nul
         author: data.author || 'MappingBitcoin Team',
         authorPubkey: data.authorPubkey,
         tags: data.tags || [],
-        featuredImage: data.featuredImage || '/blog/images/default-featured.jpg',
+        featuredImage,
         featuredImageAlt: data.featuredImageAlt || data.title || slug,
-        previewImage: data.previewImage || data.featuredImage || '/blog/images/default-preview.jpg',
+        ogImage,
+        previewImage: data.previewImage || ogImage,
         content,
     };
 }

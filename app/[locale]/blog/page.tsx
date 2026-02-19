@@ -75,7 +75,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
             "description": post.description,
             "datePublished": post.date,
             "url": `${env.siteUrl}/blog/${post.slug}`,
-            "image": `${env.siteUrl}${post.featuredImage}`,
+            "image": `${env.siteUrl}${post.ogImage}`,
             "author": {
                 "@type": "Organization",
                 "name": post.author,

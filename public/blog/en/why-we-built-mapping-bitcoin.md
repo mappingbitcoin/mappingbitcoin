@@ -7,8 +7,9 @@ tags:
   - announcement
   - vision
   - nostr
-featuredImage: "/blog/images/why-we-built-mapping-bitcoin-featured.jpg"
+featuredImage: "/blog/images/why-we-built-mapping-bitcoin-featured.svg"
 featuredImageAlt: "MappingBitcoin - Building better Bitcoin merchant discovery"
+ogImage: "/blog/images/why-we-built-mapping-bitcoin-featured.jpg"
 previewImage: "/blog/images/why-we-built-mapping-bitcoin-preview.jpg"
 ---
 

@@ -1,88 +1,158 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
   <defs>
+    <!-- Gradients -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0a0a0f"/>
       <stop offset="50%" style="stop-color:#111118"/>
       <stop offset="100%" style="stop-color:#0a0a0f"/>
     </linearGradient>
-    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="bitcoinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#f7931a"/>
       <stop offset="100%" style="stop-color:#ffb347"/>
     </linearGradient>
-    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#f7931a;stop-opacity:0.3"/>
-      <stop offset="100%" style="stop-color:#f7931a;stop-opacity:0"/>
+    <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f7931a;stop-opacity:0.8"/>
+      <stop offset="50%" style="stop-color:#f7931a;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#f7931a;stop-opacity:0.8"/>
     </linearGradient>
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#f7931a;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#f7931a;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="globeGradient" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#1a1a24"/>
+      <stop offset="100%" style="stop-color:#0a0a0f"/>
+    </radialGradient>
+
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Pin symbol -->
+    <symbol id="pin" viewBox="0 0 24 36">
+      <path d="M12 0C5.4 0 0 5.4 0 12C0 21 12 36 12 36S24 21 24 12C24 5.4 18.6 0 12 0Z" fill="url(#bitcoinGradient)"/>
+      <circle cx="12" cy="12" r="6" fill="#0a0a0f"/>
+      <text x="12" y="16" text-anchor="middle" fill="#f7931a" font-size="10" font-weight="bold" font-family="Arial">B</text>
+    </symbol>
   </defs>
 
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bgGradient)"/>
 
-  <!-- Grid pattern -->
-  <g opacity="0.05">
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"/>
+  <!-- Subtle grid pattern -->
+  <g opacity="0.03">
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
     </pattern>
     <rect width="1200" height="630" fill="url(#grid)"/>
   </g>
 
-  <!-- Decorative circles -->
-  <circle cx="150" cy="500" r="200" fill="url(#glowGradient)" opacity="0.5"/>
-  <circle cx="1050" cy="130" r="150" fill="url(#glowGradient)" opacity="0.3"/>
+  <!-- Globe/Map circle -->
+  <g transform="translate(600, 315)">
+    <!-- Outer glow -->
+    <circle cx="0" cy="0" r="280" fill="url(#glowGradient)" opacity="0.5"/>
 
-  <!-- Bitcoin symbol decorative -->
-  <g transform="translate(950, 400)" opacity="0.1">
-    <circle cx="0" cy="0" r="120" stroke="#f7931a" stroke-width="3" fill="none"/>
-    <text x="0" y="45" text-anchor="middle" fill="#f7931a" font-size="120" font-family="Arial, sans-serif" font-weight="bold">B</text>
+    <!-- Globe base -->
+    <circle cx="0" cy="0" r="220" fill="url(#globeGradient)" stroke="#f7931a" stroke-width="1" stroke-opacity="0.2"/>
+
+    <!-- Globe latitude lines -->
+    <ellipse cx="0" cy="0" rx="220" ry="80" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.15"/>
+    <ellipse cx="0" cy="-70" rx="180" ry="50" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.1"/>
+    <ellipse cx="0" cy="70" rx="180" ry="50" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.1"/>
+    <ellipse cx="0" cy="-130" rx="120" ry="30" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.08"/>
+    <ellipse cx="0" cy="130" rx="120" ry="30" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.08"/>
+
+    <!-- Globe longitude lines -->
+    <ellipse cx="0" cy="0" rx="80" ry="220" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.15"/>
+    <ellipse cx="0" cy="0" rx="150" ry="220" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.1" transform="rotate(30)"/>
+    <ellipse cx="0" cy="0" rx="150" ry="220" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.1" transform="rotate(-30)"/>
+    <ellipse cx="0" cy="0" rx="200" ry="220" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.08" transform="rotate(60)"/>
+    <ellipse cx="0" cy="0" rx="200" ry="220" fill="none" stroke="#f7931a" stroke-width="0.5" stroke-opacity="0.08" transform="rotate(-60)"/>
   </g>
 
-  <!-- Map pin decorative -->
-  <g transform="translate(100, 150)" opacity="0.15">
-    <path d="M50 0C22.4 0 0 22.4 0 50C0 87.5 50 140 50 140S100 87.5 100 50C100 22.4 77.6 0 50 0ZM50 67.5C38.4 67.5 29 58.1 29 46.5S38.4 25.5 50 25.5S71 34.9 71 46.5S61.6 67.5 50 67.5Z" fill="#f7931a"/>
+  <!-- Connection lines between pins -->
+  <g stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6">
+    <!-- Main connections -->
+    <path d="M 250,200 Q 400,150 480,280" stroke-dasharray="8,4"/>
+    <path d="M 480,280 Q 550,350 700,320" stroke-dasharray="8,4"/>
+    <path d="M 700,320 Q 800,280 920,350" stroke-dasharray="8,4"/>
+    <path d="M 920,350 Q 1000,400 950,480" stroke-dasharray="8,4"/>
+    <path d="M 480,280 Q 400,380 350,450" stroke-dasharray="8,4"/>
+    <path d="M 350,450 Q 450,500 580,420" stroke-dasharray="8,4"/>
+    <path d="M 580,420 Q 650,380 700,320" stroke-dasharray="8,4"/>
+    <path d="M 700,320 Q 600,250 480,280" stroke-dasharray="8,4"/>
+    <path d="M 250,200 Q 300,300 350,450" stroke-dasharray="8,4"/>
+    <path d="M 920,350 Q 850,300 700,320" stroke-dasharray="8,4"/>
   </g>
 
-  <!-- Main content -->
-  <g transform="translate(80, 200)">
-    <!-- Tag -->
-    <rect x="0" y="0" width="140" height="32" rx="16" fill="#f7931a" opacity="0.2"/>
-    <text x="70" y="22" text-anchor="middle" fill="#f7931a" font-size="14" font-family="system-ui, -apple-system, sans-serif" font-weight="600">ANNOUNCEMENT</text>
-
-    <!-- Title -->
-    <text y="90" fill="white" font-size="56" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">
-      <tspan x="0">Why We Built</tspan>
-    </text>
-    <text y="155" fill="white" font-size="56" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">
-      <tspan x="0">Mapping Bitcoin</tspan>
-    </text>
-
-    <!-- Subtitle -->
-    <text y="210" fill="#9ca3af" font-size="24" font-family="system-ui, -apple-system, sans-serif">
-      <tspan x="0">Infrastructure that respects contributors and merchants</tspan>
-    </text>
-
-    <!-- Divider -->
-    <rect x="0" y="250" width="120" height="4" rx="2" fill="url(#accentGradient)"/>
-
-    <!-- Features -->
-    <g transform="translate(0, 290)">
-      <circle cx="10" cy="10" r="6" fill="#f7931a"/>
-      <text x="30" y="15" fill="#d1d5db" font-size="18" font-family="system-ui, -apple-system, sans-serif">Built on Nostr</text>
-
-      <circle cx="200" cy="10" r="6" fill="#f7931a"/>
-      <text x="220" y="15" fill="#d1d5db" font-size="18" font-family="system-ui, -apple-system, sans-serif">Web of Trust</text>
-
-      <circle cx="390" cy="10" r="6" fill="#f7931a"/>
-      <text x="410" y="15" fill="#d1d5db" font-size="18" font-family="system-ui, -apple-system, sans-serif">Open Source</text>
-    </g>
+  <!-- Animated pulse circles at connection points -->
+  <g fill="none" stroke="#f7931a" stroke-width="1">
+    <circle cx="480" cy="280" r="15" opacity="0.3"/>
+    <circle cx="700" cy="320" r="12" opacity="0.25"/>
+    <circle cx="350" cy="450" r="10" opacity="0.2"/>
+    <circle cx="580" cy="420" r="8" opacity="0.2"/>
   </g>
 
-  <!-- Logo area -->
-  <g transform="translate(80, 550)">
-    <text fill="#f7931a" font-size="24" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">MAPPING</text>
-    <text x="130" fill="white" font-size="24" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">BITCOIN</text>
+  <!-- Location pins with Bitcoin symbols -->
+  <g filter="url(#glow)">
+    <!-- Pin 1 - Top left -->
+    <use href="#pin" x="232" y="165" width="36" height="54"/>
+
+    <!-- Pin 2 - Center top -->
+    <use href="#pin" x="462" y="235" width="36" height="54"/>
+
+    <!-- Pin 3 - Center -->
+    <use href="#pin" x="682" y="275" width="36" height="54"/>
+
+    <!-- Pin 4 - Right -->
+    <use href="#pin" x="902" y="305" width="36" height="54"/>
+
+    <!-- Pin 5 - Bottom left -->
+    <use href="#pin" x="332" y="405" width="36" height="54"/>
+
+    <!-- Pin 6 - Bottom center -->
+    <use href="#pin" x="562" y="375" width="36" height="54"/>
+
+    <!-- Pin 7 - Bottom right -->
+    <use href="#pin" x="932" y="435" width="36" height="54"/>
   </g>
 
-  <!-- URL -->
-  <text x="1120" y="570" text-anchor="end" fill="#6b7280" font-size="16" font-family="system-ui, -apple-system, sans-serif">mappingbitcoin.com</text>
+  <!-- Small floating Bitcoin symbols -->
+  <g fill="#f7931a" opacity="0.15" font-family="Arial, sans-serif" font-weight="bold">
+    <text x="180" y="380" font-size="40">₿</text>
+    <text x="820" y="180" font-size="30">₿</text>
+    <text x="1050" y="280" font-size="35">₿</text>
+    <text x="100" y="520" font-size="25">₿</text>
+    <text x="1000" y="550" font-size="28">₿</text>
+  </g>
+
+  <!-- Decorative dots (representing more locations) -->
+  <g fill="#f7931a">
+    <circle cx="620" cy="180" r="4" opacity="0.4"/>
+    <circle cx="780" cy="420" r="3" opacity="0.3"/>
+    <circle cx="420" cy="350" r="3" opacity="0.35"/>
+    <circle cx="850" cy="250" r="4" opacity="0.3"/>
+    <circle cx="300" cy="280" r="3" opacity="0.25"/>
+    <circle cx="750" cy="480" r="3" opacity="0.3"/>
+    <circle cx="500" cy="500" r="4" opacity="0.25"/>
+    <circle cx="650" cy="150" r="3" opacity="0.2"/>
+    <circle cx="900" cy="200" r="3" opacity="0.25"/>
+    <circle cx="200" y="450" r="3" opacity="0.2"/>
+  </g>
+
+  <!-- Logo in corner -->
+  <g transform="translate(50, 560)">
+    <text fill="#f7931a" font-size="22" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">MAPPING</text>
+    <text x="115" fill="white" font-size="22" font-family="system-ui, -apple-system, sans-serif" font-weight="bold">BITCOIN</text>
+  </g>
+
+  <!-- Subtle tagline -->
+  <text x="1150" y="580" text-anchor="end" fill="#4b5563" font-size="14" font-family="system-ui, -apple-system, sans-serif">
+    Discover Bitcoin merchants worldwide
+  </text>
 </svg>
