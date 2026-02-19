@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import StarRating from "./StarRating";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { LoginModal } from "@/components/auth";
-import { SpinnerIcon, WarningIcon, PhotoIcon, CloseIcon } from "@/assets/icons/ui";
+import { SpinnerIcon, WarningIcon, PhotoIcon, CloseIcon, EditIcon } from "@/assets/icons/ui";
 import { useBlossomUpload } from "@/hooks/useBlossomUpload";
+import { UserIcon } from "@/assets/icons/ui";
 
 const MAX_IMAGES = 5;
 
@@ -27,12 +28,14 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
     const [content, setContent] = useState("");
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Image upload state - multiple images
     const [images, setImages] = useState<UploadedImage[]>([]);
     const [uploadingCount, setUploadingCount] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { uploadFile, isUploading, error: uploadError, clearError: clearUploadError, progress } = useBlossomUpload();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const { uploadFile, isUploading, error: uploadError, clearError: clearUploadError } = useBlossomUpload();
 
     const isLoggedIn = !!user;
     const hasWriteAccess = user?.mode === "write";
@@ -71,6 +74,27 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
                 }
             });
             setImages([]);
+            setIsExpanded(false);
+        }
+    };
+
+    const handleExpand = () => {
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+        setIsExpanded(true);
+        // Focus textarea after expansion
+        setTimeout(() => {
+            textareaRef.current?.focus();
+        }, 100);
+    };
+
+    const handleCollapse = () => {
+        // Only collapse if no content has been entered
+        if (rating === 0 && content === "" && images.length === 0) {
+            setIsExpanded(false);
+            setLocalError(null);
         }
     };
 
@@ -161,10 +185,76 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
 
     const displayError = error || localError || uploadError;
     const isAnyUploading = isUploading || uploadingCount > 0;
+    const hasContent = rating > 0 || content.length > 0 || images.length > 0;
 
+    // Collapsed State - Click to expand
+    if (!isExpanded) {
+        return (
+            <div className="bg-surface-light rounded-lg border border-border-light p-4">
+                <button
+                    type="button"
+                    onClick={handleExpand}
+                    className="w-full flex items-center gap-3 text-left group"
+                >
+                    {/* User Avatar */}
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-surface border border-border-light flex items-center justify-center overflow-hidden">
+                        {user?.picture ? (
+                            <img
+                                src={user.picture}
+                                alt=""
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <UserIcon className="w-5 h-5 text-text-light" />
+                        )}
+                    </div>
+
+                    {/* Prompt */}
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 px-3 py-2.5 bg-surface border border-border-light rounded-lg group-hover:border-accent/50 transition-colors">
+                            <EditIcon className="w-4 h-4 text-text-light/50 flex-shrink-0" />
+                            <span className="text-text-light/70 text-sm truncate">
+                                {user ? "Share your experience..." : "Log in to write a review"}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Star rating preview */}
+                    <div className="flex-shrink-0 hidden sm:block">
+                        <StarRating value={0} readOnly size="sm" />
+                    </div>
+                </button>
+
+                {/* Login Modal */}
+                <LoginModal
+                    isOpen={showLoginModal}
+                    onClose={() => setShowLoginModal(false)}
+                    titleKey="title"
+                    descriptionKey="default"
+                    onSuccess={() => {
+                        setShowLoginModal(false);
+                        setIsExpanded(true);
+                    }}
+                />
+            </div>
+        );
+    }
+
+    // Expanded State - Full form
     return (
         <div className="bg-surface-light rounded-lg border border-border-light p-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Write a Review</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Write a Review</h3>
+                {!hasContent && (
+                    <button
+                        type="button"
+                        onClick={handleCollapse}
+                        className="text-sm text-text-light hover:text-white transition-colors"
+                    >
+                        Cancel
+                    </button>
+                )}
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Rating */}
@@ -185,6 +275,7 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
                         Your Review <span className="text-text-light/60">(optional)</span>
                     </label>
                     <textarea
+                        ref={textareaRef}
                         id="review-content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
@@ -308,22 +399,11 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
                             <SpinnerIcon className="w-4 h-4 animate-spin" />
                             Uploading {uploadingCount > 1 ? `${uploadingCount} images` : "image"}...
                         </>
-                    ) : !isLoggedIn ? (
-                        "Log in to Review"
                     ) : (
                         "Submit Review"
                     )}
                 </button>
             </form>
-
-            {/* Login Modal */}
-            <LoginModal
-                isOpen={showLoginModal}
-                onClose={() => setShowLoginModal(false)}
-                titleKey="title"
-                descriptionKey="default"
-                onSuccess={() => setShowLoginModal(false)}
-            />
         </div>
     );
 }
