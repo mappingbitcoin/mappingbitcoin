@@ -31,6 +31,11 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
             </div>
 
             <div className="mb-8 pb-8 border-b border-white/10">
+                {/* Title */}
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+                    {post.title}
+                </h1>
+
                 {/* Tags and Language Switcher Row */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                     <div className="flex flex-wrap gap-2">
