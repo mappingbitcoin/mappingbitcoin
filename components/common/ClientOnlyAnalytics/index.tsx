@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const AHREFS_KEY = "VaxFMy0znBPSWmIVe+HxGw";
 
 function hasAnalyticsConsent(): boolean {
     // Check Do Not Track browser setting
@@ -62,7 +64,16 @@ export default function ClientOnlyAnalytics() {
         };
     }, []);
 
-    if (!shouldLoad || !GA_TRACKING_ID) return null;
+    if (!shouldLoad) return null;
 
-    return <GoogleAnalytics gaId={GA_TRACKING_ID} />;
+    return (
+        <>
+            {GA_TRACKING_ID && <GoogleAnalytics gaId={GA_TRACKING_ID} />}
+            <Script
+                src="https://analytics.ahrefs.com/analytics.js"
+                data-key={AHREFS_KEY}
+                strategy="lazyOnload"
+            />
+        </>
+    );
 }
