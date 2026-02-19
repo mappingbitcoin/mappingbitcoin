@@ -11,9 +11,12 @@ This document describes the complete reviews system for MappingBitcoin, includin
 5. [Review Submission Flow](#review-submission-flow)
 6. [Image Upload System](#image-upload-system)
 7. [Trust-Weighted Ratings](#trust-weighted-ratings)
-8. [Review Listener](#review-listener)
-9. [API Reference](#api-reference)
-10. [Component Reference](#component-reference)
+8. [Web of Trust Integration](#web-of-trust-integration)
+9. [Review Listener](#review-listener)
+10. [API Reference](#api-reference)
+11. [Component Reference](#component-reference)
+
+> **See also:** [WOT_INTEGRATION.md](./WOT_INTEGRATION.md) for detailed Web of Trust documentation.
 
 ---
 
@@ -177,6 +180,11 @@ model Review {
     imageUrls       String[]     @default([]) @map("image_urls")
     thumbnailUrls   String[]     @default([]) @map("thumbnail_urls")
     thumbnailKeys   String[]     @default([]) @map("thumbnail_keys")
+
+    // Web of Trust (computed from WoT Oracle)
+    wotDistance     Int?         @map("wot_distance")     // Hops from bot pubkey
+    wotPathCount    Int?         @map("wot_path_count")   // Number of paths found
+    wotComputedAt   DateTime?    @map("wot_computed_at")  // When computed
 
     // Spam filtering
     spamScore       Float?       @map("spam_score")
@@ -438,15 +446,93 @@ Eve's suspicious 1-star rating has minimal impact due to low trust score.
 
 ### Review Sorting
 
-Reviews are sorted by trust score (highest first), then by date:
+Reviews can be sorted by trust score, WoT distance, or date:
 
 ```typescript
+// Default: Trust score (highest first)
 reviews.sort((a, b) => {
     if (b.trustScore !== a.trustScore) {
         return b.trustScore - a.trustScore;
     }
     return b.eventCreatedAt.getTime() - a.eventCreatedAt.getTime();
 });
+
+// WoT Distance (closest first)
+reviews.sort((a, b) => {
+    const aWot = a.wotDistance ?? Infinity;
+    const bWot = b.wotDistance ?? Infinity;
+    if (aWot !== bWot) return aWot - bWot;
+    return b.eventCreatedAt.getTime() - a.eventCreatedAt.getTime();
+});
+```
+
+---
+
+## Web of Trust Integration
+
+Reviews are enhanced with Web of Trust (WoT) data from the Nostr social graph. This provides an additional signal for review authenticity beyond the internal trust score.
+
+> **See [WOT_INTEGRATION.md](./WOT_INTEGRATION.md) for complete WoT documentation.**
+
+### WoT Distance Levels
+
+| Distance | Label | Badge Color | Description |
+|----------|-------|-------------|-------------|
+| 0 | You | Green | The reviewer is you |
+| 1 | Direct | Emerald | You follow this person |
+| 2 | 2nd | Yellow | Friend of a friend |
+| 3 | 3rd | Orange | 3 hops away |
+| 4+ | 4+ | Gray | Distant connection |
+| null | Unknown | Gray (dashed) | Not connected to trust network |
+
+### WoT Filtering
+
+Users can filter reviews by WoT distance:
+
+- **All Reviews** - Show all reviews regardless of WoT
+- **Trusted (≤3 hops)** - Show reviews from within 3 hops
+- **Close (≤2 hops)** - Show reviews from direct follows and friends-of-friends
+
+### WoT Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         WoT Data Flow                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. Review Indexed (via API or Listener)                                 │
+│         │                                                                │
+│         ▼                                                                │
+│  2. Query WoT Oracle                                                     │
+│     GET /distance?from={bot_pubkey}&to={author_pubkey}                   │
+│         │                                                                │
+│         ▼                                                                │
+│  3. Store WoT Data                                                       │
+│     - wotDistance (hops)                                                 │
+│     - wotPathCount (number of paths)                                     │
+│     - wotComputedAt (timestamp)                                          │
+│         │                                                                │
+│         ▼                                                                │
+│  4. Display with WoTBadge                                                │
+│     - Color-coded by distance                                            │
+│     - Tooltip with description                                           │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Backfilling WoT Data
+
+For existing reviews without WoT data:
+
+```bash
+# Compute WoT for reviews missing data
+npm run recompute:wot
+
+# Force recompute all reviews
+npm run recompute:wot -- --all
+
+# Recompute stale data (>24h old)
+npm run recompute:wot -- --stale
 ```
 
 ---
@@ -556,7 +642,7 @@ if (processedEvents.size > MAX_PROCESSED_CACHE) {
 
 ### GET /api/places/[slug]/reviews
 
-Retrieve all reviews for a venue with trust scores.
+Retrieve all reviews for a venue with trust scores and WoT data.
 
 **Parameters:**
 - `slug` - URL-formatted OSM ID (e.g., `node-123456`)
@@ -574,6 +660,8 @@ Retrieve all reviews for a venue with trust scores.
       "content": "Great place!",
       "eventCreatedAt": "2024-01-15T10:30:00Z",
       "trustScore": 0.8,
+      "wotDistance": 2,
+      "wotPathCount": 3,
       "imageUrls": ["https://blossom.primal.net/..."],
       "thumbnailUrls": ["https://storage.hetzner.com/..."],
       "author": {
@@ -588,6 +676,25 @@ Retrieve all reviews for a venue with trust scores.
   "weightedAverageRating": 4.5,
   "simpleAverageRating": 4.2,
   "totalReviews": 15
+}
+```
+
+### GET /api/wot/distance
+
+Get WoT distance from Mapping Bitcoin bot to a target pubkey.
+
+**Parameters:**
+- `pubkey` - 64-character hex pubkey
+
+**Response:**
+```json
+{
+  "pubkey": "def456...",
+  "distance": 2,
+  "pathCount": 3,
+  "mutual": false,
+  "fromPubkey": "abc123...",
+  "source": "oracle"
 }
 ```
 
@@ -728,6 +835,30 @@ Visual indicator of trust level.
 
 **Sizes:** `sm`, `md`, `lg`
 
+### WoTBadge
+
+Visual indicator of Web of Trust distance.
+
+```tsx
+<WoTBadge
+    distance={2}
+    source="oracle"
+    size="md"
+    showSource={false}
+/>
+```
+
+**Props:**
+- `distance` - Number of hops (null for unknown)
+- `source` - `"oracle"` or `"extension"` (where the WoT was computed)
+- `size` - `"sm"`, `"md"`, `"lg"`
+- `showSource` - Whether to show source indicator
+
+**Display:**
+- Green checkmark for distance 0-1
+- User icon for distance 2+
+- Question mark for unknown
+
 ### WeightedRating
 
 Aggregated rating display for venues.
@@ -793,11 +924,12 @@ components/reviews/
 ├── index.ts              # Exports
 ├── ReviewForm.tsx        # Review submission form
 ├── ReviewCard.tsx        # Single review display
-├── ReviewList.tsx        # List of reviews
+├── ReviewList.tsx        # List of reviews (with WoT filtering)
 ├── ReplyForm.tsx         # Reply submission form
 ├── ReviewsSection.tsx    # Main container
 ├── StarRating.tsx        # Star rating picker
-└── TrustBadge.tsx        # Trust level badges
+├── TrustBadge.tsx        # Trust level badges
+└── WoTBadge.tsx          # Web of Trust distance badge
 
 hooks/
 ├── useReviews.ts         # Review CRUD operations
@@ -809,15 +941,19 @@ lib/
 │   ├── constants.ts      # Event kinds, tag helpers
 │   ├── reviewEvents.ts   # Event parsers
 │   └── config.ts         # Relay configuration
+├── wot/
+│   └── oracleClient.ts   # WoT Oracle API client
 └── db/services/
     └── reviews.ts        # Database operations
 
 app/api/
 ├── places/[slug]/reviews/route.ts  # GET reviews
+├── wot/distance/route.ts           # GET WoT distance
 └── reviews/
     ├── index/route.ts              # POST index review
     └── process-image/route.ts      # POST create thumbnail
 
 scripts/
-└── reviewListener.ts     # Background relay listener
+├── reviewListener.ts     # Background relay listener
+└── recomputeWoT.ts       # WoT backfill script
 ```
