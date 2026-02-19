@@ -1,15 +1,11 @@
 import createIntlMiddleware from "next-intl/middleware";
-import type { NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
 
-const intlMiddleware = createIntlMiddleware({
-    locales: routing.locales,
-    defaultLocale: "en",
-    localePrefix: "as-needed",
-});
+const intlMiddleware = createIntlMiddleware(routing);
 
-export default function proxy(req: NextRequest) {
-    return intlMiddleware(req);
-}
+export default intlMiddleware;
 
-export const config = { matcher: ["/((?!api|_next|.*\\..*).*)"] };
+export const config = {
+    // Match all paths except API routes, static files, and Next.js internals
+    matcher: ["/((?!api|_next|.*\\..*).*)"]
+};
