@@ -1,6 +1,6 @@
 # Overview
 
-MappingBitcoin.com is a comprehensive platform for discovering Bitcoin-accepting businesses worldwide.
+MappingBitcoin is a comprehensive platform for discovering Bitcoin-accepting businesses worldwide.
 
 ## What We Do
 
@@ -14,6 +14,12 @@ We continuously sync with OpenStreetMap to capture new Bitcoin-accepting venues 
 ### Data Enrichment
 Raw OSM data is enhanced with geographic information, standardized categories, and URL-friendly identifiers.
 
+### Trust-Weighted Reviews
+Leave reviews as Nostr events. Reviews are weighted by Web of Trust (WoT) to prioritize trusted community members and resist Sybil attacks.
+
+### Web of Trust
+Reviews show WoT badges indicating the reviewer's connection to the trust network. Filter reviews by trust level to see feedback from close connections.
+
 ### Community Contributions
 Users can submit new venues directly through our platform, with changes reflected in OpenStreetMap.
 
@@ -21,13 +27,13 @@ Users can submit new venues directly through our platform, with changes reflecte
 Venue images are stored on Blossom servers using the Nostr protocol for decentralized, censorship-resistant hosting.
 
 ### Ownership Verification
-Business owners can verify their venues through email or domain verification to establish trust.
+Business owners can verify their venues through email or domain verification. Verified owners can respond to reviews.
 
 ## Technology Stack
 
 - **Next.js** - React framework for the frontend
 - **OpenStreetMap** - Source of truth for venue data
-- **Nostr** - Authentication and social announcements
+- **Nostr** - Authentication, reviews, and social features
 - **Blossom** - Decentralized image storage
 - **Hetzner Object Storage** - Data persistence
 
@@ -35,6 +41,8 @@ Business owners can verify their venues through email or domain verification to 
 
 - [OSM Sync](/docs/osm-sync) - Learn how we sync with OpenStreetMap
 - [Data Enrichment](/docs/data-enrichment) - Understand our enrichment pipeline
+- [Reviews](/docs/reviews) - How reviews and ratings work
+- [Web of Trust](/docs/web-of-trust) - Understanding trust scores
 - [Creating Venues](/docs/venue-creation) - Submit new Bitcoin venues
 - [Image Uploads](/docs/blossom-images) - Upload venue images
 - [Verification](/docs/verification) - Verify your business

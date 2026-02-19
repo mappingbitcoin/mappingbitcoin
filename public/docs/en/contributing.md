@@ -34,6 +34,7 @@ If you own or operate a Bitcoin-accepting business, verify your listing to build
 | Benefit | Description |
 |---------|-------------|
 | Trust Badge | Verified checkmark on your listing |
+| Reply to Reviews | Only verified owners can respond to reviews |
 | Priority Display | Higher visibility in search results |
 | Edit Control | Manage your business information |
 | Customer Trust | Show customers you're legitimate |
@@ -52,34 +53,20 @@ If you own or operate a Bitcoin-accepting business, verify your listing to build
 
 See the [Verification Guide](/docs/verification) for detailed instructions.
 
-## Comments
+## Reviews & Ratings
 
-Share your experience with Bitcoin-accepting venues.
-
-### Leaving Comments
-
-- Visit any venue page
-- Scroll to the comments section
-- Sign in with your Nostr account
-- Share your experience
-
-### Comment Guidelines
-
-- Be respectful and constructive
-- Share genuine experiences
-- Report outdated information
-- Help other Bitcoin users find great places
-
-## Reviews
-
-Provide detailed feedback about your experiences.
+Share your experiences at Bitcoin-accepting venues through our decentralized review system.
 
 ### Writing Reviews
 
-- Rate your overall experience
-- Describe the Bitcoin payment process
-- Note any issues or highlights
-- Help others know what to expect
+1. Visit any venue page
+2. Scroll to the Reviews section
+3. Sign in with your Nostr account
+4. Select a star rating (1-5)
+5. Optionally add text and images
+6. Submit your review
+
+Your review is published as a Nostr event, making it portable and censorship-resistant.
 
 ### What Makes a Good Review
 
@@ -88,16 +75,15 @@ Provide detailed feedback about your experiences.
 - Staff knowledge about Bitcoin
 - Any tips for other customers
 
-## Rating
+### Trust-Weighted Ratings
 
-> **Coming Soon**
+Reviews are weighted by Web of Trust (WoT). Trusted community members have more impact on aggregate ratings than new or unknown accounts. This helps resist spam and fake reviews.
 
-We're developing a rating system that will allow users to:
+See [Reviews](/docs/reviews) for full documentation.
 
-- Rate venues on multiple criteria
-- See aggregate community ratings
-- Filter venues by rating
-- Track rating history over time
+### For Business Owners
+
+Verified venue owners can respond to reviews on their venues. See [Verification](/docs/verification) to claim your business.
 
 ## Reporting Issues
 

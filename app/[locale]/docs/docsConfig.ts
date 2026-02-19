@@ -41,6 +41,21 @@ export const docsConfig: DocSection[] = [
         ],
     },
     {
+        title: "Reviews & Trust",
+        items: [
+            {
+                slug: "reviews",
+                title: "Reviews",
+                description: "Submitting and understanding reviews",
+            },
+            {
+                slug: "web-of-trust",
+                title: "Web of Trust",
+                description: "Trust scoring and WoT badges",
+            },
+        ],
+    },
+    {
         title: "Features",
         items: [
             {

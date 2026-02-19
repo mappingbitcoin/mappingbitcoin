@@ -7,6 +7,7 @@ The verification system allows venue owners to prove ownership through multiple 
 | Benefit | Description |
 |---------|-------------|
 | Trust | Establish credibility with customers |
+| Reply to Reviews | Only verified owners can respond to reviews |
 | Security | Prevent impersonation |
 | Visibility | Priority in search results |
 | Badge | Verification badge on profile |
@@ -82,6 +83,7 @@ Once verified:
 
 - Verification badge appears on venue
 - Owner's Nostr pubkey associated
+- Ability to reply to reviews on your venue
 - Claim recorded in database
 - Announced on Nostr network
 
@@ -115,3 +117,4 @@ EXPIRED   REVOKED (if email changes)
 
 - [Creating Venues](/docs/venue-creation) - Add your venue first
 - [Image Uploads](/docs/blossom-images) - Add venue images
+- [Reviews](/docs/reviews) - How reviews work (owners can reply)
