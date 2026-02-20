@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Locale } from "@/i18n/types";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getAdjacentDocs, getDocBySlug } from "./docsConfig";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";

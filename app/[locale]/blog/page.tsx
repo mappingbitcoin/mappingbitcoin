@@ -3,7 +3,7 @@ import { Localized } from "@/i18n/types";
 import Script from "next/script";
 import { generateCanonical } from "@/i18n/seo";
 import React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getAllBlogPosts, formatBlogDate } from "@/lib/blog/parser";
 import { env } from "@/lib/Environment";

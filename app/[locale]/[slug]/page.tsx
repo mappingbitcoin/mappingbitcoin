@@ -386,6 +386,13 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
         "itemListElement": breadcrumbItems
     };
 
+    // Generate SEO content for crawlers
+    const subcategoryLabel = categoryAndSubcategory
+        ? getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory)
+        : null;
+    const locationName = location ? deslugify(location) : countryLabel;
+    const venueCount = venues.length;
+
     return (
         <>
             <Script
@@ -398,6 +405,38 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
             />
+            {/* Server-rendered SEO content for crawlers */}
+            <div className="sr-only">
+                <h1>{translatedTitle}</h1>
+                <p>{translatedDescription}</p>
+                <h2>About Bitcoin in {locationName}</h2>
+                <p>
+                    {subcategoryLabel
+                        ? `Find ${venueCount} ${subcategoryLabel.toLowerCase()} businesses accepting Bitcoin in ${locationName}. `
+                        : `Discover ${venueCount} Bitcoin-accepting businesses in ${locationName}. `}
+                    Browse verified merchants, view locations on the map, and support businesses that accept cryptocurrency payments.
+                </p>
+                <h2>Bitcoin Payment Locations</h2>
+                <p>
+                    Each listing shows business details, address, and Bitcoin payment information.
+                    Our data comes from OpenStreetMap and community contributions, ensuring accurate and up-to-date merchant information.
+                </p>
+                {subcategoryLabel && (
+                    <>
+                        <h2>{subcategoryLabel} Accepting Bitcoin</h2>
+                        <p>
+                            Looking for {subcategoryLabel.toLowerCase()} that accept Bitcoin in {locationName}?
+                            Our directory includes verified businesses where you can spend Bitcoin.
+                            Filter by location, view on map, and find the perfect place to use your cryptocurrency.
+                        </p>
+                    </>
+                )}
+                <h2>Support Bitcoin Adoption</h2>
+                <p>
+                    By visiting Bitcoin-accepting businesses in {locationName}, you help drive cryptocurrency adoption.
+                    Every Bitcoin transaction supports merchants who believe in financial freedom and decentralized payments.
+                </p>
+            </div>
             <PlacesDirectoryWrapper country={countryLabel} places={venues} city={location} categoryAndSubcategory={categoryAndSubcategory} availableCities={availableCities} availableSubcategories={availableCategories} exactMatch={data.exactMatch} />
         </>
     );

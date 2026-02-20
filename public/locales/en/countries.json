@@ -25,10 +25,10 @@
     "countryAndCity": "Bitcoin Places in {city}, {country}"
   },
   "descriptions": {
-    "countryOnly": "Discover shops, cafes, and businesses in {country} that accept Bitcoin. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
-    "countryAndCategory": "Discover {category} in {country}. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
-    "countryCityCategory": "Discover {category} in {city}, {country}. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase.",
-    "countryAndCity": "Discover shops, cafes, and businesses in {city}, {country} that accept Bitcoin. Explore trusted Bitcoin-friendly places across the country and support crypto adoption with every purchase."
+    "countryOnly": "Find shops & businesses accepting Bitcoin in {country}. Browse verified Bitcoin-friendly places on our map.",
+    "countryAndCategory": "Find {category} accepting Bitcoin in {country}. Browse verified places on our Bitcoin map.",
+    "countryCityCategory": "Find {category} accepting Bitcoin in {city}, {country}. Browse places on our map.",
+    "countryAndCity": "Find shops & businesses accepting Bitcoin in {city}, {country}. Browse verified places on our map."
   },
   "keywords": {
     "countryOnly": "bitcoin map {country}, bitcoin in {country}, bitcoin shops in {country}, accept bitcoin in {country}, bitcoin-friendly {country}, spend bitcoin in {country}",

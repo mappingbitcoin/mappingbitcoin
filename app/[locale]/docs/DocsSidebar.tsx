@@ -1,6 +1,6 @@
 'use client';
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
 import { docsConfig } from "./docsConfig";
 import { useState } from "react";

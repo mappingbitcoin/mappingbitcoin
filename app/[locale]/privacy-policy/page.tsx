@@ -4,12 +4,20 @@ import {Localized} from "@/i18n/types";
 import Script from "next/script";
 import {generateCanonical} from "@/i18n/seo";
 import React from "react";
+import fs from "fs";
+import path from "path";
 
 export const generateMetadata = buildGeneratePageMetadata("privacy-policy");
 
 export default async function PrivacyPolicyPage({ params }: Localized) {
     const { metadata, locale } = await getPageSeo("privacy-policy")({ params });
     const canonical = generateCanonical("privacy-policy", locale);
+
+    // Read markdown content server-side for SEO
+    const mdPath = path.join(process.cwd(), "public", "privacy-policy", `${locale}.md`);
+    const content = fs.existsSync(mdPath)
+        ? fs.readFileSync(mdPath, "utf-8")
+        : fs.readFileSync(path.join(process.cwd(), "public", "privacy-policy", "en.md"), "utf-8");
 
     return (
         <>
@@ -55,7 +63,7 @@ export default async function PrivacyPolicyPage({ params }: Localized) {
                     })
                 }}
             />
-            <PrivacyPolicy locale={locale} />
+            <PrivacyPolicy content={content} />
         </>
     );
 }
