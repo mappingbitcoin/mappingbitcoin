@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getAdjacentPosts, getRelatedPosts, formatBlogDate, LOCALE_NAMES, type BlogPost } from "@/lib/blog/parser";
 import ReactMarkdown from "react-markdown";

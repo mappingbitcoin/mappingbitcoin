@@ -1,6 +1,6 @@
 'use client';
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useBlogSearch } from "@/hooks";

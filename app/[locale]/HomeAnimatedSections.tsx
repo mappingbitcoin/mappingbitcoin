@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import { ShieldCheckIcon, EditIcon, ChatIcon, LockIcon, ChevronRightIcon } from "@/assets/icons/ui";
 

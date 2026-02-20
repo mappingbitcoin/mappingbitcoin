@@ -16,7 +16,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "overview",
                 title: "Overview",
-                description: "Introduction to Mapping Bitcoin",
+                description: "Learn how Mapping Bitcoin works - an open-source directory of Bitcoin-accepting businesses built on OpenStreetMap and Nostr.",
             },
         ],
     },
@@ -26,17 +26,17 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "osm-sync",
                 title: "OSM Sync",
-                description: "OpenStreetMap synchronization",
+                description: "How Mapping Bitcoin syncs with OpenStreetMap to keep Bitcoin venue data accurate and up-to-date worldwide.",
             },
             {
                 slug: "data-enrichment",
                 title: "Data Enrichment",
-                description: "Geographic and category enrichment",
+                description: "How we enrich venue data with geographic coordinates, categories, and business details for better discovery.",
             },
             {
                 slug: "nostr-integration",
                 title: "Nostr Integration",
-                description: "Decentralized social features and announcements",
+                description: "How Mapping Bitcoin uses Nostr for decentralized identity, social features, and censorship-resistant announcements.",
             },
         ],
     },
@@ -46,12 +46,12 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "reviews",
                 title: "Reviews",
-                description: "Submitting and understanding reviews",
+                description: "How to submit reviews for Bitcoin venues and understand our decentralized review system powered by Nostr.",
             },
             {
                 slug: "web-of-trust",
                 title: "Web of Trust",
-                description: "Trust scoring and WoT badges",
+                description: "How trust scoring works on Mapping Bitcoin - WoT badges, reputation, and community-driven verification.",
             },
         ],
     },
@@ -61,17 +61,17 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "venue-creation",
                 title: "Creating Venues",
-                description: "Submit new Bitcoin venues",
+                description: "Step-by-step guide to adding new Bitcoin-accepting businesses to Mapping Bitcoin and OpenStreetMap.",
             },
             {
                 slug: "blossom-images",
                 title: "Image Uploads",
-                description: "Blossom protocol for images",
+                description: "How to upload venue images using the Blossom protocol for decentralized, censorship-resistant image hosting.",
             },
             {
                 slug: "verification",
                 title: "Verification",
-                description: "Verify business ownership",
+                description: "How business owners can verify their venue listing on Mapping Bitcoin using Nostr for proof of ownership.",
             },
         ],
     },
@@ -81,7 +81,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "contributing",
                 title: "Contributing",
-                description: "How to contribute to the platform",
+                description: "Join the Mapping Bitcoin community - contribute code, add venues, improve data, or become a local ambassador.",
             },
         ],
     },
@@ -91,7 +91,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "api-reference",
                 title: "API Reference",
-                description: "REST API documentation (coming soon)",
+                description: "REST API documentation for Mapping Bitcoin - access venue data, search locations, and integrate with your app.",
             },
         ],
     },

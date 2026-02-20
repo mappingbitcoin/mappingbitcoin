@@ -4,12 +4,20 @@ import {Localized} from "@/i18n/types";
 import Script from "next/script";
 import {generateCanonical} from "@/i18n/seo";
 import React from "react";
+import fs from "fs";
+import path from "path";
 
 export const generateMetadata = buildGeneratePageMetadata("terms-and-conditions");
 
 export default async function TermsAndConditionsPage({ params }: Localized) {
     const { metadata, locale } = await getPageSeo("terms-and-conditions")({ params });
     const canonical = generateCanonical("terms-and-conditions", locale);
+
+    // Read markdown content server-side for SEO
+    const mdPath = path.join(process.cwd(), "public", "terms-and-conditions", `${locale}.md`);
+    const content = fs.existsSync(mdPath)
+        ? fs.readFileSync(mdPath, "utf-8")
+        : fs.readFileSync(path.join(process.cwd(), "public", "terms-and-conditions", "en.md"), "utf-8");
 
     return (
         <>
@@ -55,7 +63,7 @@ export default async function TermsAndConditionsPage({ params }: Localized) {
                     })
                 }}
             />
-            <TermsAndConditions locale={locale} />
+            <TermsAndConditions content={content} />
         </>
     );
 }
