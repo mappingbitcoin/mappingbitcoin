@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { env } from "@/lib/Environment";
 import { PLACE_CATEGORIES, PLACE_SUBTYPE_MAP, PlaceCategory } from "@/constants/PlaceCategories";
+import { getCategoryCache } from "@/app/api/cache/CategoryCache";
 import CategoriesClient from "./CategoriesClient";
 
 const title = "Bitcoin Business Categories | Mapping Bitcoin";
@@ -49,9 +50,22 @@ function generateCategoryList() {
         }));
 }
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
     const categoryList = generateCategoryList();
     const totalSubcategories = categoryList.reduce((sum, cat) => sum + cat.count, 0);
+
+    // Get available subcategories from actual data
+    let availableSubcategories: Set<string> = new Set();
+    try {
+        const cache = await getCategoryCache();
+        availableSubcategories = new Set(Object.keys(cache.subcategories));
+    } catch {
+        // Data not available, show all subcategories
+        availableSubcategories = new Set(
+            (Object.keys(PLACE_SUBTYPE_MAP) as PlaceCategory[])
+                .flatMap((key) => PLACE_SUBTYPE_MAP[key])
+        );
+    }
 
     return (
         <>
@@ -93,7 +107,7 @@ export default function CategoriesPage() {
                         Bitcoin Business Categories
                     </h1>
                     <p className="text-text-light text-lg max-w-2xl mx-auto">
-                        Browse {categoryList.length} categories and over {totalSubcategories} types of businesses
+                        Browse {categoryList.length} categories and over {availableSubcategories.size} types of businesses
                         that accept Bitcoin payments worldwide.
                     </p>
                 </div>
@@ -101,7 +115,7 @@ export default function CategoriesPage() {
 
             {/* Client Component */}
             <section className="bg-primary min-h-[60vh]">
-                <CategoriesClient />
+                <CategoriesClient availableSubcategories={Array.from(availableSubcategories)} />
             </section>
         </>
     );
