@@ -801,6 +801,23 @@ export const SUBCATEGORY_SLUGS_BY_LOCALE: Record<Locale, Record<PlaceSubcategory
     'en': SUBCATEGORY_EN_SLUG_MAP
 }
 
+// Reverse lookup: from slug to subcategory
+const EN_SLUG_TO_SUBCATEGORY: Record<string, PlaceSubcategory> = Object.fromEntries(
+    Object.entries(SUBCATEGORY_EN_SLUG_MAP).map(([key, value]) => [value, key as PlaceSubcategory])
+);
+
+const ES_SLUG_TO_SUBCATEGORY: Record<string, PlaceSubcategory> = Object.fromEntries(
+    Object.entries(SUBCATEGORY_ES_SLUG_MAP).map(([key, value]) => [value, key as PlaceSubcategory])
+);
+
+/**
+ * Get the subcategory from a plural slug (e.g., "atms" -> "atm", "restaurants" -> "restaurant")
+ */
+export function getSubcategoryFromSlug(slug: string, locale: string = 'en'): PlaceSubcategory | null {
+    const map = locale === 'es' ? ES_SLUG_TO_SUBCATEGORY : EN_SLUG_TO_SUBCATEGORY;
+    return map[slug] || null;
+}
+
 export function getLocalizedCountryCategorySlug(countryName: string, subcategory: PlaceSubcategory, locale: string = 'en'): string {
     const slug = getSimplifiedCountrySlug(countryName)
     switch (locale) {
