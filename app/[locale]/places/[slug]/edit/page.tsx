@@ -26,10 +26,34 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
     if (!venue) return { title: "Place Not Found" };
 
     const { name } = parseTags(venue.tags);
+    const title = `Edit ${name} | Mapping Bitcoin`;
+    const description = `Suggest edits for ${name} on Mapping Bitcoin. Help keep Bitcoin merchant data accurate and up-to-date.`;
+    const image = `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`;
 
     return {
-        title: `Edit ${name} | Mapping Bitcoin`,
-        description: `Suggest edits for ${name} on Mapping Bitcoin`,
+        title,
+        description,
+        robots: { index: false, follow: true }, // Form page, don't index
+        openGraph: {
+            title,
+            description,
+            type: "website",
+            siteName: "Mapping Bitcoin",
+            images: [
+                {
+                    url: image,
+                    width: 1200,
+                    height: 630,
+                    alt: `Edit ${name} - Mapping Bitcoin`,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [image],
+        },
     };
 }
 

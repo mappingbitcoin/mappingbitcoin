@@ -65,6 +65,7 @@ const Footer = () => {
                                 {[
                                     { href: "/map", key: "menu.map" },
                                     { href: "/countries", key: "menu.countries" },
+                                    { href: "/categories", key: "menu.categories" },
                                     { href: "/stats", label: "Stats" },
                                     { href: "/verified-places", label: "Verified Places" },
                                 ].map((item, index) => (

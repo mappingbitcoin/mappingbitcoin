@@ -1,0 +1,13 @@
+{
+  "title": "Bitcoin Business Categories",
+  "subtitle": "Browse {count} categories and over {subcategoryCount} types of businesses that accept Bitcoin payments worldwide.",
+  "search": {
+    "placeholder": "Search categories...",
+    "noResults": "No categories found",
+    "noResultsDescription": "No categories match \"{query}\". Try a different search term.",
+    "clearSearch": "Clear search"
+  },
+  "showMore": "more",
+  "showLess": "Show less",
+  "seoParagraph": "Mapping Bitcoin organizes Bitcoin-accepting businesses into {count} main categories with over {subcategoryCount} specific business types. Whether you're looking for restaurants, hotels, retail stores, or professional services that accept Bitcoin, our comprehensive directory helps you find exactly what you need."
+}

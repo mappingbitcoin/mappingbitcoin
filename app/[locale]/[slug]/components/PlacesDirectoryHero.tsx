@@ -92,7 +92,7 @@ export default function PlacesDirectoryHero({
                         </nav>
 
                         <div className="flex items-center gap-3 flex-wrap mb-3">
-                            <span className="text-3xl md:text-4xl font-bold text-white" aria-hidden="true">{heading}</span>
+                            <h1 className="text-3xl md:text-4xl font-bold text-white">{heading}</h1>
                             <span className="inline-flex items-center gap-1.5 bg-white/10 py-1.5 px-3 rounded-full">
                                 <span className="text-lg font-bold text-white">{totalPlaces.toLocaleString()}</span>
                                 <span className="text-sm text-white/70">{t("countries.stats.totalPlaces")}</span>

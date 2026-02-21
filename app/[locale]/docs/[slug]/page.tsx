@@ -17,7 +17,7 @@ interface DocsSlugParams {
 }
 
 export async function generateMetadata({ params }: DocsSlugParams): Promise<Metadata> {
-    const { slug } = await params;
+    const { slug, locale } = await params;
     const doc = getDocBySlug(slug);
 
     if (!doc) {
@@ -26,16 +26,24 @@ export async function generateMetadata({ params }: DocsSlugParams): Promise<Meta
         };
     }
 
+    const canonical = generateCanonical(`docs/${slug}`, locale);
+    const image = `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`;
+
     return {
         title: `${doc.title} | Documentation | Mapping Bitcoin`,
         description: doc.description,
+        alternates: {
+            canonical,
+        },
         openGraph: {
             title: `${doc.title} | Documentation | Mapping Bitcoin`,
             description: doc.description,
+            url: canonical,
             type: "article",
+            siteName: "Mapping Bitcoin",
             images: [
                 {
-                    url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                    url: image,
                     width: 1200,
                     height: 630,
                     alt: doc.title,
@@ -46,6 +54,7 @@ export async function generateMetadata({ params }: DocsSlugParams): Promise<Meta
             card: "summary_large_image",
             title: `${doc.title} | Mapping Bitcoin`,
             description: doc.description,
+            images: [image],
         },
     };
 }

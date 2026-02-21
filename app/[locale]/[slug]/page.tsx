@@ -6,7 +6,7 @@ import {getPageSeo} from "@/utils/SEOUtils";
 import {Locale, Localized} from "@/i18n/types";
 import {deslugify} from "@/utils/StringUtils";
 import {getMessages} from "next-intl/server";
-import {getLocalizedFromMessages} from "@/app/[locale]/[slug]/MerchantUtils";
+import {getLocalizedFromMessages, generateSeoDescription, generateSeoTitle} from "@/app/[locale]/[slug]/MerchantUtils";
 import {Link} from '@/i18n/navigation';
 import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug} from "@/utils/SlugUtils";
 import {EnrichedVenue} from "@/models/Overpass";
@@ -132,8 +132,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!countryLabel) return notFound();
 
-    const translatedTitle = getLocalizedFromMessages({ t, locale, attribute: 'headings', country: countryLabel, city: deslugify(location), categoryAndSubcategory });
-    const translatedDescription = getLocalizedFromMessages({ t, locale, attribute: 'descriptions', country: countryLabel, city: deslugify(location), categoryAndSubcategory });
+    const seoTitle = generateSeoTitle({ country: countryLabel, city: deslugify(location), categoryAndSubcategory, locale });
+    const translatedDescription = generateSeoDescription({ country: countryLabel, city: deslugify(location), categoryAndSubcategory, locale });
     const translatedKeywords = getLocalizedFromMessages({ t, locale, attribute: 'keywords', country: countryLabel, city: deslugify(location), categoryAndSubcategory });
 
     const languages: Record<string, string> = {}
@@ -150,10 +150,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         canonical = `${env.siteUrl}/${alternates[locale]}`;
     }
 
-    const siteSuffix = " | Mapping Bitcoin";
-
     return {
-        title: `${translatedTitle}${siteSuffix}`,
+        title: seoTitle,
         description: translatedDescription,
         keywords: translatedKeywords,
         alternates: {
@@ -162,17 +160,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
         openGraph: {
             type: "website",
+            siteName: "Mapping Bitcoin",
             images: baseMetadata.openGraph?.images,
-            title: `${translatedTitle}${siteSuffix}`,
+            title: seoTitle,
             description: translatedDescription,
             url: canonical,
         },
         twitter: {
             card: "summary_large_image",
             images: baseMetadata.twitter?.images,
-            title: `${translatedTitle}${siteSuffix}`,
+            title: seoTitle,
             description: translatedDescription,
-            site: canonical
         }
     };
 }
@@ -407,7 +405,6 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             />
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
-                <h1>{translatedTitle}</h1>
                 <p>{translatedDescription}</p>
                 <h2>About Bitcoin in {locationName}</h2>
                 <p>

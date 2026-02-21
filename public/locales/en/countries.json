@@ -156,7 +156,8 @@
     "noCitiesFound": "No cities found"
   },
   "suggestions": {
-    "otherCategories": "Categories",
+    "otherCategories": "Other categories in {location}",
+    "categoriesIn": "Categories in {location}",
     "otherCities": "Other cities in {country}"
   }
 }

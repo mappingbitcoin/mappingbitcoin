@@ -18,3 +18,5 @@ Disallow: /*/admin
 Disallow: /api/
 
 Sitemap: https://mappingbitcoin.com/sitemap.xml
+Sitemap: https://mappingbitcoin.com/countries/sitemap.xml
+Sitemap: https://mappingbitcoin.com/categories/sitemap.xml
