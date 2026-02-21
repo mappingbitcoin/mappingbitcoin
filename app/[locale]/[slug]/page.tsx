@@ -22,7 +22,7 @@ import { distance } from 'fastest-levenshtein';
 import { PageSection } from "@/components/layout";
 import PlacesDirectoryWrapper from "@/app/[locale]/[slug]/PlacesDirectoryWrapper";
 
-function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, exactMatch: boolean } | null {
+function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, exactMatch: boolean, noVenues?: boolean } | null {
     const lowerSlug = slug.toLowerCase();
     const cache = getSlugsCache() ?? {};
 
@@ -51,7 +51,37 @@ function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, ex
             );
         });
 
-    if (candidates.length === 0) return null;
+    if (candidates.length === 0) {
+        // 4. No exact match - check if country exists in cache (any slug with this country)
+        // Find any entry with this country to get the proper country code
+        const countryEntry = Object.entries(cache).find(([cachedSlug, entry]) => {
+            const parsedCandidate = parseSlugPattern(cachedSlug);
+            return parsedCandidate?.country === parsed.country && entry.country;
+        });
+
+        if (countryEntry) {
+            // Valid country but no venues for this specific category/city combination
+            // Create a synthetic entry so we can show the empty state
+            const [, existingEntry] = countryEntry;
+            return {
+                venueInformation: {
+                    type: 'category',
+                    locale: parsed.lang,
+                    canonical: lowerSlug,
+                    country: existingEntry.country, // Use the proper country code from existing entry
+                    location: parsed.city,
+                    categoryAndSubcategory: parsed.category ? {
+                        category: 'other',
+                        subcategory: parsed.category as PlaceSubcategory
+                    } : undefined
+                },
+                exactMatch: false,
+                noVenues: true
+            };
+        }
+
+        return null;
+    }
 
     // Optional: sort candidates by similarity of city string
     const closest = candidates.sort((a, b) => {
@@ -71,16 +101,32 @@ function parseSlugPattern(slug: string): {
     country: string;
     lang: 'en' | 'es';
 } | null {
-    const enMatch = slug.match(/^bitcoin-(.+)-in-(.+)-([a-z]{2,})$/);
-    if (enMatch) {
-        const [, category, city, country] = enMatch;
+    // English: bitcoin-CATEGORY-in-CITY-COUNTRY (with city)
+    const enCityMatch = slug.match(/^bitcoin-(.+)-in-(.+)-([a-z]{2,})$/);
+    if (enCityMatch) {
+        const [, category, city, country] = enCityMatch;
         return { category, city, country, lang: 'en' };
     }
 
-    const esMatch = slug.match(/^(.+)-bitcoin-en-(.+)-([a-z]{2,})$/);
-    if (esMatch) {
-        const [, category, city, country] = esMatch;
+    // English: bitcoin-CATEGORY-in-COUNTRY (country only, no city)
+    const enCountryMatch = slug.match(/^bitcoin-(.+)-in-([a-z-]+)$/);
+    if (enCountryMatch) {
+        const [, category, country] = enCountryMatch;
+        return { category, city: undefined, country, lang: 'en' };
+    }
+
+    // Spanish: CATEGORY-bitcoin-en-CITY-COUNTRY (with city)
+    const esCityMatch = slug.match(/^(.+)-bitcoin-en-(.+)-([a-z]{2,})$/);
+    if (esCityMatch) {
+        const [, category, city, country] = esCityMatch;
         return { category, city, country, lang: 'es' };
+    }
+
+    // Spanish: CATEGORY-bitcoin-en-COUNTRY (country only)
+    const esCountryMatch = slug.match(/^(.+)-bitcoin-en-([a-z-]+)$/);
+    if (esCountryMatch) {
+        const [, category, country] = esCountryMatch;
+        return { category, city: undefined, country, lang: 'es' };
     }
 
     return null;
@@ -89,15 +135,72 @@ function parseSlugPattern(slug: string): {
 type CityWithCount = { name: string; count: number };
 
 async function fetchVenuesByRegion({ country, location, categoryAndSubcategory }: RegionQuery): Promise<{ venues: EnrichedVenue[], availableCities?: CityWithCount[], availableCategories?: PlaceSubcategory[] }> {
-    const params = new URLSearchParams();
-    params.append("country", country);
-    if (location) params.append("city", location ?? '');
-    if (categoryAndSubcategory) params.append("subcategory", categoryAndSubcategory.subcategory);
+    // Import the data layer directly instead of making HTTP request to avoid self-referential calls
+    const { getVenueCache } = await import("@/app/api/cache/VenueCache");
+    const slugify = (await import("slugify")).default;
+
+    const countryLower = country.toLowerCase();
+    const cityLower = location?.toLowerCase();
+    const subcategoryLower = categoryAndSubcategory?.subcategory?.toLowerCase();
 
     try {
-        const res = await fetch(`${env.siteUrl || "http://localhost:3000"}/api/places/region?${params.toString()}`);
-        if (!res.ok) return {venues: []};
-        return (await res.json()) as { venues: EnrichedVenue[], cities: string[], categories:[] };
+        const venues = await getVenueCache();
+
+        const filtered = venues.filter(v => {
+            const venueCountry = v?.country?.toLowerCase();
+            if (!venueCountry || venueCountry !== countryLower) return false;
+
+            if (cityLower) {
+                const cityMatch = v?.city ? slugify(v?.city).toLowerCase().includes(slugify(cityLower).toLowerCase()) : false;
+                const stateMatch = v?.state ? slugify(v?.state).toLowerCase().includes(slugify(cityLower).toLowerCase()) : false;
+                if (!cityMatch && !stateMatch) return false;
+            }
+
+            return !(subcategoryLower && v.subcategory?.toLowerCase() !== subcategoryLower);
+        });
+
+        // All venues in this country
+        const countryVenues = venues.filter(v =>
+            v.country?.toLowerCase() === countryLower
+        );
+
+        // Count venues per city/state
+        const cityCounts = new Map<string, number>();
+        countryVenues.forEach(v => {
+            const venueCity = v.city?.trim();
+            const venueState = v.state?.trim();
+
+            if (venueCity && venueCity.toLowerCase() !== cityLower) {
+                cityCounts.set(venueCity, (cityCounts.get(venueCity) || 0) + 1);
+            }
+
+            if (
+                venueState &&
+                venueState.toLowerCase() !== venueCity?.toLowerCase() &&
+                venueState.toLowerCase() !== cityLower
+            ) {
+                cityCounts.set(venueState, (cityCounts.get(venueState) || 0) + 1);
+            }
+        });
+
+        // Convert to array with counts and sort by count descending
+        const availableCities = Array.from(cityCounts.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count);
+
+        const availableCategories = Array.from(
+            new Set(
+                countryVenues
+                    .map(v => v.subcategory?.trim())
+                    .filter(c => c && c.toLowerCase() !== subcategoryLower)
+            )
+        ).sort((a, b) => a!.localeCompare(b!)) as PlaceSubcategory[];
+
+        return {
+            venues: filtered,
+            availableCities,
+            availableCategories,
+        };
     } catch (error) {
         console.error("Failed to fetch venues by region:", error);
         return {venues: []};
@@ -184,11 +287,35 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
     const data = parseVenueSlug(slug)
 
     if (!data) return (
-        <PageSection padding="default" background="white" className="pt-12">
-            <h1 className="text-[2rem] font-bold mb-6">
-                No results for the given parameters.
-            </h1>
-            <p>We couldn&#39;t find any venues that match your search.</p>
+        <PageSection padding="default" background="default" className="pt-12">
+            <div className="max-w-3xl mx-auto text-center">
+                <h1 className="text-[2rem] font-bold mb-4 text-white">
+                    {t.countries.emptyState.invalidSlug}
+                </h1>
+                <p className="text-text-light text-lg mb-8">
+                    {t.countries.emptyState.invalidSlugDescription}
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                    <Link
+                        href="/map"
+                        className="inline-flex items-center gap-2 bg-surface-light hover:bg-surface-light/80 border border-border-light text-white font-medium px-6 py-3 rounded-lg transition-colors no-underline"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                        {t.countries.actions.goToMap}
+                    </Link>
+                    <Link
+                        href="/places/create"
+                        className="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-medium px-6 py-3 rounded-lg transition-colors no-underline shadow-sm hover:shadow"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                        </svg>
+                        {t.countries.actions.addPlace}
+                    </Link>
+                </div>
+            </div>
         </PageSection>
     )
 
@@ -219,46 +346,93 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
         });
 
         const enrichedSubcategories = Array.from(seen.values());
+        const locationDisplay = location ? `${deslugify(location)}, ${countryLabel}` : countryLabel;
+        const categoryLabel = categoryAndSubcategory
+            ? getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory)
+            : null;
+        const hasSuggestions = (availableCities && availableCities.length > 0) || (enrichedSubcategories && enrichedSubcategories.length > 0);
 
         return (
-            <PageSection padding="default" background="white" className="pt-12">
-                <h1 className="text-[2rem] font-bold mb-6">
-                    No results for {categoryAndSubcategory ? `${getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory)} in ` : ""}{location ? `${deslugify(location)}, ` : ""}{countryLabel}
-                </h1>
-                <p>We couldn&#39;t find any venues that match your search.</p>
+            <PageSection padding="default" background="default" className="pt-12">
+                <div className="max-w-3xl mx-auto">
+                    <h1 className="text-[2rem] font-bold mb-4 text-white">
+                        {categoryLabel
+                            ? t.countries.emptyState.titleWithCategory.replace("{category}", categoryLabel.toLowerCase()).replace("{location}", locationDisplay)
+                            : t.countries.emptyState.title.replace("{location}", locationDisplay)
+                        }
+                    </h1>
+                    <p className="text-text-light text-lg mb-8">
+                        {categoryLabel
+                            ? t.countries.emptyState.descriptionWithCategory.replace("{category}", categoryLabel.toLowerCase())
+                            : t.countries.emptyState.description
+                        }
+                    </p>
 
-                {availableCities && availableCities.length > 0 && (
-                    <div className="my-8 [&_h3]:text-xl [&_h3]:mb-6">
-                        <h3>{t.merchants.suggestions.otherCities.replace("{country}", countryLabel)}</h3>
-                        <ul className="flex flex-wrap gap-2">
-                            {availableCities.map((cityData) => {
-                                const slugKey = getLocalizedCitySlug(countryLabel, cityData.name, locale)
-                                return (
-                                    slugKey && (
-                                        <li key={cityData.name} className="list-none mb-3 [&_a]:bg-gray-100 [&_a]:py-1.5 [&_a]:px-2.5 [&_a]:rounded [&_a]:no-underline [&_a]:text-[0.95rem] [&_a]:text-gray-800 [&_a:hover]:bg-gray-200">
-                                            <Link href={`/${slugKey}`}>{cityData.name} ({cityData.count})</Link>
-                                        </li>
-                                    )
-                                );
-                            })}
-                        </ul>
+                    {/* CTA Card */}
+                    <div className="bg-surface-light border border-border-light rounded-xl p-6 mb-10">
+                        <h2 className="text-xl font-semibold text-white mb-3">
+                            {t.countries.emptyState.ctaTitle}
+                        </h2>
+                        <Link
+                            href="/places/create"
+                            className="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-medium px-6 py-3 rounded-lg transition-colors no-underline shadow-sm hover:shadow"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                            </svg>
+                            {t.countries.emptyState.ctaButton}
+                        </Link>
                     </div>
-                )}
 
-                {enrichedSubcategories && enrichedSubcategories.length > 0 && (
-                    <div className="flex min-w-[150px] w-full max-w-[350px] flex-col justify-start items-start gap-2 max-md:min-w-full max-md:max-w-full">
-                        <h3>{t.merchants.suggestions.otherCategories.replace("{country}", country)}</h3>
-                        <ul className="flex flex-wrap gap-2">
-                            {enrichedSubcategories.map(({slugKey,category, subcategory}) =>
-                                (
-                                    <CategoryChip as={"li"} category={category ?? 'other'} key={slugKey}>
-                                        <Link href={`/${slugKey}`}>{subcategory ?? t.map["venue-tooltip"]?.defaultCategory}</Link>
-                                    </CategoryChip>
-                                )
+                    {hasSuggestions && (
+                        <div className="border-t border-border-light pt-8">
+                            <p className="text-text-light font-medium mb-6">{t.countries.emptyState.exploreSuggestions}</p>
+
+                            {availableCities && availableCities.length > 0 && (
+                                <div className="mb-8">
+                                    <h3 className="text-lg font-semibold mb-4 text-white">{t.merchants.suggestions.otherCities.replace("{country}", countryLabel)}</h3>
+                                    <ul className="flex flex-wrap gap-2">
+                                        {availableCities.map((cityData) => {
+                                            const slugKey = getLocalizedCitySlug(countryLabel, cityData.name, locale)
+                                            return (
+                                                slugKey && (
+                                                    <li key={cityData.name} className="list-none">
+                                                        <Link
+                                                            href={`/${slugKey}`}
+                                                            className="inline-block bg-surface-light hover:bg-surface-light/80 py-1.5 px-3 rounded-lg no-underline text-sm text-text-light hover:text-white transition-colors border border-border-light"
+                                                        >
+                                                            {cityData.name} ({cityData.count})
+                                                        </Link>
+                                                    </li>
+                                                )
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
                             )}
-                        </ul>
-                    </div>
-                )}
+
+                            {enrichedSubcategories && enrichedSubcategories.length > 0 && (
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4 text-white">
+                                        {location
+                                            ? t.merchants.suggestions.categoriesIn.replace("{location}", countryLabel)
+                                            : t.merchants.suggestions.otherCategories.replace("{location}", countryLabel)
+                                        }
+                                    </h3>
+                                    <ul className="flex flex-wrap gap-2">
+                                        {enrichedSubcategories.map(({slugKey, category, subcategory}) =>
+                                            (
+                                                <CategoryChip as={"li"} category={category ?? 'other'} key={slugKey}>
+                                                    <Link href={`/${slugKey}`}>{subcategory ?? t.map["venue-tooltip"]?.defaultCategory}</Link>
+                                                </CategoryChip>
+                                            )
+                                        )}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </PageSection>
         );
     }
