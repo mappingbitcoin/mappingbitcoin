@@ -4,6 +4,7 @@ import map from './map.json';
 import places from './places.json';
 import countries from './countries.json';
 import categories from './categories.json';
+import stats from './stats.json';
 import common from './common.json';
 import login from './login.json';
 import unsubscribe from './unsubscribe.json';
@@ -30,6 +31,8 @@ const messages = {
     merchants: countries,
     // Categories page
     categories,
+    // Stats page
+    stats,
     "verify-your-business": verifyYourBusiness,
     // Admin panel translations
     admin
