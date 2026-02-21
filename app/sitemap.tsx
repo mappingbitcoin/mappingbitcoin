@@ -3,13 +3,13 @@ import { MetadataRoute } from "next";
 import { env } from "@/lib/Environment";
 import { allDocs } from "@/app/[locale]/docs/docsConfig";
 import { getAllBlogPosts } from "@/lib/blog/parser";
-import merchantSlugs from "@/data/merchant-slugs.json";
+// import merchantSlugs from "@/data/merchant-slugs.json";
 
-type MerchantSlug = {
-    type: "country" | "category" | "city";
-    canonical: string;
-    alternates: Record<string, string>;
-};
+// type MerchantSlug = {
+//     type: "country" | "category" | "city";
+//     canonical: string;
+//     alternates: Record<string, string>;
+// };
 
 export const revalidate = 3600; // revalidate sitemap every hour
 
@@ -34,16 +34,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Generate merchant directory pages (countries, cities, categories)
-    const merchantPages = (merchantSlugs as MerchantSlug[]).map((entry) => {
-        // Countries have higher priority than cities/categories
-        const priority = entry.type === "country" ? 0.8 : entry.type === "city" ? 0.7 : 0.6;
-        return {
-            url: `${env.siteUrl}/${entry.canonical}`,
-            lastModified: new Date().toISOString(),
-            changeFrequency: "weekly" as const,
-            priority,
-        };
-    });
+    // Keep commented to not flood search engines
+    // const merchantPages = (merchantSlugs as MerchantSlug[]).map((entry) => {
+    //     // Countries have higher priority than cities/categories
+    //     const priority = entry.type === "country" ? 0.8 : entry.type === "city" ? 0.7 : 0.6;
+    //     return {
+    //         url: `${env.siteUrl}/${entry.canonical}`,
+    //         lastModified: new Date().toISOString(),
+    //         changeFrequency: "weekly" as const,
+    //         priority,
+    //     };
+    // });
 
     return [
         ...[{
@@ -82,6 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Individual blog posts
         ...blogPages,
         // Merchant directory pages (countries, cities, categories)
-        ...merchantPages,
+        // Keep commented to not flood search engines
+        // ...merchantPages,
     ] as MetadataRoute.Sitemap;
 }
