@@ -82,12 +82,15 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
         keywords,
         openGraph: {
             ...ogRest,
+            type: "website",
+            siteName: "Mapping Bitcoin",
             title: finalTitle,
             description: fullDescription,
             url: generateCanonical(`places/${venue.slug || slug}`, locale),
         },
         twitter: {
             ...twRest,
+            card: "summary_large_image",
             title: finalTitle,
             description: fullDescription,
         }

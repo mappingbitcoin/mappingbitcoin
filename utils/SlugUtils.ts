@@ -817,3 +817,11 @@ export function getLocalizedCitySlug(countryName: string, cityName: string, loca
         default: return `bitcoin-shops-in-${slug}`;
     }
 }
+
+export function getLocalizedCityCategorySlug(countryName: string, cityName: string, subcategory: PlaceSubcategory, locale: string = 'en'): string {
+    const citySlug = getSimplifiedCitySlug(countryName, cityName);
+    switch (locale) {
+        case 'es': return `${SUBCATEGORY_ES_SLUG_MAP[subcategory]}-bitcoin-en-${citySlug}`;
+        default: return `bitcoin-${SUBCATEGORY_EN_SLUG_MAP[subcategory]}-in-${citySlug}`;
+    }
+}

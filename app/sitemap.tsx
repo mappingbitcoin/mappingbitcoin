@@ -14,7 +14,7 @@ type MerchantSlug = {
 export const revalidate = 3600; // revalidate sitemap every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const staticPages = ["contact", 'countries', 'privacy-policy', 'terms-and-conditions', 'verify-your-business', 'places/create', 'stats', 'verified-places'];
+    const staticPages = ["contact", 'countries', 'categories', 'privacy-policy', 'terms-and-conditions', 'verify-your-business', 'places/create', 'stats', 'verified-places'];
 
     // Generate docs pages
     const docsPages = allDocs.map((doc) => ({

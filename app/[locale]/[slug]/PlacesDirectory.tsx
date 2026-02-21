@@ -22,6 +22,7 @@ import {
     PlaceListItem,
     Pagination,
     CitiesSidebar,
+    CategoriesSidebar,
     MobileFiltersSheet,
 } from "./components";
 
@@ -252,7 +253,15 @@ export default function PlacesDirectory({
                         </div>
 
                         {/* Sidebar */}
-                        <CitiesSidebar country={country} availableCities={availableCities} />
+                        <div className="space-y-4">
+                            <CitiesSidebar country={country} availableCities={availableCities} />
+                            <CategoriesSidebar
+                                country={country}
+                                city={city}
+                                categoryAndSubcategory={categoryAndSubcategory}
+                                enrichedSubcategories={enrichedSubcategories}
+                            />
+                        </div>
                     </div>
 
                     {/* FAQ Section */}

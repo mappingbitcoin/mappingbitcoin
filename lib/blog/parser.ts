@@ -51,7 +51,8 @@ export function getBlogPost(slug: string, locale: string = 'en'): BlogPost | nul
     const { data, content: rawContent } = matter(fileContent);
 
     // Strip first H1 from content (we render title as H1 in component to avoid duplicates)
-    const content = rawContent.replace(/^#\s+.+\n+/, '');
+    // Account for potential leading whitespace/newlines after frontmatter
+    const content = rawContent.replace(/^\s*#\s+.+\n+/, '');
 
     // For ogImage, prefer explicit ogImage, then derive JPG from featuredImage SVG, then use featuredImage as-is
     const featuredImage = data.featuredImage || '/blog/images/default-featured.svg';

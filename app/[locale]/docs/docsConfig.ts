@@ -16,7 +16,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "overview",
                 title: "Overview",
-                description: "Learn how Mapping Bitcoin works - an open-source directory of Bitcoin-accepting businesses built on OpenStreetMap and Nostr.",
+                description: "Learn how Mapping Bitcoin works - an open-source directory of Bitcoin-accepting businesses worldwide, built on OpenStreetMap and the Nostr protocol.", // 155
             },
         ],
     },
@@ -26,17 +26,17 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "osm-sync",
                 title: "OSM Sync",
-                description: "How Mapping Bitcoin syncs with OpenStreetMap to keep Bitcoin venue data accurate and up-to-date worldwide.",
+                description: "Discover how Mapping Bitcoin continuously syncs with OpenStreetMap to keep Bitcoin merchant data accurate, verified, and up-to-date across the globe.", // 152
             },
             {
                 slug: "data-enrichment",
                 title: "Data Enrichment",
-                description: "How we enrich venue data with geographic coordinates, categories, and business details for better discovery.",
+                description: "Learn how we enrich raw venue data with geographic coordinates, standardized categories, and business details to improve merchant discovery.", // 144
             },
             {
                 slug: "nostr-integration",
                 title: "Nostr Integration",
-                description: "How Mapping Bitcoin uses Nostr for decentralized identity, social features, and censorship-resistant announcements.",
+                description: "Explore how Mapping Bitcoin leverages Nostr for decentralized identity, censorship-resistant social features, and real-time venue announcements.", // 150
             },
         ],
     },
@@ -46,12 +46,12 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "reviews",
                 title: "Reviews",
-                description: "How to submit reviews for Bitcoin venues and understand our decentralized review system powered by Nostr.",
+                description: "Learn how to submit reviews for Bitcoin venues using Nostr. Understand our decentralized, censorship-resistant review system and rating methodology.", // 156
             },
             {
                 slug: "web-of-trust",
                 title: "Web of Trust",
-                description: "How trust scoring works on Mapping Bitcoin - WoT badges, reputation, and community-driven verification.",
+                description: "Understand how trust scoring works on Mapping Bitcoin - Web of Trust badges, reputation metrics, and community-driven merchant verification.", // 148
             },
         ],
     },
@@ -61,17 +61,17 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "venue-creation",
                 title: "Creating Venues",
-                description: "Step-by-step guide to adding new Bitcoin-accepting businesses to Mapping Bitcoin and OpenStreetMap.",
+                description: "Step-by-step guide to adding new Bitcoin-accepting businesses to Mapping Bitcoin. Your submissions sync directly with OpenStreetMap worldwide.", // 151
             },
             {
                 slug: "blossom-images",
                 title: "Image Uploads",
-                description: "How to upload venue images using the Blossom protocol for decentralized, censorship-resistant image hosting.",
+                description: "Learn how to upload venue photos using the Blossom protocol - a decentralized, censorship-resistant image hosting solution built for Bitcoin merchants.", // 157
             },
             {
                 slug: "verification",
                 title: "Verification",
-                description: "How business owners can verify their venue listing on Mapping Bitcoin using Nostr for proof of ownership.",
+                description: "Discover how business owners can verify their venue listing on Mapping Bitcoin using Nostr, proving ownership and building customer trust.", // 145
             },
         ],
     },
@@ -81,7 +81,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "contributing",
                 title: "Contributing",
-                description: "Join the Mapping Bitcoin community - contribute code, add venues, improve data, or become a local ambassador.",
+                description: "Join the Mapping Bitcoin community and help grow the Bitcoin economy. Contribute code, add venues, improve data quality, or become a local ambassador.", // 154
             },
         ],
     },
@@ -91,7 +91,7 @@ export const docsConfig: DocSection[] = [
             {
                 slug: "api-reference",
                 title: "API Reference",
-                description: "REST API documentation for Mapping Bitcoin - access venue data, search locations, and integrate with your app.",
+                description: "Complete REST API documentation for Mapping Bitcoin. Access venue data, search Bitcoin merchants by location, and integrate with your applications.", // 154
             },
         ],
     },

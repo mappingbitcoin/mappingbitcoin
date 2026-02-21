@@ -3,6 +3,7 @@ import contact from './contact.json';
 import map from './map.json';
 import places from './places.json';
 import countries from './countries.json';
+import categories from './categories.json';
 import common from './common.json';
 import login from './login.json';
 import unsubscribe from './unsubscribe.json';
@@ -27,6 +28,8 @@ const messages = {
     // Countries module - also keep 'merchants' key for backward compatibility
     countries,
     merchants: countries,
+    // Categories page
+    categories,
     "verify-your-business": verifyYourBusiness,
     // Admin panel translations
     admin

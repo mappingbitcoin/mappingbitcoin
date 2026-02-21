@@ -6,6 +6,7 @@ import mapSeo, { type MapPageKey } from "./map";
 import contactSeo, { type ContactPageKey } from "./contact";
 import placesSeo, { type PlacesPageKey } from "./places";
 import countriesSeo, { type CountriesPageKey } from "./countries";
+import categoriesSeo, { type CategoriesPageKey } from "./categories";
 import legalSeo, { type LegalPageKey } from "./legal";
 import notFoundSeo, { type NotFoundPageKey } from "./not-found";
 import verifyYourBusinessSeo, { type VerifyYourBusinessPageKey } from "./verify-your-business";
@@ -22,6 +23,7 @@ export type PageKey =
     | ContactPageKey
     | PlacesPageKey
     | CountriesPageKey
+    | CategoriesPageKey
     | LegalPageKey
     | NotFoundPageKey
     | VerifyYourBusinessPageKey
@@ -43,6 +45,7 @@ const seoContent: SEOMap<PageKey> = {
     ...contactSeo,
     ...placesSeo,
     ...countriesSeo,
+    ...categoriesSeo,
     ...legalSeo,
     ...notFoundSeo,
     ...verifyYourBusinessSeo,

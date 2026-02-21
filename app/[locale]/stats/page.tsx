@@ -1,12 +1,38 @@
 import { Metadata } from "next";
+import { env } from "@/lib/Environment";
 import StatsClient from "./StatsClient";
 
+const title = "Bitcoin Merchant Statistics | Mapping Bitcoin";
+const description = "Explore global Bitcoin adoption statistics. See the growth of Bitcoin-accepting merchants, top countries, categories, and verification trends.";
+const url = `${env.siteUrl}/stats`;
+const image = `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`;
+
 export const metadata: Metadata = {
-    title: "Bitcoin Merchant Statistics | Mapping Bitcoin",
-    description: "Explore global Bitcoin adoption statistics. See the growth of Bitcoin-accepting merchants, top countries, categories, and verification trends over time.",
+    title,
+    description,
+    alternates: {
+        canonical: url,
+    },
     openGraph: {
-        title: "Bitcoin Merchant Statistics | Mapping Bitcoin",
-        description: "Explore global Bitcoin adoption statistics. See the growth of Bitcoin-accepting merchants worldwide.",
+        title,
+        description,
+        url,
+        type: "website",
+        siteName: "Mapping Bitcoin",
+        images: [
+            {
+                url: image,
+                width: 1200,
+                height: 630,
+                alt: "Bitcoin Merchant Statistics - Mapping Bitcoin",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
     },
 };
 
