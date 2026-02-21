@@ -1,75 +1,53 @@
-import { Metadata } from "next";
+import Script from "next/script";
 import { env } from "@/lib/Environment";
+import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
+import { getTranslations } from "next-intl/server";
 import StatsClient from "./StatsClient";
 
-const title = "Bitcoin Merchant Statistics | Mapping Bitcoin";
-const description = "Explore global Bitcoin adoption statistics. See the growth of Bitcoin-accepting merchants, top countries, categories, and verification trends.";
-const url = `${env.siteUrl}/stats`;
-const image = `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`;
+export const generateMetadata = buildGeneratePageMetadata('stats');
 
-export const metadata: Metadata = {
-    title,
-    description,
-    alternates: {
-        canonical: url,
-    },
-    openGraph: {
-        title,
-        description,
-        url,
-        type: "website",
-        siteName: "Mapping Bitcoin",
-        images: [
+export default async function StatsPage() {
+    const t = await getTranslations("stats");
+
+    // JSON-LD: BreadcrumbList schema
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
             {
-                url: image,
-                width: 1200,
-                height: 630,
-                alt: "Bitcoin Merchant Statistics - Mapping Bitcoin",
+                "@type": "ListItem",
+                "position": 1,
+                "name": t("breadcrumb.home"),
+                "item": env.siteUrl
             },
-        ],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: [image],
-    },
-};
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": t("breadcrumb.stats"),
+                "item": `${env.siteUrl}/stats`
+            }
+        ]
+    };
 
-export default function StatsPage() {
     return (
         <>
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
-                <h1>Bitcoin Merchant Statistics</h1>
-                <p>
-                    Track global Bitcoin adoption with comprehensive statistics and analytics.
-                    Mapping Bitcoin provides real-time data on Bitcoin-accepting merchants worldwide,
-                    helping you understand the growth of the Bitcoin economy.
-                </p>
-                <h2>Global Bitcoin Merchant Data</h2>
-                <p>
-                    Our statistics dashboard shows the total number of Bitcoin-accepting businesses,
-                    geographic distribution across countries, and growth trends over time.
-                    Monitor how Bitcoin adoption is spreading in different regions and business categories.
-                </p>
-                <h2>Categories of Bitcoin-Accepting Businesses</h2>
-                <p>
-                    Explore Bitcoin acceptance across various business categories including restaurants,
-                    cafes, hotels, bars, retail stores, professional services, and more.
-                    See which industries are leading Bitcoin adoption.
-                </p>
-                <h2>Verified Bitcoin Merchants</h2>
-                <p>
-                    Our verification system ensures accurate and up-to-date information about
-                    Bitcoin-accepting businesses. Track the growth of verified merchants and
-                    trusted Bitcoin payment locations.
-                </p>
-                <h2>Bitcoin Adoption Trends</h2>
-                <p>
-                    View monthly growth charts showing how Bitcoin merchant adoption has evolved.
-                    Analyze cumulative growth patterns and identify emerging markets for Bitcoin payments.
-                </p>
+                <h1>{t("seo.h1")}</h1>
+                <p>{t("seo.intro")}</p>
+                <h2>{t("seo.globalTitle")}</h2>
+                <p>{t("seo.globalDescription")}</p>
+                <h2>{t("seo.categoriesTitle")}</h2>
+                <p>{t("seo.categoriesDescription")}</p>
+                <h2>{t("seo.verifiedTitle")}</h2>
+                <p>{t("seo.verifiedDescription")}</p>
+                <h2>{t("seo.trendsTitle")}</h2>
+                <p>{t("seo.trendsDescription")}</p>
             </div>
             <StatsClient />
         </>

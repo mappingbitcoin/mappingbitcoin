@@ -32,6 +32,30 @@ export default async function DocsPage({ params }: Localized) {
                     })
                 }}
             />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://mappingbitcoin.com/"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Documentation",
+                                "item": canonical
+                            }
+                        ]
+                    })
+                }}
+            />
             <DocArticle slug="overview" locale={locale} />
         </>
     );

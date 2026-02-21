@@ -1,7 +1,7 @@
 {
   "hero": {
-    "title": "The Bitcoin Economy, Mapped",
-    "description": "{venues}+ venues across {continents} continents. Find where Bitcoin works.",
+    "title": "Global Bitcoin Map",
+    "description": "Find every place, organization, and community in the Bitcoin ecosystem.",
     "cta": {
       "primary": "Explore map",
       "secondary": "Browse directory"

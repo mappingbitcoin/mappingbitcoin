@@ -23,10 +23,32 @@ function countryCodeToFlag(code: string): string {
     return String.fromCodePoint(...codePoints);
 }
 
+// Highlight matching text
+function HighlightText({ text, query }: { text: string; query: string }) {
+    if (!query.trim()) return <>{text}</>;
+
+    const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+
+    return (
+        <>
+            {parts.map((part, i) =>
+                part.toLowerCase() === query.toLowerCase() ? (
+                    <mark key={i} className="bg-accent/30 text-white rounded px-0.5">
+                        {part}
+                    </mark>
+                ) : (
+                    <span key={i}>{part}</span>
+                )
+            )}
+        </>
+    );
+}
+
 export default function SubcategoryClient({ label, pluralLabel, data }: SubcategoryClientProps) {
     const t = useTranslations("categories");
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedCountries, setExpandedCountries] = useState<Set<string>>(new Set());
+    const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set()); // Track which countries have all cities shown
 
     // Filter countries by search
     const filteredCountries = useMemo(() => {
@@ -40,8 +62,49 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
         });
     }, [data.countries, searchQuery]);
 
+    // Auto-expand countries that have matching cities when searching
+    const countriesWithMatchingCities = useMemo(() => {
+        if (!searchQuery.trim()) return new Set<string>();
+        const query = searchQuery.toLowerCase();
+        const matching = new Set<string>();
+        for (const country of data.countries) {
+            if (country.cities.some((city) => city.name.toLowerCase().includes(query))) {
+                matching.add(country.name);
+            }
+        }
+        return matching;
+    }, [data.countries, searchQuery]);
+
+    // Determine if a country should be expanded (manually expanded OR has matching cities during search)
+    const isCountryExpanded = (countryName: string) => {
+        return expandedCountries.has(countryName) || countriesWithMatchingCities.has(countryName);
+    };
+
+    // Get filtered cities for a country (filter by search query if searching)
+    const getFilteredCities = (country: typeof data.countries[0]) => {
+        if (!searchQuery.trim()) return country.cities;
+        const query = searchQuery.toLowerCase();
+        // If country name matches, show all cities; otherwise filter cities
+        if (country.name.toLowerCase().includes(query)) {
+            return country.cities;
+        }
+        return country.cities.filter((city) => city.name.toLowerCase().includes(query));
+    };
+
     const toggleCountry = (countryName: string) => {
         setExpandedCountries((prev) => {
+            const next = new Set(prev);
+            if (next.has(countryName)) {
+                next.delete(countryName);
+            } else {
+                next.add(countryName);
+            }
+            return next;
+        });
+    };
+
+    const toggleCitiesExpanded = (countryName: string) => {
+        setExpandedCities((prev) => {
             const next = new Set(prev);
             if (next.has(countryName)) {
                 next.delete(countryName);
@@ -55,15 +118,26 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
     return (
         <div className="w-full py-8 px-8 max-md:px-4">
             <div className="max-w-container mx-auto">
-                {/* Back Link */}
-                <div className="mb-6">
-                    <Link
-                        href="/categories"
-                        className="text-accent hover:text-accent-light transition-colors text-sm"
-                    >
-                        ← Back to Categories
-                    </Link>
-                </div>
+                {/* Breadcrumbs */}
+                <nav className="mb-6" aria-label="Breadcrumb">
+                    <ol className="flex items-center gap-2 text-sm">
+                        <li>
+                            <Link href="/" className="text-text-light hover:text-accent transition-colors">
+                                {t("breadcrumb.home")}
+                            </Link>
+                        </li>
+                        <li className="text-text-light">/</li>
+                        <li>
+                            <Link href="/categories" className="text-text-light hover:text-accent transition-colors">
+                                {t("breadcrumb.categories")}
+                            </Link>
+                        </li>
+                        <li className="text-text-light">/</li>
+                        <li className="text-white font-medium">
+                            {pluralLabel}
+                        </li>
+                    </ol>
+                </nav>
 
                 {/* Search Bar */}
                 <div className="mb-8">
@@ -71,7 +145,7 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light" />
                         <input
                             type="text"
-                            placeholder="Search countries or cities..."
+                            placeholder={t("search.placeholderSubcategory")}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full pl-12 pr-4 py-3 bg-surface border border-border-light rounded-card text-white placeholder:text-text-light focus:outline-none focus:border-accent"
@@ -95,7 +169,7 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredCountries.map((country) => {
-                            const isExpanded = expandedCountries.has(country.name);
+                            const isExpanded = isCountryExpanded(country.name);
                             const hasCities = country.cities.length > 0;
 
                             return (
@@ -114,10 +188,10 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                                             {/* Country Info */}
                                             <div className="flex-1 min-w-0">
                                                 <span className="text-white font-medium truncate block">
-                                                    {country.name}
+                                                    <HighlightText text={country.name} query={searchQuery} />
                                                 </span>
                                                 <span className="text-xs text-text-light">
-                                                    {country.count} places
+                                                    {t("subcategory.places", { count: country.count })}
                                                 </span>
                                             </div>
 
@@ -126,7 +200,7 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                                                 <button
                                                     onClick={() => toggleCountry(country.name)}
                                                     className="p-1.5 text-text-light hover:text-white hover:bg-surface-light rounded transition-colors cursor-pointer"
-                                                    aria-label={isExpanded ? "Collapse" : "Expand"}
+                                                    aria-label={isExpanded ? t("subcategory.collapse") : t("subcategory.expand")}
                                                 >
                                                     {isExpanded ? (
                                                         <ChevronDownIcon className="w-4 h-4" />
@@ -142,7 +216,7 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                                             href={`/${country.slug}`}
                                             className="text-sm text-accent hover:text-accent-light transition-colors"
                                         >
-                                            View all {pluralLabel.toLowerCase()} →
+                                            {t("subcategory.viewAll", { category: pluralLabel.toLowerCase() })} →
                                         </Link>
                                     </div>
 
@@ -159,25 +233,45 @@ export default function SubcategoryClient({ label, pluralLabel, data }: Subcateg
                                                 <div className="px-4 pb-4 pt-0">
                                                     <div className="border-t border-border-light pt-3">
                                                         <p className="text-xs text-text-light mb-2">
-                                                            Cities:
+                                                            {t("subcategory.cities")}:
                                                         </p>
-                                                        <div className="flex flex-wrap gap-1.5">
-                                                            {country.cities.slice(0, 10).map((city) => (
-                                                                <Link
-                                                                    key={city.name}
-                                                                    href={`/${city.slug}`}
-                                                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-surface-light/80 text-text-light border border-border-light/50 rounded hover:text-accent hover:border-accent/50 transition-colors"
-                                                                >
-                                                                    <span>{city.name}</span>
-                                                                    <span className="opacity-60">({city.count})</span>
-                                                                </Link>
-                                                            ))}
-                                                            {country.cities.length > 10 && (
-                                                                <span className="text-xs text-text-light px-2 py-1">
-                                                                    +{country.cities.length - 10} more
-                                                                </span>
-                                                            )}
-                                                        </div>
+                                                        {(() => {
+                                                            const filteredCities = getFilteredCities(country);
+                                                            const showAllCities = expandedCities.has(country.name) || searchQuery.trim();
+                                                            const displayCities = showAllCities ? filteredCities : filteredCities.slice(0, 10);
+                                                            const hasMoreCities = !showAllCities && filteredCities.length > 10;
+
+                                                            return (
+                                                                <div className="flex flex-wrap gap-1.5">
+                                                                    {displayCities.map((city) => (
+                                                                        <Link
+                                                                            key={city.name}
+                                                                            href={`/${city.slug}`}
+                                                                            className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-surface-light/80 text-text-light border border-border-light/50 rounded hover:text-accent hover:border-accent/50 transition-colors"
+                                                                        >
+                                                                            <span><HighlightText text={city.name} query={searchQuery} /></span>
+                                                                            <span className="opacity-60">({city.count})</span>
+                                                                        </Link>
+                                                                    ))}
+                                                                    {hasMoreCities && (
+                                                                        <button
+                                                                            onClick={() => toggleCitiesExpanded(country.name)}
+                                                                            className="text-xs text-accent hover:text-accent-light px-2 py-1 cursor-pointer transition-colors"
+                                                                        >
+                                                                            {t("subcategory.moreItems", { count: filteredCities.length - 10 })}
+                                                                        </button>
+                                                                    )}
+                                                                    {expandedCities.has(country.name) && filteredCities.length > 10 && !searchQuery.trim() && (
+                                                                        <button
+                                                                            onClick={() => toggleCitiesExpanded(country.name)}
+                                                                            className="text-xs text-accent hover:text-accent-light px-2 py-1 cursor-pointer transition-colors"
+                                                                        >
+                                                                            {t("showLess")}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </div>
                                                 </div>
                                             </motion.div>

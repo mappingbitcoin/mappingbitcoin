@@ -6,8 +6,8 @@ export type HomePageKey = 'home';
 const homeSeo: SEOModule<HomePageKey> = {
     home: {
         en: {
-            title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-            description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
+            title: "Global Bitcoin Map | Mapping Bitcoin",
+            description: "Find every place, organization, and community in the Bitcoin ecosystem. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
             keywords: [
                 "bitcoin map",
                 "bitcoin merchants",
@@ -21,8 +21,8 @@ const homeSeo: SEOModule<HomePageKey> = {
                 "bitcoin payments"
             ],
             openGraph: {
-                title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-                description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
+                title: "Global Bitcoin Map | Mapping Bitcoin",
+                description: "Find every place, organization, and community in the Bitcoin ecosystem. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
                 url: env.siteUrl,
                 type: "website",
                 images: [
@@ -30,14 +30,14 @@ const homeSeo: SEOModule<HomePageKey> = {
                         url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
                         width: 1200,
                         height: 630,
-                        alt: "The Bitcoin Economy, Mapped - Mapping Bitcoin",
+                        alt: "Global Bitcoin Map - Mapping Bitcoin",
                     },
                 ],
             },
             twitter: {
                 card: "summary_large_image",
-                title: "The Bitcoin Economy, Mapped | Mapping Bitcoin",
-                description: "Find places that accept Bitcoin worldwide. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
+                title: "Global Bitcoin Map | Mapping Bitcoin",
+                description: "Find every place, organization, and community in the Bitcoin ecosystem. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },

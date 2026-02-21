@@ -1,8 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { env } from "@/lib/Environment";
 import { getSubcategoryData } from "@/app/api/cache/CategoryCache";
 import { PLACE_CATEGORIES, matchPlaceSubcategory } from "@/constants/PlaceCategories";
+import { getTranslations } from "next-intl/server";
 import SubcategoryClient from "./SubcategoryClient";
 
 type PageProps = {
@@ -36,6 +38,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title,
         description,
+        keywords: [
+            `bitcoin ${pluralLabel.toLowerCase()}`,
+            `${pluralLabel.toLowerCase()} accept bitcoin`,
+            `${pluralLabel.toLowerCase()} bitcoin payment`,
+            `${pluralLabel.toLowerCase()} lightning network`,
+            "bitcoin merchants",
+            `spend bitcoin ${pluralLabel.toLowerCase()}`
+        ],
         alternates: {
             canonical: url,
         },
@@ -64,7 +74,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function SubcategoryPage({ params }: PageProps) {
-    const { subcategory } = await params;
+    const { subcategory, locale } = await params;
+    const t = await getTranslations({ locale, namespace: "categories" });
     const data = await getSubcategoryData(subcategory);
 
     if (!data) {
@@ -73,7 +84,7 @@ export default async function SubcategoryPage({ params }: PageProps) {
 
     // Get singular label for the subcategory
     const match = matchPlaceSubcategory(subcategory);
-    const categoryInfo = PLACE_CATEGORIES["en"];
+    const categoryInfo = PLACE_CATEGORIES[locale as keyof typeof PLACE_CATEGORIES] || PLACE_CATEGORIES["en"];
     const label = match
         ? categoryInfo[match.category]?.types?.[subcategory as keyof typeof categoryInfo[typeof match.category]["types"]] || subcategory.replace(/_/g, " ")
         : subcategory.replace(/_/g, " ");
@@ -81,15 +92,70 @@ export default async function SubcategoryPage({ params }: PageProps) {
     // Get the plural label from the slug (e.g., "cafes", "restaurants")
     const pluralLabel = slugToLabel(data.pluralSlug);
 
+    // JSON-LD: ItemList schema for countries in this subcategory
+    const itemListSchema = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": t("jsonLd.subcategoryName", { category: pluralLabel }),
+        "description": t("jsonLd.subcategoryDescription", { category: pluralLabel.toLowerCase() }),
+        "numberOfItems": data.countries.length,
+        "itemListElement": data.countries.slice(0, 50).map((country, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": country.name,
+            "description": `${country.count} ${pluralLabel.toLowerCase()} accepting Bitcoin in ${country.name}`,
+            "url": `${env.siteUrl}/${country.slug}`
+        }))
+    };
+
+    // JSON-LD: BreadcrumbList schema
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": t("breadcrumb.home"),
+                "item": env.siteUrl
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": t("breadcrumb.categories"),
+                "item": `${env.siteUrl}/categories`
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": pluralLabel,
+                "item": `${env.siteUrl}/categories/${subcategory}`
+            }
+        ]
+    };
+
     return (
         <>
+            <Script
+                id="itemlist-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
                 <p>
-                    Find {pluralLabel.toLowerCase()} that accept Bitcoin payments in {data.countries.length} countries around the world.
-                    Our directory includes {data.totalCount} verified places where you can pay with Bitcoin or Lightning.
+                    {t("seo.subcategory.intro", {
+                        category: pluralLabel.toLowerCase(),
+                        countries: data.countries.length,
+                        count: data.totalCount
+                    })}
                 </p>
-                <h2>Countries with {pluralLabel}</h2>
+                <h2>{t("seo.subcategory.countriesTitle", { category: pluralLabel })}</h2>
                 <ul>
                     {data.countries.slice(0, 20).map((country) => (
                         <li key={country.name}>
@@ -100,13 +166,13 @@ export default async function SubcategoryPage({ params }: PageProps) {
             </div>
 
             {/* Hero Section */}
-            <section className="bg-primary pt-12 pb-6">
+            <section className="bg-primary pt-12 pb-6 mt-16">
                 <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        {pluralLabel} Accepting Bitcoin
+                        {t("subcategory.title", { category: pluralLabel })}
                     </h1>
                     <p className="text-text-light text-lg max-w-2xl mx-auto">
-                        {data.totalCount} places in {data.countries.length} countries accept Bitcoin
+                        {t("subcategory.subtitle", { count: data.totalCount, countries: data.countries.length })}
                     </p>
                 </div>
             </section>
