@@ -436,16 +436,16 @@ class HetznerStorageClient {
     }
 }
 
-// Singleton instance with HMR support
+// Singleton instance with HMR support (works in both dev and production)
 const globalForStorage = globalThis as unknown as {
     hetznerStorage: HetznerStorageClient | undefined;
 };
 
+// Only create new instance if one doesn't exist
 const storage = globalForStorage.hetznerStorage ?? new HetznerStorageClient();
 
-if (!isProduction) {
-    globalForStorage.hetznerStorage = storage;
-}
+// Store singleton globally in both dev and production
+globalForStorage.hetznerStorage = storage;
 
 export default storage;
 
