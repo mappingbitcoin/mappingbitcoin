@@ -129,13 +129,18 @@ interface CategoryInfo {
     subcategories: { key: string; label: string }[];
 }
 
-export default function CategoriesClient() {
+interface CategoriesClientProps {
+    availableSubcategories: string[];
+}
+
+export default function CategoriesClient({ availableSubcategories }: CategoriesClientProps) {
+    const availableSet = useMemo(() => new Set(availableSubcategories), [availableSubcategories]);
     const t = useTranslations("categories");
     const locale = useLocale() as Locale;
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedCategory, setExpandedCategory] = useState<PlaceCategory | null>(null);
 
-    // Build categories data
+    // Build categories data, filtering to only show subcategories with actual venue data
     const categories = useMemo(() => {
         const categoriesData = PLACE_CATEGORIES[locale];
         return (Object.keys(PLACE_SUBTYPE_MAP) as PlaceCategory[])
@@ -143,12 +148,15 @@ export default function CategoriesClient() {
             .map((key): CategoryInfo => ({
                 key,
                 label: categoriesData[key]?.label || key.replace(/-/g, " "),
-                subcategories: PLACE_SUBTYPE_MAP[key].map((subKey) => ({
-                    key: subKey,
-                    label: categoriesData[key]?.types?.[subKey as keyof typeof categoriesData[typeof key]["types"]] || subKey.replace(/_/g, " "),
-                })),
-            }));
-    }, [locale]);
+                subcategories: PLACE_SUBTYPE_MAP[key]
+                    .filter((subKey) => availableSet.has(subKey)) // Only show subcategories with data
+                    .map((subKey) => ({
+                        key: subKey,
+                        label: categoriesData[key]?.types?.[subKey as keyof typeof categoriesData[typeof key]["types"]] || subKey.replace(/_/g, " "),
+                    })),
+            }))
+            .filter((cat) => cat.subcategories.length > 0); // Hide categories with no available subcategories
+    }, [locale, availableSet]);
 
     // Filter by search
     const filteredCategories = useMemo(() => {
