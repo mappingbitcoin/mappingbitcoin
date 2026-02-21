@@ -105,7 +105,7 @@ class HetznerStorageClient {
 
         this.bucket = config.bucket;
         this.isConfigured = true;
-        console.log("✅ Hetzner Storage client initialized");
+        // Note: Logging removed to avoid duplicate messages in Next.js multi-worker environment
     }
 
     private getConfig(): HetznerStorageConfig | null {
@@ -439,13 +439,17 @@ class HetznerStorageClient {
 // Singleton instance with HMR support (works in both dev and production)
 const globalForStorage = globalThis as unknown as {
     hetznerStorage: HetznerStorageClient | undefined;
+    hetznerStorageInitialized: boolean | undefined;
 };
 
 // Only create new instance if one doesn't exist
 const storage = globalForStorage.hetznerStorage ?? new HetznerStorageClient();
 
-// Store singleton globally in both dev and production
-globalForStorage.hetznerStorage = storage;
+// Store singleton globally in both dev and production (suppress duplicate init logs)
+if (!globalForStorage.hetznerStorageInitialized) {
+    globalForStorage.hetznerStorage = storage;
+    globalForStorage.hetznerStorageInitialized = true;
+}
 
 export default storage;
 

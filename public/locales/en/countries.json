@@ -171,5 +171,16 @@
     "otherCategories": "Other categories in {location}",
     "categoriesIn": "Categories in {location}",
     "otherCities": "Other cities in {country}"
+  },
+  "emptyState": {
+    "title": "No Bitcoin places in {location} yet",
+    "titleWithCategory": "No {category} accepting Bitcoin in {location} yet",
+    "description": "Be the first to add a Bitcoin-friendly place in this area! Help grow the Bitcoin economy by adding businesses you know that accept Bitcoin.",
+    "descriptionWithCategory": "We don't have any {category} accepting Bitcoin here yet. Know a place? Help the community by adding it to our map!",
+    "ctaTitle": "Know a place that accepts Bitcoin?",
+    "ctaButton": "Add a Place",
+    "exploreSuggestions": "Or explore these alternatives:",
+    "invalidSlug": "Page not found",
+    "invalidSlugDescription": "We couldn't find any places matching this URL. Try searching on our map or explore available countries."
   }
 }
