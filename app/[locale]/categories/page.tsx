@@ -1,42 +1,12 @@
-import { Metadata } from "next";
+import Script from "next/script";
 import { env } from "@/lib/Environment";
 import { PLACE_CATEGORIES, PLACE_SUBTYPE_MAP, PlaceCategory } from "@/constants/PlaceCategories";
 import { getCategoryCache } from "@/app/api/cache/CategoryCache";
+import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
+import { getTranslations } from "next-intl/server";
 import CategoriesClient from "./CategoriesClient";
 
-const title = "Bitcoin Business Categories | Mapping Bitcoin";
-const description = "Browse all categories of businesses that accept Bitcoin payments. Find restaurants, cafes, hotels, shops, and services accepting Bitcoin and Lightning.";
-const url = `${env.siteUrl}/categories`;
-const image = `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`;
-
-export const metadata: Metadata = {
-    title,
-    description,
-    alternates: {
-        canonical: url,
-    },
-    openGraph: {
-        title,
-        description,
-        url,
-        type: "website",
-        siteName: "Mapping Bitcoin",
-        images: [
-            {
-                url: image,
-                width: 1200,
-                height: 630,
-                alt: "Bitcoin Business Categories - Mapping Bitcoin",
-            },
-        ],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: [image],
-    },
-};
+export const generateMetadata = buildGeneratePageMetadata('categories');
 
 // Generate category list for SEO
 function generateCategoryList() {
@@ -51,6 +21,7 @@ function generateCategoryList() {
 }
 
 export default async function CategoriesPage() {
+    const t = await getTranslations("categories");
     const categoryList = generateCategoryList();
     const totalSubcategories = categoryList.reduce((sum, cat) => sum + cat.count, 0);
 
@@ -67,17 +38,60 @@ export default async function CategoriesPage() {
         );
     }
 
+    // JSON-LD: ItemList schema for categories
+    const itemListSchema = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": t("jsonLd.categoriesName"),
+        "description": t("jsonLd.categoriesDescription"),
+        "numberOfItems": categoryList.length,
+        "itemListElement": categoryList.map((cat, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": cat.label,
+            "description": `${cat.count} types of ${cat.label.toLowerCase()} businesses accepting Bitcoin`,
+            "url": `${env.siteUrl}/categories`
+        }))
+    };
+
+    // JSON-LD: BreadcrumbList schema
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": t("breadcrumb.home"),
+                "item": env.siteUrl
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": t("breadcrumb.categories"),
+                "item": `${env.siteUrl}/categories`
+            }
+        ]
+    };
+
     return (
         <>
+            <Script
+                id="itemlist-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+            />
+            <Script
+                id="breadcrumb-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
                 <p>
-                    Mapping Bitcoin organizes Bitcoin-accepting businesses into {categoryList.length} main categories
-                    with over {totalSubcategories} specific business types. Whether you&apos;re looking for
-                    restaurants, hotels, retail stores, or professional services that accept Bitcoin, our
-                    comprehensive directory helps you find exactly what you need.
+                    {t("seo.intro", { count: categoryList.length, subcategoryCount: totalSubcategories })}
                 </p>
-                <h2>Main Business Categories</h2>
+                <h2>{t("seo.mainCategoriesTitle")}</h2>
                 <ul>
                     {categoryList.map((cat) => (
                         <li key={cat.key}>
@@ -85,30 +99,20 @@ export default async function CategoriesPage() {
                         </li>
                     ))}
                 </ul>
-                <h2>Popular Categories for Bitcoin Payments</h2>
-                <p>
-                    Food and drink establishments, including restaurants, cafes, and bars, are among the most
-                    common places accepting Bitcoin. Shopping locations like grocery stores, electronics
-                    retailers, and clothing boutiques also frequently accept cryptocurrency. The services
-                    sector, from hair salons to professional consultants, continues to grow in Bitcoin adoption.
-                </p>
-                <h2>Finding Bitcoin-Accepting Businesses</h2>
-                <p>
-                    Use our interactive map to discover Bitcoin merchants near you, or browse by country to
-                    see regional adoption. Each business listing includes payment details, showing whether
-                    they accept Lightning Network payments, on-chain Bitcoin, or both.
-                </p>
+                <h2>{t("seo.popularTitle")}</h2>
+                <p>{t("seo.popularDescription")}</p>
+                <h2>{t("seo.findingTitle")}</h2>
+                <p>{t("seo.findingDescription")}</p>
             </div>
 
             {/* Hero Section */}
-            <section className="bg-primary pt-12 pb-6">
+            <section className="bg-primary pt-12 pb-6 mt-16">
                 <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        Bitcoin Business Categories
+                        {t("title")}
                     </h1>
                     <p className="text-text-light text-lg max-w-2xl mx-auto">
-                        Browse {categoryList.length} categories and over {availableSubcategories.size} types of businesses
-                        that accept Bitcoin payments worldwide.
+                        {t("subtitle", { count: categoryList.length, subcategoryCount: availableSubcategories.size })}
                     </p>
                 </div>
             </section>

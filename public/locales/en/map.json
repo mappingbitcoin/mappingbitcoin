@@ -1,4 +1,16 @@
 {
+  "seo": {
+    "h1": "Interactive Bitcoin Map - Find Bitcoin-Accepting Places Worldwide",
+    "intro": "Discover Bitcoin-accepting businesses near you with our interactive map. Mapping Bitcoin helps you find cafes, restaurants, shops, ATMs, hotels, and services that accept Bitcoin payments anywhere in the world.",
+    "findTitle": "Find Bitcoin-Friendly Businesses",
+    "findDescription": "Our map displays thousands of Bitcoin-accepting locations across all continents. Search by location, filter by business category, and find trusted merchants that welcome Bitcoin payments.",
+    "categoriesTitle": "Bitcoin Payment Categories",
+    "categoriesDescription": "Browse Bitcoin-accepting businesses by category: restaurants, cafes, bars, hotels, retail stores, professional services, ATMs, coworking spaces, and many more. Each category shows verified and community-sourced locations.",
+    "dataTitle": "Real-Time Bitcoin Merchant Data",
+    "dataDescription": "Our map pulls data from OpenStreetMap and community contributions to provide the most comprehensive Bitcoin merchant directory. Help grow the Bitcoin economy by adding new Bitcoin-accepting businesses you discover.",
+    "spendTitle": "Spend Bitcoin Anywhere",
+    "spendDescription": "Whether you are traveling or exploring your local area, use Mapping Bitcoin to find places where you can spend your Bitcoin. Support businesses that embrace cryptocurrency payments and help drive global Bitcoin adoption."
+  },
   "helpPopup": {
     "title": "Interactive Global Bitcoin Map",
     "subtitle": "Find Bitcoin-Accepting Merchants Near You",

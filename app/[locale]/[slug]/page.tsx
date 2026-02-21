@@ -178,8 +178,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PlacesDirectoryPage({ params }: PageProps) {
     const { slug, locale } = await params;
-    const all2 = await getMessages({ locale: 'en' });
-    const t = { merchants: all2.merchants, map: all2.map } as Record<string, any>;
+    const all2 = await getMessages({ locale });
+    const t = { merchants: all2.merchants, map: all2.map, countries: all2.countries } as Record<string, any>;
 
     const data = parseVenueSlug(slug)
 
@@ -406,33 +406,23 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
                 <p>{translatedDescription}</p>
-                <h2>About Bitcoin in {locationName}</h2>
+                <h2>{t.countries.seo.aboutBitcoin.replace('{location}', locationName)}</h2>
                 <p>
                     {subcategoryLabel
-                        ? `Find ${venueCount} ${subcategoryLabel.toLowerCase()} businesses accepting Bitcoin in ${locationName}. `
-                        : `Discover ${venueCount} Bitcoin-accepting businesses in ${locationName}. `}
-                    Browse verified merchants, view locations on the map, and support businesses that accept cryptocurrency payments.
+                        ? t.countries.seo.findPlaces.replace('{count}', venueCount).replace('{category}', subcategoryLabel.toLowerCase()).replace('{location}', locationName)
+                        : t.countries.seo.discoverPlaces.replace('{count}', venueCount).replace('{location}', locationName)}
+                    {' '}{t.countries.seo.browseVerified}
                 </p>
-                <h2>Bitcoin Payment Locations</h2>
-                <p>
-                    Each listing shows business details, address, and Bitcoin payment information.
-                    Our data comes from OpenStreetMap and community contributions, ensuring accurate and up-to-date merchant information.
-                </p>
+                <h2>{t.countries.seo.paymentLocationsTitle}</h2>
+                <p>{t.countries.seo.paymentLocationsDescription}</p>
                 {subcategoryLabel && (
                     <>
-                        <h2>{subcategoryLabel} Accepting Bitcoin</h2>
-                        <p>
-                            Looking for {subcategoryLabel.toLowerCase()} that accept Bitcoin in {locationName}?
-                            Our directory includes verified businesses where you can spend Bitcoin.
-                            Filter by location, view on map, and find the perfect place to use your cryptocurrency.
-                        </p>
+                        <h2>{t.countries.seo.categoryAcceptingTitle.replace('{category}', subcategoryLabel)}</h2>
+                        <p>{t.countries.seo.categoryAcceptingDescription.replace('{category}', subcategoryLabel.toLowerCase()).replace('{location}', locationName)}</p>
                     </>
                 )}
-                <h2>Support Bitcoin Adoption</h2>
-                <p>
-                    By visiting Bitcoin-accepting businesses in {locationName}, you help drive cryptocurrency adoption.
-                    Every Bitcoin transaction supports merchants who believe in financial freedom and decentralized payments.
-                </p>
+                <h2>{t.countries.seo.supportAdoptionTitle}</h2>
+                <p>{t.countries.seo.supportAdoptionDescription.replace('{location}', locationName)}</p>
             </div>
             <PlacesDirectoryWrapper country={countryLabel} places={venues} city={location} categoryAndSubcategory={categoryAndSubcategory} availableCities={availableCities} availableSubcategories={availableCategories} exactMatch={data.exactMatch} />
         </>

@@ -51,7 +51,7 @@ All venue schemas include:
 - aggregateRating (when reviews available)
 
 ## How to Cite
-MappingBitcoin.com - The Bitcoin Economy, Mapped
+MappingBitcoin.com - Global Bitcoin Map
 URL: https://mappingbitcoin.com
 Source: OpenStreetMap contributors, Nostr protocol
 

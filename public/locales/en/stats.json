@@ -1,0 +1,19 @@
+{
+  "title": "Bitcoin Merchant Statistics",
+  "seo": {
+    "h1": "Bitcoin Merchant Statistics",
+    "intro": "Track global Bitcoin adoption with comprehensive statistics and analytics. Mapping Bitcoin provides real-time data on Bitcoin-accepting merchants worldwide, helping you understand the growth of the Bitcoin economy.",
+    "globalTitle": "Global Bitcoin Merchant Data",
+    "globalDescription": "Our statistics dashboard shows the total number of Bitcoin-accepting businesses, geographic distribution across countries, and growth trends over time. Monitor how Bitcoin adoption is spreading in different regions and business categories.",
+    "categoriesTitle": "Categories of Bitcoin-Accepting Businesses",
+    "categoriesDescription": "Explore Bitcoin acceptance across various business categories including restaurants, cafes, hotels, bars, retail stores, professional services, and more. See which industries are leading Bitcoin adoption.",
+    "verifiedTitle": "Verified Bitcoin Merchants",
+    "verifiedDescription": "Our verification system ensures accurate and up-to-date information about Bitcoin-accepting businesses. Track the growth of verified merchants and trusted Bitcoin payment locations.",
+    "trendsTitle": "Bitcoin Adoption Trends",
+    "trendsDescription": "View monthly growth charts showing how Bitcoin merchant adoption has evolved. Analyze cumulative growth patterns and identify emerging markets for Bitcoin payments."
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "stats": "Statistics"
+  }
+}

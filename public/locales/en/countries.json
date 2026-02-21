@@ -18,6 +18,18 @@
     "countryAndCategory": "Discover {category} in {country} that accept Bitcoin. Browse a curated list of verified places for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence.",
     "countryCityCategory": "Discover {category} in {city}, {country} that accept Bitcoin. Browse a curated list of verified places for everyday purchases, including {subcategories}. Whether you're looking for cafes, restaurants, coworking spaces, or shops that accept Lightning or on-chain payments, our Bitcoin map helps you spend your sats with confidence."
   },
+  "seo": {
+    "aboutBitcoin": "About Bitcoin in {location}",
+    "findPlaces": "Find {count} {category} businesses accepting Bitcoin in {location}.",
+    "discoverPlaces": "Discover {count} Bitcoin-accepting businesses in {location}.",
+    "browseVerified": "Browse verified merchants, view locations on the map, and support businesses that accept cryptocurrency payments.",
+    "paymentLocationsTitle": "Bitcoin Payment Locations",
+    "paymentLocationsDescription": "Each listing shows business details, address, and Bitcoin payment information. Our data comes from OpenStreetMap and community contributions, ensuring accurate and up-to-date merchant information.",
+    "categoryAcceptingTitle": "{category} Accepting Bitcoin",
+    "categoryAcceptingDescription": "Looking for {category} that accept Bitcoin in {location}? Our directory includes verified businesses where you can spend Bitcoin. Filter by location, view on map, and find the perfect place to use your cryptocurrency.",
+    "supportAdoptionTitle": "Support Bitcoin Adoption",
+    "supportAdoptionDescription": "By visiting Bitcoin-accepting businesses in {location}, you help drive cryptocurrency adoption. Every Bitcoin transaction supports merchants who believe in financial freedom and decentralized payments."
+  },
   "headings": {
     "countryOnly": "Bitcoin Places in {country}",
     "countryAndCategory": "{category} in {country}",
