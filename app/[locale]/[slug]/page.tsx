@@ -8,11 +8,11 @@ import {deslugify} from "@/utils/StringUtils";
 import {getMessages} from "next-intl/server";
 import {getLocalizedFromMessages, generateSeoDescription, generateSeoTitle} from "@/app/[locale]/[slug]/MerchantUtils";
 import {Link} from '@/i18n/navigation';
-import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug} from "@/utils/SlugUtils";
+import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug, getSubcategoryFromSlug} from "@/utils/SlugUtils";
 import {EnrichedVenue} from "@/models/Overpass";
 import {getSubcategoryLabel, matchPlaceSubcategory, PlaceSubcategory} from "@/constants/PlaceCategories";
 import { CategoryChip } from "@/components/ui";
-import {getLocalizedCountryName} from "@/utils/CountryUtils";
+import {getLocalizedCountryName, getCountryCodeFromSlug} from "@/utils/CountryUtils";
 import {RegionQuery, VenueSlugEntrySEO} from "@/models/VenueSlug";
 import {getSlugsCache} from "@/app/api/cache/SlugsCache";
 import {parseTags} from "@/utils/OsmHelpers";
@@ -52,28 +52,53 @@ function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, ex
         });
 
     if (candidates.length === 0) {
-        // 4. No exact match - check if country exists in cache (any slug with this country)
-        // Find any entry with this country to get the proper country code
+        // 4. No exact match - validate country and category independently
+
+        // First try to find the country code from cache
+        let countryCode: string | null = null;
         const countryEntry = Object.entries(cache).find(([cachedSlug, entry]) => {
             const parsedCandidate = parseSlugPattern(cachedSlug);
             return parsedCandidate?.country === parsed.country && entry.country;
         });
 
         if (countryEntry) {
-            // Valid country but no venues for this specific category/city combination
-            // Create a synthetic entry so we can show the empty state
-            const [, existingEntry] = countryEntry;
+            countryCode = countryEntry[1].country;
+        } else {
+            // Country not in cache - validate using i18n-iso-countries
+            countryCode = getCountryCodeFromSlug(parsed.country);
+        }
+
+        // Validate the category (convert plural slug to subcategory)
+        const subcategory = getSubcategoryFromSlug(parsed.category, parsed.lang);
+
+        // If both country and category are valid, show empty state
+        if (countryCode && subcategory) {
             return {
                 venueInformation: {
                     type: 'category',
                     locale: parsed.lang,
                     canonical: lowerSlug,
-                    country: existingEntry.country, // Use the proper country code from existing entry
+                    country: countryCode,
                     location: parsed.city,
-                    categoryAndSubcategory: parsed.category ? {
+                    categoryAndSubcategory: {
                         category: 'other',
-                        subcategory: parsed.category as PlaceSubcategory
-                    } : undefined
+                        subcategory: subcategory
+                    }
+                },
+                exactMatch: false,
+                noVenues: true
+            };
+        }
+
+        // If only country is valid (for "shops" URLs which are country-only)
+        if (countryCode && parsed.category === 'shops') {
+            return {
+                venueInformation: {
+                    type: 'country',
+                    locale: parsed.lang,
+                    canonical: lowerSlug,
+                    country: countryCode,
+                    location: parsed.city
                 },
                 exactMatch: false,
                 noVenues: true
