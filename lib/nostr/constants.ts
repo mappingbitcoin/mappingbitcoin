@@ -29,7 +29,7 @@ export const NOSTR_KINDS = {
  * Review event structure (kind 38381)
  *
  * Tags:
- * - ["d", "<osm_id>"] - OSM ID like "node/123456" (makes it addressable)
+ * - ["d", "<osm_d_tag>"] - OSM identifier like "osm:node:123456" (makes it addressable)
  * - ["rating", "1-5"] - Star rating (1-5)
  * - ["g", "<geohash>"] - Location geohash for discovery
  * - ["t", "review"] - Category tag
@@ -38,7 +38,7 @@ export const NOSTR_KINDS = {
  * Content: Review text (markdown supported)
  */
 export interface ReviewEventTags {
-    d: string;        // OSM ID (e.g., "node/123456")
+    d: string;        // OSM d tag (e.g., "osm:node:123456")
     rating?: string;  // "1" to "5"
     g?: string;       // Geohash
     t?: string;       // Category tag
@@ -51,14 +51,14 @@ export interface ReviewEventTags {
  * Tags:
  * - ["e", "<review_event_id>"] - Reference to parent review
  * - ["p", "<review_author_pubkey>"] - Author of the review being replied to
- * - ["d", "<osm_id>"] - OSM ID for context
+ * - ["d", "<osm_d_tag>"] - OSM identifier for context
  *
  * Content: Reply text
  */
 export interface ReviewReplyEventTags {
     e: string;  // Parent review event ID
     p: string;  // Review author pubkey
-    d: string;  // OSM ID
+    d: string;  // OSM d tag (e.g., "osm:node:123456")
 }
 
 /**
@@ -75,11 +75,39 @@ export function parseRatingFromTags(tags: string[][]): number | null {
 }
 
 /**
- * Parse OSM ID from event tags (d tag)
+ * Convert internal osmId (e.g., "node/123456") to Nostr d tag format ("osm:node:123456")
+ */
+export function osmIdToDTag(osmId: string): string {
+    // "node/123456" → "osm:node:123456"
+    return `osm:${osmId.replace("/", ":")}`;
+}
+
+/**
+ * Convert Nostr d tag value back to internal osmId format.
+ * Handles both new format ("osm:node:123456") and legacy format ("node/123456").
+ */
+export function dTagToOsmId(dTagValue: string): string {
+    if (dTagValue.startsWith("osm:")) {
+        // "osm:node:123456" → "node/123456"
+        const withoutPrefix = dTagValue.slice(4); // "node:123456"
+        const colonIdx = withoutPrefix.indexOf(":");
+        if (colonIdx !== -1) {
+            return withoutPrefix.slice(0, colonIdx) + "/" + withoutPrefix.slice(colonIdx + 1);
+        }
+    }
+    // Legacy format or fallback — already "node/123456"
+    return dTagValue;
+}
+
+/**
+ * Parse OSM ID from event tags (d tag).
+ * Handles both new format ("osm:node:123456") and legacy ("node/123456").
+ * Always returns the internal format ("node/123456").
  */
 export function parseOsmIdFromTags(tags: string[][]): string | null {
     const dTag = tags.find(t => t[0] === "d");
-    return dTag?.[1] || null;
+    if (!dTag?.[1]) return null;
+    return dTagToOsmId(dTag[1]);
 }
 
 /**
@@ -110,7 +138,7 @@ export function createReviewTags(
     imageUrls?: string[]
 ): string[][] {
     const tags: string[][] = [
-        ["d", osmId],
+        ["d", osmIdToDTag(osmId)],
         ["t", "review"],
     ];
 
@@ -143,6 +171,6 @@ export function createReviewReplyTags(
     return [
         ["e", reviewEventId],
         ["p", reviewAuthorPubkey],
-        ["d", osmId],
+        ["d", osmIdToDTag(osmId)],
     ];
 }

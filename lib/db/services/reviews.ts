@@ -85,7 +85,18 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
             },
         });
 
-        return tx.review.upsert({
+        // Check if this author already has a review for this venue (different eventId)
+        const existingReview = await tx.review.findFirst({
+            where: {
+                authorPubkey,
+                venueId: venue.id,
+                eventId: { not: eventId },
+            },
+            include: { replies: true },
+        });
+
+        // Create/update the new review
+        const newReview = await tx.review.upsert({
             where: { eventId },
             update: {
                 rating,
@@ -114,6 +125,21 @@ export async function indexReview(input: IndexReviewInput): Promise<IndexReviewR
                 thumbnailKeys: thumbnailKeys ?? [],
             },
         });
+
+        // If there was a previous review, transfer its replies and delete it
+        if (existingReview) {
+            if (existingReview.replies.length > 0) {
+                await tx.reviewReply.updateMany({
+                    where: { reviewId: existingReview.id },
+                    data: { reviewId: newReview.id },
+                });
+                console.log(`[Reviews] Transferred ${existingReview.replies.length} replies from old review ${existingReview.eventId} to ${eventId}`);
+            }
+            await tx.review.delete({ where: { id: existingReview.id } });
+            console.log(`[Reviews] Replaced review ${existingReview.eventId} with ${eventId} for venue ${osmId} by ${authorPubkey.substring(0, 8)}...`);
+        }
+
+        return newReview;
     });
 
     if (spamCheck?.action === "flag") {
@@ -213,6 +239,21 @@ export async function indexReviewReply(input: IndexReviewReplyInput) {
                 profileUpdatedAt: authorProfile ? new Date() : null,
             },
         });
+
+        // Check if this author already has a reply to this review (different eventId)
+        const existingReply = await tx.reviewReply.findFirst({
+            where: {
+                reviewId: review.id,
+                authorPubkey,
+                eventId: { not: eventId },
+            },
+        });
+
+        // Delete old reply if the same owner is replacing it
+        if (existingReply) {
+            await tx.reviewReply.delete({ where: { id: existingReply.id } });
+            console.log(`[Reviews] Replaced reply ${existingReply.eventId} with ${eventId} for review ${reviewEventId} by ${authorPubkey.substring(0, 8)}...`);
+        }
 
         return tx.reviewReply.upsert({
             where: { eventId },
