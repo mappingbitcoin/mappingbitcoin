@@ -14,6 +14,7 @@ import { City } from "@/models/City";
 import KDBush from "kdbush";
 import { around } from "geokdbush";
 import { assignSlugToVenue } from "@/utils/sync/slugs/VenueSlugs";
+import { saveSlugRegistry } from "@/utils/sync/slugs/SlugRegistry";
 
 const ENRICHED_FILE = path.resolve("data", "EnrichedVenues.json");
 const FALLBACK_FILE = path.resolve("data", "BitcoinVenues.json");
@@ -33,10 +34,15 @@ function logGeoEnrichment(entries: string[]) {
 }
 
 async function getBatchFiles(): Promise<string[]> {
+    if (!fsSync.existsSync(QUEUE_DIR)) return [];
     const files = await fs.readdir(QUEUE_DIR);
     return files
         .filter(f => /^geo-enrichment-\d+\.json$/.test(f))
-        .sort((a, b) => parseInt(a) - parseInt(b));
+        .sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, ''), 10);
+            const numB = parseInt(b.replace(/\D/g, ''), 10);
+            return numA - numB;
+        });
 }
 
 function computeCenterFromNodes(venue: EnrichedVenue, allVenues: EnrichedVenue[], venuesIndex: Record<string, number>) {
@@ -149,6 +155,7 @@ async function enrichVenue(
 async function saveAndRefresh(venues: EnrichedVenue[], logs: string[]) {
     await fs.writeFile(ENRICHED_FILE, JSON.stringify(venues, null, 2), "utf8");
     await uploadToStorage(ENRICHED_FILE, "EnrichedVenues.json", AssetType.VENUES);
+    await saveSlugRegistry().catch(err => console.error("[EnrichGeoData] Failed to save slug registry:", err));
     logGeoEnrichment(logs);
     await refreshVenueCache();
     await refreshLocationCache();

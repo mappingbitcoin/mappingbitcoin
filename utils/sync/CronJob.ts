@@ -45,9 +45,16 @@ export async function startBitcoinVenueCron() {
         try {
             await initOsmReplicationState()
             await processOsmDiffs();
-            await enrichGeoData();
         } catch (err) {
             console.error('[Cron] Diff sync error:', err);
+        }
+
+        // Run enrichment independently - process any pending queue files
+        // even if diff processing failed above
+        try {
+            await enrichGeoData();
+        } catch (err) {
+            console.error('[Cron] Geo enrichment error:', err);
         } finally {
             isSyncRunningOsmDiffs = false;
         }
