@@ -182,7 +182,7 @@ export async function POST(req: Request) {
         // Announce new venue on Nostr (non-blocking)
         if (nodeId) {
             announceNewVenue({
-                osmId: `node:${nodeId}`,
+                osmId: `node/${nodeId}`,
                 name: venue.name || "New venue",
                 city: venue.city,
                 country: venue.country,

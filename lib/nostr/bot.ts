@@ -7,6 +7,7 @@
 import { serverEnv, publicEnv } from "@/lib/Environment";
 import { getPublicKey, signEvent, getEventHash, hexToNpub, NostrEvent } from "./crypto";
 import { publishEventToRelays, NOSTR_RELAYS } from "./actions";
+import { getSlugForOsmId } from "@/utils/sync/slugs/SlugRegistry";
 
 // ============================================================================
 // Message Templates - New Venue (30 variations)
@@ -122,9 +123,17 @@ function maskEmail(email: string): string {
 export interface VenueInfo {
     osmId: string;
     name: string;
+    slug?: string;
     city?: string;
     country?: string;
     category?: string;
+}
+
+/**
+ * Extract the numeric ID from an osmId string like "node/12345" or "node:12345"
+ */
+export function extractNumericId(osmId: string): string {
+    return osmId.replace(/^(node|way|relation)[/:]/, '');
 }
 
 export interface VerificationInfo {
@@ -149,7 +158,9 @@ export async function announceNewVenue(
     try {
         const botPubkey = getPublicKey(privateKey);
         const location = [venue.city, venue.country].filter(Boolean).join(", ") || "unknown location";
-        const url = `${publicEnv.siteUrl}/places/${venue.osmId}`;
+        const registrySlug = !venue.slug ? await getSlugForOsmId(venue.osmId).catch(() => undefined) : undefined;
+        const venueSlug = venue.slug || registrySlug || extractNumericId(venue.osmId);
+        const url = `${publicEnv.siteUrl}/places/${venueSlug}`;
 
         const template = getRandomTemplate(NEW_VENUE_TEMPLATES);
         const content = template
@@ -219,7 +230,9 @@ export async function announceVerification(
     try {
         const botPubkey = getPublicKey(privateKey);
         const location = [venue.city, venue.country].filter(Boolean).join(", ") || "unknown location";
-        const url = `${publicEnv.siteUrl}/places/${venue.osmId}`;
+        const registrySlug = !venue.slug ? await getSlugForOsmId(venue.osmId).catch(() => undefined) : undefined;
+        const venueSlug = venue.slug || registrySlug || extractNumericId(venue.osmId);
+        const url = `${publicEnv.siteUrl}/places/${venueSlug}`;
         const method = formatVerificationMethod(verification.method, verification.detail);
 
         const template = getRandomTemplate(VERIFIED_VENUE_TEMPLATES);

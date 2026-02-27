@@ -11,6 +11,10 @@ import Textarea from "@/components/ui/Textarea";
 import FormField from "@/components/ui/FormField";
 import Checkbox from "@/components/ui/Checkbox";
 
+function extractNumericId(osmId: string): string {
+    return osmId.replace(/^(node|way|relation)[/:]/, '');
+}
+
 type PostType = "manual" | "new" | "verified" | "created";
 type PlaceFilter = "all" | "verified" | "unverified";
 
@@ -499,8 +503,8 @@ export default function PostTab() {
                             <p className="text-xs text-text-light mb-2">Template Preview (example):</p>
                             <p className="text-white text-sm">
                                 {postType === "verified"
-                                    ? `Verified! ${selectedPlace.name} in ${selectedPlace.city}, ${selectedPlace.country} is officially confirmed via ${selectedPlace.verificationMethod?.toLowerCase() || "verification"}. Trust, but verify. https://mappingbitcoin.com/places/${selectedPlace.slug || selectedPlace.osmId}`
-                                    : `New Bitcoin spot just dropped! ${selectedPlace.name} in ${selectedPlace.city}, ${selectedPlace.country} now accepts sats. Check it out on the map: https://mappingbitcoin.com/places/${selectedPlace.slug || selectedPlace.osmId}`}
+                                    ? `Verified! ${selectedPlace.name} in ${selectedPlace.city}, ${selectedPlace.country} is officially confirmed via ${selectedPlace.verificationMethod?.toLowerCase() || "verification"}. Trust, but verify. https://mappingbitcoin.com/places/${selectedPlace.slug || extractNumericId(selectedPlace.osmId)}`
+                                    : `New Bitcoin spot just dropped! ${selectedPlace.name} in ${selectedPlace.city}, ${selectedPlace.country} now accepts sats. Check it out on the map: https://mappingbitcoin.com/places/${selectedPlace.slug || extractNumericId(selectedPlace.osmId)}`}
                             </p>
                             <p className="text-xs text-text-light/60 mt-2 italic">
                                 Actual content will be randomly selected from 30 template variations

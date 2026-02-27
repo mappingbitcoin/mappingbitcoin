@@ -194,7 +194,7 @@ export async function enrichGeoData() {
         for (const v of venues) {
             const enriched = await enrichVenue(v, venues, _venueIndexMap, findNearestCity);
             if (enriched) {
-                assignSlugToVenue(enriched, existingSlugs);
+                await assignSlugToVenue(enriched, existingSlugs);
                 byId.set(v.id, enriched);
                 logs.push(`✅ Enriched ${v.id} — ${enriched.city}, ${enriched.state}, ${enriched.country} [slug: ${enriched.slug}]`);
                 enrichedCount++;
@@ -252,7 +252,7 @@ export async function enrichGeoData() {
         for (const queued of queue) {
             const enriched = await enrichVenue(queued, venues, _venueIndexMap, findNearestCity, byId.get(queued.id));
             if (enriched) {
-                assignSlugToVenue(enriched, existingSlugs);
+                await assignSlugToVenue(enriched, existingSlugs);
                 byId.set(queued.id, enriched);
                 logs.push(`✅ Enriched ${queued.id} — ${enriched.city}, ${enriched.state}, ${enriched.country} [slug: ${enriched.slug}]`);
                 enrichedCount++;

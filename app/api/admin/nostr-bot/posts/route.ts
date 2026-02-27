@@ -9,6 +9,7 @@ import {
     NOSTR_RELAYS,
     NostrPost,
 } from "@/lib/nostr/actions";
+import { extractNumericId } from "@/lib/nostr/bot";
 
 // ============================================================================
 // Message Templates - New Venue (30 variations)
@@ -279,7 +280,7 @@ export async function POST(request: NextRequest) {
         if (postType && place) {
             const placeData = place as PlacePostData;
             const location = [placeData.city, placeData.country].filter(Boolean).join(", ") || "unknown location";
-            url = `${publicEnv.siteUrl}/places/${placeData.slug || placeData.osmId}`;
+            url = `${publicEnv.siteUrl}/places/${placeData.slug || extractNumericId(placeData.osmId)}`;
 
             // Check for duplicate posts before proceeding
             const duplicateCheck = await checkForDuplicatePost(

@@ -5,6 +5,7 @@ import slugify from 'slugify';
 import { EnrichedVenue } from '@/models/Overpass';
 import { uploadToStorage, AssetType } from '@/lib/storage';
 import { refreshVenueCache } from '@/app/api/cache/VenueCache';
+import { registerSlugBatch, saveSlugRegistry } from './SlugRegistry';
 
 const ENRICHED_FILE = path.resolve('data', 'EnrichedVenues.json');
 
@@ -72,12 +73,17 @@ export async function generateVenueSlugs(): Promise<number> {
             venue.slug = slug;
             existingSlugs.add(slug);
             updated++;
+
+            // Register in slug registry
+            const name = venue.tags?.name || venue.tags?.['name:en'] || '';
+            await registerSlugBatch(`node/${venue.id}`, slug, name, venue.city, venue.country);
         }
     }
 
     if (updated > 0) {
         await fs.writeFile(ENRICHED_FILE, JSON.stringify(venues, null, 2), 'utf8');
         await uploadToStorage(ENRICHED_FILE, 'EnrichedVenues.json', AssetType.VENUES);
+        await saveSlugRegistry();
         await refreshVenueCache();
         console.log(`[VenueSlugs] Generated slugs for ${updated} venues.`);
     } else {
@@ -87,10 +93,10 @@ export async function generateVenueSlugs(): Promise<number> {
     return updated;
 }
 
-export function assignSlugToVenue(
+export async function assignSlugToVenue(
     venue: EnrichedVenue,
     existingSlugs: Set<string>
-): string {
+): Promise<string> {
     if (venue.slug && !existingSlugs.has(venue.slug)) {
         existingSlugs.add(venue.slug);
         return venue.slug;
@@ -99,5 +105,10 @@ export function assignSlugToVenue(
     const slug = generateVenueSlug(venue, existingSlugs);
     venue.slug = slug;
     existingSlugs.add(slug);
+
+    // Register in slug registry
+    const name = venue.tags?.name || venue.tags?.['name:en'] || '';
+    await registerSlugBatch(`node/${venue.id}`, slug, name, venue.city, venue.country);
+
     return slug;
 }

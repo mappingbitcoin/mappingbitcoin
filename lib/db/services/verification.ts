@@ -3,7 +3,8 @@ import { Resend } from "resend";
 import dns from "dns/promises";
 import { createVerificationCodeEmail } from "@/lib/email/templates";
 import { serverEnv } from "@/lib/Environment";
-import { announceVerification } from "@/lib/nostr/bot";
+import { announceVerification, extractNumericId } from "@/lib/nostr/bot";
+import { getVenueCache, getVenueIndexMap } from "@/app/api/cache/VenueCache";
 
 const VERIFICATION_CODE_EXPIRY_MINUTES = 15;
 const MAX_VERIFICATION_ATTEMPTS = 5;
@@ -172,11 +173,22 @@ export async function verifyEmailCode(
         },
     });
 
+    // Look up venue details from cache for the Nostr announcement
+    const numericId = parseInt(extractNumericId(updatedClaim.venue.id), 10);
+    const venueCache = await getVenueCache();
+    const indexMap = await getVenueIndexMap();
+    const cachedVenue = !isNaN(numericId) && indexMap[numericId] !== undefined
+        ? venueCache[indexMap[numericId]]
+        : undefined;
+
     // Announce verification on Nostr and store the event ID
     announceVerification(
         {
             osmId: updatedClaim.venue.id,
-            name: "Verified Merchant", // Name will be fetched from cache if needed
+            name: cachedVenue?.tags?.name || "Verified Merchant",
+            slug: cachedVenue?.slug,
+            city: cachedVenue?.city,
+            country: cachedVenue?.country,
         },
         {
             method: "EMAIL",
@@ -512,11 +524,22 @@ export async function checkDomainVerification(
                 },
             });
 
+            // Look up venue details from cache for the Nostr announcement
+            const domainNumericId = parseInt(extractNumericId(updatedClaim.venue.id), 10);
+            const domainVenueCache = await getVenueCache();
+            const domainIndexMap = await getVenueIndexMap();
+            const domainCachedVenue = !isNaN(domainNumericId) && domainIndexMap[domainNumericId] !== undefined
+                ? domainVenueCache[domainIndexMap[domainNumericId]]
+                : undefined;
+
             // Announce verification on Nostr and store the event ID
             announceVerification(
                 {
                     osmId: updatedClaim.venue.id,
-                    name: "Verified Merchant", // Name will be fetched from cache if needed
+                    name: domainCachedVenue?.tags?.name || "Verified Merchant",
+                    slug: domainCachedVenue?.slug,
+                    city: domainCachedVenue?.city,
+                    country: domainCachedVenue?.country,
                 },
                 {
                     method: "DOMAIN",
