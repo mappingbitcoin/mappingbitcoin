@@ -6,13 +6,15 @@ import TabButton from "@/components/ui/TabButton";
 import ProfileTab from "./components/ProfileTab";
 import WallTab from "./components/WallTab";
 import PostTab from "./components/PostTab";
+import ToolsTab from "./components/ToolsTab";
 
-type TabType = "profile" | "wall" | "post";
+type TabType = "profile" | "wall" | "post" | "tools";
 
 const tabs: { id: TabType; label: string }[] = [
     { id: "profile", label: "Profile" },
     { id: "wall", label: "Wall" },
     { id: "post", label: "New Post" },
+    { id: "tools", label: "Tools" },
 ];
 
 export default function NostrBotPage() {
@@ -54,6 +56,7 @@ export default function NostrBotPage() {
                 {activeTab === "profile" && <ProfileTab />}
                 {activeTab === "wall" && <WallTab />}
                 {activeTab === "post" && <PostTab />}
+                {activeTab === "tools" && <ToolsTab />}
             </div>
         </div>
     );
