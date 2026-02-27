@@ -26,39 +26,43 @@ export const NOSTR_KINDS = {
 } as const;
 
 /**
- * Review event structure (kind 38381)
+ * Event Formats
  *
- * Tags:
- * - ["d", "<osm_d_tag>"] - OSM identifier like "osm:node:123456" (makes it addressable)
- * - ["rating", "1-5"] - Star rating (1-5)
- * - ["g", "<geohash>"] - Location geohash for discovery
- * - ["t", "review"] - Category tag
- * - ["image", "<url>"] - Optional image URL (Blossom)
+ * Review (kind 38381) — addressable by (author, "osm:node:123456")
+ *   tags:
+ *     ["d",      "osm:node:123456"]       addressable key
+ *     ["i",      "osm:node/123456"]       venue reference (query via #i)
+ *     ["t",      "review"]                category
+ *     ["rating", "1"–"5"]                 optional star rating
+ *     ["g",      "<geohash9>"]            chained geohash (9→3 chars)
+ *     ["g",      "<geohash8>"]
+ *     ...
+ *     ["g",      "<geohash3>"]
+ *     ["image",  "<url>"]                 optional, repeatable (Blossom)
+ *   content: review text (markdown)
  *
- * Content: Review text (markdown supported)
+ * Reply (kind 38382) — addressable by (author, review_event_id)
+ *   tags:
+ *     ["d", "<review_event_id>"]          addressable key (one reply per review)
+ *     ["e", "<review_event_id>"]          parent review reference
+ *     ["p", "<review_author_pubkey>"]     parent review author
+ *     ["i", "osm:node/123456"]            venue reference (query via #i)
+ *     ["g", "<geohash9>"]                 chained geohash (9→3 chars)
+ *     ...
+ *     ["g", "<geohash3>"]
+ *   content: reply text
  */
-export interface ReviewEventTags {
-    d: string;        // OSM d tag (e.g., "osm:node:123456")
-    rating?: string;  // "1" to "5"
-    g?: string;       // Geohash
-    t?: string;       // Category tag
-    image?: string;   // Image URL (Blossom)
-}
 
 /**
- * Review reply event structure (kind 38382)
- *
- * Tags:
- * - ["e", "<review_event_id>"] - Reference to parent review
- * - ["p", "<review_author_pubkey>"] - Author of the review being replied to
- * - ["d", "<osm_d_tag>"] - OSM identifier for context
- *
- * Content: Reply text
+ * Produce chained geohash tags at decreasing precision for geographic discovery.
+ * e.g. "u09tunq6x" → [["g","u09tunq6x"],["g","u09tunq6"],…,["g","u09"]]
  */
-export interface ReviewReplyEventTags {
-    e: string;  // Parent review event ID
-    p: string;  // Review author pubkey
-    d: string;  // OSM d tag (e.g., "osm:node:123456")
+function geohashChain(geohash: string, minLength = 3): string[][] {
+    const tags: string[][] = [];
+    for (let len = geohash.length; len >= minLength; len--) {
+        tags.push(["g", geohash.slice(0, len)]);
+    }
+    return tags;
 }
 
 /**
@@ -120,15 +124,6 @@ export function parseImagesFromTags(tags: string[][]): string[] {
 }
 
 /**
- * @deprecated Use parseImagesFromTags for multiple image support
- * Parse single image URL from event tags (for backwards compatibility)
- */
-export function parseImageFromTags(tags: string[][]): string | null {
-    const imageTag = tags.find(t => t[0] === "image");
-    return imageTag?.[1] || null;
-}
-
-/**
  * Create tags for a review event
  */
 export function createReviewTags(
@@ -139,6 +134,7 @@ export function createReviewTags(
 ): string[][] {
     const tags: string[][] = [
         ["d", osmIdToDTag(osmId)],
+        ["i", `osm:${osmId}`],
         ["t", "review"],
     ];
 
@@ -147,7 +143,7 @@ export function createReviewTags(
     }
 
     if (geohash) {
-        tags.push(["g", geohash]);
+        tags.push(...geohashChain(geohash));
     }
 
     // Add multiple image tags
@@ -161,16 +157,29 @@ export function createReviewTags(
 }
 
 /**
- * Create tags for a review reply event
+ * Create tags for a review reply event.
+ * The d tag is the review event ID so each (author, review) pair is
+ * addressable — the owner can edit their reply while having separate
+ * replies for different reviews.
+ * The i tag carries the OSM reference so relays can filter all review
+ * activity (reviews + replies) for a venue via #i.
  */
 export function createReviewReplyTags(
     reviewEventId: string,
     reviewAuthorPubkey: string,
-    osmId: string
+    osmId: string,
+    geohash?: string,
 ): string[][] {
-    return [
+    const tags: string[][] = [
+        ["d", reviewEventId],
         ["e", reviewEventId],
         ["p", reviewAuthorPubkey],
-        ["d", osmIdToDTag(osmId)],
+        ["i", `osm:${osmId}`],
     ];
+
+    if (geohash) {
+        tags.push(...geohashChain(geohash));
+    }
+
+    return tags;
 }

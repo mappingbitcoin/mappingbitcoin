@@ -203,7 +203,7 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
 
         try {
             // Create the reply event
-            const tags = createReviewReplyTags(reviewEventId, reviewAuthorPubkey, osmId);
+            const tags = createReviewReplyTags(reviewEventId, reviewAuthorPubkey, osmId, geohash);
             const event = {
                 kind: NOSTR_KINDS.REVIEW_REPLY,
                 tags,
@@ -272,7 +272,7 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
             setSubmitError(err instanceof Error ? err.message : "Failed to submit reply");
             return false;
         }
-    }, [user, profile, osmId, publishEvent, publishError, clearError]);
+    }, [user, profile, osmId, geohash, publishEvent, publishError, clearError]);
 
     return {
         reviews,
