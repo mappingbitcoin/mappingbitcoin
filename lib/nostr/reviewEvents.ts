@@ -15,25 +15,6 @@ export interface NostrEvent {
     sig: string;
 }
 
-export interface ParsedReview {
-    eventId: string;
-    osmId: string;
-    authorPubkey: string;
-    rating: number | null;
-    content: string | null;
-    eventCreatedAt: Date;
-}
-
-export interface ParsedReply {
-    eventId: string;
-    reviewEventId: string;
-    reviewAuthorPubkey: string;
-    osmId: string;
-    authorPubkey: string;
-    content: string;
-    eventCreatedAt: Date;
-}
-
 /**
  * Parse a review event (kind 38381) into IndexReviewInput format
  */
@@ -71,7 +52,8 @@ export function parseReviewEvent(event: NostrEvent): IndexReviewInput | null {
 }
 
 /**
- * Parse a review reply event (kind 38382) into IndexReviewReplyInput format
+ * Parse a review reply event (kind 38382) into IndexReviewReplyInput format.
+ * The d tag contains the parent review event ID (same value as the e tag).
  */
 export function parseReplyEvent(event: NostrEvent): Omit<IndexReviewReplyInput, "isOwnerReply"> | null {
     if (event.kind !== NOSTR_KINDS.REVIEW_REPLY) {
@@ -79,18 +61,14 @@ export function parseReplyEvent(event: NostrEvent): Omit<IndexReviewReplyInput, 
         return null;
     }
 
-    // Extract e tag (parent review event ID)
+    // Extract parent review event ID from e tag (or fall back to d tag)
     const eTag = event.tags.find(t => t[0] === "e");
-    if (!eTag || !eTag[1]) {
-        console.warn(`[parseReplyEvent] Missing parent review ID (e tag) in event ${event.id}`);
+    const dTag = event.tags.find(t => t[0] === "d");
+    const reviewEventId = eTag?.[1] || dTag?.[1];
+    if (!reviewEventId) {
+        console.warn(`[parseReplyEvent] Missing parent review ID (e/d tag) in event ${event.id}`);
         return null;
     }
-
-    // Extract p tag (parent review author pubkey) - optional but useful
-    const pTag = event.tags.find(t => t[0] === "p");
-
-    // Extract d tag (OSM ID) - for context
-    const osmId = parseOsmIdFromTags(event.tags);
 
     const content = event.content?.trim();
     if (!content) {
@@ -100,7 +78,7 @@ export function parseReplyEvent(event: NostrEvent): Omit<IndexReviewReplyInput, 
 
     return {
         eventId: event.id,
-        reviewEventId: eTag[1],
+        reviewEventId,
         authorPubkey: event.pubkey,
         content,
         eventCreatedAt: new Date(event.created_at * 1000),
@@ -108,13 +86,26 @@ export function parseReplyEvent(event: NostrEvent): Omit<IndexReviewReplyInput, 
 }
 
 /**
- * Validate a Nostr event signature (basic check)
- * For production, use a proper verification library
+ * Verify a Nostr event: checks that the id matches the hash of the
+ * serialized event, and that the Schnorr signature is valid.
  */
-export function validateEventId(event: NostrEvent): boolean {
-    // In production, calculate the event hash and compare
-    // For now, just check that the ID exists and has correct format
-    return event.id && /^[0-9a-f]{64}$/i.test(event.id);
+export async function verifyEvent(event: NostrEvent): Promise<boolean> {
+    try {
+        const { getEventHash } = await import("./crypto");
+        const { schnorr } = await import("@noble/secp256k1");
+        const { hexToBytes } = await import("@noble/hashes/utils.js");
+
+        const expectedId = getEventHash(event);
+        if (event.id !== expectedId) return false;
+
+        return schnorr.verify(
+            hexToBytes(event.sig),
+            hexToBytes(event.id),
+            hexToBytes(event.pubkey)
+        );
+    } catch {
+        return false;
+    }
 }
 
 /**

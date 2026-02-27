@@ -455,6 +455,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                         <ReviewsSection
                                             osmId={`${venue.type}/${venue.id}`}
                                             venueSlug={`${venue.type}-${venue.id}`}
+                                            geohash={venue.geohash}
                                         />
                                     )}
 

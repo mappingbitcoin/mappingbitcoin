@@ -15,6 +15,7 @@ import KDBush from "kdbush";
 import { around } from "geokdbush";
 import { assignSlugToVenue } from "@/utils/sync/slugs/VenueSlugs";
 import { saveSlugRegistry } from "@/utils/sync/slugs/SlugRegistry";
+import ngeohash from "ngeohash";
 
 const ENRICHED_FILE = path.resolve("data", "EnrichedVenues.json");
 const FALLBACK_FILE = path.resolve("data", "BitcoinVenues.json");
@@ -92,6 +93,11 @@ async function enrichVenue(
         } else {
             console.warn(`⚠️ Geo-enrichment failed for venue ${v.id} at (${v.lon}, ${v.lat}) - no nearest city found`);
         }
+    }
+
+    if (!existing?.geohash && v.lat && v.lon) {
+        v.geohash = ngeohash.encode(v.lat, v.lon, 9);
+        updated = true;
     }
 
     if ((!existing?.category || !existing.subcategory) && v.tags) {

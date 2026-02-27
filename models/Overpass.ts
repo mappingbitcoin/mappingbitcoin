@@ -42,6 +42,7 @@ export type EnrichedVenue<T extends PlaceCategory = PlaceCategory> = OverpassEle
     country: string;
     state?: string;
     city: string;
+    geohash?: string;
     enrichedAt: string; // Timestamp of basic address enrichment
     formattedAddress: string;
 
