@@ -2,11 +2,13 @@
 /**
  * Repost Verification Announcements
  *
- * Fetches the bot's verification posts from relays, deletes them via NIP-09,
- * and re-publishes with corrected URLs (using slugs or numeric IDs).
+ * Fetches the bot's verification posts from relays, detects those with
+ * malformed URLs (e.g. /places/node/12345 instead of /places/some-slug),
+ * deletes them via NIP-09, and re-publishes with corrected URLs.
  *
  * Usage:
- *   npx tsx scripts/repostVerifications.ts                    # Process all
+ *   npx tsx scripts/repostVerifications.ts                    # Fix bad URLs only
+ *   npx tsx scripts/repostVerifications.ts --all              # Reprocess ALL events
  *   npx tsx scripts/repostVerifications.ts --dry-run          # Preview only
  *   npx tsx scripts/repostVerifications.ts --limit 5          # First 5 only
  *   npx tsx scripts/repostVerifications.ts --dry-run --limit 3
@@ -28,11 +30,13 @@ import { getSlugForOsmId } from "../utils/sync/slugs/SlugRegistry";
 interface CliOptions {
     dryRun: boolean;
     limit: number;
+    all: boolean;
 }
 
 function parseArgs(): CliOptions {
     const args = process.argv.slice(2);
     const dryRun = args.includes("--dry-run");
+    const all = args.includes("--all");
 
     let limit = Infinity;
     const limitIdx = args.indexOf("--limit");
@@ -44,7 +48,7 @@ function parseArgs(): CliOptions {
         }
     }
 
-    return { dryRun, limit };
+    return { dryRun, limit, all };
 }
 
 // ============================================================================
@@ -82,6 +86,25 @@ function getMethodFromPost(post: NostrPost): { method: string; detail: string } 
     return null;
 }
 
+/**
+ * Extract the URL from a post's ["r", url] tag or content
+ */
+function getUrlFromPost(post: NostrPost): string | null {
+    const rTag = post.tags.find((t) => t[0] === "r");
+    if (rTag?.[1]) return rTag[1];
+    // Fallback: extract URL from content
+    const urlMatch = post.content.match(/https?:\/\/[^\s]+\/places\/[^\s]+/);
+    return urlMatch?.[0] || null;
+}
+
+/**
+ * Check if a URL contains a malformed venue path like /places/node/12345
+ * instead of /places/some-slug or /places/12345
+ */
+function hasBadUrl(url: string): boolean {
+    return /\/places\/(node|way|relation)\//.test(url);
+}
+
 // ============================================================================
 // Main
 // ============================================================================
@@ -91,6 +114,7 @@ async function main() {
 
     console.log("[Repost] Repost Verification Announcements");
     console.log(`[Repost] Mode: ${options.dryRun ? "DRY RUN" : "LIVE"}`);
+    console.log(`[Repost] Scope: ${options.all ? "ALL events" : "BAD URLs only"}`);
     if (options.limit < Infinity) console.log(`[Repost] Limit: ${options.limit}`);
     console.log();
 
@@ -153,6 +177,18 @@ async function main() {
     if (unmatchedPosts.length > 0) {
         console.log(`[Repost] ${unmatchedPosts.length} verification posts not matched to any claim (will skip)`);
     }
+
+    // 5b. Filter to only bad URLs unless --all
+    let candidates = matched;
+    if (!options.all) {
+        const withBadUrls = matched.filter(({ post }) => {
+            const url = getUrlFromPost(post);
+            return url ? hasBadUrl(url) : false;
+        });
+        const goodCount = matched.length - withBadUrls.length;
+        console.log(`[Repost] ${withBadUrls.length} events have malformed URLs, ${goodCount} are OK`);
+        candidates = withBadUrls;
+    }
     console.log();
 
     // 6. Load venue data
@@ -160,7 +196,7 @@ async function main() {
     const venueIndexMap = await getVenueIndexMap();
 
     // Apply limit
-    const toProcess = matched.slice(0, options.limit);
+    const toProcess = candidates.slice(0, options.limit);
 
     // 7. Process each matched claim
     let deleted = 0;
@@ -176,10 +212,14 @@ async function main() {
 
         const venueName = venue?.tags?.name || "Unknown venue";
         const slug = venue?.slug || (await getSlugForOsmId(osmId).catch(() => undefined));
+        const oldUrl = getUrlFromPost(post);
+        const newSlug = slug || extractNumericId(osmId);
+        const newUrl = `https://mappingbitcoin.com/places/${newSlug}`;
 
         console.log(`[Repost] [${i + 1}/${toProcess.length}] ${venueName} (${osmId})`);
         console.log(`  Old event: ${post.id}`);
-        console.log(`  Slug: ${slug || "(none, will use numeric ID)"}`);
+        console.log(`  Old URL:   ${oldUrl || "(not found)"}`);
+        console.log(`  New URL:   ${newUrl}`);
 
         if (options.dryRun) {
             console.log("  -> DRY RUN: Would delete + republish");
@@ -257,6 +297,7 @@ async function main() {
     console.log("[Repost] Summary:");
     console.log(`  Total verification posts found: ${verificationPosts.length}`);
     console.log(`  Matched to DB claims: ${matched.length}`);
+    console.log(`  With bad URLs: ${candidates.length}`);
     console.log(`  Processed: ${toProcess.length}`);
     if (!options.dryRun) {
         console.log(`  Deleted: ${deleted}`);
