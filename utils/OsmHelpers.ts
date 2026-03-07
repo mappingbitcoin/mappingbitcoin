@@ -7,11 +7,14 @@ import {Locale} from "@/i18n/types";
 import addressFormatter from "@fragaria/address-formatter";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 
-export function buildTagsFromForm(form: VenueForm): Record<string, string> {
+export function buildTagsFromForm(form: VenueForm, options?: { nostrPubkey?: string }): Record<string, string> {
     const tags: Record<string, string> = {};
 
     if (form.role && form.role !== '')
         tags["note:submitted_by_role"] = form.role;
+
+    if (options?.nostrPubkey)
+        tags["note:submitted_by_nostr"] = options.nostrPubkey;
 
     // Type from subcategory
     if (form.subcategory !== '') {

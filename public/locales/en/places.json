@@ -42,6 +42,19 @@
       "owner": "Business Owner",
       "customer": "Visited as Customer",
       "other": "Other"
+    },
+    "osmAccountChoice": {
+      "title": "How would you like to submit?",
+      "mappingbitcoin": "MappingBitcoin",
+      "mappingbitcoinDesc": "No login required",
+      "personal": "My OSM Account",
+      "personalDesc": "Requires OSM login",
+      "personalLoggedIn": "Logged in as {name}"
+    },
+    "nostrAttribution": {
+      "label": "Attribute this contribution to your Nostr profile",
+      "loginPrompt": "Want attribution?",
+      "loginLink": "Log in with Nostr"
     }
   }
 }

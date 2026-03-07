@@ -14,7 +14,9 @@ import { Locale } from "@/i18n/types";
 import addressFormatter from "@fragaria/address-formatter";
 import { findOne } from "country-codes-list";
 import { useOsmUser } from "@/providers/OsmAuth";
+import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { LoginWithOSM } from "@/components/auth";
+import LoginModal from "@/components/auth/LoginModal";
 import { COMMON_TAG_TRANSLATIONS, CommonTag } from "@/constants/CommonOsmTags";
 import {
     PlaceCategory,
@@ -36,6 +38,7 @@ import {
     CategorySelector,
     LocationSection,
     PlacePreview,
+    OsmAccountChoice,
 } from "@/components/place-form";
 import { useAddressAutocomplete, reverseGeocode } from "@/hooks/useAddressAutocomplete";
 import { useVenueSearch, fetchVenueDetails } from "@/hooks/useVenueSearch";
@@ -160,6 +163,7 @@ const TABS = [
 
 export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps) {
     const { user } = useOsmUser();
+    const { user: nostrUser, profile: nostrProfile } = useNostrAuth();
     const t = useTranslations('venues.form');
     const locale = useLocale() as Locale;
     const router = useRouter();
@@ -167,6 +171,9 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isImageUploading, setIsImageUploading] = useState(false);
     const [suggestedSubcategories, setSuggestedSubcategories] = useState<string[]>([]);
+    const [osmAccountMode, setOsmAccountMode] = useState<"mappingbitcoin" | "personal">("mappingbitcoin");
+    const [nostrAttribution, setNostrAttribution] = useState(false);
+    const [showNostrLoginModal, setShowNostrLoginModal] = useState(false);
 
     const isEditMode = Boolean(venue);
 
@@ -377,7 +384,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (!user) {
+        if (osmAccountMode === "personal" && !user) {
             toast.error("Please login with OpenStreetMap first.");
             return;
         }
@@ -435,6 +442,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                     body: JSON.stringify({
                         venue: form,
                         captcha: token,
+                        osmAccountMode,
+                        nostrPubkey: nostrAttribution && nostrUser?.pubkey ? nostrUser.pubkey : undefined,
                         suggestedSubcategories: suggestedSubcategories.length > 0 ? suggestedSubcategories : undefined,
                     }),
                 });
@@ -548,6 +557,20 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                     {/* About Tab */}
                                     {activeTab === 1 && (
                                         <>
+                                            {/* OSM Account Choice - only in create mode */}
+                                            {!isEditMode && (
+                                                <OsmAccountChoice
+                                                    mode={osmAccountMode}
+                                                    onModeChange={setOsmAccountMode}
+                                                    nostrAttribution={nostrAttribution}
+                                                    onNostrAttributionChange={setNostrAttribution}
+                                                    osmUserName={user?.display_name || null}
+                                                    nostrProfileName={nostrProfile?.display_name || nostrProfile?.name || null}
+                                                    isNostrLoggedIn={!!nostrUser}
+                                                    onNostrLoginClick={() => setShowNostrLoginModal(true)}
+                                                />
+                                            )}
+
                                             {/* Top row: Image on left, Name/Category on right - 50/50 */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                                 {/* Left column: Image uploader */}
@@ -821,7 +844,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                         )}
                                         {activeTab === 3 && (
                                             <>
-                                                {!user ? (
+                                                {osmAccountMode === "personal" && !user ? (
                                                     <LoginWithOSM />
                                                 ) : (
                                                     <Button
@@ -857,6 +880,12 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                     </p>
                 </div>
             </section>
+
+            {/* Nostr Login Modal (for optional attribution) */}
+            <LoginModal
+                isOpen={showNostrLoginModal}
+                onClose={() => setShowNostrLoginModal(false)}
+            />
         </>
     );
 }
