@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { publicEnv } from "@/lib/Environment";
 
 interface UseRecaptchaOptions {
@@ -67,9 +67,14 @@ let loadingPromise: Promise<void> | null = null;
  * Script is loaded lazily - only when preload() is called or getToken() is requested
  */
 export function useRecaptcha({ action }: UseRecaptchaOptions): UseRecaptchaReturn {
-    const [isReady, setIsReady] = useState(() =>
-        typeof window !== "undefined" && Boolean(window.grecaptcha)
-    );
+    const [isReady, setIsReady] = useState(false);
+
+    // Check if already loaded after hydration to avoid mismatch
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.grecaptcha) {
+            setIsReady(true);
+        }
+    }, []);
     const isConfigured = Boolean(publicEnv.recaptchaSiteKey);
     const loadingRef = useRef(false);
 
