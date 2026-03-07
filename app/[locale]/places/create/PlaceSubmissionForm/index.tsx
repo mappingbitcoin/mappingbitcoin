@@ -171,7 +171,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isImageUploading, setIsImageUploading] = useState(false);
     const [suggestedSubcategories, setSuggestedSubcategories] = useState<string[]>([]);
-    const [osmAccountMode, setOsmAccountMode] = useState<"mappingbitcoin" | "personal">("mappingbitcoin");
+    // TODO: Change default to "mappingbitcoin" when OsmAccountChoice UI is enabled
+    const [osmAccountMode, setOsmAccountMode] = useState<"mappingbitcoin" | "personal">("personal");
     const [nostrAttribution, setNostrAttribution] = useState(false);
     const [showNostrLoginModal, setShowNostrLoginModal] = useState(false);
 
@@ -557,7 +558,8 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                     {/* About Tab */}
                                     {activeTab === 1 && (
                                         <>
-                                            {/* OSM Account Choice - only in create mode */}
+                                            {/* OSM Account Choice - hidden until MAPPING_BITCOIN_OSM_ACCESS_TOKEN is configured
+                                               TODO: Uncomment when MappingBitcoin OSM bot account is set up
                                             {!isEditMode && (
                                                 <OsmAccountChoice
                                                     mode={osmAccountMode}
@@ -570,6 +572,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                                     onNostrLoginClick={() => setShowNostrLoginModal(true)}
                                                 />
                                             )}
+                                            */}
 
                                             {/* Top row: Image on left, Name/Category on right - 50/50 */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
