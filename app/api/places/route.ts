@@ -193,6 +193,17 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: true, changesetId, nodeId });
     } catch (err) {
         console.error("[POST /api/places] Failed to upload to OSM:", err);
-        return NextResponse.json({ error: "Failed to upload venue to OpenStreetMap. Please try again." }, { status: 500 });
+        const message = err instanceof Error ? err.message : "Unknown error";
+
+        let userMessage = "Failed to upload venue to OpenStreetMap. Please try again.";
+        if (message.includes("401") || message.includes("Unauthorized")) {
+            userMessage = "Your OpenStreetMap session has expired. Please log in again.";
+        } else if (message.includes("409") || message.includes("Conflict")) {
+            userMessage = "A conflict occurred with OpenStreetMap. Please try again.";
+        } else if (message.includes("429") || message.includes("Too Many")) {
+            userMessage = "Too many requests to OpenStreetMap. Please wait a moment and try again.";
+        }
+
+        return NextResponse.json({ error: userMessage }, { status: 500 });
     }
 }

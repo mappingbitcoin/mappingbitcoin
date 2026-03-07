@@ -133,12 +133,18 @@ export async function uploadOsmNode(changesetId: string, xml: string, token: str
 }
 
 export async function closeOsmChangeset(changesetId: string, token: string) {
-    await fetch(`https://api.openstreetmap.org/api/0.6/changeset/${changesetId}/close`, {
+    const res = await fetch(`https://api.openstreetmap.org/api/0.6/changeset/${changesetId}/close`, {
         method: "PUT",
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (!res.ok) {
+        // Log but don't throw — the node was already created successfully.
+        // Changeset will auto-close after 1 hour per OSM API behavior.
+        console.error(`[closeOsmChangeset] Failed to close changeset ${changesetId}: ${res.status} ${await res.text()}`);
+    }
 }
 
 export async function fetchOsmNode(nodeId: number): Promise<{ version: number; lat: number; lon: number; tags: Record<string, string> }> {
