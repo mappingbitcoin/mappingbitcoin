@@ -47,6 +47,8 @@ import {
     DirectionsIcon,
     CloseIcon,
     SendIcon,
+    ChevronRightIcon,
+    ArrowLeftIcon,
 } from "@/assets/icons";
 import Button, { TagRemoveButton } from "@/components/ui/Button";
 
@@ -182,18 +184,41 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
         }
     };
 
+    const getMissingSectionFields = (section: number, formData: VenueForm): string[] => {
+        const missing: string[] = [];
+        switch (section) {
+            case 1:
+                if (!formData.name?.trim()) missing.push(t('fields.name'));
+                if (!formData.category) missing.push(t('fields.category'));
+                if (!formData.subcategory) missing.push(t('fields.subcategory'));
+                break;
+            case 2:
+                if (!formData.lat || !formData.lon) missing.push(t('fields.location'));
+                break;
+        }
+        return missing;
+    };
+
     const [form, setForm] = useState<VenueForm>(() => {
-        // In edit mode, initialize from venue
         if (venue) {
             return venueToForm(venue);
         }
-        // In create mode, try to restore from session storage
-        if (typeof window !== "undefined") {
-            const stored = sessionStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : EMPTY_FORM;
-        }
         return EMPTY_FORM;
     });
+
+    // Restore from sessionStorage AFTER hydration to avoid mismatch (React error #418)
+    useEffect(() => {
+        if (!isEditMode) {
+            const stored = sessionStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    setForm(JSON.parse(stored));
+                } catch {
+                    // Corrupted data, ignore
+                }
+            }
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const venueSelectorRef = useRef<HTMLDivElement>(null);
     const addressSelectorRef = useRef<HTMLUListElement>(null);
@@ -218,7 +243,7 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
     } = useVenueSearch({ debounceMs: 300, limit: 6 });
 
     // reCAPTCHA - loads lazily when getToken is called
-    const { getToken: getRecaptchaToken, preload: preloadRecaptcha } = useRecaptcha({ action: "submit" });
+    const { getToken: getRecaptchaToken, preload: preloadRecaptcha, isConfigured: isRecaptchaConfigured } = useRecaptcha({ action: "submit" });
 
     useOnClickOutside([venueSelectorRef], () => clearVenueSuggestions());
     useOnClickOutside([addressSelectorRef], () => clearAddressSuggestions());
@@ -231,6 +256,13 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
     }, [form, isEditMode]);
 
     const parsedOpeningHours: DayHours[] = useMemo(() => parseOpeningHours(form.opening_hours), [form.opening_hours]);
+
+    // Preload reCAPTCHA when user reaches the final tab
+    useEffect(() => {
+        if (activeTab === 3) {
+            preloadRecaptcha();
+        }
+    }, [activeTab, preloadRecaptcha]);
 
     function changeTab(newTab: number) {
         setActiveTab(newTab);
@@ -349,8 +381,19 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
             toast.error("Please login with OpenStreetMap first.");
             return;
         }
+        if (!form.name?.trim()) {
+            toast.error("Please enter a venue name.");
+            changeTab(1);
+            return;
+        }
         if (!form.category || !form.subcategory) {
             toast.error("Please select a category and subcategory.");
+            changeTab(1);
+            return;
+        }
+        if (!form.lat || !form.lon) {
+            toast.error("Please set the venue location.");
+            changeTab(2);
             return;
         }
         setIsSubmitting(true);
@@ -358,8 +401,13 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
             const token = await getRecaptchaToken();
 
             if (!token) {
-                toast.error("Security verification failed. Please refresh and try again.");
-                console.error("[PlaceSubmissionForm] reCAPTCHA token is null");
+                if (!isRecaptchaConfigured) {
+                    toast.error("Security verification is not configured. Please contact the site administrator.");
+                    console.error("[PlaceSubmissionForm] NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not set");
+                } else {
+                    toast.error("Security verification failed. Please disable ad blockers for this site and try again.");
+                    console.error("[PlaceSubmissionForm] reCAPTCHA token is null - script may be blocked");
+                }
                 setIsSubmitting(false);
                 return;
             }
@@ -413,6 +461,23 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
         setSuggestedSubcategories([]);
         sessionStorage.removeItem(STORAGE_KEY);
         toast.success("Form reset");
+    };
+
+    const handleNext = () => {
+        const missing = getMissingSectionFields(activeTab, form);
+        if (missing.length > 0) {
+            toast.error(`Please complete: ${missing.join(", ")}`);
+            return;
+        }
+        if (activeTab < 3) {
+            changeTab(activeTab + 1);
+        }
+    };
+
+    const handleBack = () => {
+        if (activeTab > 1) {
+            changeTab(activeTab - 1);
+        }
     };
 
     const handleSuggestSubcategory = (suggestion: string) => {
@@ -731,19 +796,45 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                             <Button type="button" onClick={handleReset} variant="ghost" color="danger" size="sm">{t('resetButton')}</Button>
                                         )}
                                     </div>
-                                    <div>
-                                        {!user ? (
-                                            <LoginWithOSM />
-                                        ) : (
+                                    <div className="flex items-center gap-2">
+                                        {activeTab > 1 && (
                                             <Button
-                                                type="submit"
-                                                disabled={isSubmitting || isImageUploading || !form.name?.trim() || !form.category || !form.subcategory || !form.lat || !form.lon}
-                                                loading={isSubmitting || isImageUploading}
-                                                leftIcon={!isSubmitting && !isImageUploading ? <SendIcon /> : undefined}
+                                                type="button"
+                                                onClick={handleBack}
+                                                variant="outline"
+                                                color="neutral"
                                                 size="sm"
+                                                leftIcon={<ArrowLeftIcon />}
                                             >
-                                                {isImageUploading ? "Uploading image..." : isSubmitting ? "Submitting..." : isEditMode ? "Submit Changes" : t('submitVenue')}
+                                                {t('backButton')}
                                             </Button>
+                                        )}
+                                        {activeTab < 3 && (
+                                            <Button
+                                                type="button"
+                                                onClick={handleNext}
+                                                size="sm"
+                                                rightIcon={<ChevronRightIcon />}
+                                            >
+                                                {t('nextButton')}
+                                            </Button>
+                                        )}
+                                        {activeTab === 3 && (
+                                            <>
+                                                {!user ? (
+                                                    <LoginWithOSM />
+                                                ) : (
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={isSubmitting || isImageUploading || !form.name?.trim() || !form.category || !form.subcategory || !form.lat || !form.lon}
+                                                        loading={isSubmitting || isImageUploading}
+                                                        leftIcon={!isSubmitting && !isImageUploading ? <SendIcon /> : undefined}
+                                                        size="sm"
+                                                    >
+                                                        {isImageUploading ? "Uploading image..." : isSubmitting ? "Submitting..." : isEditMode ? "Submit Changes" : t('submitVenue')}
+                                                    </Button>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>
