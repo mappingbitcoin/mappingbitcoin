@@ -9,6 +9,9 @@
     "fields": {
       "name": "Place Name",
       "about": "About",
+      "category": "Category",
+      "subcategory": "Subcategory",
+      "location": "Location (search an address or drag the map pin)",
       "openingHours": "Opening Hours",
       "paymentMethods": "Payment Methods",
       "contact": "Contact",
