@@ -122,6 +122,15 @@ export const serverEnv = {
     },
 
     /**
+     * MappingBitcoin OSM bot access token
+     * Long-lived OAuth2 token for submitting venues on behalf of users
+     * who don't want to create their own OSM account
+     */
+    get osmBotAccessToken(): string | undefined {
+        return requiredInProduction("MAPPING_BITCOIN_OSM_ACCESS_TOKEN", process.env.MAPPING_BITCOIN_OSM_ACCESS_TOKEN);
+    },
+
+    /**
      * Web of Trust Oracle URL
      * Used for computing WoT distances for reviews
      */

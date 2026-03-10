@@ -9,3 +9,4 @@ export { default as LocationSection } from '../place/LocationSection';
 export { default as PaymentMethodsSelector } from '../place/PaymentMethodsSelector';
 export { default as PlacePreview } from '../place/PlacePreview';
 export { default as SocialLinksEditor } from '../place/SocialLinksEditor';
+export { default as OsmAccountChoice } from './OsmAccountChoice';
