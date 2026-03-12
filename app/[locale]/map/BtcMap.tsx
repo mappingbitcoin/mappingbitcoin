@@ -148,18 +148,9 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         return () => window.removeEventListener('resize', setVh);
     }, []);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const map = mapRef.current?.getMap?.();
-            if (map && map.isStyleLoaded()) {
-                console.log("✅ Map is fully ready");
-                setMapReady(true);
-                clearInterval(interval);
-            }
-        }, 100);
-
-        return () => clearInterval(interval);
-    }, []);
+    // mapReady is set by handleMapLoad (onLoad callback) after source & layers are added.
+    // Do NOT set mapReady from an interval — isStyleLoaded() fires before handleMapLoad
+    // finishes adding the 'clusters' source, causing a race condition.
 
     // Fetch and select venue from URL param when map is ready (once only)
     useEffect(() => {
@@ -246,15 +237,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
     }
 
     const fetchClusters = useCallback(async (newViewState?: ViewState) => {
-        if (!mapReady) {
-            const map = mapRef.current?.getMap?.();
-            if (!map) return;
-            if (!map.isStyleLoaded()) {
-                return;
-            } else {
-                setMapReady(true)
-            }
-        }
+        if (!mapReady) return;
 
         let workingViewState = viewState;
         if (newViewState) workingViewState = newViewState;
@@ -490,7 +473,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
 
         if (!map) return;
 
-        if (map.getSource('clusters') && map.getLayer('venue-icons') && map.getLayer('cluster-circles')) {
+        if (map.getSource('clusters') && map.getLayer('venue-icons') && map.getLayer('cluster-circles') && map.getLayer('cluster-circles-glow')) {
             setMapReady(true)
             return;
         }
@@ -544,6 +527,29 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
             type: 'geojson',
             data: { type: 'FeatureCollection', features: [] },
             promoteId: 'id'
+        });
+
+        map.addLayer({
+            id: 'cluster-circles-glow',
+            type: 'circle',
+            source: 'clusters',
+            paint: {
+                'circle-radius': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'count'],
+                    1, 22,
+                    10, 31,
+                    50, 46
+                ],
+                'circle-color': [
+                    'case',
+                    ['boolean', ['get', 'isSelected'], false],
+                    '#006eff',
+                    '#E96B00',
+                ],
+                'circle-opacity': 0.3,
+            }
         });
 
         map.addLayer({
