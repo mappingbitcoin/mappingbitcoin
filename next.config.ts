@@ -22,15 +22,23 @@ const securityHeaders = [
         key: 'Permissions-Policy',
         value: 'camera=(), microphone=(), geolocation=(self)',
     },
+    {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains',
+    },
+    {
+        key: 'Content-Security-Policy',
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; font-src 'self' https://fonts.gstatic.com; frame-src https://www.google.com; media-src 'self' https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';",
+    },
 ];
 
 const nextConfig: NextConfig = {
     poweredByHeader: false,
     typescript: {
-        ignoreBuildErrors: ['production', 'healthcheck'].includes(process.env.NODE_ENV),
+        ignoreBuildErrors: process.env.NODE_ENV === 'healthcheck',
     },
     experimental: {
-        optimizePackageImports: ['lodash', 'framer-motion', 'react-icons'],
+        optimizePackageImports: ['lodash', 'framer-motion', 'react-icons', 'recharts', 'i18n-iso-countries', 'nostr-tools', '@noble/curves', '@noble/hashes'],
     },
     images: {
         remotePatterns: [

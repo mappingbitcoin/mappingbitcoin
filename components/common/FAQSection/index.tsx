@@ -31,6 +31,16 @@ function escapeHtml(str: string): string {
     return str.replace(/[&<>"']/g, (char) => htmlEscapes[char]);
 }
 
+/**
+ * Sanitize HTML by stripping script tags and inline event handlers
+ */
+function sanitizeHtml(html: string): string {
+    return html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/on\w+="[^"]*"/gi, '')
+        .replace(/on\w+='[^']*'/gi, '');
+}
+
 export default function FAQSection({
     translationKey,
     substitutions = {},
@@ -90,7 +100,7 @@ export default function FAQSection({
                                 >
                                     <div className="px-4 pb-4 text-text text-sm leading-relaxed [&_a]:text-accent [&_a]:underline [&_a:hover]:text-accent-dark">
                                         {isStringAnswer ? (
-                                            <div dangerouslySetInnerHTML={{ __html: renderWithPlaceholders(answer) }} />
+                                            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderWithPlaceholders(answer)) }} />
                                         ) : (
                                             answer
                                         )}

@@ -816,7 +816,14 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         };
     }, []);
 
-    if (loadingLocation) return <div>Loading map…</div>;
+    if (loadingLocation) return (
+        <div className="h-[calc(100vh-4rem)] mt-16 bg-primary flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                <p className="text-text-light text-sm">Loading map...</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="h-[calc(var(--vh)-4rem)] mt-16 bg-primary">
@@ -826,7 +833,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                 <p>Currently displaying venues, merchants, shops accepting Bitcoin around the world.</p>
             </div>
             <div className="h-[calc(var(--vh)-4rem)] relative">
-                <main className="h-[calc(var(--vh,1vh)*100-4rem)] w-full relative" ref={mapContainerRef}>
+                <div className="h-[calc(var(--vh,1vh)*100-4rem)] w-full relative" ref={mapContainerRef}>
                     <div className={`pointer-events-none absolute w-[90vw] max-w-container flex gap-4 flex-col md:flex-row top-4 z-999 left-4 max-md:h-22 max-md:w-[calc(100%-2rem)] ${selectedVenue ? '' : 'max-md:[&_.searchContainer]:min-w-full max-md:[&_.searchInputContainer]:min-w-full max-md:[&_.search]:min-w-full max-md:[&_.search]:max-w-full'}`}>
                         <div className="searchContainer w-full max-w-82 pointer-events-auto">
                             <div className="searchInputContainer relative">
@@ -881,9 +888,9 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         </div>
                         {!selectedVenue &&
                             <div className="relative flex gap-4 justify-start items-start flex-row w-full pointer-events-auto">
-                                <div className="bg-surface text-text py-2 px-3 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.3)] border border-border-light text-sm cursor-pointer w-fit select-none font-medium" onClick={() => setShowDropdown(!showDropdown)} ref={categorySelectorRef}>
+                                <button type="button" className="bg-surface text-text py-2 px-3 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.3)] border border-border-light text-sm cursor-pointer w-fit select-none font-medium" onClick={() => setShowDropdown(!showDropdown)} ref={categorySelectorRef} aria-expanded={showDropdown} aria-label="Filter by category">
                                     {t('filter.byCategory')} ▼
-                                </div>
+                                </button>
 
                                 {showDropdown && (
                                     <div className="absolute top-[calc(100%-0.8rem)] max-md:top-[calc(100%+0.8rem)] left-0 z-[100] bg-surface text-text rounded-xl py-3 px-4 shadow-[0_6px_16px_rgba(0,0,0,0.4)] border border-border-light max-h-[280px] overflow-y-auto flex flex-col" ref={categoryDropdownRef}>
@@ -940,8 +947,8 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         }
                     </div>
                     <div className="absolute top-4 max-md:top-auto max-md:bottom-12 left-[calc(100%-2.5rem)] flex flex-col z-[100] gap-2">
-                        <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom + 1)}>＋</button>
-                        <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom - 1)}>－</button>
+                        <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom + 1)} aria-label="Zoom in">＋</button>
+                        <button className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] text-xl font-bold cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white text-center hover:bg-gray-500" onClick={() => easeTo(viewState.longitude, viewState.latitude, viewState.zoom - 1)} aria-label="Zoom out">－</button>
                         {/* Map Style Toggle */}
                         <button
                             className="bg-black/25 rounded-lg p-0 w-[30px] min-w-[30px] min-h-[30px] h-[30px] cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-colors duration-200 text-white flex items-center justify-center hover:bg-gray-500"
@@ -1007,7 +1014,6 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 w-12 h-12 rounded-full bg-black/80 text-white border-none text-2xl font-bold cursor-pointer z-[1001] flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-colors duration-200 hover:bg-black/90"
                         onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Help button clicked');
                             setShowHelpPopup(true);
                         }}
                         aria-label="Help and information"
@@ -1015,7 +1021,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         ?
                     </button>
 
-                </main>
+                </div>
 
                 {tooltip && (
                     <div

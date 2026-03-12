@@ -37,5 +37,9 @@ export async function GET() {
         newThisMonth,
         countries: countriesSet.size,
         growthPercent: Math.max(0, growthPercent),
+    }, {
+        headers: {
+            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
     });
 }

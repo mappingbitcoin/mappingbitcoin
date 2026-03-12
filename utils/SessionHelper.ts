@@ -8,7 +8,6 @@ export async function getSession(): Promise<null | {
     id: string;
     display_name: string;
     image_url?: string;
-    access_token: string;
 }> {
     const sessionCookie = (await cookies()).get("session")?.value;
     if (!sessionCookie) return null;
@@ -20,4 +19,13 @@ export async function getSession(): Promise<null | {
     } catch {
         return null;
     }
+}
+
+/**
+ * Read the OSM access token from the dedicated httpOnly cookie.
+ * This token is stored separately from the JWT session to avoid exposure.
+ */
+export async function getOsmToken(): Promise<string | null> {
+    const token = (await cookies()).get("osm_token")?.value;
+    return token || null;
 }

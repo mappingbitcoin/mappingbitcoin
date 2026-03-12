@@ -17,7 +17,7 @@ export default function PageHeader({
         <header className={`mb-8 ${centered ? "text-center" : ""} ${className}`}>
             <h1 className="text-4xl font-bold mb-4 max-md:text-3xl">{title}</h1>
             {description && (
-                <p className="text-gray-600 text-lg max-w-175 mx-auto max-md:text-base">
+                <p className="text-gray-400 text-lg max-w-175 mx-auto max-md:text-base">
                     {description}
                 </p>
             )}

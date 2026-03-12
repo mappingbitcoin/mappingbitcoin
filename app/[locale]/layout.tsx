@@ -1,4 +1,4 @@
-import React, { cache, Suspense } from "react";
+import React, { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 
@@ -9,7 +9,6 @@ import { NostrAuthProvider } from "@/contexts/NostrAuthContext";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { startBitcoinVenueCron } from "@/utils/sync/CronJob";
 import { getMessages } from "next-intl/server";
 
 // Organization schema for all pages
@@ -38,10 +37,6 @@ const organizationSchema = {
     ]
 };
 
-const bootOnce = cache(async () => {
-    startBitcoinVenueCron();      // Schedule recurring task
-});
-
 export default async function LocaleLayout({
   children,
   params,
@@ -49,7 +44,6 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-    await bootOnce();
 
     try {
         const { locale } = await params;
@@ -105,10 +99,12 @@ export default async function LocaleLayout({
 
         return (
           <section style={{ padding: "2rem" }}>
-            <h1>💥 Locale Layout Error</h1>
-            <p>{error?.message || "Unknown error"}</p>
+            <h1>Locale Layout Error</h1>
+            <p>{process.env.NODE_ENV === 'development' ? (error?.message || "Unknown error") : "Something went wrong"}</p>
             <p>{"Contact support at satoshi@mappingbitcoin.com"}</p>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{error?.stack}</pre>
+            {process.env.NODE_ENV === 'development' && (
+              <pre style={{ whiteSpace: "pre-wrap" }}>{error?.stack}</pre>
+            )}
           </section>
         );
     }

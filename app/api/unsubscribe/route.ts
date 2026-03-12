@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSubscriberByToken, unsubscribeByToken } from "@/lib/db";
+import { checkRateLimit, getClientIP } from "@/lib/rateLimit";
+
+const unsubscribeRateLimit = { maxRequests: 10, windowMs: 60000 };
 
 /**
  * GET /api/unsubscribe?token=xxx
@@ -7,6 +10,15 @@ import { getSubscriberByToken, unsubscribeByToken } from "@/lib/db";
  */
 export async function GET(request: NextRequest) {
     try {
+        const clientIP = getClientIP(request);
+        const rateLimitResult = checkRateLimit(`unsubscribe-get:${clientIP}`, unsubscribeRateLimit);
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { error: "Too many requests. Please try again later." },
+                { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)) } }
+            );
+        }
+
         const token = request.nextUrl.searchParams.get("token");
 
         if (!token) {
@@ -54,6 +66,15 @@ interface UnsubscribeRequest {
  */
 export async function POST(request: NextRequest) {
     try {
+        const clientIP = getClientIP(request);
+        const rateLimitResult = checkRateLimit(`unsubscribe-post:${clientIP}`, unsubscribeRateLimit);
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { error: "Too many requests. Please try again later." },
+                { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)) } }
+            );
+        }
+
         const body: UnsubscribeRequest = await request.json();
         const { token, list } = body;
 

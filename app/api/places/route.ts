@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import {getVenueCache, getVenueIndexMap} from "@/app/api/cache/VenueCache";
 
 import { getTileCache } from "@/app/api/cache/TileCache";
-import {getSession} from "@/utils/SessionHelper";
+import {getSession, getOsmToken} from "@/utils/SessionHelper";
 import {
     buildOsmChangeXML,
     buildTagsFromForm,
@@ -16,6 +16,7 @@ import {
 import {TileCluster} from "@/models/TileCluster";
 import { serverEnv } from "@/lib/Environment";
 import { announceNewVenue } from "@/lib/nostr/bot";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(String(req.url));
@@ -112,11 +113,15 @@ export const GET = async (req: Request) => {
         updatedAt = null;
     }
 
-    return successObjectResponse({
+    return NextResponse.json({
         tiles: tilesReturned,
         relevantCategories: globalCategoryCount,
         relevantSubcategories: globalSubcategoryCount,
         updatedAt,
+    }, {
+        headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
     });
 };
 
@@ -135,45 +140,23 @@ export async function POST(req: Request) {
         token = botToken;
     } else {
         const user = await getSession();
-        if (!user || !user.access_token) {
+        const osmToken = await getOsmToken();
+        if (!user || !osmToken) {
             return NextResponse.json({ error: "Not logged in with OSM" }, { status: 401 });
         }
-        token = user.access_token;
+        token = osmToken;
     }
 
     // 2. Validate CAPTCHA
-    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
-
     if (!captcha) {
         console.error("[POST /api/places] Missing CAPTCHA token");
         return NextResponse.json({ error: "Security verification required. Please refresh the page." }, { status: 403 });
     }
 
-    if (!recaptchaSecretKey) {
-        console.error("[POST /api/places] reCAPTCHA secret key not configured");
-        // Allow in development if no secret key
-        if (process.env.NODE_ENV !== "development") {
-            return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
-        }
-    } else {
-        const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                secret: recaptchaSecretKey,
-                response: captcha,
-            }),
-        });
-
-        const result = await verify.json();
-        if (!result.success) {
-            console.error("[POST /api/places] reCAPTCHA verification failed:", result);
-            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
-        }
-        if (result.score < 0.5) {
-            console.error("[POST /api/places] reCAPTCHA score too low:", result.score);
-            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
-        }
+    const recaptchaResult = await verifyRecaptcha(captcha);
+    if (!recaptchaResult.success) {
+        console.error("[POST /api/places] reCAPTCHA failed:", recaptchaResult.error);
+        return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
     }
 
     // 3. Build XML for OSM

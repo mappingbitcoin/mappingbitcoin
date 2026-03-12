@@ -9,103 +9,13 @@ import {
     NOSTR_RELAYS,
     NostrPost,
 } from "@/lib/nostr/actions";
-import { extractNumericId } from "@/lib/nostr/bot";
-
-// ============================================================================
-// Message Templates - New Venue (30 variations)
-// ============================================================================
-const NEW_VENUE_TEMPLATES = [
-    "New Bitcoin spot just dropped! {name} in {location} now accepts sats. Check it out on the map: {url}",
-    "The Bitcoin map grows stronger. Welcome {name} ({location}) to the network! {url}",
-    "Another merchant joins the circular economy! {name} in {location} is now accepting Bitcoin. {url}",
-    "Stack sats, spend sats at {name} in {location}. Fresh on the map! {url}",
-    "Bitcoin adoption in action: {name} ({location}) just got listed. Find them here: {url}",
-    "New pin on the map! {name} in {location} accepts Bitcoin payments. {url}",
-    "The network effect is real. {name} ({location}) now takes BTC. {url}",
-    "Bitcoiners in {location} have a new spot: {name}. Visit the map: {url}",
-    "Fresh merchant alert: {name} in {location} is open for Bitcoin business. {url}",
-    "One more for the orange team! {name} ({location}) joins the map. {url}",
-    "Hyperbitcoinization in progress. {name} in {location} now on the map: {url}",
-    "New listing: {name} in {location} accepts sats. Time to spend some Bitcoin! {url}",
-    "The map just got better. {name} ({location}) is now accepting Bitcoin. {url}",
-    "Another business sees the light! {name} in {location} takes BTC now. {url}",
-    "Bitcoin spending just got easier in {location}. Welcome {name}! {url}",
-    "New merchant: {name} in {location}. The circular economy grows! {url}",
-    "Found: Another place to spend your sats. {name}, {location}. {url}",
-    "Bitcoin map update: {name} ({location}) added! Check it out: {url}",
-    "More merchants, more adoption. {name} in {location} now accepts Bitcoin. {url}",
-    "The orange wave reaches {location}. {name} is now on the map: {url}",
-    "Spend Bitcoin at {name} in {location}. Just added to the map! {url}",
-    "New Bitcoin-friendly business: {name} ({location}). Find it here: {url}",
-    "Building the Bitcoin economy one merchant at a time. Welcome {name}, {location}! {url}",
-    "Plot twist: {name} in {location} now accepts the hardest money. {url}",
-    "Mapping Bitcoin grows! {name} ({location}) joins the revolution. {url}",
-    "Another one joins the network. {name} in {location} accepts BTC. {url}",
-    "Bitcoin accepted here: {name}, {location}. Added to the map! {url}",
-    "The future is being built in {location}. {name} now takes Bitcoin. {url}",
-    "New spot for plebs: {name} in {location}. Find it on the map: {url}",
-    "Orange pill in action at {name} ({location}). Now accepting Bitcoin! {url}",
-];
-
-// ============================================================================
-// Message Templates - Verified Venue (30 variations)
-// ============================================================================
-const VERIFIED_VENUE_TEMPLATES = [
-    "Verified! {name} in {location} is officially confirmed via {method}. Trust, but verify. {url}",
-    "{name} ({location}) just got the verified badge via {method}. Real Bitcoin merchant confirmed! {url}",
-    "Verification complete: {name} in {location} verified through {method}. {url}",
-    "Trust level: maximum. {name} ({location}) verified via {method}. {url}",
-    "Official: {name} in {location} is a verified Bitcoin merchant ({method}). {url}",
-    "Green check for {name} ({location})! Verified through {method}. {url}",
-    "{name} in {location} passes the vibe check. Verified via {method}. {url}",
-    "Confirmed and verified: {name} ({location}) - {method} verification complete. {url}",
-    "No more guessing. {name} in {location} is officially verified ({method}). {url}",
-    "Badge earned! {name} ({location}) verified through {method}. {url}",
-    "Merchant verification: {name} in {location} confirmed via {method}. {url}",
-    "The real deal: {name} ({location}) is now verified through {method}. {url}",
-    "Verification success! {name} in {location} confirmed via {method}. {url}",
-    "{name} ({location}) is legit. Verified through {method}. Check them out: {url}",
-    "Stamp of approval: {name} in {location} verified via {method}. {url}",
-    "100% verified: {name} ({location}). Confirmation method: {method}. {url}",
-    "Trust established. {name} in {location} verified through {method}. {url}",
-    "Another verified merchant: {name} ({location}) - confirmed via {method}. {url}",
-    "Proof of merchant: {name} in {location} verified ({method}). {url}",
-    "{name} ({location}) just leveled up with {method} verification. {url}",
-    "Verified and trusted: {name} in {location}. Method: {method}. {url}",
-    "Confirmation received: {name} ({location}) is a verified Bitcoin merchant via {method}. {url}",
-    "Don't trust, verify. {name} in {location} passed the test ({method}). {url}",
-    "New verified merchant: {name} ({location}). Verified through {method}. {url}",
-    "Quality confirmed: {name} in {location} verified via {method}. {url}",
-    "Authenticity verified: {name} ({location}) confirmed through {method}. {url}",
-    "Blue check energy: {name} in {location} verified via {method}. {url}",
-    "{name} ({location}) joins the verified club. Method: {method}. {url}",
-    "Verification complete for {name} in {location}. Confirmed via {method}. {url}",
-    "Officially Bitcoin: {name} ({location}) verified through {method}. {url}",
-];
-
-function getRandomTemplate(templates: string[]): string {
-    const index = Math.floor(Math.random() * templates.length);
-    return templates[index];
-}
-
-function formatVerificationMethod(method: string): string {
-    switch (method) {
-        case "EMAIL":
-            return "email";
-        case "DOMAIN":
-            return "domain";
-        case "PHONE":
-            return "phone";
-        case "MANUAL":
-            return "manual review";
-        case "PHYSICAL":
-            return "physical visit";
-        case "GOOGLE":
-            return "Google verification";
-        default:
-            return method.toLowerCase();
-    }
-}
+import {
+    extractNumericId,
+    NEW_VENUE_TEMPLATES,
+    VERIFIED_VENUE_TEMPLATES,
+    getRandomTemplate,
+    formatVerificationMethod,
+} from "@/lib/nostr/bot";
 
 /**
  * Check if a duplicate post already exists

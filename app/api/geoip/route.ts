@@ -2,8 +2,10 @@ import {NextRequest, NextResponse} from 'next/server';
 import { open } from 'maxmind';
 import path from "path";
 import {GeoIPResponse, MaxMindCityRecord} from "@/models/GEOIpResponse";
+import { checkRateLimit, getClientIP } from "@/lib/rateLimit";
 
 const DB_PATH = path.resolve(process.cwd(), 'data', 'GeoLite2-City.mmdb');
+const geoipRateLimit = { maxRequests: 20, windowMs: 60000 };
 
 let readerPromise: ReturnType<typeof open> | null = null;
 
@@ -15,9 +17,15 @@ async function getReader() {
 }
 
 export async function GET(req: NextRequest) {
-    const ip = req.nextUrl.searchParams.get('ip')  || req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
-    if (!ip) {
-        return NextResponse.json({ error: 'Missing IP parameter' }, { status: 400 });
+    const ip = getClientIP(req);
+
+    // Rate limit by client IP
+    const rateLimitResult = checkRateLimit(`geoip:${ip}`, geoipRateLimit);
+    if (!rateLimitResult.allowed) {
+        return NextResponse.json(
+            { error: 'Too many requests. Please try again later.' },
+            { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)) } }
+        );
     }
 
     // Handle localhost/loopback IPs - return default 0,0 coordinates

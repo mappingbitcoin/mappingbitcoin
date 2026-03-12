@@ -344,12 +344,19 @@ export async function getReviewsWithTrustByOsmId(
                     : { spamStatus: { not: "BLOCKED" } },
                 include: {
                     author: true,
-                    replies: {
-                        // Only include replies from the verified owner
-                        where: ownerPubkey ? { authorPubkey: ownerPubkey } : { id: "__never_match__" },
-                        include: { author: true },
-                        orderBy: { eventCreatedAt: "asc" },
-                    },
+                    ...(ownerPubkey ? {
+                        replies: {
+                            where: { authorPubkey: ownerPubkey },
+                            include: { author: true },
+                            orderBy: { eventCreatedAt: "asc" as const },
+                        },
+                    } : {
+                        replies: {
+                            where: { id: undefined },
+                            take: 0,
+                            include: { author: true },
+                        },
+                    }),
                 },
                 orderBy: { eventCreatedAt: "desc" },
             },

@@ -23,13 +23,18 @@ export async function initVenueCache() {
 
 export async function cacheVenues(newData: OverpassElement[]) {
     const existing = readExisting();
+    const existingIds = new Set(existing.map(item => item.id));
     const byId = new Map<number, OverpassElement>();
+    let dirty = false;
 
     for (const item of existing) {
         byId.set(item.id, item);
     }
 
     for (const item of newData) {
+        if (!existingIds.has(item.id)) {
+            dirty = true;
+        }
         byId.set(item.id, item);
     }
 
@@ -40,9 +45,7 @@ export async function cacheVenues(newData: OverpassElement[]) {
         return;
     }
 
-    const isChanged =
-        merged.length !== existing.length ||
-        merged.some((v, i) => JSON.stringify(v) !== JSON.stringify(existing[i]));
+    const isChanged = dirty || merged.length !== existing.length;
 
     if (isChanged) {
         fs.writeFileSync(VENUE_CACHE, JSON.stringify(merged, null, 2));
@@ -71,9 +74,7 @@ export async function writeVenueCache(data: OverpassElement[]) {
         return;
     }
 
-    const isChanged =
-        data.length !== existing.length ||
-        data.some((v, i) => JSON.stringify(v) !== JSON.stringify(existing[i]));
+    const isChanged = data.length !== existing.length;
 
     if (isChanged) {
         fs.writeFileSync(VENUE_CACHE, JSON.stringify(data, null, 2));

@@ -1,65 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { contactFormLimiter } from "@/lib/rate-limiter";
+import { checkRateLimit, getClientIP, rateLimiters } from "@/lib/rateLimit";
 import { createContactNotificationEmail } from "@/lib/email/templates";
 import { serverEnv } from "@/lib/Environment";
 import { validateEmail, sanitizeString, checkBodySize } from "@/lib/validation";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const resend = new Resend(serverEnv.resendApiKey);
-
-const RECAPTCHA_THRESHOLD = 0.5;
 
 interface ContactFormData {
     name: string;
     email: string;
     message: string;
     recaptchaToken: string;
-}
-
-async function verifyRecaptcha(token: string): Promise<{ success: boolean; score?: number; error?: string }> {
-    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
-    if (!recaptchaSecretKey) {
-        console.warn("RECAPTCHA_SECRET_KEY not configured, skipping verification");
-        return { success: true };
-    }
-
-    try {
-        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                secret: recaptchaSecretKey,
-                response: token,
-            }),
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-            return { success: false, error: "reCAPTCHA verification failed" };
-        }
-
-        if (data.score < RECAPTCHA_THRESHOLD) {
-            return { success: false, score: data.score, error: "Request flagged as suspicious" };
-        }
-
-        return { success: true, score: data.score };
-    } catch (error) {
-        console.error("reCAPTCHA verification error:", error);
-        return { success: false, error: "Failed to verify reCAPTCHA" };
-    }
-}
-
-function getClientIp(request: NextRequest): string {
-    const forwarded = request.headers.get("x-forwarded-for");
-    if (forwarded) {
-        return forwarded.split(",")[0].trim();
-    }
-    const realIp = request.headers.get("x-real-ip");
-    if (realIp) {
-        return realIp;
-    }
-    return "unknown";
 }
 
 export async function POST(request: NextRequest) {
@@ -110,15 +63,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Check rate limits
-        const clientIp = getClientIp(request);
-        const rateLimitResult = contactFormLimiter.check(clientIp, email);
+        const clientIp = getClientIP(request);
+        const rateLimitResult = checkRateLimit(`contact:${clientIp}`, rateLimiters.sensitive);
 
         if (!rateLimitResult.allowed) {
-            const resetInMinutes = Math.ceil(rateLimitResult.resetIn / 60000);
             return NextResponse.json(
                 {
-                    error: rateLimitResult.reason || "Too many requests",
-                    resetIn: resetInMinutes,
+                    error: "Too many requests from your IP address",
+                    resetIn: Math.ceil((rateLimitResult.resetAt - Date.now()) / 60000),
                 },
                 { status: 429 }
             );

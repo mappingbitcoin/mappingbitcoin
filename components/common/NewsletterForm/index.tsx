@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CheckmarkIcon } from "@/assets/icons/ui";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
-import { isValidEmail } from "@/utils/validation";
+import { validateEmail } from "@/lib/validation";
 import Button from "@/components/ui/Button";
 
 type SubscribeStatus = "idle" | "loading" | "success" | "error" | "already";
@@ -27,8 +27,9 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!email || !isValidEmail(email)) {
-            setErrorMessage(t("invalidEmail"));
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.valid) {
+            setErrorMessage(emailValidation.error || t("invalidEmail"));
             setStatus("error");
             return;
         }
@@ -118,6 +119,13 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({
 };
 
 // Small presentational component for status messages
+const colorClasses: Record<string, string> = {
+    green: 'text-green-400',
+    orange: 'text-orange-400',
+    red: 'text-red-400',
+    blue: 'text-blue-400',
+};
+
 const StatusMessage = ({
     className,
     color,
@@ -127,7 +135,7 @@ const StatusMessage = ({
     color: "green" | "orange";
     message: string;
 }) => (
-    <div className={`flex items-center gap-2 text-${color}-400 ${className}`}>
+    <div className={`flex items-center gap-2 ${colorClasses[color] || 'text-gray-400'} ${className}`}>
         <CheckmarkIcon className="w-[18px] h-[18px]" />
         <span className="text-sm">{message}</span>
     </div>

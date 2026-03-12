@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import storage, { AssetType } from "@/lib/storage";
 import { randomUUID } from "crypto";
+import dns from "dns/promises";
 
 interface ProcessImageBody {
     imageUrl: string;
@@ -18,6 +19,76 @@ const THUMBNAIL_WIDTH = 400;
 const THUMBNAIL_QUALITY = 80;
 const MAX_IMAGE_SIZE = 50 * 1024 * 1024; // 50MB
 const FETCH_TIMEOUT_MS = 30000; // 30 seconds
+
+// Known image hosting services (warn if hostname doesn't match any of these)
+const KNOWN_IMAGE_HOSTS = [
+    "blossom.",
+    "nostr.build",
+    "image.nostr.build",
+    "void.cat",
+    "cdn.satellite.earth",
+    "files.sovbit.host",
+    "nostrage.com",
+    "nosto.re",
+];
+
+/**
+ * Check if an IP address is private/internal (SSRF protection)
+ */
+function isPrivateIP(ip: string): boolean {
+    // IPv6 loopback
+    if (ip === "::1") return true;
+
+    // IPv4 checks
+    const parts = ip.split(".").map(Number);
+    if (parts.length !== 4) return false;
+
+    // 127.0.0.0/8 (loopback)
+    if (parts[0] === 127) return true;
+    // 0.0.0.0
+    if (parts[0] === 0 && parts[1] === 0 && parts[2] === 0 && parts[3] === 0) return true;
+    // 10.0.0.0/8 (private)
+    if (parts[0] === 10) return true;
+    // 172.16.0.0/12 (private)
+    if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+    // 192.168.0.0/16 (private)
+    if (parts[0] === 192 && parts[1] === 168) return true;
+    // 169.254.0.0/16 (link-local)
+    if (parts[0] === 169 && parts[1] === 254) return true;
+
+    return false;
+}
+
+/**
+ * Validate a hostname is not a private/internal address (SSRF protection)
+ */
+async function validateHostname(hostname: string): Promise<{ safe: boolean; reason?: string }> {
+    // Block known local hostnames
+    const blockedHostnames = ["localhost", "127.0.0.1", "0.0.0.0", "::1"];
+    if (blockedHostnames.includes(hostname)) {
+        return { safe: false, reason: "Blocked hostname" };
+    }
+
+    // Block internal TLDs
+    const blockedSuffixes = [".local", ".internal", ".localhost"];
+    for (const suffix of blockedSuffixes) {
+        if (hostname.endsWith(suffix)) {
+            return { safe: false, reason: `Blocked hostname suffix: ${suffix}` };
+        }
+    }
+
+    // Resolve DNS and check if the IP is private
+    try {
+        const { address } = await dns.lookup(hostname);
+        if (isPrivateIP(address)) {
+            return { safe: false, reason: `Hostname resolves to private IP: ${address}` };
+        }
+    } catch {
+        return { safe: false, reason: "DNS resolution failed" };
+    }
+
+    return { safe: true };
+}
 
 /**
  * POST /api/reviews/process-image
@@ -52,6 +123,27 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
+
+        // SSRF protection: validate hostname is not private/internal
+        const hostnameCheck = await validateHostname(url.hostname);
+        if (!hostnameCheck.safe) {
+            console.warn(`[ProcessImage] SSRF blocked: ${url.hostname} - ${hostnameCheck.reason}`);
+            return NextResponse.json(
+                { error: "Image URL hostname is not allowed" },
+                { status: 400 }
+            );
+        }
+
+        // Allowlist check: warn if hostname is not a known image host
+        const isKnownHost = KNOWN_IMAGE_HOSTS.some(
+            (pattern) => url.hostname === pattern || url.hostname.endsWith(`.${pattern}`) || url.hostname.startsWith(pattern)
+        );
+        if (!isKnownHost) {
+            console.warn(`[ProcessImage] Unknown image host: ${url.hostname} - allowing but not on known hosts list`);
+        }
+
+        // TODO: Add rate limiting to this endpoint to prevent abuse.
+        // Consider per-IP or per-session rate limits (e.g., 10 requests/minute).
 
         // Fetch image from Blossom with timeout
         console.log(`[ProcessImage] Fetching image from ${body.imageUrl}`);

@@ -98,13 +98,13 @@ export async function GET() {
 
         try {
             // Total verified count
-            const countResult = await prisma.placeVerification.count({
+            const countResult = await prisma.claim.count({
                 where: { status: "VERIFIED" },
             });
             verifiedCount = countResult ?? 0;
 
             // Get all verified entries with dates
-            const verifiedEntries = await prisma.placeVerification.findMany({
+            const verifiedEntries = await prisma.claim.findMany({
                 where: {
                     status: "VERIFIED",
                     verifiedAt: { not: null },

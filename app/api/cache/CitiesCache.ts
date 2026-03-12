@@ -7,6 +7,7 @@ import {around} from "geokdbush";
 type CitiesCache = City[];
 
 let _cache: CitiesCache | null = null;
+let _index: KDBush<City> | null = null;
 
 export async function getCitiesCache() {
     if (_cache) return _cache
@@ -35,7 +36,9 @@ export async function getCitiesCache() {
 
 export async function findNearestCity(longitude: number, latitude: number): Promise<City> {
     const cities = await getCitiesCache()
-    const index = new KDBush(cities, p => p.lon, p => p.lat);
+    if (!_index) {
+        _index = new KDBush(cities, p => p.lon, p => p.lat);
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return cities[around(index, longitude, latitude, 1)[0] as any as number];
+    return cities[around(_index, longitude, latitude, 1)[0] as any as number];
 }

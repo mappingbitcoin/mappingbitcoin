@@ -75,18 +75,29 @@ export function checkRateLimit(
 
 /**
  * Get client IP from request headers
+ * Priority: cf-connecting-ip (Cloudflare) > x-real-ip > x-forwarded-for (rightmost)
+ * For x-forwarded-for, we use the LAST (rightmost) IP because it is the one
+ * appended by the most trusted proxy closest to our server, making it resistant
+ * to client-side spoofing of earlier entries in the chain.
  */
 export function getClientIP(request: Request): string {
-    // Check various headers for the real IP
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    if (forwardedFor) {
-        // x-forwarded-for can contain multiple IPs, take the first one
-        return forwardedFor.split(",")[0].trim();
+    // Cloudflare sets this to the actual client IP
+    const cfConnectingIP = request.headers.get("cf-connecting-ip");
+    if (cfConnectingIP) {
+        return cfConnectingIP.trim();
     }
 
+    // x-real-ip is typically set by the reverse proxy (e.g., nginx)
     const realIP = request.headers.get("x-real-ip");
     if (realIP) {
-        return realIP;
+        return realIP.trim();
+    }
+
+    // x-forwarded-for: use the LAST IP (rightmost) as it's added by our trusted proxy
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    if (forwardedFor) {
+        const ips = forwardedFor.split(",").map(ip => ip.trim()).filter(Boolean);
+        return ips[ips.length - 1];
     }
 
     // Fallback - in production behind a proxy, this should not be reached

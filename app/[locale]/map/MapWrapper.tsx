@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 const BtcMap = dynamic(() => import("@/app/[locale]/map/BtcMap"), {
     ssr: false,
     loading: () => (
-        <div className="h-[calc(100vh-4rem)] mt-16 bg-white flex items-center justify-center">
+        <div className="h-[calc(100vh-4rem)] mt-16 bg-primary flex items-center justify-center">
             <div className="text-text-light">Loading map...</div>
         </div>
     ),

@@ -5,7 +5,7 @@ import {parseStringPromise} from "xml2js";
 import {findNearestCity} from "@/app/api/cache/CitiesCache";
 import {TAG_CATEGORY_MAP} from "@/constants/PlaceOsmDictionary";
 import {getAdmin1Name} from "@/app/api/cache/Admin1Cache";
-import {getSession} from "@/utils/SessionHelper";
+import {getSession, getOsmToken} from "@/utils/SessionHelper";
 import {
     buildTagsFromForm,
     fetchOsmNode,
@@ -14,7 +14,7 @@ import {
     uploadOsmNode,
     closeOsmChangeset
 } from "@/utils/OsmHelpers";
-import { serverEnv } from "@/lib/Environment";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -109,14 +109,11 @@ async function fetchVenueFromChangeset(changesetId: number) {
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-    console.log("[PUT /api/places] Request received");
     const { slug } = await params;
-    console.log("[PUT /api/places] Slug:", slug);
 
     let body;
     try {
         body = await request.json();
-        console.log("[PUT /api/places] Body parsed, has captcha:", !!body.captcha, "has venue:", !!body.venue);
     } catch (e) {
         console.error("[PUT /api/places] Failed to parse body:", e);
         return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
@@ -146,45 +143,23 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // 1. Check if user is logged in via OSM
     const user = await getSession();
-    if (!user || !user.access_token) {
+    const osmToken = await getOsmToken();
+    if (!user || !osmToken) {
         return NextResponse.json({ error: "Not logged in with OSM" }, { status: 401 });
     }
 
-    const token = user.access_token;
+    const token = osmToken;
 
     // 2. Validate CAPTCHA
-    const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
-
     if (!captcha) {
         console.error("[PUT /api/places] Missing CAPTCHA token");
         return NextResponse.json({ error: "Security verification required. Please refresh the page." }, { status: 403 });
     }
 
-    if (!recaptchaSecretKey) {
-        console.error("[PUT /api/places] reCAPTCHA secret key not configured");
-        // Allow in development if no secret key
-        if (process.env.NODE_ENV !== "development") {
-            return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
-        }
-    } else {
-        const verify = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                secret: recaptchaSecretKey,
-                response: captcha,
-            }),
-        });
-
-        const result = await verify.json();
-        if (!result.success) {
-            console.error("[PUT /api/places] reCAPTCHA verification failed:", result);
-            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
-        }
-        if (result.score < 0.5) {
-            console.error("[PUT /api/places] reCAPTCHA score too low:", result.score);
-            return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
-        }
+    const recaptchaResult = await verifyRecaptcha(captcha);
+    if (!recaptchaResult.success) {
+        console.error("[PUT /api/places] reCAPTCHA failed:", recaptchaResult.error);
+        return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 403 });
     }
 
     try {

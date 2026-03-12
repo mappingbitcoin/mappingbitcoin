@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import levenshtein from 'fast-levenshtein';
+import { distance as levenshteinDistance } from 'fastest-levenshtein';
 
 type OsmElement = {
     id: number;
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
                 .filter((el) => el.tags?.name)
                 .map((el) => ({
                     ...el,
-                    distance: levenshtein.get(el.tags!.name.toLowerCase(), targetName),
+                    distance: levenshteinDistance(el.tags!.name.toLowerCase(), targetName),
                 }))
                 .sort((a, b) => a.distance - b.distance);
         }

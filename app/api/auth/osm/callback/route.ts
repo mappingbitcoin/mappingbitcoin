@@ -22,6 +22,16 @@ export async function GET(req: NextRequest) {
     const code = req.nextUrl.searchParams.get("code");
     if (!code) return NextResponse.redirect(`${publicEnv.siteUrl}/?error=osm_missing_code`);
 
+    // Validate OAuth state parameter to prevent CSRF attacks
+    const state = req.nextUrl.searchParams.get("state");
+    const cookieStore = await cookies();
+    const storedState = cookieStore.get("oauth_state")?.value;
+    if (!state || !storedState || state !== storedState) {
+        cookieStore.delete("oauth_state");
+        return NextResponse.redirect(`${publicEnv.siteUrl}/?error=osm_csrf_mismatch`);
+    }
+    cookieStore.delete("oauth_state");
+
     const tokenRes = await fetch("https://www.openstreetmap.org/oauth2/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -46,13 +56,27 @@ export async function GET(req: NextRequest) {
         id: data.user.id,
         display_name: data.user.display_name,
         image_url: data.user.img?.href,
-        access_token: access_token,
     };
 
     await createSession(user);
 
-    const returnTo = (await cookies()).get("returnTo")?.value || "/";
+    // Store access_token in a separate httpOnly cookie (not in the JWT)
+    // This prevents the token from being exposed via /api/me or JWT decoding
+    (await cookies()).set("osm_token", access_token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: "lax",
+        path: "/",
+    });
+
+    let returnTo = (await cookies()).get("returnTo")?.value || "/";
     (await cookies()).delete("returnTo");
+
+    // Validate returnTo to prevent open redirect attacks
+    // Must start with "/" but not "//" (protocol-relative URL) and must not contain "\"
+    if (!returnTo.startsWith("/") || returnTo.startsWith("//") || returnTo.includes("\\")) {
+        returnTo = "/";
+    }
 
     return NextResponse.redirect(`${publicEnv.siteUrl}${returnTo}`);
 }
