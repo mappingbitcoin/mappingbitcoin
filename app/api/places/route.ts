@@ -121,15 +121,25 @@ export const GET = async (req: Request) => {
 };
 
 export async function POST(req: Request) {
-    const { venue, captcha } = await req.json();
+    const { venue, captcha, osmAccountMode = "personal", nostrPubkey } = await req.json();
 
-    // 1. Check if user is logged in via OSM
-    const user = await getSession();
-    if (!user || !user.access_token) {
-        return NextResponse.json({ error: "Not logged in with OSM" }, { status: 401 });
+    // 1. Determine which OSM token to use
+    let token: string;
+
+    if (osmAccountMode === "mappingbitcoin") {
+        const botToken = serverEnv.osmBotAccessToken;
+        if (!botToken) {
+            console.error("[POST /api/places] MappingBitcoin OSM bot token not configured");
+            return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+        }
+        token = botToken;
+    } else {
+        const user = await getSession();
+        if (!user || !user.access_token) {
+            return NextResponse.json({ error: "Not logged in with OSM" }, { status: 401 });
+        }
+        token = user.access_token;
     }
-
-    const token = user.access_token;
 
     // 2. Validate CAPTCHA
     const recaptchaSecretKey = serverEnv.recaptchaSecretKey;
@@ -167,7 +177,7 @@ export async function POST(req: Request) {
     }
 
     // 3. Build XML for OSM
-    const tags = buildTagsFromForm(venue)
+    const tags = buildTagsFromForm(venue, { nostrPubkey })
 
     try {
         const xml = buildOsmChangeXML(venue.lat, venue.lon, tags);
@@ -187,12 +197,23 @@ export async function POST(req: Request) {
                 city: venue.city,
                 country: venue.country,
                 category: venue.category,
-            }).catch((err) => console.error("[NostrBot] Announcement failed:", err));
+            }, nostrPubkey).catch((err) => console.error("[NostrBot] Announcement failed:", err));
         }
 
         return NextResponse.json({ ok: true, changesetId, nodeId });
     } catch (err) {
         console.error("[POST /api/places] Failed to upload to OSM:", err);
-        return NextResponse.json({ error: "Failed to upload venue to OpenStreetMap. Please try again." }, { status: 500 });
+        const message = err instanceof Error ? err.message : "Unknown error";
+
+        let userMessage = "Failed to upload venue to OpenStreetMap. Please try again.";
+        if (message.includes("401") || message.includes("Unauthorized")) {
+            userMessage = "Your OpenStreetMap session has expired. Please log in again.";
+        } else if (message.includes("409") || message.includes("Conflict")) {
+            userMessage = "A conflict occurred with OpenStreetMap. Please try again.";
+        } else if (message.includes("429") || message.includes("Too Many")) {
+            userMessage = "Too many requests to OpenStreetMap. Please wait a moment and try again.";
+        }
+
+        return NextResponse.json({ error: userMessage }, { status: 500 });
     }
 }
