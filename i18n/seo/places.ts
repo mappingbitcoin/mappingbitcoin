@@ -38,10 +38,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
             description: "Share Bitcoin-friendly businesses with the community. Submit accurate place details so others can spend Bitcoin nearby.",
             keywords: [
                 "submit bitcoin place",
-                "add bitcoin business",
-                "share bitcoin merchant",
-                "bitcoin-friendly location",
-                "bitcoin community map"
+                "add bitcoin business"
             ],
             openGraph: {
                 title: "Submit a Bitcoin-Friendly Place | Mapping Bitcoin",
@@ -71,10 +68,7 @@ const placesSeo: SEOModule<PlacesPageKey> = {
             description: "Find Bitcoin-friendly {{category}} in {{location}}. Browse verified merchants accepting Bitcoin payments.",
             keywords: [
                 "bitcoin merchants",
-                "bitcoin-friendly businesses",
-                "spend bitcoin",
-                "bitcoin payments",
-                "bitcoin directory"
+                "spend bitcoin"
             ],
             openGraph: {
                 title: "Bitcoin {{category}} in {{location}} | Mapping Bitcoin",

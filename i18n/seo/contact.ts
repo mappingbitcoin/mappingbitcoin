@@ -10,11 +10,7 @@ const contactSeo: SEOModule<ContactPageKey> = {
             title: "Contact | Mapping Bitcoin",
             description: "Mapping Bitcoin is an open-source platform for discovering, learning, and using Bitcoin. Contact us for collaboration, questions, or feedback.",
             keywords: [
-                "contact Bitcoin",
-                "Bitcoin help",
-                "Bitcoin support",
-                "Mapping Bitcoin contact",
-                "connect Bitcoin project"
+                "mapping bitcoin contact"
             ],
             openGraph: {
                 title: "Contact | Mapping Bitcoin",

@@ -10,14 +10,8 @@ const blogSeo: SEOModule<BlogPageKey> = {
             title: "Blog | Mapping Bitcoin",
             description: "Updates, insights, and announcements from the MappingBitcoin team. Learn about our mission to build better Bitcoin merchant discovery.",
             keywords: [
-                "bitcoin blog",
-                "bitcoin merchants",
-                "nostr",
-                "web of trust",
-                "bitcoin adoption",
-                "mapping bitcoin",
-                "bitcoin directory",
-                "bitcoin news"
+                "mapping bitcoin blog",
+                "bitcoin adoption"
             ],
             openGraph: {
                 title: "Blog | Mapping Bitcoin",

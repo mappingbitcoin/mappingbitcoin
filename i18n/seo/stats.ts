@@ -10,12 +10,7 @@ const statsSeo: SEOModule<StatsPageKey> = {
             description: "Explore global Bitcoin adoption statistics. See the growth of Bitcoin-accepting merchants, top countries, categories, and verification trends.",
             keywords: [
                 "bitcoin statistics",
-                "bitcoin adoption stats",
-                "bitcoin merchants growth",
-                "bitcoin acceptance trends",
-                "bitcoin payment statistics",
-                "lightning network adoption",
-                "bitcoin business analytics"
+                "bitcoin adoption stats"
             ],
             openGraph: {
                 title: "Bitcoin Merchant Statistics | Mapping Bitcoin",

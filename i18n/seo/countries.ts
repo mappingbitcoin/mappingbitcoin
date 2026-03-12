@@ -10,13 +10,8 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
             title: "Bitcoin Places by Country | Mapping Bitcoin",
             description: "Explore cafes, shops, ATMs, and other places around the world where Bitcoin is accepted. Browse by continent and country to see where it's used most.",
             keywords: [
-                "bitcoin friendly countries",
-                "where is bitcoin accepted",
-                "bitcoin usage by country",
-                "countries that accept bitcoin",
-                "bitcoin adoption map",
-                "bitcoin places by country",
-                "bitcoin places worldwide"
+                "bitcoin by country",
+                "bitcoin adoption map"
             ],
             openGraph: {
                 title: "Bitcoin Places by Country | Mapping Bitcoin",
@@ -46,11 +41,7 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
             description: "Explore trusted locations around the world where Bitcoin is accepted. Cafes, restaurants, ATMs and more.",
             keywords: [
                 "bitcoin places",
-                "accepts bitcoin",
-                "bitcoin cafes",
-                "bitcoin map",
-                "bitcoin friendly places",
-                "lightning network locations"
+                "accepts bitcoin"
             ],
             openGraph: {
                 title: "– Mapping Bitcoin",

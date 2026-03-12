@@ -11,13 +11,8 @@ const mapSeo: SEOModule<MapPageKey> = {
             description: "Find Bitcoin-accepting places worldwide. Cafés, restaurants, shops, ATMs, and more. Search by location, filter by category, discover where to spend Bitcoin.",
             keywords: [
                 "bitcoin map",
-                "interactive bitcoin map",
-                "bitcoin merchants map",
-                "bitcoin locations",
-                "bitcoin ATMs",
-                "spend bitcoin",
                 "bitcoin near me",
-                "lightning network map"
+                "spend bitcoin"
             ],
             openGraph: {
                 title: "Interactive Bitcoin Map | Mapping Bitcoin",

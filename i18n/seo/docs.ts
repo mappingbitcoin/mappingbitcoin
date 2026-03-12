@@ -10,14 +10,7 @@ const docsSeo: SEOModule<DocsPageKey> = {
             title: "Documentation | Mapping Bitcoin",
             description: "Learn how Mapping Bitcoin works: OSM synchronization, data enrichment, venue creation, Blossom image uploading, and place verification system.",
             keywords: [
-                "bitcoin documentation",
-                "bitcoin merchant directory docs",
-                "openstreetmap bitcoin",
-                "osm sync",
-                "blossom protocol",
-                "place verification",
-                "bitcoin venue creation",
-                "mapping bitcoin guide"
+                "mapping bitcoin docs"
             ],
             openGraph: {
                 title: "Documentation | Mapping Bitcoin",
