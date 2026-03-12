@@ -10,11 +10,6 @@ const legalSeo: SEOModule<LegalPageKey> = {
             title: "Privacy Policy | Mapping Bitcoin",
             description: "Learn how Mapping Bitcoin handles data. We use minimal cookies, anonymous stats, and public OpenStreetMap sources.",
             keywords: [
-                "bitcoin privacy",
-                "privacy policy",
-                "data handling",
-                "cookie usage",
-                "openstreetmap data",
                 "mapping bitcoin privacy"
             ],
             openGraph: {
@@ -44,11 +39,7 @@ const legalSeo: SEOModule<LegalPageKey> = {
             title: "Terms and Conditions | Mapping Bitcoin",
             description: "Read the terms and conditions for using Mapping Bitcoin. Understand your rights and responsibilities when using our Bitcoin resources and tools.",
             keywords: [
-                "terms and conditions",
-                "bitcoin terms of service",
-                "mapping bitcoin terms",
-                "user agreement",
-                "bitcoin platform rules"
+                "mapping bitcoin terms"
             ],
             openGraph: {
                 title: "Terms and Conditions | Mapping Bitcoin",

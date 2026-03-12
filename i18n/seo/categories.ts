@@ -9,16 +9,8 @@ const categoriesSeo: SEOModule<CategoriesPageKey> = {
             title: "Bitcoin Business Categories | Mapping Bitcoin",
             description: "Browse all categories of businesses that accept Bitcoin payments. Find restaurants, cafes, hotels, shops, and services accepting Bitcoin and Lightning.",
             keywords: [
-                "bitcoin categories",
-                "bitcoin business types",
                 "bitcoin merchants",
-                "bitcoin restaurants",
-                "bitcoin cafes",
-                "bitcoin hotels",
-                "bitcoin shops",
-                "bitcoin services",
-                "lightning payments",
-                "bitcoin directory"
+                "bitcoin categories"
             ],
             openGraph: {
                 title: "Bitcoin Business Categories | Mapping Bitcoin",
@@ -49,11 +41,7 @@ const categoriesSeo: SEOModule<CategoriesPageKey> = {
             description: "Find {{category}} that accept Bitcoin in {{countries}} countries. Browse {{count}} verified places on our Bitcoin map.",
             keywords: [
                 "bitcoin {{category}}",
-                "{{category}} accept bitcoin",
-                "{{category}} bitcoin payment",
-                "{{category}} lightning network",
-                "bitcoin merchants",
-                "spend bitcoin {{category}}"
+                "{{category}} accept bitcoin"
             ],
             openGraph: {
                 title: "{{category}} Accepting Bitcoin | Mapping Bitcoin",

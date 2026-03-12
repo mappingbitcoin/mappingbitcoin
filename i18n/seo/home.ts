@@ -9,16 +9,9 @@ const homeSeo: SEOModule<HomePageKey> = {
             title: "Global Bitcoin Map | Mapping Bitcoin",
             description: "Find every place, organization, and community in the Bitcoin ecosystem. Open-source, community-driven map of merchants accepting Bitcoin and Lightning payments.",
             keywords: [
+                "mapping bitcoin",
                 "bitcoin map",
-                "bitcoin merchants",
-                "bitcoin directory",
-                "where to spend bitcoin",
-                "bitcoin locations",
-                "spend bitcoin",
-                "bitcoin economy",
-                "bitcoin adoption",
-                "lightning network",
-                "bitcoin payments"
+                "btc map"
             ],
             openGraph: {
                 title: "Global Bitcoin Map | Mapping Bitcoin",
