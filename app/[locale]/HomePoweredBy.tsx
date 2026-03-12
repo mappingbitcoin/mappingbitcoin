@@ -28,7 +28,7 @@ export function PoweredBySection({ label }: PoweredBySectionProps) {
                     <OSMIcon className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                     <span className="text-sm font-medium">OpenStreetMap</span>
                 </motion.a>
-                <span className="text-gray-600">+</span>
+                <span className="text-gray-400">+</span>
                 <motion.a
                     href="https://nostr.com"
                     target="_blank"
@@ -40,7 +40,7 @@ export function PoweredBySection({ label }: PoweredBySectionProps) {
                     <NostrIcon className="w-7 h-7 opacity-60 group-hover:opacity-100 transition-all" aria-hidden="true" />
                     <span className="text-sm font-medium">Nostr</span>
                 </motion.a>
-                <span className="text-gray-600">+</span>
+                <span className="text-gray-400">+</span>
                 <motion.a
                     href="https://nostr-wot.com"
                     target="_blank"

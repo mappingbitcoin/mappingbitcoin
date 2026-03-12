@@ -83,6 +83,59 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // --- Input validation to prevent casual abuse ---
+        // Note: Full Nostr event signature verification (verifying the event was
+        // actually signed by the claimed pubkey) would be ideal for production use,
+        // but these validations prevent casual/automated abuse of the endpoint.
+
+        const HEX_64 = /^[0-9a-f]{64}$/;
+
+        if (!HEX_64.test(body.eventId)) {
+            return NextResponse.json(
+                { error: "Invalid eventId: must be 64 lowercase hex characters" },
+                { status: 400 }
+            );
+        }
+
+        if (!HEX_64.test(body.authorPubkey)) {
+            return NextResponse.json(
+                { error: "Invalid authorPubkey: must be 64 lowercase hex characters" },
+                { status: 400 }
+            );
+        }
+
+        if (body.type === "review" && (!body.osmId || typeof body.osmId !== "string" || body.osmId.trim().length === 0)) {
+            return NextResponse.json(
+                { error: "Invalid osmId: must be a non-empty string" },
+                { status: 400 }
+            );
+        }
+
+        if (body.content && body.content.length > 10000) {
+            return NextResponse.json(
+                { error: "Content too long: maximum 10000 characters" },
+                { status: 400 }
+            );
+        }
+
+        if (body.imageUrls) {
+            if (body.imageUrls.length > 10) {
+                return NextResponse.json(
+                    { error: "Too many images: maximum 10 allowed" },
+                    { status: 400 }
+                );
+            }
+
+            for (const url of body.imageUrls) {
+                if (!url.startsWith("https://")) {
+                    return NextResponse.json(
+                        { error: "Invalid image URL: all image URLs must use https://" },
+                        { status: 400 }
+                    );
+                }
+            }
+        }
+
         const eventCreatedAt = new Date(body.eventCreatedAt * 1000);
 
         if (body.type === "reply") {

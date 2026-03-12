@@ -36,7 +36,12 @@ export async function getTileCache(): Promise<TileCache> {
     const venues = await getVenueCache();
     const cache: TileCache = {};
 
+    // Zoom levels 13+ store full venue summaries for individual pin rendering.
+    // Zoom levels 1-12 only store aggregate data (count, lat, lon, ids) to save memory.
+    const DETAIL_ZOOM_MIN = 13;
+
     for (let zoom = 1; zoom <= 16; zoom++) {
+        const storeVenues = zoom >= DETAIL_ZOOM_MIN;
         const grouped: Record<string, Tile<VenueSummary>> = {};
 
         for (const venue of venues) {
@@ -64,7 +69,9 @@ export async function getTileCache(): Promise<TileCache> {
             }
 
             const tile = grouped[tileId];
-            tile.venues.push({ id, lat, lon, category, subcategory, country });
+            if (storeVenues) {
+                tile.venues.push({ id, lat, lon, category, subcategory, country });
+            }
             tile.ids.push(id);
             tile.count += 1;
             tile.latitude += lat;

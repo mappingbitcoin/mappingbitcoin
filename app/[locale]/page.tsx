@@ -202,7 +202,7 @@ const HomePage = async ({ params }: Localized) => {
                 }}
             />
 
-            <main className="bg-[#0D0D0D] min-h-screen">
+            <div className="bg-[#0D0D0D] min-h-screen">
                 {/* Section 1: Hero */}
                 <HeroSection
                     title={t("hero.title")}
@@ -324,7 +324,7 @@ const HomePage = async ({ params }: Localized) => {
 
                 {/* Section 10: Newsletter CTA */}
                 <NewsletterCTA />
-            </main>
+            </div>
         </>
     );
 };

@@ -16,6 +16,12 @@ export const isProduction = NODE_ENV === "production";
 export const isTest = NODE_ENV === "test";
 
 // =============================================================================
+// Module-level state for ephemeral dev session secret
+// =============================================================================
+
+let _devSessionSecret: string | null = null;
+
+// =============================================================================
 // Validation Helpers
 // =============================================================================
 
@@ -76,10 +82,18 @@ export const serverEnv = {
      */
     get sessionSecret(): string {
         const value = process.env.SESSION_SECRET;
-        if (isProduction && !value) {
-            throw new Error("SESSION_SECRET is required in production");
+        if (!value) {
+            if (isProduction) {
+                throw new Error("SESSION_SECRET is required in production");
+            }
+            // Generate ephemeral secret for development (changes on restart)
+            if (!_devSessionSecret) {
+                _devSessionSecret = require('crypto').randomBytes(32).toString('hex');
+                console.warn("[Environment] No SESSION_SECRET set. Using ephemeral secret (sessions won't persist across restarts).");
+            }
+            return _devSessionSecret!;
         }
-        return value || "dev-secret-change-in-production";
+        return value;
     },
 
     /**
@@ -185,36 +199,6 @@ export const serverEnv = {
         },
     },
 
-    // -------------------------------------------------------------------------
-    // DigitalOcean Spaces Configuration (Legacy)
-    // -------------------------------------------------------------------------
-
-    digitalOcean: {
-        get isConfigured(): boolean {
-            return !!(
-                process.env.DO_SPACES_ENDPOINT &&
-                process.env.DO_SPACES_BUCKET_NAME &&
-                process.env.DO_SPACES_SECRET &&
-                process.env.DO_SPACES_KEY &&
-                process.env.DO_SPACES_REGION
-            );
-        },
-        get endpoint(): string | undefined {
-            return process.env.DO_SPACES_ENDPOINT;
-        },
-        get bucket(): string {
-            return process.env.DO_SPACES_BUCKET_NAME || "";
-        },
-        get accessKey(): string {
-            return process.env.DO_SPACES_KEY || "";
-        },
-        get secretKey(): string {
-            return process.env.DO_SPACES_SECRET || "";
-        },
-        get region(): string | undefined {
-            return process.env.DO_SPACES_REGION;
-        },
-    },
 } as const;
 
 // =============================================================================

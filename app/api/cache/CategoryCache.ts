@@ -1,10 +1,8 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { EnrichedVenue } from "@/models/Overpass";
 import { PlaceSubcategory } from "@/constants/PlaceCategories";
 import { getLocalizedCountryCategorySlug, getLocalizedCityCategorySlug, SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
 import countries from "i18n-iso-countries";
 import en from "i18n-iso-countries/langs/en.json";
+import { getVenueCache } from "@/app/api/cache/VenueCache";
 
 countries.registerLocale(en);
 
@@ -45,9 +43,7 @@ function getCountryName(code: string): string {
 export async function getCategoryCache(): Promise<CategoryCache> {
     if (_categoryCache) return _categoryCache;
 
-    const file = path.join(process.cwd(), 'data', 'EnrichedVenues.json');
-    const txt = await fs.readFile(file, 'utf8');
-    const venues = JSON.parse(txt) as EnrichedVenue[];
+    const venues = await getVenueCache();
 
     // Aggregate: subcategory -> country -> city
     const subcategoryMap: Record<string, {

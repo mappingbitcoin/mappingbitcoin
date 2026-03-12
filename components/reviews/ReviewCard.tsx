@@ -9,6 +9,24 @@ import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { hexToNpub } from "@/lib/nostr/crypto";
 import type { ReviewWithTrust } from "@/lib/db/services/reviews";
 
+/**
+ * Sanitizes a URL to ensure it uses a safe protocol (http or https).
+ * Returns an empty string for invalid URLs or those using dangerous protocols
+ * (e.g., javascript:, data:, vbscript:).
+ */
+function sanitizeImageUrl(url: string | undefined | null): string {
+    if (!url) return '';
+    try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+            return '';
+        }
+        return url;
+    } catch {
+        return '';
+    }
+}
+
 interface ReviewCardProps {
     review: ReviewWithTrust;
     onReply?: (reviewEventId: string, reviewAuthorPubkey: string) => void;
@@ -73,9 +91,9 @@ export default function ReviewCard({
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
                     {/* Avatar */}
-                    {review.author.picture ? (
+                    {review.author.picture && sanitizeImageUrl(review.author.picture) ? (
                         <img
-                            src={review.author.picture}
+                            src={sanitizeImageUrl(review.author.picture)}
                             alt={authorName}
                             className="w-10 h-10 rounded-full object-cover bg-surface"
                         />
@@ -142,7 +160,7 @@ export default function ReviewCard({
                                 className="block rounded-lg overflow-hidden border border-border-light bg-surface hover:opacity-90 transition-opacity cursor-pointer"
                             >
                                 <img
-                                    src={imageUrl}
+                                    src={sanitizeImageUrl(imageUrl)}
                                     alt={`Review photo ${index + 1}`}
                                     className="h-24 w-24 object-cover"
                                     loading="lazy"
@@ -269,7 +287,7 @@ function ImageLightbox({ images, currentIndex, onClose, onNext, onPrev }: ImageL
 
             {/* Image */}
             <img
-                src={images[currentIndex]}
+                src={sanitizeImageUrl(images[currentIndex])}
                 alt={`Review photo ${currentIndex + 1}`}
                 className="max-w-full max-h-full object-contain"
                 onClick={(e) => e.stopPropagation()}
@@ -290,9 +308,9 @@ function ReplyCard({ reply, ownerPubkey }: ReplyCardProps) {
     return (
         <div className="flex gap-3 pl-4 border-l-2 border-border-light">
             {/* Avatar */}
-            {reply.author.picture ? (
+            {reply.author.picture && sanitizeImageUrl(reply.author.picture) ? (
                 <img
-                    src={reply.author.picture}
+                    src={sanitizeImageUrl(reply.author.picture)}
                     alt={authorName}
                     className="w-8 h-8 rounded-full object-cover bg-surface flex-shrink-0"
                 />

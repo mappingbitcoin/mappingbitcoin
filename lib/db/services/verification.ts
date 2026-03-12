@@ -112,7 +112,7 @@ async function sendVerificationEmail(email: string, code: string, venueName?: st
     await resend.emails.send({
         from: "Mapping Bitcoin <verify@mappingbitcoin.com>",
         to: [email],
-        subject: `Your Verification Code: ${code}`,
+        subject: "Your MappingBitcoin Verification Code",
         text,
         html,
     });

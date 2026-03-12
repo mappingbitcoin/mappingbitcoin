@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAuthToken } from "@/lib/db/services/auth";
 import storage, { AssetType } from "@/lib/storage";
 import { v4 as uuidv4 } from "uuid";
+import { getSession } from "@/utils/SessionHelper";
 
 function getAuthToken(request: NextRequest): string | null {
     const authHeader = request.headers.get("authorization");
@@ -185,6 +186,17 @@ export async function GET(request: NextRequest) {
                 { error: "File key is required" },
                 { status: 400 }
             );
+        }
+
+        // Require authentication for sensitive asset types
+        if (assetType === AssetType.CLAIMS) {
+            const session = await getSession();
+            if (!session) {
+                return NextResponse.json(
+                    { error: "Authentication required to access claim documents" },
+                    { status: 401 }
+                );
+            }
         }
 
         // Check if storage is available

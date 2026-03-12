@@ -64,32 +64,6 @@ export function sanitizeString(input: string, maxLength = 5000): string {
 }
 
 /**
- * Validate that a string meets length requirements
- */
-export function validateLength(
-    value: string,
-    minLength: number,
-    maxLength: number,
-    fieldName = "Field"
-): { valid: boolean; error?: string } {
-    if (!value || typeof value !== "string") {
-        return { valid: false, error: `${fieldName} is required` };
-    }
-
-    const trimmed = value.trim();
-
-    if (trimmed.length < minLength) {
-        return { valid: false, error: `${fieldName} is too short` };
-    }
-
-    if (trimmed.length > maxLength) {
-        return { valid: false, error: `${fieldName} is too long` };
-    }
-
-    return { valid: true };
-}
-
-/**
  * Check if request body size exceeds the limit
  * @param request - The incoming request
  * @param maxSizeBytes - Maximum allowed body size in bytes (default 100KB)

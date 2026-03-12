@@ -13,13 +13,36 @@ import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {getFormattedAddress} from "@/utils/AddressUtils";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {getSubcategoryLabel, matchPlaceSubcategory} from "@/constants/PlaceCategories";
+import {getVenueCache, getVenueSlugIndexMap, getVenueIndexMap} from "@/app/api/cache/VenueCache";
 
-async function getVenueBySlug(slug: string, preview = false): Promise<EnrichedVenue | null> {
-    const base = env.siteUrl || "http://localhost:3000";
-    const url = `${base}/api/places/${slug}${preview ? '?preview=true' : ''}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    return await res.json();
+async function getVenueBySlug(slug: string, _preview = false): Promise<EnrichedVenue | null> {
+    // Preview mode still needs the API for changeset lookups
+    if (_preview) {
+        const base = env.siteUrl || "http://localhost:3000";
+        const url = `${base}/api/places/${slug}?preview=true`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        return await res.json();
+    }
+
+    const venues = await getVenueCache();
+    const slugIndexMap = await getVenueSlugIndexMap();
+    const idIndexMap = await getVenueIndexMap();
+
+    // Try to find by slug first
+    let venueIndex = slugIndexMap[slug];
+
+    // If not found by slug, try to find by ID (for backwards compatibility)
+    if (venueIndex === undefined) {
+        const numericId = parseInt(slug, 10);
+        if (!isNaN(numericId)) {
+            venueIndex = idIndexMap[numericId];
+        }
+    }
+
+    if (venueIndex === undefined) return null;
+
+    return venues[venueIndex];
 }
 
 interface PageProps {
@@ -80,6 +103,9 @@ export async function generateMetadata({ params }: PageProps & Localized): Promi
         title: finalTitle,
         description: fullDescription,
         keywords,
+        alternates: {
+            canonical: `${env.siteUrl}/places/${slug}`,
+        },
         openGraph: {
             ...ogRest,
             type: "website",

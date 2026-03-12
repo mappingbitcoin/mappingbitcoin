@@ -20,7 +20,7 @@ import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {PAYMENT_METHODS} from "@/constants/PaymentMethods";
 import {SOCIAL_ICONS} from "@/constants/SocialIcons";
 import {getFormattedAddress} from "@/utils/AddressUtils";
-import moment from 'moment';
+
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
 import { ReviewsSection } from "@/components/reviews";
@@ -500,7 +500,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                                     {venue.timestamp && (
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-text-light">Last updated:</span>
-                                                            <span className="text-white">{moment(venue.timestamp).format('MMM DD, YYYY')}</span>
+                                                            <span className="text-white">{new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).format(new Date(venue.timestamp))}</span>
                                                         </div>
                                                     )}
                                                 </div>

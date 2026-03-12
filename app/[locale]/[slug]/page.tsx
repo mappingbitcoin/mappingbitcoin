@@ -22,9 +22,9 @@ import { distance } from 'fastest-levenshtein';
 import { PageSection } from "@/components/layout";
 import PlacesDirectoryWrapper from "@/app/[locale]/[slug]/PlacesDirectoryWrapper";
 
-function parseVenueSlug(slug: string): { venueInformation: VenueSlugEntrySEO, exactMatch: boolean, noVenues?: boolean } | null {
+async function parseVenueSlug(slug: string): Promise<{ venueInformation: VenueSlugEntrySEO, exactMatch: boolean, noVenues?: boolean } | null> {
     const lowerSlug = slug.toLowerCase();
-    const cache = getSlugsCache() ?? {};
+    const cache = (await getSlugsCache()) ?? {};
 
     // 1. Exact match
     let data = cache[lowerSlug];
@@ -240,7 +240,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { locale, slug } = await params;
-    const data = parseVenueSlug(slug);
+    const data = await parseVenueSlug(slug);
 
     if (!data) return notFound();
 
@@ -309,7 +309,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
     const all2 = await getMessages({ locale });
     const t = { merchants: all2.merchants, map: all2.map, countries: all2.countries } as Record<string, any>;
 
-    const data = parseVenueSlug(slug)
+    const data = await parseVenueSlug(slug)
 
     if (!data) return (
         <PageSection padding="default" background="default" className="pt-12">

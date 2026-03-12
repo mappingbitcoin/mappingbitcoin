@@ -1,12 +1,8 @@
 import prisma from "../prisma";
+import crypto from "crypto";
 
 function generateUnsubscribeToken(): string {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let token = "";
-    for (let i = 0; i < 32; i++) {
-        token += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return token;
+    return crypto.randomBytes(32).toString("hex");
 }
 
 export async function getOrCreateSubscriptionList(slug: string, name?: string, description?: string) {

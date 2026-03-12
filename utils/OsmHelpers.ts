@@ -7,6 +7,19 @@ import {Locale} from "@/i18n/types";
 import addressFormatter from "@fragaria/address-formatter";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 
+/**
+ * Escapes special XML characters to prevent XML injection attacks.
+ * Must be applied to any user-provided data inserted into XML strings.
+ */
+function escapeXml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
 export function buildTagsFromForm(form: VenueForm, options?: { nostrPubkey?: string }): Record<string, string> {
     const tags: Record<string, string> = {};
 
@@ -84,7 +97,7 @@ export function buildTagsFromForm(form: VenueForm, options?: { nostrPubkey?: str
 
 export function buildOsmChangeXML(lat: number, lon: number, tags: Record<string, string>): string {
     const tagXml = Object.entries(tags)
-        .map(([k, v]) => `<tag k="${k}" v="${v}" />`)
+        .map(([k, v]) => `<tag k="${escapeXml(k)}" v="${escapeXml(v)}" />`)
         .join("\n        ");
 
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -173,7 +186,7 @@ export function buildOsmModifyXML(
     tags: Record<string, string>
 ): string {
     const tagXml = Object.entries(tags)
-        .map(([k, v]) => `<tag k="${k}" v="${v}" />`)
+        .map(([k, v]) => `<tag k="${escapeXml(k)}" v="${escapeXml(v)}" />`)
         .join("\n        ");
 
     return `<?xml version="1.0" encoding="UTF-8"?>

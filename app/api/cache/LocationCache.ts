@@ -1,7 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
-import {EnrichedVenue} from "@/models/Overpass";
 import {Place} from "@/models/Place";
+import {getVenueCache} from "@/app/api/cache/VenueCache";
 
 type Accumulator = {
     latSum: number;
@@ -22,9 +20,7 @@ let _cache: LocationCache | null = null;
 export async function getLocationCache(): Promise<LocationCache> {
     if (_cache) return _cache;
 
-    const file = path.join(process.cwd(), 'data', 'EnrichedVenues.json');
-    const txt = await fs.readFile(file, 'utf8');
-    const venues = JSON.parse(txt) as EnrichedVenue[];
+    const venues = await getVenueCache();
 
     const cityAcc: Record<string, Accumulator> = {};
     const stateAcc: Record<string, Accumulator> = {};

@@ -7,8 +7,8 @@ interface MapClientProps {
     metadata: Metadata;
 }
 
-// Lazy load MapWrapper - maps require browser APIs and are heavy
-const MapWrapper = dynamic(() => import("./MapWrapper"), {
+// Dynamic import with ssr: false to fix maplibre-gl minification issues in production
+const BtcMap = dynamic(() => import("@/app/[locale]/map/BtcMap"), {
     ssr: false,
     loading: () => (
         <div className="w-full h-screen bg-primary flex items-center justify-center">
@@ -21,5 +21,5 @@ const MapWrapper = dynamic(() => import("./MapWrapper"), {
 });
 
 export default function MapClient({ metadata }: MapClientProps) {
-    return <MapWrapper metadata={metadata} />;
+    return <BtcMap metadata={metadata} />;
 }

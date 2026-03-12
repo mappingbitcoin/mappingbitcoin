@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Locale } from "@/i18n/types";
-import moment from "moment";
+
 import { useContainerSize } from "@/hooks/useContainerSize";
 import { computeMapView } from "@/utils/MapUtils";
 import { deslugify } from "@/utils/StringUtils";
@@ -91,9 +91,9 @@ export default function PlacesDirectory({
     // Calculate stats
     const totalPlaces = places.length;
     const filteredCount = filteredPlaces.length;
-    const oneWeekAgo = useMemo(() => moment().subtract(7, "days"), []);
+    const oneWeekAgo = useMemo(() => new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), []);
     const newThisWeek = useMemo(() => {
-        return places.filter(place => place.timestamp && moment(place.timestamp).isAfter(oneWeekAgo)).length;
+        return places.filter(place => place.timestamp && new Date(place.timestamp) > oneWeekAgo).length;
     }, [places, oneWeekAgo]);
 
     // Pagination
@@ -184,7 +184,7 @@ export default function PlacesDirectory({
                     {/* Hidden SEO content */}
                     <div className="sr-only">
                         <p>{seoParagraph}</p>
-                        <p>Last updated: {moment().format("MMM, yyyy")}</p>
+                        <p>Last updated: {new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(new Date())}</p>
                     </div>
 
                     {/* Two Column Layout */}
@@ -224,7 +224,7 @@ export default function PlacesDirectory({
                                     {/* Places List */}
                                     <div className="flex flex-col gap-0.5">
                                         {paginatedPlaces.map((place: EnrichedVenue) => {
-                                            const isNew = place.timestamp && moment(place.timestamp).isAfter(oneWeekAgo);
+                                            const isNew = place.timestamp && new Date(place.timestamp) > oneWeekAgo;
                                             return (
                                                 <PlaceListItem
                                                     key={place.id}

@@ -79,6 +79,7 @@ const NavBar = () => {
 
     return (
         <motion.nav
+            aria-label="Main navigation"
             className="w-full py-1 px-6 md:px-8 text-white fixed top-0 z-1000 backdrop-blur-sm border-b border-white/5"
             initial={{ y: -100 }}
             animate={{ y: 0 }}
@@ -170,6 +171,8 @@ const NavBar = () => {
                                             className="group flex items-center gap-2 p-1 rounded-full cursor-pointer hover:bg-white/10 transition-colors"
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
+                                            aria-expanded={userMenuOpen}
+                                            aria-haspopup="true"
                                         >
                                             <UserAvatar
                                                 pubkey={user.pubkey}
@@ -187,6 +190,7 @@ const NavBar = () => {
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     transition={{ duration: 0.15 }}
                                                     className="absolute right-0 mt-2 w-64 bg-surface border border-border-light rounded-xl shadow-lg overflow-hidden"
+                                                    role="menu"
                                                 >
                                                     <div className="p-4 border-b border-border-light">
                                                         <div className="flex items-center gap-3">
@@ -232,6 +236,7 @@ const NavBar = () => {
                                                                 href="/admin"
                                                                 onClick={() => setUserMenuOpen(false)}
                                                                 className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors no-underline"
+                                                                role="menuitem"
                                                             >
                                                                 <SettingsIcon className="w-4 h-4" />
                                                                 {t('admin')}
@@ -241,21 +246,24 @@ const NavBar = () => {
                                                             href="/my-verifications"
                                                             onClick={() => setUserMenuOpen(false)}
                                                             className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors no-underline"
+                                                            role="menuitem"
                                                         >
                                                             <ShieldCheckIcon className="w-4 h-4" />
                                                             {t('myVerifications')}
                                                         </Link>
-                                                        <Button
-                                                            onClick={handleLogout}
-                                                            variant="ghost"
-                                                            color="neutral"
-                                                            size="sm"
-                                                            leftIcon={<LogoutIcon />}
-                                                            fullWidth
-                                                            className="justify-start"
-                                                        >
-                                                            {t('logout')}
-                                                        </Button>
+                                                        <div role="menuitem">
+                                                            <Button
+                                                                onClick={handleLogout}
+                                                                variant="ghost"
+                                                                color="neutral"
+                                                                size="sm"
+                                                                leftIcon={<LogoutIcon />}
+                                                                fullWidth
+                                                                className="justify-start"
+                                                            >
+                                                                {t('logout')}
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             )}

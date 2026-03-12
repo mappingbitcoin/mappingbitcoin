@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import {EnrichedVenue} from "@/models/Overpass";
 import {parseTags} from "@/utils/OsmHelpers";
 import {getFormattedAddress} from "@/utils/AddressUtils";
-import moment from 'moment'
+
 import {deslugify} from "@/utils/StringUtils";
 import { VerifyOwnershipButton } from "@/components/verification";
 import { canVerifyVenue } from "@/lib/verification/domainUtils";
@@ -301,7 +301,14 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                                 </p>}
                                 {venue.timestamp && <p className="text-text-light">
                                     <strong className="text-white">Last modification: </strong>
-                                    {moment(venue.timestamp).format('MMM DD, yyyy [at] HH:mm [hs]')}
+                                    {new Intl.DateTimeFormat('en-US', {
+                                        month: 'short',
+                                        day: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                    }).format(new Date(venue.timestamp)) + ' hs'}
                                 </p>}
                             </div>
                         </div>

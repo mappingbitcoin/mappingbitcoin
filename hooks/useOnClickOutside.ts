@@ -1,15 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export const useOnClickOutside = (
     refs: React.RefObject<HTMLElement | null>[],
     callback: () => void
 ) => {
+    // Store callback in a ref so the effect never re-runs when it changes
+    const callbackRef = useRef(callback);
+    callbackRef.current = callback;
+
+    // Store refs array in a ref to avoid re-registering on every render
+    const refsRef = useRef(refs);
+    refsRef.current = refs;
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent | TouchEvent) => {
             const target = event.target as Node;
 
             // Check if click is inside any of the provided refs
-            const isClickInside = refs.some(ref =>
+            const isClickInside = refsRef.current.some(ref =>
                 ref.current?.contains(target)
             );
 
@@ -17,7 +25,7 @@ export const useOnClickOutside = (
             const isClickInsideModal = (target as Element).closest?.('[data-modal="true"]');
 
             if (!isClickInside && !isClickInsideModal) {
-                callback();
+                callbackRef.current();
             }
         };
 
@@ -28,5 +36,5 @@ export const useOnClickOutside = (
             document.removeEventListener('mouseup', handleClickOutside);
             document.removeEventListener('touchend', handleClickOutside);
         };
-    }, [refs, callback]);
+    }, []); // stable -- no deps needed, reads from refs
 };

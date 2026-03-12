@@ -1,4 +1,3 @@
-import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { XMLParser } from 'fast-xml-parser';
@@ -15,7 +14,7 @@ function sanitizeTags(tags: Record<string, string>): Record<string, string> {
 }
 export async function processOsmDiffs() {
     await processAllMissingDiffsSequentially(async (sequence, oscPath, timestamp) => {
-        const changes = parseOsmDiffFile(oscPath);
+        const changes = await parseOsmDiffFile(oscPath);
 
         const existing = readVenueCache();
         const byId = new Map<number, OverpassElement>(existing.map(v => [v.id, v]));
@@ -88,8 +87,8 @@ export async function processOsmDiffs() {
             const day = String(date.getDate()).padStart(2, '0');
             const logPath = path.join('data', 'logs', `${year}`, `${month}`);
             const logFile = path.join(logPath, `${day}.log`);
-            fs.mkdirSync(logPath, { recursive: true });
-            fs.appendFileSync(logFile, `=== Diff #${sequence} ===\n${logEntries.join('\n')}\n`);
+            await fsp.mkdir(logPath, { recursive: true });
+            await fsp.appendFile(logFile, `=== Diff #${sequence} ===\n${logEntries.join('\n')}\n`);
         }
     });
 }
@@ -105,13 +104,13 @@ async function appendToGeoQueue(newEntries: OverpassElement[], sequence: number)
     console.log(`📥 Created enrichment batch: ${filename} (${newEntries.length} entries)`);
 }
 
-function parseOsmDiffFile(filepath: string): {
+async function parseOsmDiffFile(filepath: string): Promise<{
     created: OsmChangeEntry[];
     modified: OsmChangeEntry[];
     deleted: OsmChangeEntry[];
     unqualifiedModified: OsmChangeEntry[];
-} {
-    const raw = fs.readFileSync(filepath, 'utf-8');
+}> {
+    const raw = await fsp.readFile(filepath, 'utf-8');
     const parser = new XMLParser({ ignoreAttributes: false });
     const parsed = parser.parse(raw);
 

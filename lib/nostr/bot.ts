@@ -13,7 +13,7 @@ import { getSlugForOsmId } from "@/utils/sync/slugs/SlugRegistry";
 // Message Templates - New Venue (30 variations)
 // ============================================================================
 
-const NEW_VENUE_TEMPLATES = [
+export const NEW_VENUE_TEMPLATES = [
     "New Bitcoin spot just dropped! {name} in {location} now accepts sats. Check it out on the map: {url}",
     "The Bitcoin map grows stronger. Welcome {name} ({location}) to the network! {url}",
     "Another merchant joins the circular economy! {name} in {location} is now accepting Bitcoin. {url}",
@@ -50,7 +50,7 @@ const NEW_VENUE_TEMPLATES = [
 // Message Templates - Verified Venue (30 variations)
 // ============================================================================
 
-const VERIFIED_VENUE_TEMPLATES = [
+export const VERIFIED_VENUE_TEMPLATES = [
     "Verified! {name} in {location} is officially confirmed via {method}. Trust, but verify. {url}",
     "{name} ({location}) just got the verified badge via {method}. Real Bitcoin merchant confirmed! {url}",
     "Verification complete: {name} in {location} verified through {method}. {url}",
@@ -87,12 +87,12 @@ const VERIFIED_VENUE_TEMPLATES = [
 // Helper Functions
 // ============================================================================
 
-function getRandomTemplate(templates: string[]): string {
+export function getRandomTemplate(templates: string[]): string {
     const index = Math.floor(Math.random() * templates.length);
     return templates[index];
 }
 
-function formatVerificationMethod(method: string, detail?: string): string {
+export function formatVerificationMethod(method: string, detail?: string): string {
     switch (method) {
         case "EMAIL":
             return detail ? `email (${maskEmail(detail)})` : "email";
@@ -102,6 +102,10 @@ function formatVerificationMethod(method: string, detail?: string): string {
             return "phone";
         case "MANUAL":
             return "manual review";
+        case "PHYSICAL":
+            return "physical visit";
+        case "GOOGLE":
+            return "Google verification";
         default:
             return method.toLowerCase();
     }
