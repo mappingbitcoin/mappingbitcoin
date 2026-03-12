@@ -99,6 +99,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
     const mapRef = useRef<MapRef>(null);
     const [locationDenied, setLocationDenied] = useState(false);
     const selectedVenueDivRef = useRef<HTMLDivElement>(null);
+    const initialVenueFetched = useRef(false);
     const [isLocationFetch, setIsLocationFetch] = useState(false)
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const [viewState, setViewState] = useState<ViewState>(initialViewState);
@@ -160,9 +161,10 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         return () => clearInterval(interval);
     }, []);
 
-    // Fetch and select venue from URL param when map is ready
+    // Fetch and select venue from URL param when map is ready (once only)
     useEffect(() => {
-        if (!mapReady || !initialVenueSlug || selectedVenue) return;
+        if (!mapReady || !initialVenueSlug || initialVenueFetched.current) return;
+        initialVenueFetched.current = true;
 
         const fetchVenue = async () => {
             try {
@@ -177,7 +179,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
         };
 
         fetchVenue();
-    }, [mapReady, initialVenueSlug, selectedVenue]);
+    }, [mapReady, initialVenueSlug]);
 
     useEffect(() => {
         const navbar = document.querySelector('nav');
