@@ -4,15 +4,18 @@ import seoContent, {PageKey, SEOMap, generateCanonical} from "@/i18n/seo";
 import {routing} from "@/i18n/routing";
 
 // Page path mapping for generating alternates
-const pagePathMap: Record<PageKey, string> = {
+const pagePathMap: Partial<Record<PageKey, string>> = {
     home: "",
     map: "map",
     contact: "contact",
-    places: "places",
+    place: "places",
+    "submit-place": "places/create",
     countries: "countries",
-    privacy: "privacy",
-    terms: "terms",
-    notFound: "404",
+    categories: "categories",
+    stats: "stats",
+    "privacy-policy": "privacy-policy",
+    "terms-and-conditions": "terms-and-conditions",
+    "not-found": "404",
     "verify-your-business": "verify-your-business",
     docs: "docs",
     blog: "blog",

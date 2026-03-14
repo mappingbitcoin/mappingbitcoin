@@ -114,7 +114,7 @@ type PlaceCategoryInfo = {
 };
 
 export function getCategoriesByLocale(locale: Locale) {
-    return Object.keys(PLACE_CATEGORIES[locale]) as PlaceCategory[];
+    return Object.keys(PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en']) as PlaceCategory[];
 }
 
 export function getSubcategories<K extends PlaceCategory>(
@@ -137,7 +137,7 @@ export function matchPlaceSubcategory(input: string): { category: PlaceCategory,
 
 // This function assumes you've already matched the subcategory to a category
 export function getSubcategoryLabel(locale: Locale, category: PlaceCategory, subcategory: string): string | null {
-    const placeCategoryInfo = PLACE_CATEGORIES[locale];
+    const placeCategoryInfo = PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'];
     for (const [categoryKey, info] of Object.entries(placeCategoryInfo)) {
         if (categoryKey === category) {
             const label = info.types?.[subcategory as keyof typeof info.types];
@@ -147,7 +147,7 @@ export function getSubcategoryLabel(locale: Locale, category: PlaceCategory, sub
     return null;
 }
 
-export const PLACE_CATEGORIES: Record<Locale, PlaceCategoryInfo> = {
+export const PLACE_CATEGORIES: Partial<Record<Locale, PlaceCategoryInfo>> & { en: PlaceCategoryInfo } = {
     "en": {
         "automotive": {
             "label": "Automotive",

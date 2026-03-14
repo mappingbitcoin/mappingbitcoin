@@ -28,7 +28,7 @@ const ClusterTooltip = ({ content }: Props) => {
                 <div className="pointer-events-none hover:pointer-events-auto cursor-pointer transition-transform duration-150 ease-in-out bg-surface border border-border-light rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.3)] max-md:hidden">
                     <div className="bg-surface text-white py-2 px-3 rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.3)] max-w-[280px]">
                         {Object.entries(content).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([cat, count]) => {
-                            const match = SUBCATEGORY_SLUGS_BY_LOCALE[locale][cat as PlaceSubcategory];
+                            const match = (SUBCATEGORY_SLUGS_BY_LOCALE[locale] ?? SUBCATEGORY_SLUGS_BY_LOCALE['en'])[cat as PlaceSubcategory];
                             return match ? (
                                 <div key={cat}>
                                     <strong>{deslugify(match)}</strong>: <span className="text-text-light">{count}</span>

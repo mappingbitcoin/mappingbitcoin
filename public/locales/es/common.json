@@ -1,0 +1,58 @@
+{
+  "menu": {
+    "map": "Mapa",
+    "addPlace": "Añadir lugar",
+    "countries": "Países",
+    "categories": "Categorías",
+    "blog": "Blog",
+    "docs": "Documentación",
+    "events": "Eventos",
+    "learn": "Aprender",
+    "tools": "Herramientas",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "signedInAs": "Conectado como",
+    "readOnly": "Solo lectura",
+    "myVerifications": "Mis verificaciones",
+    "admin": "Panel de administración"
+  },
+  "footer": {
+    "allRightsReserved": "Todos los derechos reservados.",
+    "menu": {
+      "map": "Mapa",
+      "countries": "Países",
+      "categories": "Categorías",
+      "blog": "Blog",
+      "docs": "Documentación",
+      "learn": "Aprender",
+      "contact": "Contacto",
+      "privacy-policy": "Política de privacidad",
+      "terms": "Términos"
+    }
+  },
+  "subscribe": {
+    "cta": {
+      "title": "Mantente al día",
+      "subtitle": "Recibe notificaciones sobre nuevas funciones, mejoras y noticias del ecosistema Bitcoin."
+    },
+    "placeholder": "Ingresa tu correo electrónico",
+    "button": "Suscribirse",
+    "success": "¡Estás dentro! Te mantendremos informado.",
+    "alreadySubscribed": "Ya estás suscrito.",
+    "invalidEmail": "Por favor, ingresa un correo electrónico válido.",
+    "error": "Algo salió mal. Por favor, intenta de nuevo."
+  },
+  "search": {
+    "placeholder": "Buscar artículos..."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "No pudimos encontrar la página que buscabas.",
+    "cta": "Volver al inicio"
+  },
+  "learn": {
+    "headerTitle": "Aprende Bitcoin practicando",
+    "headerDescription": "Entiende cómo funciona Bitcoin a través de guías prácticas, herramientas útiles y aplicaciones del mundo real."
+  }
+}

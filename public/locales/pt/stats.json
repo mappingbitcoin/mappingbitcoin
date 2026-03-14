@@ -1,0 +1,19 @@
+{
+  "title": "Estatísticas de comerciantes Bitcoin",
+  "seo": {
+    "h1": "Estatísticas de comerciantes Bitcoin",
+    "intro": "Acompanhe a adoção global do Bitcoin com estatísticas e análises abrangentes. O Mapping Bitcoin fornece dados em tempo real sobre comerciantes que aceitam Bitcoin no mundo todo, ajudando você a entender o crescimento da economia Bitcoin.",
+    "globalTitle": "Dados globais de comerciantes Bitcoin",
+    "globalDescription": "Nosso painel de estatísticas mostra o número total de negócios que aceitam Bitcoin, a distribuição geográfica por países e as tendências de crescimento ao longo do tempo. Monitore como a adoção do Bitcoin está se expandindo em diferentes regiões e categorias de negócios.",
+    "categoriesTitle": "Categorias de negócios que aceitam Bitcoin",
+    "categoriesDescription": "Explore a aceitação do Bitcoin em diversas categorias de negócios incluindo restaurantes, cafés, hotéis, bares, lojas de varejo, serviços profissionais e mais. Descubra quais setores lideram a adoção do Bitcoin.",
+    "verifiedTitle": "Comerciantes Bitcoin verificados",
+    "verifiedDescription": "Nosso sistema de verificação garante informações precisas e atualizadas sobre negócios que aceitam Bitcoin. Acompanhe o crescimento de comerciantes verificados e locais de pagamento Bitcoin confiáveis.",
+    "trendsTitle": "Tendências de adoção do Bitcoin",
+    "trendsDescription": "Visualize gráficos de crescimento mensal mostrando como a adoção de comerciantes Bitcoin evoluiu. Analise padrões de crescimento acumulativo e identifique mercados emergentes para pagamentos Bitcoin."
+  },
+  "breadcrumb": {
+    "home": "Início",
+    "stats": "Estatísticas"
+  }
+}

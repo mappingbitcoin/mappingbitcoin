@@ -14,6 +14,7 @@ export interface BlogPostMeta {
     featuredImageAlt: string;
     ogImage: string;           // For social media previews (must be JPG/PNG)
     previewImage: string;      // For blog listing cards
+    slugs?: Record<string, string>;  // Locale-specific slugs from frontmatter
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -70,6 +71,7 @@ export function getBlogPost(slug: string, locale: string = 'en'): BlogPost | nul
         featuredImageAlt: data.featuredImageAlt || data.title || slug,
         ogImage,
         previewImage: data.previewImage || ogImage,
+        slugs: data.slugs || undefined,
         content,
     };
 }
@@ -117,6 +119,30 @@ export function getAdjacentPosts(slug: string, locale: string = 'en'): { prev?: 
 }
 
 /**
+ * Given a blog post slug in one locale, find the slug for a target locale.
+ * Uses the frontmatter slugs map if available.
+ */
+export function getBlogSlugForLocale(
+    currentSlug: string,
+    currentLocale: string,
+    targetLocale: string
+): string | null {
+    // If same locale, return same slug
+    if (currentLocale === targetLocale) return currentSlug;
+
+    // Try to read the current post to get its slugs map
+    const post = getBlogPostMeta(currentSlug, currentLocale);
+    if (!post?.slugs) return null;
+
+    const targetSlug = post.slugs[targetLocale];
+    if (!targetSlug) return null;
+
+    // Verify the target post actually exists
+    const targetPost = getBlogPostMeta(targetSlug, targetLocale);
+    return targetPost ? targetSlug : null;
+}
+
+/**
  * Format date for display
  */
 export function formatBlogDate(dateString: string, locale: string = 'en'): string {
@@ -144,15 +170,37 @@ export function getAvailableBlogLocales(): string[] {
 }
 
 /**
- * Get available locales for a specific blog post
+ * Get available locales for a specific blog post, with locale-specific slugs
  */
-export function getPostAvailableLocales(slug: string): string[] {
-    const allLocales = getAvailableBlogLocales();
+export function getPostAvailableLocales(slug: string, currentLocale: string = 'en'): { locale: string; slug: string }[] {
+    const currentPost = getBlogPostMeta(slug, currentLocale);
+    const result: { locale: string; slug: string }[] = [];
 
-    return allLocales.filter(locale => {
-        const filePath = path.join(BLOG_DIR, locale, `${slug}.md`);
-        return fs.existsSync(filePath);
-    });
+    // Always include current locale
+    result.push({ locale: currentLocale, slug });
+
+    if (currentPost?.slugs) {
+        // Use frontmatter slugs map for other locales
+        for (const [locale, localeSlug] of Object.entries(currentPost.slugs)) {
+            if (locale === currentLocale) continue;
+            const targetPost = getBlogPostMeta(localeSlug, locale);
+            if (targetPost) {
+                result.push({ locale, slug: localeSlug });
+            }
+        }
+    } else {
+        // Fallback: check all blog locale directories for same slug
+        const allLocales = getAvailableBlogLocales();
+        for (const locale of allLocales) {
+            if (locale === currentLocale) continue;
+            const filePath = path.join(BLOG_DIR, locale, `${slug}.md`);
+            if (fs.existsSync(filePath)) {
+                result.push({ locale, slug });
+            }
+        }
+    }
+
+    return result;
 }
 
 /**

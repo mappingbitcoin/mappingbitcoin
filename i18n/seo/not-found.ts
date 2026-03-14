@@ -29,6 +29,54 @@ const notFoundSeo: SEOModule<NotFoundPageKey> = {
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             },
         },
+        es: {
+            title: "Pagina No Encontrada | Mapping Bitcoin",
+            description: "Esta pagina no existe, pero aun puedes explorar herramientas Bitcoin, guias y lugares donde se acepta.",
+            openGraph: {
+                title: "Pagina No Encontrada | Mapping Bitcoin",
+                description: "Esta pagina no existe, pero aun puedes explorar herramientas Bitcoin, guias y lugares donde se acepta.",
+                url: env.siteUrl,
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Pagina No Encontrada | Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Pagina No Encontrada | Mapping Bitcoin",
+                description: "Esta pagina no existe, pero aun puedes explorar herramientas Bitcoin, guias y lugares donde se acepta.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            },
+        },
+        pt: {
+            title: "Pagina Nao Encontrada | Mapping Bitcoin",
+            description: "Esta pagina nao existe, mas voce ainda pode explorar ferramentas Bitcoin, guias e locais onde e aceito.",
+            openGraph: {
+                title: "Pagina Nao Encontrada | Mapping Bitcoin",
+                description: "Esta pagina nao existe, mas voce ainda pode explorar ferramentas Bitcoin, guias e locais onde e aceito.",
+                url: env.siteUrl,
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Pagina Nao Encontrada | Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Pagina Nao Encontrada | Mapping Bitcoin",
+                description: "Esta pagina nao existe, mas voce ainda pode explorar ferramentas Bitcoin, guias e locais onde e aceito.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            },
+        },
     },
 };
 

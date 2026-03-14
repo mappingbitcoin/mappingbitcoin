@@ -10,7 +10,7 @@ export interface SEOUrls {
     type: 'city' | 'category' | 'country';
     locale: Locale;
     canonical: string;
-    alternates?: Record<Locale, string>;
+    alternates?: Partial<Record<Locale, string>>;
     alternates_i18n?: Partial<Record<Locale, string[]>>;
 }
 

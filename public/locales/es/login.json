@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "title": "Iniciar sesión - Mapping Bitcoin",
+    "description": "Inicia sesión en Mapping Bitcoin con tu identidad de Nostr para añadir y gestionar ubicaciones que aceptan Bitcoin."
+  },
+  "heading": "Iniciar sesión",
+  "subheading": "Usa tu identidad de Nostr para acceder a Mapping Bitcoin",
+  "modal": {
+    "title": "Iniciar sesión",
+    "subtitle": "Inicia sesión con tu identidad de Nostr",
+    "adminTitle": "Acceso de administrador",
+    "adminDescription": "Inicia sesión con tu clave de Nostr para acceder al panel de administración."
+  },
+  "description": {
+    "default": "Inicia sesión con tu identidad de Nostr. Elige tu método preferido:",
+    "verification": "Para verificar la propiedad, necesitas iniciar sesión con tu identidad de Nostr. Elige tu método preferido:"
+  },
+  "methods": {
+    "extension": {
+      "title": "Extensión de navegador",
+      "description": "Alby, nos2x u otra extensión NIP-07",
+      "notFound": "No se detectó ninguna extensión - instala Alby o nos2x"
+    },
+    "key": {
+      "title": "Clave Nsec / Npub",
+      "description": "Ingresa tu clave privada (nsec) o pública (npub)",
+      "hint": "Nota: nsec otorga acceso de escritura, npub es solo lectura"
+    },
+    "bunker": {
+      "title": "Firmante remoto (NIP-46)",
+      "description": "Conectar vía código QR o URL de bunker",
+      "scanQR": "Escanear código QR",
+      "scanDescription": "Usa tu app de firmante para escanear",
+      "pasteURL": "Ingresar URL de Bunker",
+      "pasteDescription": "Pega la cadena de conexión bunker://",
+      "backToOptions": "Volver a opciones",
+      "scanInstructions": "Escanea con tu app de firmante Nostr (Amber, nsec.app, etc.)",
+      "orManual": "O ingresa la URL del bunker manualmente"
+    }
+  },
+  "keyInput": {
+    "label": "Ingresa tu clave",
+    "placeholder": "nsec1... o npub1..."
+  },
+  "bunkerInput": {
+    "placeholder": "bunker://..."
+  },
+  "actions": {
+    "continue": "Continuar",
+    "connect": "Conectar",
+    "connecting": "Conectando..."
+  },
+  "createAccount": {
+    "question": "¿No tienes una cuenta de Nostr?",
+    "title": "Crear nueva cuenta",
+    "description": "Empieza con Nostr a través de nstart.me",
+    "creating": "Creando tu cuenta...",
+    "completeSetup": "Completa la configuración en la ventana emergente",
+    "cancel": "Cancelar",
+    "popupNote": "Se abre en una ventana emergente. Iniciarás sesión automáticamente al terminar.",
+    "popupBlocked": "Ventana emergente bloqueada. Por favor, permite las ventanas emergentes para este sitio."
+  },
+  "errors": {
+    "enterKey": "Por favor, ingresa tu clave nsec o npub",
+    "enterBunkerUrl": "Por favor, ingresa tu URL de bunker",
+    "extensionFailed": "Error al iniciar sesión con la extensión",
+    "keyFailed": "Error al iniciar sesión con la clave",
+    "bunkerFailed": "Error al conectar con el bunker"
+  },
+  "divider": "o",
+  "info": {
+    "title": "¿Qué es Nostr?",
+    "description": "Nostr es un protocolo descentralizado para redes sociales e identidad. Tus claves de Nostr te permiten ser dueño de tu identidad en diferentes aplicaciones sin depender de servicios centralizados."
+  },
+  "loggedIn": {
+    "title": "¡Has iniciado sesión!",
+    "redirecting": "Redirigiendo..."
+  },
+  "steps": {
+    "login": "Iniciar sesión",
+    "verify": "Verificar",
+    "done": "Listo"
+  },
+  "admin": {
+    "accessRequired": "Acceso de administrador requerido",
+    "pleaseLogin": "Por favor, inicia sesión con una clave de Nostr para acceder al panel de administración.",
+    "writeRequired": "Acceso de escritura requerido",
+    "writeRequiredDescription": "El acceso de administrador requiere capacidad de firma. Por favor, inicia sesión con una clave nsec o extensión de navegador.",
+    "loginWithWriteAccess": "Iniciar sesión con acceso de escritura",
+    "currentlyReadOnly": "Actualmente conectado en modo solo lectura:",
+    "verifyIdentity": "Verifica tu identidad",
+    "extensionPrompt": "Tu extensión de navegador te pedirá firmar un mensaje.",
+    "bunkerPrompt": "Tu bunker de Nostr te pedirá firmar un mensaje.",
+    "signPrompt": "Firma un mensaje para demostrar que controlas esta clave de Nostr.",
+    "signToContinue": "Firmar para continuar",
+    "tryAgain": "Intentar de nuevo",
+    "loggedInAs": "Conectado como:",
+    "accessDenied": "Acceso denegado",
+    "noPrivileges": "Tu cuenta no tiene privilegios de administrador.",
+    "pubkey": "Pubkey:",
+    "returnHome": "Volver al inicio",
+    "returnToSite": "Volver al sitio",
+    "checkingAccess": "Verificando acceso...",
+    "authenticating": "Autenticando...",
+    "authenticatedBackground": "Autenticado con firma en segundo plano"
+  },
+  "myVerifications": {
+    "loginRequired": "Inicio de sesión requerido",
+    "pleaseLogin": "Por favor, inicia sesión con Nostr para ver las verificaciones de tus establecimientos."
+  },
+  "verification": {
+    "badge": {
+      "verified": "Verificado",
+      "verifiedOwner": "Propietario verificado",
+      "description": "La propiedad de este establecimiento ha sido verificada mediante confirmación por correo electrónico.",
+      "owner": "Propietario",
+      "since": "Desde"
+    }
+  }
+}

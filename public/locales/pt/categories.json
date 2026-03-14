@@ -1,0 +1,45 @@
+{
+  "title": "Categorias de negócios Bitcoin",
+  "subtitle": "Explore {count} categorias e mais de {subcategoryCount} tipos de negócios que aceitam pagamentos com Bitcoin no mundo todo.",
+  "search": {
+    "placeholder": "Buscar categorias...",
+    "placeholderSubcategory": "Buscar países ou cidades...",
+    "noResults": "Nenhuma categoria encontrada",
+    "noResultsDescription": "Nenhuma categoria corresponde a \"{query}\". Tente um termo de busca diferente.",
+    "clearSearch": "Limpar busca"
+  },
+  "showMore": "mais",
+  "showLess": "Mostrar menos",
+  "breadcrumb": {
+    "home": "Início",
+    "categories": "Categorias"
+  },
+  "subcategory": {
+    "title": "{category} que aceitam Bitcoin",
+    "subtitle": "{count} locais em {countries} países aceitam Bitcoin",
+    "places": "{count} locais",
+    "viewAll": "Ver todos os {category}",
+    "cities": "Cidades",
+    "moreItems": "+{count} mais",
+    "expand": "Expandir",
+    "collapse": "Recolher"
+  },
+  "seo": {
+    "intro": "O Mapping Bitcoin organiza negócios que aceitam Bitcoin em {count} categorias principais com mais de {subcategoryCount} tipos de negócios específicos. Seja para encontrar restaurantes, hotéis, lojas de varejo ou serviços profissionais que aceitem Bitcoin, nosso diretório abrangente ajuda você a encontrar exatamente o que precisa.",
+    "mainCategoriesTitle": "Principais categorias de negócios",
+    "popularTitle": "Categorias populares para pagamentos Bitcoin",
+    "popularDescription": "Estabelecimentos de comida e bebida, incluindo restaurantes, cafés e bares, estão entre os locais mais comuns que aceitam Bitcoin. Locais de compras como mercearias, lojas de eletrônicos e boutiques de roupas também aceitam criptomoedas com frequência. O setor de serviços, de salões de beleza a consultores profissionais, continua crescendo na adoção do Bitcoin.",
+    "findingTitle": "Encontrar negócios que aceitam Bitcoin",
+    "findingDescription": "Use nosso mapa interativo para descobrir comerciantes Bitcoin perto de você, ou navegue por país para ver a adoção regional. Cada listagem de negócio inclui detalhes de pagamento, mostrando se aceitam pagamentos Lightning Network, Bitcoin on-chain, ou ambos.",
+    "subcategory": {
+      "intro": "Encontre {category} que aceitam pagamentos com Bitcoin em {countries} países ao redor do mundo. Nosso diretório inclui {count} locais verificados onde você pode pagar com Bitcoin ou Lightning.",
+      "countriesTitle": "Países com {category}"
+    }
+  },
+  "jsonLd": {
+    "categoriesName": "Categorias de negócios Bitcoin",
+    "categoriesDescription": "Diretório de categorias de negócios que aceitam pagamentos com Bitcoin",
+    "subcategoryName": "{category} que aceitam Bitcoin",
+    "subcategoryDescription": "Diretório de {category} que aceitam pagamentos com Bitcoin no mundo todo"
+  }
+}

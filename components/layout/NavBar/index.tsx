@@ -20,6 +20,7 @@ import {
     CloseIcon,
 } from "@/assets/icons/ui";
 import Button from "@/components/ui/Button";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 
 const menuItems = [
     'map',
@@ -164,6 +165,7 @@ const NavBar = () => {
                                 transition={{ duration: 0.3, delay: 0.2 }}
                                 className="flex items-center gap-3"
                             >
+                                <LanguageSwitcher />
 {user ? (
                                     <div className="relative" ref={userMenuRef}>
                                         <motion.button
@@ -331,6 +333,15 @@ const NavBar = () => {
                                     </Link>
                                 </motion.div>
                             )}
+
+                            {/* Language Switcher for Mobile */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: 0.25 }}
+                            >
+                                <LanguageSwitcher />
+                            </motion.div>
 
                             {/* Mobile CTAs */}
                             <motion.div
