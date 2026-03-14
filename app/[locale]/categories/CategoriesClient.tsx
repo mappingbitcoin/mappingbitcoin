@@ -142,7 +142,7 @@ export default function CategoriesClient({ availableSubcategories }: CategoriesC
 
     // Build categories data, filtering to only show subcategories with actual venue data
     const categories = useMemo(() => {
-        const categoriesData = PLACE_CATEGORIES[locale];
+        const categoriesData = PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'];
         return (Object.keys(PLACE_SUBTYPE_MAP) as PlaceCategory[])
             .filter((key) => key !== "geographical-areas") // Hide geographical areas
             .map((key): CategoryInfo => ({

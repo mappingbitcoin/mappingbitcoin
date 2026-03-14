@@ -78,6 +78,17 @@ const CATEGORY_REMOVABLE_SUFFIXES: Record<Locale, string[]> = {
         " agencia",
         " compañía",
     ],
+    pt: [
+        " restaurante",
+        " loja",
+        " centro",
+        " serviço",
+        " serviços",
+        " estação",
+        " escritório",
+        " agência",
+        " empresa",
+    ],
 };
 
 /**
@@ -95,6 +106,12 @@ const TITLE_TEMPLATES: Record<Locale, Record<TemplateKey, string>> = {
         countryAndCategory: "{category} en {country}",
         countryAndCity: "Lugares Bitcoin en {city}, {country}",
         countryOnly: "Lugares Bitcoin en {country}",
+    },
+    pt: {
+        countryCityCategory: "{category} em {city}, {country}",
+        countryAndCategory: "{category} em {country}",
+        countryAndCity: "Locais Bitcoin em {city}, {country}",
+        countryOnly: "Locais Bitcoin em {country}",
     },
 };
 
@@ -317,6 +334,40 @@ const DESCRIPTION_TEMPLATES: Record<Locale, Record<TemplateKey, string[]>> = {
             "Comercios Bitcoin en {country}. Encuentra lugares verificados.",
             "Gasta Bitcoin en {country}. Comercios verificados.",
             "Lugares Bitcoin en {country}.",
+        ],
+    },
+    pt: {
+        countryCityCategory: [
+            "Encontre {category} que aceitam Bitcoin em {city}, {country}. Explore nosso mapa interativo.",
+            "Descubra {category} em {city}, {country} que aceitam Bitcoin. Mapa de comércios Bitcoin.",
+            "{category} que aceitam Bitcoin em {city}, {country}. Locais verificados.",
+            "{category} Bitcoin em {city}, {country}. Diretório de comércios verificados.",
+            "{category} em {city}, {country} com pagamentos Bitcoin.",
+            "{category} Bitcoin em {city}, {country}.",
+        ],
+        countryAndCategory: [
+            "Encontre {category} que aceitam Bitcoin em {country}. Explore comércios em nosso mapa.",
+            "Descubra {category} em {country} que aceitam Bitcoin. Mapa de comércios verificados.",
+            "{category} que aceitam Bitcoin em {country}. Encontre locais em nosso mapa.",
+            "{category} Bitcoin em {country}. Diretório de comércios verificados.",
+            "{category} em {country} com pagamentos Bitcoin.",
+            "{category} Bitcoin em {country}.",
+        ],
+        countryAndCity: [
+            "Encontre lojas e negócios que aceitam Bitcoin em {city}, {country}. Mapa verificado.",
+            "Descubra locais que aceitam Bitcoin em {city}, {country}. Diretório de comércios.",
+            "Locais que aceitam Bitcoin em {city}, {country}. Mapa verificado.",
+            "Comércios Bitcoin em {city}, {country}. Locais verificados.",
+            "Gaste Bitcoin em {city}, {country}. Comércios verificados.",
+            "Locais Bitcoin em {city}, {country}.",
+        ],
+        countryOnly: [
+            "Encontre lojas e negócios que aceitam Bitcoin em {country}. Mapa de locais verificados.",
+            "Descubra locais que aceitam Bitcoin em {country}. Diretório de comércios verificados.",
+            "Locais que aceitam Bitcoin em {country}. Explore nosso mapa interativo.",
+            "Comércios Bitcoin em {country}. Encontre locais verificados.",
+            "Gaste Bitcoin em {country}. Comércios verificados.",
+            "Locais Bitcoin em {country}.",
         ],
     },
 };

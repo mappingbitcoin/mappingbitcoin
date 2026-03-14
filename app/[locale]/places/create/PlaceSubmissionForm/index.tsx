@@ -686,13 +686,13 @@ export default function VenueSubmissionForm({ venue }: VenueSubmissionFormProps)
                                                                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${rawValue === 'yes' ? 'bg-accent border-accent' : 'border-border-light'}`}>
                                                                             {rawValue === 'yes' && <CheckmarkIcon className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                                                                         </div>
-                                                                        <span className="text-sm text-white">{COMMON_TAG_TRANSLATIONS[locale][tag]}</span>
+                                                                        <span className="text-sm text-white">{(COMMON_TAG_TRANSLATIONS[locale] ?? COMMON_TAG_TRANSLATIONS.en)[tag]}</span>
                                                                     </label>
                                                                 );
                                                             }
                                                             return (
                                                                 <div key={tag}>
-                                                                    <label className="text-sm font-medium text-white block mb-1">{COMMON_TAG_TRANSLATIONS[locale][tag]}</label>
+                                                                    <label className="text-sm font-medium text-white block mb-1">{(COMMON_TAG_TRANSLATIONS[locale] ?? COMMON_TAG_TRANSLATIONS.en)[tag]}</label>
                                                                     <div className="flex flex-wrap gap-1.5 p-2 bg-surface-light rounded-lg border border-border-light">
                                                                         {valueList.map((val) => (
                                                                             <span key={val} className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface border border-border-light rounded text-xs text-white">

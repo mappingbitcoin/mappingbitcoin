@@ -89,7 +89,7 @@ export default function CategorySelector({
         } else {
             // Show categories that match, and subcategories within matching categories
             for (const cat of allCategories) {
-                const catLabel = PLACE_CATEGORIES[locale][cat].label;
+                const catLabel = (PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'])?.[cat]?.label ?? cat;
                 const catMatches = !searchLower || catLabel.toLowerCase().includes(searchLower);
 
                 if (catMatches) {
@@ -151,7 +151,7 @@ export default function CategorySelector({
     };
 
     const getCategoryLabel = (cat: PlaceCategory) => {
-        return PLACE_CATEGORIES[locale]?.[cat]?.label || cat;
+        return (PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'])?.[cat]?.label || cat;
     };
 
     const getDisplayValue = () => {

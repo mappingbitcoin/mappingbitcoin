@@ -796,9 +796,9 @@ const SUBCATEGORY_EN_SLUG_MAP: Record<PlaceSubcategory, string> = {
     rest_stop: "rest-stops",
 };
 
-export const SUBCATEGORY_SLUGS_BY_LOCALE: Record<Locale, Record<PlaceSubcategory, string>> = {
+export const SUBCATEGORY_SLUGS_BY_LOCALE: Partial<Record<Locale, Record<PlaceSubcategory, string>>> & { en: Record<PlaceSubcategory, string> } = {
+    'en': SUBCATEGORY_EN_SLUG_MAP,
     'es': SUBCATEGORY_ES_SLUG_MAP,
-    'en': SUBCATEGORY_EN_SLUG_MAP
 }
 
 // Reverse lookup: from slug to subcategory
