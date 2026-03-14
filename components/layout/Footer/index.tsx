@@ -5,6 +5,7 @@ import {Link, usePathname} from '@/i18n/navigation';
 import Image from "next/image";
 import {useTranslations} from "next-intl";
 import { CookieSettingsButton } from "@/components/common";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import {routing} from "@/i18n/routing";
 import {Locale} from "@/i18n/types";
 import { motion } from "framer-motion";
@@ -147,6 +148,7 @@ const Footer = () => {
                             <Link href="/privacy-policy" className="text-white/40 no-underline text-sm transition-colors duration-200 hover:text-white/70">{t("menu.privacy-policy")}</Link>
                             <Link href="/terms-and-conditions" className="text-white/40 no-underline text-sm transition-colors duration-200 hover:text-white/70">{t("menu.terms")}</Link>
                             <CookieSettingsButton />
+                            <LanguageSwitcher />
                         </div>
                         <p className="text-sm text-white/40">© 2026 MappingBitcoin.com | {t('allRightsReserved')}</p>
                     </motion.div>
