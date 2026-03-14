@@ -1,12 +1,10 @@
 import React from "react";
 import BlogSidebar from "./BlogSidebar";
 import { getAllBlogPosts } from "@/lib/blog/parser";
-import { Locale } from "@/i18n/types";
-
 interface BlogLayoutProps {
     children: React.ReactNode;
     params: Promise<{
-        locale: Locale;
+        locale: string;
     }>;
 }
 
