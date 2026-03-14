@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Gestionar suscripciones - Mapping Bitcoin",
+    "description": "Gestiona tus suscripciones y preferencias de correo electrónico"
+  },
+  "title": "Gestiona tus suscripciones",
+  "description": "Estás gestionando las suscripciones de {email}",
+  "yourSubscriptions": "Tus suscripciones",
+  "subscribedSince": "Suscrito desde {date}",
+  "unsubscribe": "Cancelar suscripción",
+  "unsubscribing": "Cancelando suscripción...",
+  "unsubscribeAll": "Cancelar todas las suscripciones",
+  "loading": "Cargando tus suscripciones...",
+  "success": {
+    "title": "Suscripción cancelada con éxito",
+    "description": "Has sido eliminado de nuestra lista de correo. ¡Lamentamos verte partir!"
+  },
+  "noToken": {
+    "title": "Enlace de cancelación faltante",
+    "description": "Esta página requiere un enlace de cancelación válido de uno de nuestros correos electrónicos."
+  },
+  "invalidToken": "Este enlace de cancelación es inválido o ha expirado.",
+  "error": "Algo salió mal",
+  "backHome": "Volver al inicio"
+}

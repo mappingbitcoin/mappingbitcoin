@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "title": "Entrar - Mapping Bitcoin",
+    "description": "Entre no Mapping Bitcoin usando sua identidade Nostr para adicionar e gerenciar locais que aceitam Bitcoin."
+  },
+  "heading": "Entrar",
+  "subheading": "Use sua identidade Nostr para acessar o Mapping Bitcoin",
+  "modal": {
+    "title": "Entrar",
+    "subtitle": "Entre com sua identidade Nostr",
+    "adminTitle": "Login de administrador",
+    "adminDescription": "Entre com sua chave Nostr para acessar o painel administrativo."
+  },
+  "description": {
+    "default": "Entre com sua identidade Nostr. Escolha seu método preferido:",
+    "verification": "Para verificar a propriedade, você precisa entrar com sua identidade Nostr. Escolha seu método preferido:"
+  },
+  "methods": {
+    "extension": {
+      "title": "Extensão do navegador",
+      "description": "Alby, nos2x ou outra extensão NIP-07",
+      "notFound": "Nenhuma extensão detectada - instale o Alby ou nos2x"
+    },
+    "key": {
+      "title": "Chave Nsec / Npub",
+      "description": "Digite sua chave privada (nsec) ou pública (npub)",
+      "hint": "Nota: nsec concede acesso de escrita, npub é somente leitura"
+    },
+    "bunker": {
+      "title": "Assinante remoto (NIP-46)",
+      "description": "Conectar via código QR ou URL do bunker",
+      "scanQR": "Escanear código QR",
+      "scanDescription": "Use seu app de assinante para escanear",
+      "pasteURL": "Inserir URL do Bunker",
+      "pasteDescription": "Cole a string de conexão bunker://",
+      "backToOptions": "Voltar às opções",
+      "scanInstructions": "Escaneie com seu app de assinante Nostr (Amber, nsec.app, etc.)",
+      "orManual": "Ou insira a URL do bunker manualmente"
+    }
+  },
+  "keyInput": {
+    "label": "Digite sua chave",
+    "placeholder": "nsec1... ou npub1..."
+  },
+  "bunkerInput": {
+    "placeholder": "bunker://..."
+  },
+  "actions": {
+    "continue": "Continuar",
+    "connect": "Conectar",
+    "connecting": "Conectando..."
+  },
+  "createAccount": {
+    "question": "Não tem uma conta Nostr?",
+    "title": "Criar nova conta",
+    "description": "Comece com o Nostr através do nstart.me",
+    "creating": "Criando sua conta...",
+    "completeSetup": "Conclua a configuração na janela pop-up",
+    "cancel": "Cancelar",
+    "popupNote": "Abre em uma janela pop-up. Você entrará automaticamente ao concluir.",
+    "popupBlocked": "Pop-up bloqueado. Por favor, permita pop-ups para este site."
+  },
+  "errors": {
+    "enterKey": "Por favor, digite sua chave nsec ou npub",
+    "enterBunkerUrl": "Por favor, digite sua URL do bunker",
+    "extensionFailed": "Falha ao entrar com a extensão",
+    "keyFailed": "Falha ao entrar com a chave",
+    "bunkerFailed": "Falha ao conectar com o bunker"
+  },
+  "divider": "ou",
+  "info": {
+    "title": "O que é Nostr?",
+    "description": "Nostr é um protocolo descentralizado para redes sociais e identidade. Suas chaves Nostr permitem que você seja dono da sua identidade em diferentes aplicativos sem depender de serviços centralizados."
+  },
+  "loggedIn": {
+    "title": "Você entrou!",
+    "redirecting": "Redirecionando..."
+  },
+  "steps": {
+    "login": "Entrar",
+    "verify": "Verificar",
+    "done": "Concluído"
+  },
+  "admin": {
+    "accessRequired": "Acesso de administrador necessário",
+    "pleaseLogin": "Por favor, entre com uma chave Nostr para acessar o painel administrativo.",
+    "writeRequired": "Acesso de escrita necessário",
+    "writeRequiredDescription": "O acesso de administrador requer capacidade de assinatura. Por favor, entre com uma chave nsec ou extensão do navegador.",
+    "loginWithWriteAccess": "Entrar com acesso de escrita",
+    "currentlyReadOnly": "Atualmente conectado em modo somente leitura:",
+    "verifyIdentity": "Verifique sua identidade",
+    "extensionPrompt": "Sua extensão do navegador solicitará que você assine uma mensagem.",
+    "bunkerPrompt": "Seu bunker Nostr solicitará que você assine uma mensagem.",
+    "signPrompt": "Assine uma mensagem para provar que você controla esta chave Nostr.",
+    "signToContinue": "Assinar para continuar",
+    "tryAgain": "Tentar novamente",
+    "loggedInAs": "Conectado como:",
+    "accessDenied": "Acesso negado",
+    "noPrivileges": "Sua conta não possui privilégios de administrador.",
+    "pubkey": "Pubkey:",
+    "returnHome": "Voltar ao início",
+    "returnToSite": "Voltar ao site",
+    "checkingAccess": "Verificando acesso...",
+    "authenticating": "Autenticando...",
+    "authenticatedBackground": "Autenticado com assinatura em segundo plano"
+  },
+  "myVerifications": {
+    "loginRequired": "Login necessário",
+    "pleaseLogin": "Por favor, entre com Nostr para ver as verificações dos seus estabelecimentos."
+  },
+  "verification": {
+    "badge": {
+      "verified": "Verificado",
+      "verifiedOwner": "Proprietário verificado",
+      "description": "A propriedade deste estabelecimento foi verificada por confirmação de e-mail.",
+      "owner": "Proprietário",
+      "since": "Desde"
+    }
+  }
+}

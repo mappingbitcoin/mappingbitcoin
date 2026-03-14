@@ -1,0 +1,60 @@
+{
+  "breadcrumb": {
+    "home": "Países",
+    "inCountry": "Bitcoin em {country}",
+    "inCity": "{city}",
+    "inCategory": "{category}"
+  },
+  "form": {
+    "fields": {
+      "name": "Nome do local",
+      "about": "Sobre",
+      "category": "Categoria",
+      "subcategory": "Subcategoria",
+      "location": "Localização (pesquise um endereço ou arraste o marcador do mapa)",
+      "openingHours": "Horário de funcionamento",
+      "paymentMethods": "Métodos de pagamento",
+      "contact": "Contato",
+      "notes": "Observações"
+    },
+    "basicInformation": "Informações básicas",
+    "searchPlaceName": "Buscar nome do local",
+    "searchVenueName": "Buscar estabelecimento por nome",
+    "selectCategory": "Selecionar categoria",
+    "selectSubcategory": "Selecionar subcategoria",
+    "additionalDetails": "Detalhes adicionais",
+    "submitPlace": "Enviar local",
+    "submitVenue": "Enviar estabelecimento",
+    "contactSection": "Contato",
+    "resetButton": "Redefinir",
+    "nextButton": "Próximo",
+    "backButton": "Voltar",
+    "locationSection": "Localização",
+    "searchAddress": "Buscar endereço",
+    "notesSection": "Observações",
+    "notesPlaceholder": "Observações",
+    "openingHours": "Horário de funcionamento",
+    "separateWithSemicolon": "Digite um valor...",
+    "paymentMethods": "Métodos de pagamento",
+    "roleQuestion": "Qual é a sua relação com este local?",
+    "roleOptions": {
+      "": "Selecione seu papel",
+      "owner": "Proprietário do negócio",
+      "customer": "Visitei como cliente",
+      "other": "Outro"
+    },
+    "osmAccountChoice": {
+      "title": "Como você gostaria de enviar?",
+      "mappingbitcoin": "MappingBitcoin",
+      "mappingbitcoinDesc": "Não requer login",
+      "personal": "Minha conta OSM",
+      "personalDesc": "Requer login no OSM",
+      "personalLoggedIn": "Conectado como {name}"
+    },
+    "nostrAttribution": {
+      "label": "Atribuir esta contribuição ao seu perfil Nostr",
+      "loginPrompt": "Quer atribuição?",
+      "loginLink": "Entrar com Nostr"
+    }
+  }
+}
