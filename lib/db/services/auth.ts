@@ -101,6 +101,40 @@ export async function verifyAndConsumeChallenge(challenge: string, pubkey: strin
 }
 
 /**
+ * Atomically verify and consume a challenge in a single transaction.
+ * Prevents TOCTOU race conditions where two concurrent requests could
+ * both verify the same unused challenge before either consumes it.
+ * Returns { id } if valid and consumed, null otherwise.
+ */
+export async function atomicVerifyAndConsume(
+    challenge: string,
+    pubkey: string
+): Promise<{ id: string } | null> {
+    return prisma.$transaction(async (tx) => {
+        const record = await tx.authChallenge.findUnique({
+            where: { challenge },
+        });
+
+        if (!record) return null;
+        if (record.pubkey !== pubkey) return null;
+        if (record.usedAt) return null;
+
+        if (record.expiresAt < new Date()) {
+            await tx.authChallenge.delete({ where: { id: record.id } });
+            return null;
+        }
+
+        // Atomically mark as used within the same transaction
+        await tx.authChallenge.update({
+            where: { id: record.id },
+            data: { usedAt: new Date() },
+        });
+
+        return { id: record.id };
+    });
+}
+
+/**
  * Create a JWT auth token for a verified pubkey
  */
 export async function createAuthToken(pubkey: string): Promise<string> {

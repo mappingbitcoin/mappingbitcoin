@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { indexReview, indexReviewReply } from "@/lib/db/services/reviews";
+import { checkRateLimit, getClientIP, rateLimiters } from "@/lib/rateLimit";
 
 interface IndexReviewBody {
     type: "review" | "reply";
@@ -72,6 +73,22 @@ async function processImage(
  * This allows immediate display without waiting for relay listener
  */
 export async function POST(request: NextRequest) {
+    // Rate limiting: standard API limit
+    const clientIP = getClientIP(request);
+    const rateLimit = checkRateLimit(`reviews:index:${clientIP}`, rateLimiters.api);
+
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: "Too many requests. Please try again later." },
+            {
+                status: 429,
+                headers: {
+                    "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
+                },
+            }
+        );
+    }
+
     try {
         const body = await request.json() as IndexReviewBody;
 

@@ -3,6 +3,7 @@ import sharp from "sharp";
 import storage, { AssetType } from "@/lib/storage";
 import { randomUUID } from "crypto";
 import dns from "dns/promises";
+import { checkRateLimit, getClientIP, rateLimiters } from "@/lib/rateLimit";
 
 interface ProcessImageBody {
     imageUrl: string;
@@ -95,6 +96,22 @@ async function validateHostname(hostname: string): Promise<{ safe: boolean; reas
  * Fetch image from Blossom, create thumbnail, upload to Hetzner
  */
 export async function POST(request: NextRequest) {
+    // Rate limiting: use sensitive limiter (5/min) since this fetches external URLs
+    const clientIP = getClientIP(request);
+    const rateLimit = checkRateLimit(`image:process:${clientIP}`, rateLimiters.sensitive);
+
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: "Too many requests. Please try again later." },
+            {
+                status: 429,
+                headers: {
+                    "Retry-After": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
+                },
+            }
+        );
+    }
+
     try {
         const body = await request.json() as ProcessImageBody;
 

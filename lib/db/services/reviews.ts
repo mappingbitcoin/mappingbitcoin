@@ -331,37 +331,30 @@ export async function getReviewsWithTrustByOsmId(
     osmId: string,
     includeBlocked: boolean = false
 ): Promise<ReviewsWithTrustResult> {
-    // Get verified owner pubkey for this venue
-    const verificationStatus = await getVerificationStatus(osmId);
-    const ownerPubkey = verificationStatus.isVerified ? verificationStatus.ownerPubkey ?? null : null;
-
-    const venue = await prisma.venue.findUnique({
-        where: { id: osmId },
-        include: {
-            reviews: {
-                where: includeBlocked
-                    ? {}
-                    : { spamStatus: { not: "BLOCKED" } },
-                include: {
-                    author: true,
-                    ...(ownerPubkey ? {
+    // Run verification status and venue query in parallel
+    const [verificationStatus, venue] = await Promise.all([
+        getVerificationStatus(osmId),
+        prisma.venue.findUnique({
+            where: { id: osmId },
+            include: {
+                reviews: {
+                    where: includeBlocked
+                        ? {}
+                        : { spamStatus: { not: "BLOCKED" } },
+                    include: {
+                        author: true,
                         replies: {
-                            where: { authorPubkey: ownerPubkey },
                             include: { author: true },
                             orderBy: { eventCreatedAt: "asc" as const },
                         },
-                    } : {
-                        replies: {
-                            where: { id: undefined },
-                            take: 0,
-                            include: { author: true },
-                        },
-                    }),
+                    },
+                    orderBy: { eventCreatedAt: "desc" },
                 },
-                orderBy: { eventCreatedAt: "desc" },
             },
-        },
-    });
+        }),
+    ]);
+
+    const ownerPubkey = verificationStatus.isVerified ? verificationStatus.ownerPubkey ?? null : null;
 
     if (!venue || venue.reviews.length === 0) {
         return {
@@ -398,20 +391,24 @@ export async function getReviewsWithTrustByOsmId(
             picture: review.author.picture,
             nip05: review.author.nip05,
         },
-        replies: review.replies.map((reply) => ({
-            id: reply.id,
-            eventId: reply.eventId,
-            authorPubkey: reply.authorPubkey,
-            content: reply.content,
-            isOwnerReply: reply.isOwnerReply,
-            eventCreatedAt: reply.eventCreatedAt,
-            author: {
-                pubkey: reply.author.pubkey,
-                name: reply.author.name,
-                picture: reply.author.picture,
-                nip05: reply.author.nip05,
-            },
-        })),
+        // Only include replies from the verified owner (filter in-memory since we
+        // parallelized the queries and can no longer filter in the DB query)
+        replies: review.replies
+            .filter((reply) => ownerPubkey && reply.authorPubkey.toLowerCase() === ownerPubkey.toLowerCase())
+            .map((reply) => ({
+                id: reply.id,
+                eventId: reply.eventId,
+                authorPubkey: reply.authorPubkey,
+                content: reply.content,
+                isOwnerReply: reply.isOwnerReply,
+                eventCreatedAt: reply.eventCreatedAt,
+                author: {
+                    pubkey: reply.author.pubkey,
+                    name: reply.author.name,
+                    picture: reply.author.picture,
+                    nip05: reply.author.nip05,
+                },
+            })),
     }));
 
     // Sort by trust score (highest first), then by date
