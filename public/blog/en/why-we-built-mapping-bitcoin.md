@@ -11,6 +11,10 @@ featuredImage: "/blog/images/why-we-built-mapping-bitcoin-featured.svg"
 featuredImageAlt: "MappingBitcoin - Building better Bitcoin merchant discovery"
 ogImage: "/blog/images/why-we-built-mapping-bitcoin-featured.jpg"
 previewImage: "/blog/images/why-we-built-mapping-bitcoin-preview.jpg"
+slugs:
+  en: "why-we-built-mapping-bitcoin"
+  es: "por-que-construimos-mapping-bitcoin"
+  pt: "por-que-construimos-mapping-bitcoin"
 ---
 
 # Why We Built Mapping Bitcoin
