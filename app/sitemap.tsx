@@ -3,64 +3,79 @@ import { MetadataRoute } from "next";
 import { env } from "@/lib/Environment";
 import { allDocs } from "@/app/[locale]/docs/docsConfig";
 import { getAllBlogPosts } from "@/lib/blog/parser";
+import { routing } from "@/i18n/routing";
+import { generateCanonical } from "@/i18n/seo";
 
 export const revalidate = 3600; // revalidate sitemap every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticPages = ["contact", 'countries', 'categories', 'privacy-policy', 'terms-and-conditions', 'verify-your-business', 'places/create', 'stats', 'verified-places'];
+    const entries: MetadataRoute.Sitemap = [];
 
-    // Generate docs pages
-    const docsPages = allDocs.map((doc) => ({
-        url: `${env.siteUrl}/docs/${doc.slug}`,
-        lastModified: new Date().toISOString(),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-    }));
-
-    // Generate blog pages
-    const blogPosts = getAllBlogPosts('en');
-    const blogPages = blogPosts.map((post) => ({
-        url: `${env.siteUrl}/blog/${post.slug}`,
-        lastModified: new Date(post.date).toISOString(),
-        changeFrequency: "monthly" as const,
-        priority: 0.8,
-    }));
-
-    return [
-        ...[{
-            url: `${env.siteUrl}/`,
+    for (const locale of routing.locales) {
+        // Homepage
+        entries.push({
+            url: generateCanonical('', locale),
             lastModified: new Date().toISOString(),
             changeFrequency: "weekly",
             priority: 1.0,
-        }], ...[{
-            url: `${env.siteUrl}/map`,
+        });
+
+        // Map
+        entries.push({
+            url: generateCanonical('map', locale),
             lastModified: new Date().toISOString(),
             changeFrequency: "daily",
             priority: 1.0,
-        }],
-        ...staticPages.map((page) => ({
-            url: `${env.siteUrl}/${page}`,
-            lastModified: new Date().toISOString(),
-            changeFrequency: "monthly",
-            priority: 0.9,
-        })),
+        });
+
+        // Static pages
+        for (const page of staticPages) {
+            entries.push({
+                url: generateCanonical(page, locale),
+                lastModified: new Date().toISOString(),
+                changeFrequency: "monthly",
+                priority: 0.9,
+            });
+        }
+
         // Docs index
-        {
-            url: `${env.siteUrl}/docs`,
+        entries.push({
+            url: generateCanonical('docs', locale),
             lastModified: new Date().toISOString(),
             changeFrequency: "weekly",
             priority: 0.9,
-        },
+        });
+
         // Individual docs pages
-        ...docsPages,
+        for (const doc of allDocs) {
+            entries.push({
+                url: generateCanonical(`docs/${doc.slug}`, locale),
+                lastModified: new Date().toISOString(),
+                changeFrequency: "weekly",
+                priority: 0.8,
+            });
+        }
+
         // Blog index
-        {
-            url: `${env.siteUrl}/blog`,
+        entries.push({
+            url: generateCanonical('blog', locale),
             lastModified: new Date().toISOString(),
             changeFrequency: "weekly",
             priority: 0.9,
-        },
-        // Individual blog posts
-        ...blogPages,
-    ] as MetadataRoute.Sitemap;
+        });
+
+        // Blog posts for this locale
+        const blogPosts = getAllBlogPosts(locale);
+        for (const post of blogPosts) {
+            entries.push({
+                url: generateCanonical(`blog/${post.slug}`, locale),
+                lastModified: new Date(post.date).toISOString(),
+                changeFrequency: "monthly",
+                priority: 0.8,
+            });
+        }
+    }
+
+    return entries;
 }
