@@ -165,7 +165,7 @@ export function generateSeoTitle({
 }): string {
     let categoryLabel: string | undefined;
     if (categoryAndSubcategory) {
-        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory);
+        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory) ?? undefined;
     }
 
     // Determine which template to use
@@ -389,7 +389,7 @@ export function generateSeoDescription({
 }): string {
     let categoryLabel: string | undefined;
     if (categoryAndSubcategory) {
-        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory);
+        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory) ?? undefined;
     }
 
     // Determine which template set to use
@@ -448,7 +448,7 @@ export function getLocalized({
 }): string {
     let categoryLabel;
     if (categoryAndSubcategory) {
-        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory);
+        categoryLabel = getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory) ?? undefined;
     }
 
     const baseParams = {

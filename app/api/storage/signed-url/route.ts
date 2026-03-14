@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
         // Generate unique filename
         const ext = getExtensionFromContentType(contentType);
         const uniqueFilename = filename
-            ? `${auth.pubkey.slice(0, 8)}-${uuidv4().slice(0, 8)}-${sanitizeFilename(filename)}`
-            : `${auth.pubkey.slice(0, 8)}-${uuidv4()}${ext}`;
+            ? `${auth.slice(0, 8)}-${uuidv4().slice(0, 8)}-${sanitizeFilename(filename)}`
+            : `${auth.slice(0, 8)}-${uuidv4()}${ext}`;
 
         // Check if storage is available
         if (!storage.isAvailable()) {
