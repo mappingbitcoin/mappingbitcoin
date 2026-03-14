@@ -169,7 +169,6 @@ export async function POST(request: NextRequest) {
                 reviewEventId: body.reviewEventId,
                 authorPubkey: body.authorPubkey,
                 content: body.content,
-                isOwnerReply: body.isOwnerReply,
                 eventCreatedAt,
                 authorProfile: body.authorProfile,
             });
