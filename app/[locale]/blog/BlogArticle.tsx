@@ -4,11 +4,17 @@ import { getAdjacentPosts, getRelatedPosts, formatBlogDate, LOCALE_NAMES, type B
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 
+const blogStrings: Record<string, { relatedPosts: string; previous: string; next: string }> = {
+    en: { relatedPosts: 'Related Posts', previous: 'Previous', next: 'Next' },
+    es: { relatedPosts: 'Artículos Relacionados', previous: 'Anterior', next: 'Siguiente' },
+    pt: { relatedPosts: 'Posts Relacionados', previous: 'Anterior', next: 'Próximo' },
+};
+
 interface BlogArticleProps {
     slug: string;
     locale: string;
     post: BlogPost;
-    availableLocales: string[];
+    availableLocales: { locale: string; slug: string }[];
 }
 
 export default function BlogArticle({ slug, locale, post, availableLocales }: BlogArticleProps) {
@@ -67,20 +73,20 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                                 />
                             </svg>
                             <div className="flex gap-1">
-                                {availableLocales.map((loc) => (
+                                {availableLocales.map((locInfo) => (
                                     <Link
-                                        key={loc}
-                                        href={`/${loc}/blog/${slug}`}
+                                        key={locInfo.locale}
+                                        href={`/${locInfo.locale}/blog/${locInfo.slug}`}
                                         className={`
                                             text-xs px-2 py-1 rounded transition-colors
-                                            ${loc === locale
+                                            ${locInfo.locale === locale
                                                 ? 'bg-white/20 text-white font-medium'
                                                 : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                             }
                                         `}
-                                        title={LOCALE_NAMES[loc] || loc.toUpperCase()}
+                                        title={LOCALE_NAMES[locInfo.locale] || locInfo.locale.toUpperCase()}
                                     >
-                                        {loc.toUpperCase()}
+                                        {locInfo.locale.toUpperCase()}
                                     </Link>
                                 ))}
                             </div>
@@ -143,7 +149,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
                 <section className="mt-12 pt-8 border-t border-white/10">
-                    <h2 className="text-lg font-semibold text-white mb-6">Related Posts</h2>
+                    <h2 className="text-lg font-semibold text-white mb-6">{blogStrings[locale]?.relatedPosts ?? 'Related Posts'}</h2>
                     <div className="grid gap-4 sm:grid-cols-3">
                         {relatedPosts.map((relatedPost) => (
                             <Link
@@ -181,7 +187,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                         href={`/blog/${prev.slug}`}
                         className="group flex flex-col items-start"
                     >
-                        <span className="text-xs text-gray-500 mb-1">Previous</span>
+                        <span className="text-xs text-gray-500 mb-1">{blogStrings[locale]?.previous ?? 'Previous'}</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -196,7 +202,7 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
                         href={`/blog/${next.slug}`}
                         className="group flex flex-col items-end"
                     >
-                        <span className="text-xs text-gray-500 mb-1">Next</span>
+                        <span className="text-xs text-gray-500 mb-1">{blogStrings[locale]?.next ?? 'Next'}</span>
                         <span className="text-accent group-hover:underline flex items-center gap-2">
                             {next.title}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

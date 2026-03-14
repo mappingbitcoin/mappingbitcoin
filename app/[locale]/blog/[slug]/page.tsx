@@ -42,17 +42,18 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
     const canonical = generateCanonical(`blog/${slug}`, locale);
     const ogImageUrl = `${env.siteUrl}${post.ogImage}`;
-    const availableLocales = getPostAvailableLocales(slug);
+    const availableLocales = getPostAvailableLocales(slug, locale);
 
     // Build hreflang alternate links for available translations
     const languages: Record<string, string> = {};
-    for (const loc of availableLocales) {
-        const localeUrl = generateCanonical(`blog/${slug}`, loc);
-        languages[loc] = localeUrl;
+    for (const locInfo of availableLocales) {
+        const localeUrl = generateCanonical(`blog/${locInfo.slug}`, locInfo.locale);
+        languages[locInfo.locale] = localeUrl;
     }
     // Add x-default pointing to the default locale version
-    if (availableLocales.includes(routing.defaultLocale)) {
-        languages['x-default'] = generateCanonical(`blog/${slug}`, routing.defaultLocale);
+    if (availableLocales.some(l => l.locale === routing.defaultLocale)) {
+        const defaultEntry = availableLocales.find(l => l.locale === routing.defaultLocale);
+        languages['x-default'] = generateCanonical(`blog/${defaultEntry!.slug}`, routing.defaultLocale);
     }
 
     return {
@@ -94,7 +95,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
     const { slug, locale } = await params;
     const post = getBlogPost(slug, locale);
-    const availableLocales = getPostAvailableLocales(slug);
+    const availableLocales = getPostAvailableLocales(slug, locale);
 
     if (!post) {
         notFound();
