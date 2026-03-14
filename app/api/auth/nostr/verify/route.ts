@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyChallenge, consumeChallenge, createAuthToken } from "@/lib/db/services/auth";
+import { atomicVerifyAndConsume, createAuthToken } from "@/lib/db/services/auth";
 import * as secp256k1 from "@noble/secp256k1";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { hexToBytes } from "@noble/hashes/utils.js";
@@ -52,8 +52,8 @@ async function verifyEventSignature(
     if (!event) return false;
 
     try {
-        // Verify the event pubkey matches
-        if (event.pubkey !== expectedPubkey) {
+        // Verify the event pubkey matches (case-insensitive)
+        if (event.pubkey.toLowerCase() !== expectedPubkey.toLowerCase()) {
             console.error("Event pubkey mismatch");
             return false;
         }
@@ -151,24 +151,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Verify the challenge exists and belongs to this pubkey (but don't consume yet)
-        const challengeRecord = await verifyChallenge(challenge, pubkey);
-        if (!challengeRecord) {
-            return NextResponse.json(
-                { error: "Invalid or expired challenge" },
-                { status: 401 }
-            );
-        }
+        // Normalize pubkey to lowercase for consistent storage/lookup
+        const normalizedPubkey = pubkey.toLowerCase();
 
         // Verify the signature using the appropriate method
         let signatureValid = false;
 
         if (signedEvent) {
             // Extension/bunker: verify event signature
-            signatureValid = await verifyEventSignature(pubkey, challenge, signedEvent);
+            signatureValid = await verifyEventSignature(normalizedPubkey, challenge, signedEvent);
         } else if (signature) {
             // Direct nsec signing: verify Schnorr signature over challenge hash
-            signatureValid = await verifyDirectSignature(pubkey, challenge, signature);
+            signatureValid = await verifyDirectSignature(normalizedPubkey, challenge, signature);
         }
 
         if (!signatureValid) {
@@ -179,15 +173,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Only consume the challenge after successful signature verification
-        await consumeChallenge(challengeRecord.id);
+        // Atomically verify and consume the challenge in a single transaction
+        // This prevents TOCTOU race conditions where concurrent requests
+        // could both verify the same challenge before either consumes it
+        const challengeRecord = await atomicVerifyAndConsume(challenge, normalizedPubkey);
+        if (!challengeRecord) {
+            return NextResponse.json(
+                { error: "Invalid or expired challenge" },
+                { status: 401 }
+            );
+        }
 
         // Create JWT token
-        const token = await createAuthToken(pubkey);
+        const token = await createAuthToken(normalizedPubkey);
 
         return NextResponse.json({
             token,
-            pubkey,
+            pubkey: normalizedPubkey,
         });
     } catch (error) {
         console.error("Verification error:", error);

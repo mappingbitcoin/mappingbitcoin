@@ -271,8 +271,19 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
             let loadedUser: NostrUser | null = null;
             if (stored) {
                 const parsed = JSON.parse(stored);
-                loadedUser = parsed;
-                setUser(parsed);
+
+                // If the user logged in with nsec, the private key lives in
+                // sessionStorage which is cleared when the tab/browser closes.
+                // Clear the stale login so the user is prompted to log in again
+                // instead of hitting "Private key not found" errors later.
+                if (parsed.method === "nsec" && !sessionStorage.getItem("nostr_privkey")) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(AUTH_TOKEN_KEY);
+                    // loadedUser stays null — user will see the login screen
+                } else {
+                    loadedUser = parsed;
+                    setUser(parsed);
+                }
             }
             const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
             if (storedToken) {
@@ -528,6 +539,13 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         }
 
         const { challenge } = await challengeRes.json();
+
+        // Bail early if nsec user lost their session key (tab was closed)
+        if (user.method === "nsec" && !sessionStorage.getItem("nostr_privkey")) {
+            logout();
+            if (silent) return null;
+            throw new Error("Session expired. Please log in again.");
+        }
 
         // Sign the challenge based on auth method
         const { signChallenge } = await import("@/lib/nostr/auth");
