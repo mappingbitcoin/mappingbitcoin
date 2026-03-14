@@ -22,14 +22,15 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { locale?: string };
+  params: Promise<Record<string, string>>;
 }) {
-  const locale = params?.locale;
+  const resolvedParams = await params;
+  const locale = resolvedParams?.locale;
   const lang = locale && routing.locales.includes(locale as (typeof routing.locales)[number])
     ? locale
     : routing.defaultLocale;

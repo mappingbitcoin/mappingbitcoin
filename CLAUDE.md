@@ -1,5 +1,9 @@
 # Claude Instructions for MappingBitcoin
 
+## Git Workflow
+
+**Do NOT use git worktrees.** Work directly on the main branch or create regular branches.
+
 ## Blog Images
 
 When creating or converting blog images:
