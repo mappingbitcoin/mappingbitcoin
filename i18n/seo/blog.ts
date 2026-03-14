@@ -34,6 +34,62 @@ const blogSeo: SEOModule<BlogPageKey> = {
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
+        es: {
+            title: "Blog | Mapping Bitcoin",
+            description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin. Conoce nuestra mision de mejorar el descubrimiento de comercios Bitcoin.",
+            keywords: [
+                "blog bitcoin",
+                "adopcion bitcoin"
+            ],
+            openGraph: {
+                title: "Blog | Mapping Bitcoin",
+                description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin.",
+                url: generateCanonical("blog", "es"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Blog de MappingBitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Blog | Mapping Bitcoin",
+                description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
+        pt: {
+            title: "Blog | Mapping Bitcoin",
+            description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin. Conheca nossa missao de melhorar a descoberta de comercios Bitcoin.",
+            keywords: [
+                "blog bitcoin",
+                "adocao bitcoin"
+            ],
+            openGraph: {
+                title: "Blog | Mapping Bitcoin",
+                description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin.",
+                url: generateCanonical("blog", "pt"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Blog do MappingBitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Blog | Mapping Bitcoin",
+                description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
     },
 };
 

@@ -1,0 +1,160 @@
+{
+  "hero": {
+    "title": "Mapa global do Bitcoin",
+    "description": "Encontre cada local, organização e comunidade do ecossistema Bitcoin.",
+    "cta": {
+      "primary": "Explorar mapa",
+      "secondary": "Explorar diretório"
+    },
+    "poweredBy": "Desenvolvido com"
+  },
+  "stats": {
+    "venues": "Locais",
+    "countries": "Países",
+    "continents": "Continentes",
+    "verifiedBusinesses": "Negócios verificados"
+  },
+  "ownBusiness": {
+    "title": "Tem um negócio Bitcoin?",
+    "description": "Adicione seu estabelecimento ao maior diretório de comerciantes Bitcoin. Seja encontrado por clientes que querem gastar Bitcoin.",
+    "cta": "Adicionar seu negócio",
+    "verifyLink": "Saiba como verificar",
+    "benefits": {
+      "verified": {
+        "title": "Selo verificado",
+        "description": "Mostre aos clientes que você é legítimo"
+      },
+      "edit": {
+        "title": "Editar listagem",
+        "description": "Mantenha suas informações atualizadas"
+      },
+      "reviews": {
+        "title": "Responder avaliações",
+        "description": "Interaja com seus clientes"
+      },
+      "secure": {
+        "title": "Seguro e gratuito",
+        "description": "Sem taxas, suas chaves"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Como funciona",
+    "features": {
+      "openData": {
+        "title": "Dados abertos",
+        "description": "Construído sobre o OpenStreetMap. Transparente e verificável."
+      },
+      "communityDriven": {
+        "title": "Impulsionado pela comunidade",
+        "description": "Qualquer pessoa pode adicionar locais. Avaliações de usuários reais."
+      },
+      "verifiablePlaces": {
+        "title": "Locais verificáveis",
+        "description": "Negócios podem comprovar propriedade. Confiança integrada."
+      },
+      "alwaysCurrent": {
+        "title": "Sempre atualizado",
+        "description": "Atualizações contínuas. Envios moderados."
+      }
+    }
+  },
+  "community": {
+    "title": "Compartilhe sua experiência",
+    "description": "Ajude a comunidade Bitcoin compartilhando suas experiências em comerciantes do mundo todo. Suas avaliações são armazenadas no Nostr, de forma descentralizada e resistente à censura.",
+    "features": {
+      "reviews": {
+        "title": "Escreva avaliações",
+        "description": "Compartilhe comentários detalhados sobre sua experiência. Sua avaliação é assinada com sua chave Nostr e pertence a você."
+      },
+      "ratings": {
+        "title": "Avalie locais",
+        "description": "Avaliações rápidas de 1 a 5 estrelas ponderadas por Web of Trust. Avaliadores confiáveis têm mais influência nas pontuações agregadas."
+      },
+      "photos": {
+        "title": "Envie fotos",
+        "description": "Adicione até 5 fotos por avaliação. As imagens são armazenadas no Blossom, uma rede de armazenamento descentralizada."
+      },
+      "navigate": {
+        "title": "Explore o mapa",
+        "description": "Filtre por tipo de pagamento, categoria ou status de verificação. Encontre comerciantes Bitcoin perto de você ou em qualquer lugar do mundo."
+      }
+    },
+    "cta": {
+      "explore": "Explorar mapa",
+      "docs": "Saiba mais"
+    }
+  },
+  "regions": {
+    "title": "Explorar por região"
+  },
+  "topCountries": {
+    "title": "Principais países Bitcoin",
+    "venues": "locais"
+  },
+  "wotIntegration": {
+    "title": "Integração com Web of Trust",
+    "description": "Integramos com o Nostr Web of Trust para fornecer sinais de confiança aprimorados para avaliações e contribuições. Veja em quem você pode confiar com base no seu grafo social.",
+    "features": {
+      "trust": {
+        "title": "Avaliações baseadas em confiança",
+        "description": "As avaliações são ponderadas pela distância de confiança. Veja opiniões de pessoas da sua rede primeiro, não de estranhos anônimos."
+      },
+      "transparency": {
+        "title": "Reputação transparente",
+        "description": "Cada colaborador tem uma identidade verificável no Nostr. Acompanhe seu histórico e veja sua pontuação de confiança."
+      },
+      "spam": {
+        "title": "Resistência a spam",
+        "description": "O Web of Trust filtra naturalmente spam e avaliações falsas. Pessoas reais, opiniões reais."
+      }
+    },
+    "cta": {
+      "install": "Instalar extensão",
+      "learnMore": "Saiba mais"
+    }
+  },
+  "newsletter": {
+    "title": "Fique atualizado",
+    "description": "Receba as últimas notícias sobre comerciantes Bitcoin e atualizações do mapa.",
+    "placeholder": "Digite seu e-mail",
+    "cta": "Inscrever-se"
+  },
+  "faq": {
+    "title": "Perguntas frequentes",
+    "questions": [
+      {
+        "question": "O que é o Mapping Bitcoin?",
+        "answer": "O Mapping Bitcoin é o maior diretório de código aberto de comerciantes que aceitam Bitcoin no mundo todo. Agregamos dados do OpenStreetMap e permitimos que negócios verifiquem suas listagens usando o Nostr, um protocolo de identidade descentralizado."
+      },
+      {
+        "question": "Como adiciono meu negócio ao mapa?",
+        "answer": "Você pode adicionar seu negócio clicando em \"Adicionar seu negócio\" e preenchendo o formulário. Sua listagem será enviada ao OpenStreetMap, o maior projeto de mapeamento aberto do mundo. Alternativamente, você pode adicioná-lo diretamente no OpenStreetMap e ele aparecerá no Mapping Bitcoin automaticamente."
+      },
+      {
+        "question": "Como funcionam as avaliações e classificações?",
+        "answer": "As avaliações são publicadas como eventos Nostr, tornando-as descentralizadas e de sua propriedade. As classificações são ponderadas pelo Web of Trust: avaliações de membros confiáveis da comunidade têm mais influência nas pontuações agregadas do que contas anônimas ou novas. Isso fornece classificações resistentes a Sybil sem moderação centralizada."
+      },
+      {
+        "question": "O que é Web of Trust e por que é importante?",
+        "answer": "Web of Trust (WoT) é um modelo de confiança descentralizado baseado no seu grafo social do Nostr. A confiança flui através das conexões de seguimento a partir de seeders da comunidade. Avaliações de pessoas mais próximas da sua rede de confiança são destacadas, e suas classificações têm mais peso. Isso ajuda a filtrar spam e exibir feedback genuíno da comunidade."
+      },
+      {
+        "question": "Preciso de uma conta Nostr para usar o Mapping Bitcoin?",
+        "answer": "Você pode navegar pelo mapa e ver os locais sem uma conta. Para deixar avaliações, classificar locais ou verificar seu negócio, você precisará fazer login com uma identidade Nostr. Você pode usar uma extensão de navegador (Alby, nos2x), inserir sua chave privada diretamente ou usar um bunker do Nostr Connect."
+      },
+      {
+        "question": "O que significa um negócio ser \"verificado\"?",
+        "answer": "Negócios verificados comprovaram criptograficamente a propriedade de sua listagem através de verificação por e-mail ou domínio. Isso é vinculado à sua identidade Nostr, proporcionando confiança sem depender de nenhuma autoridade central. Proprietários verificados também podem responder às avaliações do seu estabelecimento."
+      },
+      {
+        "question": "O Mapping Bitcoin é gratuito?",
+        "answer": "Sim, o Mapping Bitcoin é completamente gratuito para usuários e negócios. Acreditamos no acesso aberto à economia Bitcoin."
+      },
+      {
+        "question": "Vocês suportam a Lightning Network?",
+        "answer": "Sim! Muitos negócios listados aceitam pagamentos Lightning. Você pode filtrar o mapa para mostrar apenas locais que aceitam Lightning. Também suportamos pagamentos Bitcoin on-chain."
+      }
+    ]
+  }
+}

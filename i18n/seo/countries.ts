@@ -34,6 +34,62 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
+        es: {
+            title: "Lugares Bitcoin por Pais | Mapping Bitcoin",
+            description: "Explora cafeterias, tiendas, cajeros y otros lugares del mundo que aceptan Bitcoin. Navega por continente y pais para ver donde se usa mas.",
+            keywords: [
+                "bitcoin por pais",
+                "mapa adopcion bitcoin"
+            ],
+            openGraph: {
+                title: "Lugares Bitcoin por Pais | Mapping Bitcoin",
+                description: "Encuentra lugares de confianza que aceptan Bitcoin — cafeterias, restaurantes y cajeros — organizados por continente y pais.",
+                url: generateCanonical("countries", "es"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Lugares Bitcoin por Pais | Mapping Bitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Lugares Bitcoin por Pais | Mapping Bitcoin",
+                description: "Explora lugares que aceptan Bitcoin en todo el mundo — ordenados por continente y pais.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
+        pt: {
+            title: "Locais Bitcoin por Pais | Mapping Bitcoin",
+            description: "Explore cafes, lojas, caixas eletronicos e outros lugares do mundo que aceitam Bitcoin. Navegue por continente e pais para ver onde e mais usado.",
+            keywords: [
+                "bitcoin por pais",
+                "mapa adocao bitcoin"
+            ],
+            openGraph: {
+                title: "Locais Bitcoin por Pais | Mapping Bitcoin",
+                description: "Encontre lugares confiaveis que aceitam Bitcoin — cafes, restaurantes e caixas eletronicos — organizados por continente e pais.",
+                url: generateCanonical("countries", "pt"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Locais Bitcoin por Pais | Mapping Bitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Locais Bitcoin por Pais | Mapping Bitcoin",
+                description: "Explore locais que aceitam Bitcoin no mundo todo — organizados por continente e pais.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
     },
     'countries-pages': {
         en: {
@@ -61,6 +117,62 @@ const countriesSeo: SEOModule<CountriesPageKey> = {
                 card: "summary_large_image",
                 title: "– Mapping Bitcoin",
                 description: "Explore Bitcoin-accepting locations near you and around the world.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            },
+        },
+        es: {
+            title: "– Mapping Bitcoin",
+            description: "Explora lugares de confianza en todo el mundo donde se acepta Bitcoin. Cafeterias, restaurantes, cajeros y mas.",
+            keywords: [
+                "lugares bitcoin",
+                "acepta bitcoin"
+            ],
+            openGraph: {
+                title: "– Mapping Bitcoin",
+                description: "Encuentra negocios que aceptan Bitcoin. Descubre nuevos lugares globalmente.",
+                url: generateCanonical("countries", "es"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "- Mapping Bitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "– Mapping Bitcoin",
+                description: "Explora lugares que aceptan Bitcoin cerca de ti y en todo el mundo.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            },
+        },
+        pt: {
+            title: "– Mapping Bitcoin",
+            description: "Explore locais confiaveis em todo o mundo onde o Bitcoin e aceito. Cafes, restaurantes, caixas eletronicos e mais.",
+            keywords: [
+                "locais bitcoin",
+                "aceita bitcoin"
+            ],
+            openGraph: {
+                title: "– Mapping Bitcoin",
+                description: "Encontre comercios que aceitam Bitcoin. Descubra novos locais globalmente.",
+                url: generateCanonical("countries", "pt"),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "- Mapping Bitcoin"
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "– Mapping Bitcoin",
+                description: "Explore locais que aceitam Bitcoin perto de voce e no mundo todo.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             },
         },

@@ -34,6 +34,64 @@ const categoriesSeo: SEOModule<CategoriesPageKey> = {
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },
+        es: {
+            title: "Categorias de Negocios Bitcoin | Mapping Bitcoin",
+            description: "Explora todas las categorias de negocios que aceptan pagos con Bitcoin. Encuentra restaurantes, cafeterias, hoteles, tiendas y servicios que aceptan Bitcoin y Lightning.",
+            keywords: [
+                "comercios bitcoin",
+                "categorias bitcoin"
+            ],
+            openGraph: {
+                title: "Categorias de Negocios Bitcoin | Mapping Bitcoin",
+                description: "Explora todas las categorias de negocios que aceptan pagos con Bitcoin. Encuentra restaurantes, cafeterias, hoteles, tiendas y servicios que aceptan Bitcoin y Lightning.",
+                url: `${env.siteUrl}/es/categories`,
+                type: "website",
+                siteName: "Mapping Bitcoin",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Categorias de Negocios Bitcoin - Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Categorias de Negocios Bitcoin | Mapping Bitcoin",
+                description: "Explora todas las categorias de negocios que aceptan pagos con Bitcoin. Encuentra restaurantes, cafeterias, hoteles, tiendas y servicios que aceptan Bitcoin y Lightning.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            }
+        },
+        pt: {
+            title: "Categorias de Comercios Bitcoin | Mapping Bitcoin",
+            description: "Explore todas as categorias de comercios que aceitam pagamentos com Bitcoin. Encontre restaurantes, cafes, hoteis, lojas e servicos que aceitam Bitcoin e Lightning.",
+            keywords: [
+                "comercios bitcoin",
+                "categorias bitcoin"
+            ],
+            openGraph: {
+                title: "Categorias de Comercios Bitcoin | Mapping Bitcoin",
+                description: "Explore todas as categorias de comercios que aceitam pagamentos com Bitcoin. Encontre restaurantes, cafes, hoteis, lojas e servicos que aceitam Bitcoin e Lightning.",
+                url: `${env.siteUrl}/pt/categories`,
+                type: "website",
+                siteName: "Mapping Bitcoin",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Categorias de Comercios Bitcoin - Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Categorias de Comercios Bitcoin | Mapping Bitcoin",
+                description: "Explore todas as categorias de comercios que aceitam pagamentos com Bitcoin. Encontre restaurantes, cafes, hoteis, lojas e servicos que aceitam Bitcoin e Lightning.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            }
+        },
     },
     subcategory: {
         en: {
@@ -62,6 +120,64 @@ const categoriesSeo: SEOModule<CategoriesPageKey> = {
                 card: "summary_large_image",
                 title: "{{category}} Accepting Bitcoin | Mapping Bitcoin",
                 description: "Find {{category}} that accept Bitcoin in {{countries}} countries. Browse {{count}} verified places on our Bitcoin map.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            }
+        },
+        es: {
+            title: "{{category}} que Aceptan Bitcoin | Mapping Bitcoin",
+            description: "Encuentra {{category}} que aceptan Bitcoin en {{countries}} paises. Explora {{count}} lugares verificados en nuestro mapa Bitcoin.",
+            keywords: [
+                "{{category}} bitcoin",
+                "{{category}} aceptan bitcoin"
+            ],
+            openGraph: {
+                title: "{{category}} que Aceptan Bitcoin | Mapping Bitcoin",
+                description: "Encuentra {{category}} que aceptan Bitcoin en {{countries}} paises. Explora {{count}} lugares verificados en nuestro mapa Bitcoin.",
+                url: `${env.siteUrl}/es/categories/{{subcategory}}`,
+                type: "website",
+                siteName: "Mapping Bitcoin",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "{{category}} que Aceptan Bitcoin - Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "{{category}} que Aceptan Bitcoin | Mapping Bitcoin",
+                description: "Encuentra {{category}} que aceptan Bitcoin en {{countries}} paises. Explora {{count}} lugares verificados en nuestro mapa Bitcoin.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
+            }
+        },
+        pt: {
+            title: "{{category}} que Aceitam Bitcoin | Mapping Bitcoin",
+            description: "Encontre {{category}} que aceitam Bitcoin em {{countries}} paises. Explore {{count}} locais verificados no nosso mapa Bitcoin.",
+            keywords: [
+                "{{category}} bitcoin",
+                "{{category}} aceitam bitcoin"
+            ],
+            openGraph: {
+                title: "{{category}} que Aceitam Bitcoin | Mapping Bitcoin",
+                description: "Encontre {{category}} que aceitam Bitcoin em {{countries}} paises. Explore {{count}} locais verificados no nosso mapa Bitcoin.",
+                url: `${env.siteUrl}/pt/categories/{{subcategory}}`,
+                type: "website",
+                siteName: "Mapping Bitcoin",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "{{category}} que Aceitam Bitcoin - Mapping Bitcoin",
+                    },
+                ],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "{{category}} que Aceitam Bitcoin | Mapping Bitcoin",
+                description: "Encontre {{category}} que aceitam Bitcoin em {{countries}} paises. Explore {{count}} locais verificados no nosso mapa Bitcoin.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`],
             }
         },

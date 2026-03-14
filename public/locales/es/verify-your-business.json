@@ -1,0 +1,103 @@
+{
+  "hero": {
+    "title": "Verifica tu negocio",
+    "description": "Reclama y verifica tu listado en Mapping Bitcoin para generar confianza con los clientes y desbloquear funciones adicionales."
+  },
+  "whyVerify": {
+    "title": "¿Por qué verificar?",
+    "cards": {
+      "trust": {
+        "title": "Genera confianza",
+        "description": "Una insignia de verificado muestra a los clientes que tu negocio ha sido confirmado como legítimo."
+      },
+      "manage": {
+        "title": "Gestiona tu listado",
+        "description": "Actualiza la información de tu negocio, responde a reseñas y mantén los datos precisos."
+      },
+      "standOut": {
+        "title": "Destaca",
+        "description": "Los negocios verificados aparecen de forma más prominente en los resultados de búsqueda."
+      }
+    }
+  },
+  "methods": {
+    "title": "Métodos de verificación",
+    "description": "Elige el método que mejor te funcione. Ambas opciones son gratuitas y seguras.",
+    "email": {
+      "title": "Verificación por correo electrónico",
+      "description": "Verifica recibiendo un código en la dirección de correo electrónico de tu negocio listada en OpenStreetMap.",
+      "requirements": "Lo que necesitas:",
+      "req1": "Acceso a la dirección de correo electrónico listada en tu establecimiento",
+      "req2": "Una cuenta de Nostr para vincular la verificación a tu identidad",
+      "howItWorks": "Cómo funciona:",
+      "step1": "Encuentra tu negocio en Mapping Bitcoin y haz clic en \"Verificar\"",
+      "step2": "Inicia sesión con tu cuenta de Nostr",
+      "step3": "Enviamos un código de 6 dígitos a tu correo electrónico comercial",
+      "step4": "Ingresa el código para completar la verificación"
+    },
+    "domain": {
+      "title": "Verificación por dominio",
+      "description": "Verifica añadiendo un registro DNS TXT al dominio de tu sitio web.",
+      "requirements": "Lo que necesitas:",
+      "req1": "Acceso a la configuración DNS de tu dominio",
+      "req2": "Una cuenta de Nostr para vincular la verificación a tu identidad",
+      "howItWorks": "Cómo funciona:",
+      "step1": "Encuentra tu negocio en Mapping Bitcoin y haz clic en \"Verificar\"",
+      "step2": "Inicia sesión con tu cuenta de Nostr",
+      "step3": "Copia el registro TXT único que te proporcionamos",
+      "step4": "Añádelo a la configuración DNS de tu dominio",
+      "step5": "Haz clic en \"Verificar\" una vez que se propague el DNS (normalmente 5-30 minutos)"
+    }
+  },
+  "transparency": {
+    "title": "Nuestro compromiso con la transparencia",
+    "cards": {
+      "openSource": {
+        "title": "Código abierto",
+        "description": "Nuestro sistema de verificación es de código abierto. Cualquiera puede revisar el código y verificar cómo gestionamos el proceso de verificación."
+      },
+      "decentralized": {
+        "title": "Identidad descentralizada",
+        "description": "Las verificaciones están vinculadas a tu clave pública de Nostr, dándote control soberano sobre la identidad de tu negocio."
+      },
+      "noAuthority": {
+        "title": "Sin autoridad central",
+        "description": "No tenemos custodia de tu identidad. Tus claves de Nostr son tuyas, y la verificación demuestra la propiedad sin intermediarios."
+      },
+      "cryptographic": {
+        "title": "Prueba criptográfica",
+        "description": "Todas las verificaciones se registran con firmas criptográficas que pueden ser verificadas de forma independiente."
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "questions": [
+      {
+        "question": "¿Qué es Nostr?",
+        "answer": "Nostr es un protocolo descentralizado para redes sociales. Utiliza pares de claves criptográficas para la identidad, lo que significa que eres dueño de tu cuenta sin depender de ninguna empresa. Usamos Nostr para la verificación porque se alinea con los valores de soberanía individual de Bitcoin."
+      },
+      {
+        "question": "¿Cuánto tarda la verificación?",
+        "answer": "La verificación por correo electrónico es instantánea una vez que ingresas el código. La verificación por dominio depende de la propagación DNS, normalmente de 5 a 30 minutos, pero puede tardar hasta 48 horas en algunos casos."
+      },
+      {
+        "question": "¿Puedo verificar múltiples negocios?",
+        "answer": "Sí, una sola cuenta de Nostr puede verificar múltiples negocios, siempre que puedas demostrar la propiedad de cada uno mediante verificación por correo electrónico o dominio."
+      },
+      {
+        "question": "¿Por qué no puedo usar proveedores de correo comunes para la verificación por dominio?",
+        "answer": "Para la verificación por dominio vía correo electrónico, solo aceptamos dominios de correo personalizados (como tu@tunegocio.com). Esto asegura que la verificación realmente demuestre la propiedad del dominio. Sin embargo, si tu establecimiento tiene un correo electrónico listado (incluso Gmail), puedes usar la verificación por código de correo electrónico."
+      },
+      {
+        "question": "¿La verificación es gratuita?",
+        "answer": "Sí, la verificación es completamente gratuita. Creemos en el acceso abierto a la economía Bitcoin."
+      }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para verificar tu negocio?",
+    "description": "Encuentra tu listado en el mapa y haz clic en el botón Verificar para comenzar.",
+    "button": "Encontrar tu negocio"
+  }
+}

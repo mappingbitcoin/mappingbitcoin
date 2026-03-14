@@ -81,7 +81,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
     const categoryLabel = venue.subcategory && venue.category
         ? getSubcategoryLabel(locale, venue.category, venue.subcategory)
-        : venue.category ? PLACE_CATEGORIES[locale][venue.category]?.label : null;
+        : venue.category ? (PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'])?.[venue.category]?.label : null;
 
     const enabledPayments = paymentMethods
         ? Object.entries(paymentMethods).filter(([, v]) => v === "yes").map(([type]) => type)

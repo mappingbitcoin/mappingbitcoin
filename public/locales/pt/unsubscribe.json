@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Gerenciar inscrições - Mapping Bitcoin",
+    "description": "Gerencie suas inscrições e preferências de e-mail"
+  },
+  "title": "Gerencie suas inscrições",
+  "description": "Você está gerenciando as inscrições de {email}",
+  "yourSubscriptions": "Suas inscrições",
+  "subscribedSince": "Inscrito desde {date}",
+  "unsubscribe": "Cancelar inscrição",
+  "unsubscribing": "Cancelando inscrição...",
+  "unsubscribeAll": "Cancelar todas as inscrições",
+  "loading": "Carregando suas inscrições...",
+  "success": {
+    "title": "Inscrição cancelada com sucesso",
+    "description": "Você foi removido da nossa lista de e-mails. Lamentamos ver você partir!"
+  },
+  "noToken": {
+    "title": "Link de cancelamento ausente",
+    "description": "Esta página requer um link de cancelamento válido de um dos nossos e-mails."
+  },
+  "invalidToken": "Este link de cancelamento é inválido ou expirou.",
+  "error": "Algo deu errado",
+  "backHome": "Voltar ao início"
+}

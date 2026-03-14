@@ -1,0 +1,36 @@
+{
+  "heading": "Entre em contato",
+  "subheading": "Tem uma dúvida, proposta de parceria ou consulta de mídia? Entre em contato com a equipe certa abaixo.",
+  "form": {
+    "title": "Envie-nos uma mensagem",
+    "subtitle": "Preencha o formulário e retornaremos o mais breve possível.",
+    "nameLabel": "Nome completo",
+    "namePlaceholder": "Satoshi Nakamoto",
+    "emailLabel": "Endereço de e-mail",
+    "emailPlaceholder": "satoshi@bitcoin.org",
+    "messageLabel": "Mensagem",
+    "messagePlaceholder": "Conte-nos como podemos ajudar...",
+    "sendButton": "Enviar mensagem",
+    "sendingButton": "Enviando...",
+    "successMessage": "Mensagem enviada com sucesso! Retornaremos em breve.",
+    "errorMessage": "Falha ao enviar a mensagem. Por favor, tente novamente.",
+    "recaptchaError": "A verificação de segurança falhou. Por favor, atualize a página e tente novamente.",
+    "rateLimitedMessage": "Muitas solicitações. Por favor, tente novamente em {minutes} minutos.",
+    "rateLimitedGeneric": "Muitas solicitações. Por favor, tente novamente mais tarde.",
+    "recaptchaNotice": "Este site é protegido pelo reCAPTCHA e a Política de Privacidade e os Termos de Serviço do Google se aplicam."
+  },
+  "cards": {
+    "partners": {
+      "title": "Parcerias e patrocínios",
+      "description": "Interessado em colaborar com o Mapping Bitcoin? Vamos explorar oportunidades juntos."
+    },
+    "media": {
+      "title": "Mídia e imprensa",
+      "description": "Para consultas de imprensa, entrevistas ou recursos de mídia, entre em contato com nossa equipe de mídia."
+    },
+    "general": {
+      "title": "Consultas gerais",
+      "description": "Tem uma dúvida ou feedback? Estamos aqui para ajudar com qualquer assunto relacionado ao Bitcoin."
+    }
+  }
+}

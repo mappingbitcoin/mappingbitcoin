@@ -1,0 +1,60 @@
+{
+  "breadcrumb": {
+    "home": "Países",
+    "inCountry": "Bitcoin en {country}",
+    "inCity": "{city}",
+    "inCategory": "{category}"
+  },
+  "form": {
+    "fields": {
+      "name": "Nombre del lugar",
+      "about": "Acerca de",
+      "category": "Categoría",
+      "subcategory": "Subcategoría",
+      "location": "Ubicación (busca una dirección o arrastra el marcador del mapa)",
+      "openingHours": "Horario de apertura",
+      "paymentMethods": "Métodos de pago",
+      "contact": "Contacto",
+      "notes": "Notas"
+    },
+    "basicInformation": "Información básica",
+    "searchPlaceName": "Buscar nombre del lugar",
+    "searchVenueName": "Buscar establecimiento por nombre",
+    "selectCategory": "Seleccionar categoría",
+    "selectSubcategory": "Seleccionar subcategoría",
+    "additionalDetails": "Detalles adicionales",
+    "submitPlace": "Enviar lugar",
+    "submitVenue": "Enviar establecimiento",
+    "contactSection": "Contacto",
+    "resetButton": "Restablecer",
+    "nextButton": "Siguiente",
+    "backButton": "Atrás",
+    "locationSection": "Ubicación",
+    "searchAddress": "Buscar dirección",
+    "notesSection": "Notas",
+    "notesPlaceholder": "Notas",
+    "openingHours": "Horario de apertura",
+    "separateWithSemicolon": "Ingresa un valor...",
+    "paymentMethods": "Métodos de pago",
+    "roleQuestion": "¿Cuál es tu relación con este lugar?",
+    "roleOptions": {
+      "": "Selecciona tu rol",
+      "owner": "Propietario del negocio",
+      "customer": "Visité como cliente",
+      "other": "Otro"
+    },
+    "osmAccountChoice": {
+      "title": "¿Cómo deseas enviar?",
+      "mappingbitcoin": "MappingBitcoin",
+      "mappingbitcoinDesc": "No requiere inicio de sesión",
+      "personal": "Mi cuenta OSM",
+      "personalDesc": "Requiere inicio de sesión en OSM",
+      "personalLoggedIn": "Conectado como {name}"
+    },
+    "nostrAttribution": {
+      "label": "Atribuir esta contribución a tu perfil de Nostr",
+      "loginPrompt": "¿Quieres atribución?",
+      "loginLink": "Iniciar sesión con Nostr"
+    }
+  }
+}
