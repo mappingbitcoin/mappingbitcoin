@@ -66,31 +66,6 @@ Index a review for immediate display after publishing to Nostr.
 }
 ```
 
-## Web of Trust API
-
-### GET /api/wot/distance
-
-Get WoT distance from Mapping Bitcoin bot to a target pubkey.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| pubkey | string | 64-character hex pubkey |
-
-**Response:**
-
-```json
-{
-  "pubkey": "def456...",
-  "distance": 2,
-  "pathCount": 3,
-  "mutual": false,
-  "fromPubkey": "abc123...",
-  "source": "oracle"
-}
-```
-
 ## Verification API
 
 ### POST /api/verify/initiate
