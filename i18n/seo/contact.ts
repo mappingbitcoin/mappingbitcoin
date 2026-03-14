@@ -33,6 +33,60 @@ const contactSeo: SEOModule<ContactPageKey> = {
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
+        es: {
+            title: "Contacto | Mapping Bitcoin",
+            description: "Mapping Bitcoin es una plataforma de codigo abierto para descubrir, aprender y usar Bitcoin. Contactanos para colaboraciones, preguntas o comentarios.",
+            keywords: [
+                "contacto mapping bitcoin"
+            ],
+            openGraph: {
+                title: "Contacto | Mapping Bitcoin",
+                description: "Mapping Bitcoin es una plataforma de codigo abierto para descubrir, aprender y usar Bitcoin. Contactanos para colaboraciones, preguntas o comentarios.",
+                url: generateCanonical('contact', 'es'),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Contacto | Mapping Bitcoin",
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Contacto | Mapping Bitcoin",
+                description: "Mapping Bitcoin es una plataforma de codigo abierto para descubrir, aprender y usar Bitcoin. Contactanos para colaboraciones, preguntas o comentarios.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
+        pt: {
+            title: "Contato | Mapping Bitcoin",
+            description: "Mapping Bitcoin e uma plataforma de codigo aberto para descobrir, aprender e usar Bitcoin. Entre em contato para colaboracoes, perguntas ou feedback.",
+            keywords: [
+                "contato mapping bitcoin"
+            ],
+            openGraph: {
+                title: "Contato | Mapping Bitcoin",
+                description: "Mapping Bitcoin e uma plataforma de codigo aberto para descobrir, aprender e usar Bitcoin. Entre em contato para colaboracoes, perguntas ou feedback.",
+                url: generateCanonical('contact', 'pt'),
+                type: "website",
+                images: [
+                    {
+                        url: `${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`,
+                        width: 1200,
+                        height: 630,
+                        alt: "Contato | Mapping Bitcoin",
+                    }
+                ]
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: "Contato | Mapping Bitcoin",
+                description: "Mapping Bitcoin e uma plataforma de codigo aberto para descobrir, aprender e usar Bitcoin. Entre em contato para colaboracoes, perguntas ou feedback.",
+                images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
+            }
+        },
     },
 };
 
