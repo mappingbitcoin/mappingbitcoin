@@ -85,7 +85,7 @@ export const COMMON_TAGS = [
 
 export type CommonTag = typeof COMMON_TAGS[number];
 
-export const COMMON_TAG_TRANSLATIONS: Record<Locale, Record<CommonTag, string>> = {
+export const COMMON_TAG_TRANSLATIONS: Partial<Record<Locale, Record<CommonTag, string>>> & { en: Record<CommonTag, string> } = {
     en: {
         brand: "Brand",
         operator: "Operator",

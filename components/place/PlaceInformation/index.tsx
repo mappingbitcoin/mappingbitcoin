@@ -97,7 +97,7 @@ export default function PlaceInformation({venue, isSideBar = false}: Props) {
                             </CategoryChip>
                         ) : venue.category ? (
                             <CategoryChip as="span" category={venue.category ?? 'other'}>
-                                {PLACE_CATEGORIES[locale][venue.category].label ?? t("map.venue-tooltip.defaultCategory")}
+                                {(PLACE_CATEGORIES[locale] ?? PLACE_CATEGORIES['en'])?.[venue.category]?.label ?? t("map.venue-tooltip.defaultCategory")}
                             </CategoryChip>
                         ) : <></> }
                         {specialTags && Object.entries(specialTags).map((el) => {

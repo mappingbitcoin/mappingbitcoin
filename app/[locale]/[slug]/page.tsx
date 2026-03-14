@@ -124,7 +124,7 @@ function parseSlugPattern(slug: string): {
     category: string;
     city?: string;
     country: string;
-    lang: 'en' | 'es';
+    lang: 'en' | 'es' | 'pt';
 } | null {
     // English: bitcoin-CATEGORY-in-CITY-COUNTRY (with city)
     const enCityMatch = slug.match(/^bitcoin-(.+)-in-(.+)-([a-z]{2,})$/);
@@ -152,6 +152,20 @@ function parseSlugPattern(slug: string): {
     if (esCountryMatch) {
         const [, category, country] = esCountryMatch;
         return { category, city: undefined, country, lang: 'es' };
+    }
+
+    // Portuguese: CATEGORY-bitcoin-em-CITY-COUNTRY (with city)
+    const ptCityMatch = slug.match(/^(.+)-bitcoin-em-(.+)-([a-z]{2,})$/);
+    if (ptCityMatch) {
+        const [, category, city, country] = ptCityMatch;
+        return { category, city, country, lang: 'pt' };
+    }
+
+    // Portuguese: CATEGORY-bitcoin-em-COUNTRY (country only)
+    const ptCountryMatch = slug.match(/^(.+)-bitcoin-em-([a-z-]+)$/);
+    if (ptCountryMatch) {
+        const [, category, country] = ptCountryMatch;
+        return { category, city: undefined, country, lang: 'pt' };
     }
 
     return null;
