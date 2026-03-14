@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { useLocaleAlternates } from "@/contexts/LocaleAlternatesContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const LOCALE_LABELS: Record<string, string> = {
@@ -22,6 +23,7 @@ export default function LanguageSwitcher() {
     const locale = useLocale();
     const pathname = usePathname();
     const router = useRouter();
+    const { alternates } = useLocaleAlternates();
     const [isOpen, setIsOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -36,7 +38,13 @@ export default function LanguageSwitcher() {
     }, []);
 
     const handleLocaleChange = (newLocale: string) => {
-        router.replace(pathname, { locale: newLocale });
+        // If the page provided locale-specific alternate paths, use them
+        if (alternates[newLocale]) {
+            router.replace(alternates[newLocale], { locale: newLocale });
+        } else {
+            // Default: same pathname, different locale (works for static routes)
+            router.replace(pathname, { locale: newLocale });
+        }
         setIsOpen(false);
     };
 
