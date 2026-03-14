@@ -52,7 +52,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
     const {name, paymentMethods, contact, openingHours, description, descriptionsByLocale, note, notesByLocale, specialTags, amenitiesTags, source} = useMemo(() => {
         if (venue) return parseTags(venue.tags);
-        else return {name: '', paymentMethods: {}, contact: {}, openingHours: '', description: '', descriptionsByLocale: {}, note: '', notesByLocale: {}, specialTags: {}, amenitiesTags: {}, source: ''};
+        else return {name: '', paymentMethods: {} as Record<string, string>, contact: {} as Record<string, string>, openingHours: '', description: '', descriptionsByLocale: {} as Record<string, string>, note: '', notesByLocale: {} as Record<string, string>, specialTags: {} as Record<string, string>, amenitiesTags: {} as Record<string, string>, source: ''};
     }, [venue]);
 
     const formattedHours = formatOpeningHours(openingHours);

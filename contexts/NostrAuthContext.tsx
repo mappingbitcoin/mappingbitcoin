@@ -1,6 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import {
+    setPrivateKey,
+    getPrivateKey,
+    setBunkerUrl,
+    clearAll as clearKeyStore,
+} from "@/lib/nostr/keyStore";
 
 export type AuthMode = "write" | "read" | null;
 
@@ -254,7 +260,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
                 // sessionStorage which is cleared when the tab/browser closes.
                 // Clear the stale login so the user is prompted to log in again
                 // instead of hitting "Private key not found" errors later.
-                if (parsed.method === "nsec" && !sessionStorage.getItem("nostr_privkey")) {
+                if (parsed.method === "nsec" && !getPrivateKey()) {
                     localStorage.removeItem(STORAGE_KEY);
                     localStorage.removeItem(AUTH_TOKEN_KEY);
                     // loadedUser stays null — user will see the login screen
@@ -348,8 +354,8 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
                 } else {
                     // Write mode with nsec
                     const pubkey = await derivePublicKey(decoded.hex);
-                    // Store private key securely (in production, use better encryption)
-                    sessionStorage.setItem("nostr_privkey", decoded.hex);
+                    // Store private key in memory only (never persisted to storage)
+                    setPrivateKey(decoded.hex);
                     setUser({
                         pubkey,
                         mode: "write",
@@ -359,7 +365,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
             } else if (/^[0-9a-fA-F]{64}$/.test(trimmedKey)) {
                 // Raw hex key - assume it's a private key
                 const pubkey = await derivePublicKey(trimmedKey);
-                sessionStorage.setItem("nostr_privkey", trimmedKey);
+                setPrivateKey(trimmedKey);
                 setUser({
                     pubkey,
                     mode: "write",
@@ -422,8 +428,8 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
                 throw new Error("Invalid bunker URL");
             }
 
-            // Store bunker connection info
-            sessionStorage.setItem("nostr_bunker", bunkerUrl);
+            // Store bunker connection info in memory only
+            setBunkerUrl(bunkerUrl);
 
             setUser({
                 pubkey,
@@ -442,8 +448,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
         setAuthToken(null);
         setIsAdmin(false);
-        sessionStorage.removeItem("nostr_privkey");
-        sessionStorage.removeItem("nostr_bunker");
+        clearKeyStore();
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(AUTH_TOKEN_KEY);
     }, []);
@@ -511,7 +516,7 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         const { challenge } = await challengeRes.json();
 
         // Bail early if nsec user lost their session key (tab was closed)
-        if (user.method === "nsec" && !sessionStorage.getItem("nostr_privkey")) {
+        if (user.method === "nsec" && !getPrivateKey()) {
             logout();
             if (silent) return null;
             throw new Error("Session expired. Please log in again.");

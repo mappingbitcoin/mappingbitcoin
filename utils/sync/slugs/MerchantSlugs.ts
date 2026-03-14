@@ -76,7 +76,7 @@ export async function generateMerchantSlugs() {
         if (category && subcategory) {
             const subcatSlugKey = slugify(subcategory, { lower: true, strict: true });
             const categorySlugEn = SUBCATEGORY_SLUGS_BY_LOCALE['en'][subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
-            const categorySlugEs = SUBCATEGORY_SLUGS_BY_LOCALE['es'][subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
+            const categorySlugEs = SUBCATEGORY_SLUGS_BY_LOCALE['es']?.[subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
 
             const keyCountryCat = `c:${countryCode}|cat:${subcategory}`;
             if (!combinations.has(keyCountryCat)) {

@@ -1,7 +1,8 @@
 'use client';
 
 import { Link } from "@/i18n/navigation";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useBlogSearch } from "@/hooks";
 import type { BlogPostMeta } from "@/lib/blog/parser";

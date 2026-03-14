@@ -15,7 +15,7 @@ export interface FormFieldProps {
     /** Error message */
     error?: string;
     /** Helper text */
-    helpText?: string;
+    helpText?: React.ReactNode;
     /** Hint text shown to the right of label */
     hint?: string;
     /** Label size */

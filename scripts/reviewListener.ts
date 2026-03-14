@@ -66,8 +66,8 @@ async function processReviewImage(
                 fit: "inside",
                 withoutEnlargement: true,
             })
-            .rotate() // Auto-rotate based on EXIF, then strip
-            .withMetadata(false) // Strip all EXIF/metadata for privacy
+            .rotate() // Auto-rotate based on EXIF orientation before stripping
+            // sharp 0.34+ strips metadata by default — no withMetadata() needed
             .webp({ quality: THUMBNAIL_QUALITY })
             .toBuffer();
 

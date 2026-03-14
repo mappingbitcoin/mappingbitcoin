@@ -88,7 +88,7 @@ export default function ReviewsSection({
                         error={submitError}
                     />
                 }
-                ownerPubkey={ownerPubkey}
+                ownerPubkey={ownerPubkey ?? undefined}
             />
         </div>
     );

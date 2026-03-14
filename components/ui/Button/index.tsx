@@ -43,7 +43,9 @@ export interface ButtonProps {
     /** Disabled state */
     disabled?: boolean;
     /** Click handler */
-    onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
+    onClick?: React.MouseEventHandler<HTMLElement>;
+    /** HTML title attribute (tooltip) */
+    title?: string;
 }
 
 // ============================================
@@ -129,6 +131,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             type = "button",
             disabled = false,
             onClick,
+            title,
             ...props
         },
         ref
@@ -178,15 +181,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                         target="_blank"
                         rel="noopener noreferrer"
                         className={classes}
+                        title={title}
                         onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}
-                        {...motionProps}
+                        {...(motionProps as HTMLMotionProps<"a">)}
                     >
                         {content}
                     </motion.a>
                 );
             }
             return (
-                <Link href={href} className={classes} onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}>
+                <Link href={href} className={classes} title={title} onClick={onClick}>
                     {content}
                 </Link>
             );
@@ -199,6 +203,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 type={type}
                 disabled={isDisabled}
                 className={classes}
+                title={title}
                 onClick={onClick}
                 {...motionProps}
                 {...props}
