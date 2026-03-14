@@ -1,0 +1,96 @@
+{
+  "seo": {
+    "h1": "Mapa interactivo de Bitcoin - Encuentra lugares que aceptan Bitcoin en todo el mundo",
+    "intro": "Descubre negocios que aceptan Bitcoin cerca de ti con nuestro mapa interactivo. Mapping Bitcoin te ayuda a encontrar cafeterías, restaurantes, tiendas, cajeros automáticos, hoteles y servicios que aceptan pagos con Bitcoin en cualquier parte del mundo.",
+    "findTitle": "Encuentra negocios que aceptan Bitcoin",
+    "findDescription": "Nuestro mapa muestra miles de ubicaciones que aceptan Bitcoin en todos los continentes. Busca por ubicación, filtra por categoría de negocio y encuentra comercios de confianza que aceptan pagos con Bitcoin.",
+    "categoriesTitle": "Categorías de pago Bitcoin",
+    "categoriesDescription": "Explora negocios que aceptan Bitcoin por categoría: restaurantes, cafeterías, bares, hoteles, tiendas minoristas, servicios profesionales, cajeros automáticos, espacios de coworking y muchos más. Cada categoría muestra ubicaciones verificadas y aportadas por la comunidad.",
+    "dataTitle": "Datos de comercios Bitcoin en tiempo real",
+    "dataDescription": "Nuestro mapa obtiene datos de OpenStreetMap y contribuciones de la comunidad para ofrecer el directorio de comercios Bitcoin más completo. Ayuda a hacer crecer la economía Bitcoin añadiendo nuevos negocios que aceptan Bitcoin que descubras.",
+    "spendTitle": "Gasta Bitcoin en cualquier lugar",
+    "spendDescription": "Ya sea que estés viajando o explorando tu zona local, usa Mapping Bitcoin para encontrar lugares donde puedes gastar tus Bitcoin. Apoya a negocios que aceptan pagos con criptomonedas y contribuye a la adopción global de Bitcoin."
+  },
+  "helpPopup": {
+    "title": "Mapa global interactivo de Bitcoin",
+    "subtitle": "Encuentra comercios que aceptan Bitcoin cerca de ti",
+    "description": "Explora miles de negocios en todo el mundo que aceptan pagos con Bitcoin. Busca por ubicación, filtra por categoría y descubre lugares donde puedes gastar tus Bitcoin en el mundo real.",
+    "closeButton": "Entendido"
+  },
+  "searchPlaceholder": "Buscar lugares o ciudades...",
+  "filter": {
+    "byCategory": "Filtrar por categoría"
+  },
+  "locationPrompt": {
+    "title": "¿Ver lugares cerca de ti?",
+    "description": "Podemos usar la ubicación de tu dispositivo para mostrarte lugares Bitcoin a tu alrededor. Estos datos solo se usan localmente y nunca se almacenan ni comparten."
+  },
+  "venue-tooltip": {
+    "defaultCategory": "Ubicación Bitcoin",
+    "paymentMethods": "Métodos de pago",
+    "contactAndSocials": "Contacto y redes sociales",
+    "getDirections": "Cómo llegar"
+  },
+  "venue-information": {
+    "various": "Varios",
+    "paymentMethods": "Métodos de pago",
+    "amenities": "Servicios",
+    "socials": "Redes sociales",
+    "getDirections": "Cómo llegar",
+    "tabs": {
+      "overview": "Resumen",
+      "reviews": "Reseñas",
+      "about": "Acerca de"
+    },
+    "noReviews": "Aún no hay reseñas."
+  },
+  "faq": {
+    "title": "Preguntas frecuentes sobre nuestro mapa Bitcoin",
+    "questions": [
+      {
+        "question": "¿Cómo añado un nuevo lugar?",
+        "answer": "Ve a <link.create>añadir un lugar</link.create>, completa los datos y envíalos. Tu lugar será revisado antes de publicarse."
+      },
+      {
+        "question": "¿Dónde puedo aprender más sobre el algoritmo?",
+        "answer": "Descubre cómo se puntúan los lugares, cómo se validan, actualizan y protegen los datos en <link.process>cómo funciona</link.process>."
+      },
+      {
+        "question": "¿Cómo puedo explorar todos los lugares?",
+        "answer": "Visita <link.countries>nuestra página de países</link.countries> para filtrar por región, categoría o tipo de pago."
+      },
+      {
+        "question": "¿Puedo sugerir actualizaciones a un lugar existente?",
+        "answer": "Sí, haz clic en el botón 'editar' o 'reportar' en la página de un lugar para sugerir correcciones o actualizaciones."
+      },
+      {
+        "question": "¿Con qué frecuencia se actualizan los datos de los lugares?",
+        "answer": "Extraemos datos cada pocas horas y repuntuamos y reclasificamos los lugares diariamente para mayor precisión."
+      },
+      {
+        "question": "¿Puedo filtrar lugares por método de pago Bitcoin?",
+        "answer": "Sí, en <link.countries>la página de países</link.countries>, filtra por on-chain, Lightning o NFC."
+      },
+      {
+        "question": "¿Es posible exportar los datos de los lugares?",
+        "answer": "Sí, descarga CSV o JSON de la lista completa de lugares a través del enlace 'Exportar datos' en <link.countries>la página de países</link.countries>."
+      },
+      {
+        "question": "¿Quién modera los lugares enviados?",
+        "answer": "Nuestro equipo de moderación, junto con revisores de la comunidad, verifica todos los lugares nuevos o actualizados antes de aprobarlos."
+      },
+      {
+        "question": "¿Cómo puedo reportar un lugar cerrado o que dejó de aceptar Bitcoin?",
+        "answer": "Usa el botón 'reportar' en la página del lugar o contáctanos a través del formulario de contacto. Verificaremos y actualizaremos el estado."
+      },
+      {
+        "question": "¿Puede mi lugar aparecer en otros mapas o aplicaciones?",
+        "answer": "Sí, una vez aprobado, las etiquetas de OpenStreetMap de tu lugar son públicas y pueden ser usadas por aplicaciones de terceros."
+      },
+      {
+        "question": "¿Dónde puedo obtener ayuda o dejar comentarios?",
+        "answer": "Visita nuestra página de soporte (enlazada en el pie de página), únete a nuestro Discord o envíanos un mensaje a través del formulario de contacto."
+      }
+    ]
+  }
+}
