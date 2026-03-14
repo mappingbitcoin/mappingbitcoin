@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect, ComponentType } from "react";
-import { IconProps, CloseIcon, PlusIcon } from "@/assets/icons/ui";
+import { CloseIcon, PlusIcon } from "@/assets/icons/ui";
+import type { IconProps } from "@/assets/icons/types";
 import { WebsiteIcon, PhoneIcon, EmailIcon } from "@/assets/icons/contact";
 import {
     InstagramIcon,

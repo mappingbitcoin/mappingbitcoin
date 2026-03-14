@@ -2,11 +2,13 @@ import { ReactNode } from "react";
 
 type Background = "white" | "light" | "gradient" | "dark" | "none" | "transparent" | "gradient-transparent" | "light-transparent";
 type MaxWidth = "container" | "narrow" | "article" | "none";
+type Padding = "default" | "large" | "none";
 
 interface PageSectionProps {
     children: ReactNode;
     background?: Background;
     maxWidth?: MaxWidth;
+    padding?: Padding;
     className?: string;
 }
 
@@ -28,14 +30,21 @@ const maxWidthClasses: Record<MaxWidth, string> = {
     none: "",
 };
 
+const paddingClasses: Record<Padding, string> = {
+    default: "py-20 px-8",
+    large: "py-28 px-8",
+    none: "",
+};
+
 export default function PageSection({
     children,
     background = "none",
     maxWidth = "container",
+    padding = "default",
     className = "",
 }: PageSectionProps) {
     return (
-        <section className={`w-full py-20 px-8 ${bgClasses[background]}`}>
+        <section className={`w-full ${paddingClasses[padding]} ${bgClasses[background]}`}>
             <div className={`mx-auto ${maxWidthClasses[maxWidth]} ${className}`}>
                 {children}
             </div>

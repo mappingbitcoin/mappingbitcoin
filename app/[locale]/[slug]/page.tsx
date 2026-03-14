@@ -11,6 +11,7 @@ import {Link} from '@/i18n/navigation';
 import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug, getSubcategoryFromSlug} from "@/utils/SlugUtils";
 import {EnrichedVenue} from "@/models/Overpass";
 import {getSubcategoryLabel, matchPlaceSubcategory, PlaceSubcategory} from "@/constants/PlaceCategories";
+import type {CategoryAndSubcategory} from "@/constants/PlaceOsmDictionary";
 import { CategoryChip } from "@/components/ui";
 import {getLocalizedCountryName, getCountryCodeFromSlug} from "@/utils/CountryUtils";
 import {RegionQuery, VenueSlugEntrySEO} from "@/models/VenueSlug";
@@ -82,9 +83,9 @@ async function parseVenueSlug(slug: string): Promise<{ venueInformation: VenueSl
                     country: countryCode,
                     location: parsed.city,
                     categoryAndSubcategory: {
-                        category: 'other',
+                        category: 'services',
                         subcategory: subcategory
-                    }
+                    } as unknown as CategoryAndSubcategory
                 },
                 exactMatch: false,
                 noVenues: true
@@ -327,7 +328,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
     const data = await parseVenueSlug(slug)
 
     if (!data) return (
-        <PageSection padding="default" background="default" className="pt-12">
+        <PageSection padding="default" background="none" className="pt-12">
             <div className="max-w-3xl mx-auto text-center">
                 <h1 className="text-[2rem] font-bold mb-4 text-white">
                     {t.countries.emptyState.invalidSlug}
@@ -393,7 +394,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
         const hasSuggestions = (availableCities && availableCities.length > 0) || (enrichedSubcategories && enrichedSubcategories.length > 0);
 
         return (
-            <PageSection padding="default" background="default" className="pt-12">
+            <PageSection padding="default" background="none" className="pt-12">
                 <div className="max-w-3xl mx-auto">
                     <h1 className="text-[2rem] font-bold mb-4 text-white">
                         {categoryLabel

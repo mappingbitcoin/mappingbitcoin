@@ -149,6 +149,9 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
                 trustScore: 0.02, // Default for new users, will be corrected on refetch
                 imageUrls: imageUrls || [],
                 thumbnailUrls: thumbnailUrls,
+                wotDistance: null,
+                wotPathCount: null,
+                wotComputedAt: null,
                 author: {
                     pubkey: user.pubkey,
                     name: profile?.name || profile?.display_name || null,

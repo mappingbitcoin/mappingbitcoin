@@ -8,6 +8,12 @@ import {
     generateSecret,
     type NostrEvent,
 } from "./crypto";
+import {
+    getConnectSession,
+    setConnectSession,
+    hasConnectSession as hasStoredConnectSession,
+    clearConnectSession,
+} from "@/lib/nostr/keyStore";
 
 export interface NostrConnectSession {
     clientPrivateKey: string;
@@ -129,13 +135,13 @@ export function startNostrConnect(
                         isConnected = true;
                         session.remotePubkey = nostrEvent.pubkey;
 
-                        // Store the session for future signing requests
-                        sessionStorage.setItem("nostr_connect_session", JSON.stringify({
+                        // Store the session in memory for future signing requests
+                        setConnectSession({
                             clientPrivateKey: session.clientPrivateKey,
                             clientPubkey: session.clientPubkey,
                             remotePubkey: nostrEvent.pubkey,
                             relay: session.relay,
-                        }));
+                        });
 
                         cleanup();
                         callbacks.onConnected(nostrEvent.pubkey);
@@ -174,10 +180,8 @@ export async function requestSignature(
         relay: string;
     }
 ): Promise<NostrEvent | null> {
-    // Get session from storage if not provided
-    const storedSession = sessionData || JSON.parse(
-        sessionStorage.getItem("nostr_connect_session") || "null"
-    );
+    // Get session from memory if not provided
+    const storedSession = sessionData || getConnectSession();
 
     if (!storedSession) {
         throw new Error("No Nostr Connect session found");
@@ -270,10 +274,10 @@ export async function requestSignature(
 
 // Check if there's an active Nostr Connect session
 export function hasNostrConnectSession(): boolean {
-    return !!sessionStorage.getItem("nostr_connect_session");
+    return hasStoredConnectSession();
 }
 
 // Clear Nostr Connect session
 export function clearNostrConnectSession(): void {
-    sessionStorage.removeItem("nostr_connect_session");
+    clearConnectSession();
 }

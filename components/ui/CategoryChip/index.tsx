@@ -6,6 +6,8 @@ interface CategoryChipProps {
     as?: React.ElementType;
     /** Size variant */
     size?: 'sm' | 'md';
+    /** Additional className */
+    className?: string;
 }
 
 /**
@@ -20,6 +22,7 @@ export const CategoryChip = ({
     children,
     as: Component = 'span',
     size = 'md',
+    className = '',
 }: CategoryChipProps) => {
     const sizeClasses = size === 'sm'
         ? 'py-0.5 px-1.5 text-xs'
@@ -27,7 +30,7 @@ export const CategoryChip = ({
 
     return (
         <Component
-            className={`${sizeClasses} rounded-sm inline-flex items-center gap-1 font-medium capitalize bg-surface-light/80 text-text-light border border-border-light/50 border-dashed select-none`}
+            className={`${sizeClasses} rounded-sm inline-flex items-center gap-1 font-medium capitalize bg-surface-light/80 text-text-light border border-border-light/50 border-dashed select-none ${className}`}
         >
             {children}
         </Component>

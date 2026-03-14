@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
                 verifierName: claim.claimer?.displayName || undefined,
                 verifiedAt: claim.verifiedAt?.toISOString() || claim.createdAt.toISOString(),
                 verifiedEmailHash: claim.verifiedEmailHash || undefined,
-                domainVerified: claim.domainVerified || undefined,
+                domainVerified: claim.domainToVerify || undefined,
             });
         }
 

@@ -23,7 +23,7 @@ interface UploadedImage {
 }
 
 export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewFormProps) {
-    const { user } = useNostrAuth();
+    const { user, profile } = useNostrAuth();
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState("");
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -198,9 +198,9 @@ export default function ReviewForm({ onSubmit, isSubmitting, error }: ReviewForm
                 >
                     {/* User Avatar */}
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-surface border border-border-light flex items-center justify-center overflow-hidden">
-                        {user?.picture ? (
+                        {profile?.picture ? (
                             <img
-                                src={user.picture}
+                                src={profile?.picture}
                                 alt=""
                                 className="w-full h-full object-cover"
                             />

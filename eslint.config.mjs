@@ -1,36 +1,67 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import nextPlugin from "@next/eslint-plugin-next";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import reactPlugin from "eslint-plugin-react";
+import hooksPlugin from "eslint-plugin-react-hooks";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
+/** @type {import("eslint").Linter.Config[]} */
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "out/**",
+      "public/**",
+      "scripts/**",
+      "__tests__/**",
+    ],
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    plugins: {
+      "@next/next": nextPlugin,
+      "@typescript-eslint": tsPlugin,
+      "react": reactPlugin,
+      "react-hooks": hooksPlugin,
+    },
     rules: {
-      'no-restricted-imports': [
-        'error',
+      // Next.js rules
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+
+      // React hooks
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
+      // TypeScript (lenient)
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-explicit-any": "off",
+
+      // Project rules
+      "no-restricted-imports": [
+        "error",
         {
           paths: [
             {
-              name: 'next/navigation',
-              importNames: ['useRouter'],
-              message: 'Use useRouter from @/i18n/navigation instead',
+              name: "next/navigation",
+              importNames: ["useRouter"],
+              message: "Use useRouter from @/i18n/navigation instead",
             },
             {
-              name: 'next/navigation',
-              importNames: ['usePathname'],
-              message: 'Use usePathname from @/i18n/navigation instead',
+              name: "next/navigation",
+              importNames: ["usePathname"],
+              message: "Use usePathname from @/i18n/navigation instead",
             },
             {
-              name: 'next/link',
-              message: 'Use Link from @/i18n/navigation instead',
-            }
+              name: "next/link",
+              message: "Use Link from @/i18n/navigation instead",
+            },
           ],
         },
       ],

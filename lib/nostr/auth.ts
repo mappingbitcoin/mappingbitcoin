@@ -15,10 +15,14 @@ import {
     type NostrEvent,
 } from "./crypto";
 
-export type SigningMethod = "nsec" | "extension" | "bunker";
+import {
+    getPrivateKey,
+    getBunkerUrl as getStoredBunkerUrl,
+    getBunkerSession as getStoredBunkerSession,
+    setBunkerSession as saveStoredBunkerSession,
+} from "@/lib/nostr/keyStore";
 
-// Bunker session storage key
-const BUNKER_SESSION_KEY = "nostr_bunker_session";
+export type SigningMethod = "nsec" | "extension" | "bunker";
 
 interface BunkerSession {
     clientPrivateKey: string;
@@ -66,7 +70,7 @@ export async function signChallenge(
  * Sign challenge using a private key stored in session storage
  */
 async function signWithNsec(challenge: string): Promise<SignedChallengeResult> {
-    const privateKey = sessionStorage.getItem("nostr_privkey");
+    const privateKey = getPrivateKey();
     if (!privateKey) {
         throw new Error("Private key not found. Please log in again.");
     }
@@ -160,19 +164,14 @@ function parseBunkerUrl(bunkerUrl: string): { remotePubkey: string; relay: strin
 /**
  * Get or create a bunker session
  */
-function getBunkerSession(bunkerUrl: string): BunkerSession {
-    const stored = sessionStorage.getItem(BUNKER_SESSION_KEY);
+function getBunkerSessionForUrl(bunkerUrl: string): BunkerSession {
+    const stored = getStoredBunkerSession();
 
     if (stored) {
-        try {
-            const session: BunkerSession = JSON.parse(stored);
-            // Verify the session matches the current bunker
-            const { remotePubkey, relay } = parseBunkerUrl(bunkerUrl);
-            if (session.remotePubkey === remotePubkey && session.relay === relay) {
-                return session;
-            }
-        } catch {
-            // Invalid stored session, create new one
+        // Verify the session matches the current bunker
+        const { remotePubkey, relay } = parseBunkerUrl(bunkerUrl);
+        if (stored.remotePubkey === remotePubkey && stored.relay === relay) {
+            return stored;
         }
     }
 
@@ -189,7 +188,7 @@ function getBunkerSession(bunkerUrl: string): BunkerSession {
         secret,
     };
 
-    sessionStorage.setItem(BUNKER_SESSION_KEY, JSON.stringify(session));
+    saveStoredBunkerSession(session);
     return session;
 }
 
@@ -197,12 +196,12 @@ function getBunkerSession(bunkerUrl: string): BunkerSession {
  * Sign challenge using a remote signer (NIP-46)
  */
 async function signWithBunker(challenge: string): Promise<SignedChallengeResult> {
-    const bunkerUrl = sessionStorage.getItem("nostr_bunker");
+    const bunkerUrl = getStoredBunkerUrl();
     if (!bunkerUrl) {
         throw new Error("Bunker connection not found. Please reconnect.");
     }
 
-    const session = getBunkerSession(bunkerUrl);
+    const session = getBunkerSessionForUrl(bunkerUrl);
 
     // Create a Nostr event with the challenge as content
     // This is what the remote signer will sign

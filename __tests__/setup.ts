@@ -4,6 +4,7 @@
  * Stubs required environment variables so modules like Environment.ts
  * and prisma.ts don't throw at import time.
  */
+// @ts-expect-error NODE_ENV is read-only in newer TS but tests need it
 process.env.NODE_ENV = "test";
 process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
 process.env.SESSION_SECRET = "test-secret-key-for-testing-only";

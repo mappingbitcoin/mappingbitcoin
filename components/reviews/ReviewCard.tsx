@@ -47,10 +47,10 @@ export default function ReviewCard({
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
     const MAX_CONTENT_LENGTH = 300;
-    const shouldTruncate = review.content && review.content.length > MAX_CONTENT_LENGTH;
+    const shouldTruncate = review.content != null && review.content.length > MAX_CONTENT_LENGTH;
     const displayContent = shouldTruncate && !isExpanded
-        ? review.content.slice(0, MAX_CONTENT_LENGTH) + "..."
-        : review.content;
+        ? review.content!.slice(0, MAX_CONTENT_LENGTH) + "..."
+        : review.content ?? "";
 
     const authorName = review.author.name || shortenPubkey(review.authorPubkey);
     // Only verified venue owners can reply to reviews

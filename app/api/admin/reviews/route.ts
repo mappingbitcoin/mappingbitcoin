@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
 
     // Build where clause
-    const where: Parameters<typeof prisma.review.findMany>[0]["where"] = {};
+    const where: NonNullable<Parameters<typeof prisma.review.findMany>[0]>["where"] = {};
     if (status && ["PENDING", "FLAGGED", "APPROVED", "BLOCKED"].includes(status)) {
         where.spamStatus = status as "PENDING" | "FLAGGED" | "APPROVED" | "BLOCKED";
     }

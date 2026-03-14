@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { useNostrAuth } from "@/contexts/NostrAuthContext";
 import { SettingsIcon, CloseIcon, UserIcon, ArrowLeftIcon } from "@/assets/icons/ui";
