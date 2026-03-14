@@ -56,8 +56,8 @@ Reviews are weighted by the author's trust score in the MappingBitcoin web of tr
 
 | Reviewer Type | Impact on Rating |
 |---------------|------------------|
-| Community Seeders | Highest weight |
-| Trusted Members | High weight |
+| Close Connections (1-2 hops) | Highest weight |
+| Trusted Members (3 hops) | High weight |
 | Known Users | Medium weight |
 | New Accounts | Minimal weight |
 
@@ -67,14 +67,11 @@ This means reviews from trusted community members have more influence on venue r
 
 | Reviewer | Rating | Trust | Contribution |
 |----------|--------|-------|--------------|
-| Alice (Seeder) | 5 stars | 1.0 | 5.0 |
-| Bob (Trusted) | 4 stars | 0.5 | 2.0 |
-| Eve (New) | 1 star | 0.02 | 0.02 |
+| Alice (1 hop) | 5 stars | High | Strong influence |
+| Bob (2 hops) | 4 stars | Medium | Moderate influence |
+| Eve (Unknown) | 1 star | Low | Minimal influence |
 
-- Simple Average: 3.33 stars
-- Weighted Average: 4.62 stars
-
-Eve's suspicious 1-star rating has minimal impact due to her low trust score.
+Reviews from well-connected community members carry more weight, while unknown accounts have minimal impact. This prevents spam and fake reviews from skewing venue ratings.
 
 ## Web of Trust Badges
 
@@ -149,8 +146,8 @@ Nostr events are immutable. To change your review, you would publish a new event
 
 Trust is based on your Nostr social graph. To increase trust:
 
-- Get followed by community seeders
 - Build your Nostr presence
+- Connect with active community members
 - Engage with the Bitcoin/Nostr community
 
 ### Can anyone reply to reviews?

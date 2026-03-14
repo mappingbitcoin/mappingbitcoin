@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-import { getTrustScores } from "../../trust/graphBuilder";
+import { wotDistanceToTrustScore } from "../../wot/oracleClient";
 import { checkReviewSpam, type SpamCheckResult } from "../../spam/reviewFilter";
 import { getVerificationStatus } from "./verification";
 
@@ -366,11 +366,7 @@ export async function getReviewsWithTrustByOsmId(
         };
     }
 
-    // Get trust scores for all review authors
-    const authorPubkeys = venue.reviews.map((r) => r.authorPubkey);
-    const trustScores = await getTrustScores(authorPubkeys);
-
-    // Attach trust scores to reviews
+    // Attach trust scores to reviews (derived from stored WoT distance)
     const reviewsWithTrust: ReviewWithTrust[] = venue.reviews.map((review) => ({
         id: review.id,
         eventId: review.eventId,
@@ -379,7 +375,7 @@ export async function getReviewsWithTrustByOsmId(
         content: review.content,
         eventCreatedAt: review.eventCreatedAt,
         indexedAt: review.indexedAt,
-        trustScore: trustScores.get(review.authorPubkey.toLowerCase()) ?? 0.02,
+        trustScore: wotDistanceToTrustScore(review.wotDistance),
         imageUrls: review.imageUrls,
         thumbnailUrls: review.thumbnailUrls,
         wotDistance: review.wotDistance,
@@ -497,13 +493,9 @@ export async function getFlaggedReviews(limit: number = 50) {
         take: limit,
     });
 
-    // Get trust scores
-    const pubkeys = reviews.map(r => r.authorPubkey);
-    const trustScores = await getTrustScores(pubkeys);
-
     return reviews.map(review => ({
         ...review,
-        trustScore: trustScores.get(review.authorPubkey.toLowerCase()) ?? 0.02,
+        trustScore: wotDistanceToTrustScore(review.wotDistance),
     }));
 }
 

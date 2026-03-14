@@ -689,25 +689,6 @@ Retrieve all reviews for a venue with trust scores and WoT data.
 }
 ```
 
-### GET /api/wot/distance
-
-Get WoT distance from Mapping Bitcoin bot to a target pubkey.
-
-**Parameters:**
-- `pubkey` - 64-character hex pubkey
-
-**Response:**
-```json
-{
-  "pubkey": "def456...",
-  "distance": 2,
-  "pathCount": 3,
-  "mutual": false,
-  "fromPubkey": "abc123...",
-  "source": "oracle"
-}
-```
-
 ### POST /api/reviews/index
 
 Index a review or reply for immediate display.
@@ -1046,6 +1027,5 @@ app/api/
     └── process-image/route.ts      # POST create thumbnail
 
 scripts/
-├── reviewListener.ts     # Background relay listener
-└── recomputeWoT.ts       # WoT backfill script
+└── reviewListener.ts     # Background relay listener
 ```

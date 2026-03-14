@@ -18,11 +18,6 @@ export interface NostrProfile {
     nip05?: string;
 }
 
-export interface SeederInfo {
-    label: string | null;
-    region: string;
-}
-
 interface AuthenticateOptions {
     /** If true, don't throw errors for user-interaction-required scenarios */
     silent?: boolean;
@@ -31,8 +26,6 @@ interface AuthenticateOptions {
 interface NostrAuthContextType {
     user: NostrUser | null;
     profile: NostrProfile | null;
-    isSeeder: boolean;
-    seederInfo: SeederInfo | null;
     isLoading: boolean;
     error: string | null;
     authToken: string | null;
@@ -240,24 +233,9 @@ async function fetchNostrProfile(pubkey: string): Promise<NostrProfile | null> {
     return null;
 }
 
-// Fetch seeder status from API
-async function fetchSeederStatus(pubkey: string): Promise<{ isSeeder: boolean; seeder: SeederInfo | null }> {
-    try {
-        const response = await fetch(`/api/user/seeder-status?pubkey=${pubkey}`);
-        if (response.ok) {
-            return await response.json();
-        }
-    } catch (e) {
-        console.warn("Failed to fetch seeder status:", e);
-    }
-    return { isSeeder: false, seeder: null };
-}
-
 export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<NostrUser | null>(null);
     const [profile, setProfile] = useState<NostrProfile | null>(null);
-    const [isSeeder, setIsSeeder] = useState(false);
-    const [seederInfo, setSeederInfo] = useState<SeederInfo | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [authToken, setAuthToken] = useState<string | null>(null);
@@ -333,18 +311,12 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
         }
     }, [authToken, user?.pubkey]);
 
-    // Fetch user profile and seeder status when user changes
+    // Fetch user profile when user changes
     useEffect(() => {
         if (user?.pubkey) {
             fetchNostrProfile(user.pubkey).then(setProfile);
-            fetchSeederStatus(user.pubkey).then(({ isSeeder, seeder }) => {
-                setIsSeeder(isSeeder);
-                setSeederInfo(seeder);
-            });
         } else {
             setProfile(null);
-            setIsSeeder(false);
-            setSeederInfo(null);
         }
     }, [user?.pubkey]);
 
@@ -468,8 +440,6 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
     const logout = useCallback(() => {
         setUser(null);
         setProfile(null);
-        setIsSeeder(false);
-        setSeederInfo(null);
         setAuthToken(null);
         setIsAdmin(false);
         sessionStorage.removeItem("nostr_privkey");
@@ -596,8 +566,6 @@ export function NostrAuthProvider({ children }: { children: ReactNode }) {
             value={{
                 user,
                 profile,
-                isSeeder,
-                seederInfo,
                 isLoading,
                 error,
                 authToken,

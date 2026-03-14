@@ -10,7 +10,6 @@ import NavBarSearch from "./NavBarSearch";
 import { LoginModal } from "@/components/auth";
 import UserAvatar from "@/components/ui/UserAvatar";
 import {
-    BadgeCheckIcon,
     SettingsIcon,
     ShieldCheckIcon,
     LogoutIcon,
@@ -36,7 +35,7 @@ const NavBar = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const t = useTranslations("menu");
-    const { user, profile, isSeeder, seederInfo, logout, isAdmin } = useNostrAuth();
+    const { user, profile, logout, isAdmin } = useNostrAuth();
     const npub = useNpub(user?.pubkey);
 
     // Check if we're on the map page (which has its own search)
@@ -180,7 +179,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
-                                                isSeeder={isSeeder}
+
                                             />
                                         </motion.button>
 
@@ -200,7 +199,7 @@ const NavBar = () => {
                                                                 pubkey={user.pubkey}
                                                                 picture={profile?.picture}
                                                                 name={profile?.name}
-                                                                isSeeder={isSeeder}
+                
                                                             />
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-sm font-medium text-white truncate">
@@ -219,12 +218,6 @@ const NavBar = () => {
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-wrap gap-2 mt-2">
-                                                            {isSeeder && (
-                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
-                                                                    <BadgeCheckIcon className="w-3 h-3" />
-                                                                    {seederInfo?.label || 'Community Seeder'}
-                                                                </span>
-                                                            )}
                                                             {user.mode === 'read' && (
                                                                 <span className="inline-block px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
                                                                     {t('readOnly')}
@@ -357,7 +350,7 @@ const NavBar = () => {
                                                 pubkey={user.pubkey}
                                                 picture={profile?.picture}
                                                 name={profile?.name}
-                                                isSeeder={isSeeder}
+
                                             />
                                             <div>
                                                 <p className="text-sm text-white font-medium">
@@ -369,12 +362,6 @@ const NavBar = () => {
                                                     </p>
                                                 )}
                                                 <div className="flex flex-wrap gap-2 mt-1">
-                                                    {isSeeder && (
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">
-                                                            <BadgeCheckIcon className="w-3 h-3" />
-                                                            {seederInfo?.label || 'Community Seeder'}
-                                                        </span>
-                                                    )}
                                                     {user.mode === 'read' && (
                                                         <span className="inline-block px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
                                                             {t('readOnly')}
