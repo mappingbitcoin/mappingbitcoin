@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getAdjacentPosts, getRelatedPosts, formatBlogDate, LOCALE_NAMES, type BlogPost } from "@/lib/blog/parser";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
+import SetLocaleAlternates from "@/components/common/SetLocaleAlternates";
 
 const blogStrings: Record<string, { relatedPosts: string; previous: string; next: string }> = {
     en: { relatedPosts: 'Related Posts', previous: 'Previous', next: 'Next' },
@@ -22,8 +23,15 @@ export default function BlogArticle({ slug, locale, post, availableLocales }: Bl
     const relatedPosts = getRelatedPosts(slug, locale, 3);
     const hasMultipleLanguages = availableLocales.length > 1;
 
+    // Build locale → path map for the global LanguageSwitcher
+    const localeAlternates: Record<string, string> = {};
+    for (const locInfo of availableLocales) {
+        localeAlternates[locInfo.locale] = `/blog/${locInfo.slug}`;
+    }
+
     return (
         <div className="max-w-[720px] mx-auto">
+            <SetLocaleAlternates alternates={localeAlternates} />
             {/* Featured Image */}
             <div className="relative w-full aspect-[1200/630] rounded-lg overflow-hidden mb-8">
                 <Image

@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Footer, NavBar, PageTransition, BodyLockManager } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
 import { NostrAuthProvider } from "@/contexts/NostrAuthContext";
+import { LocaleAlternatesProvider } from "@/contexts/LocaleAlternatesContext";
 
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
 
         return (
           <NextIntlClientProvider locale={locale} messages={allMessages}>
+            <LocaleAlternatesProvider>
             <NostrAuthProvider>
               <Script
                 id="organization-jsonld"
@@ -91,6 +93,7 @@ export default async function LocaleLayout({
               <Footer />
               <CookieNotice />
             </NostrAuthProvider>
+            </LocaleAlternatesProvider>
           </NextIntlClientProvider>
         );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -21,6 +21,7 @@ import React from "react";
 import { distance } from 'fastest-levenshtein';
 import { PageSection } from "@/components/layout";
 import PlacesDirectoryWrapper from "@/app/[locale]/[slug]/PlacesDirectoryWrapper";
+import SetLocaleAlternates from "@/components/common/SetLocaleAlternates";
 
 async function parseVenueSlug(slug: string): Promise<{ venueInformation: VenueSlugEntrySEO, exactMatch: boolean, noVenues?: boolean } | null> {
     const lowerSlug = slug.toLowerCase();
@@ -637,6 +638,13 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
                 <h2>{t.countries.seo.supportAdoptionTitle}</h2>
                 <p>{t.countries.seo.supportAdoptionDescription.replace('{location}', locationName)}</p>
             </div>
+            {alternates && (
+                <SetLocaleAlternates alternates={
+                    Object.fromEntries(
+                        Object.entries(alternates).map(([loc, slugPath]) => [loc, `/${slugPath}`])
+                    )
+                } />
+            )}
             <PlacesDirectoryWrapper country={countryLabel} places={venues} city={location} categoryAndSubcategory={categoryAndSubcategory} availableCities={availableCities} availableSubcategories={availableCategories} exactMatch={data.exactMatch} />
         </>
     );
