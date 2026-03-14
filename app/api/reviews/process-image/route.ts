@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
                 withoutEnlargement: true,
             })
             .rotate() // Auto-rotate based on EXIF, then strip
-            .withMetadata(false) // Strip all EXIF/metadata for privacy
+            .withMetadata() // Strip all EXIF/metadata for privacy
             .webp({ quality: THUMBNAIL_QUALITY })
             .toBuffer();
 

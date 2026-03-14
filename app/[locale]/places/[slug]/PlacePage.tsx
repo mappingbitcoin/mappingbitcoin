@@ -52,7 +52,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
 
     const {name, paymentMethods, contact, openingHours, description, descriptionsByLocale, note, notesByLocale, specialTags, amenitiesTags, source} = useMemo(() => {
         if (venue) return parseTags(venue.tags);
-        else return {name: '', paymentMethods: {}, contact: {}, openingHours: '', description: '', descriptionsByLocale: {}, note: '', notesByLocale: {}, specialTags: {}, amenitiesTags: {}, source: ''};
+        else return {name: '', paymentMethods: {} as Record<string, string>, contact: {} as Record<string, string>, openingHours: '', description: '', descriptionsByLocale: {} as Record<string, string>, note: '', notesByLocale: {} as Record<string, string>, specialTags: {} as Record<string, string>, amenitiesTags: {} as Record<string, string>, source: ''};
     }, [venue]);
 
     const formattedHours = formatOpeningHours(openingHours);
@@ -249,7 +249,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                     size="sm"
                                     leftIcon={<DirectionsIcon className="w-4 h-4" />}
                                     className="flex-1"
-                                    title={tMap('getDirections')}
+                                    aria-label={tMap('getDirections')}
                                 >
                                     <span className="max-md:hidden">{tMap('getDirections')}</span>
                                 </Button>
@@ -261,7 +261,7 @@ export default function VenuePage({ venue, isPreview }: { venue: EnrichedVenue, 
                                         color="neutral"
                                         size="sm"
                                         leftIcon={<WebsiteIcon className="w-4 h-4" />}
-                                        title="Website"
+                                        aria-label="Website"
                                     >
                                         <span className="max-md:hidden">Website</span>
                                     </Button>

@@ -189,7 +189,6 @@ function buildLocalBusinessSchema(venue: EnrichedVenue, locale: Locale) {
             "ratingValue": venue.rating,
             "bestRating": 5,
             "worstRating": 1,
-            ...(venue.reviewCount && { "reviewCount": venue.reviewCount }),
         };
     }
 

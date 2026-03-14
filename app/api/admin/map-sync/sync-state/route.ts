@@ -29,7 +29,7 @@ interface SyncStateResponse {
 export async function GET(request: NextRequest) {
     const authResult = await requireAdmin(request);
     if (!authResult.success) {
-        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+        return authResult.response;
     }
 
     try {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     const authResult = await requireAdmin(request);
     if (!authResult.success) {
-        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+        return authResult.response;
     }
 
     try {

@@ -35,7 +35,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
     poweredByHeader: false,
     typescript: {
-        ignoreBuildErrors: process.env.NODE_ENV === 'healthcheck',
+        ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
     },
     experimental: {
         optimizePackageImports: ['lodash', 'framer-motion', 'react-icons', 'recharts', 'i18n-iso-countries', 'nostr-tools', '@noble/curves', '@noble/hashes'],

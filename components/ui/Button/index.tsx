@@ -178,15 +178,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                         target="_blank"
                         rel="noopener noreferrer"
                         className={classes}
-                        onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}
-                        {...motionProps}
+                        onClick={onClick as any}
+                        {...(motionProps as any)}
                     >
                         {content}
                     </motion.a>
                 );
             }
             return (
-                <Link href={href} className={classes} onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}>
+                <Link href={href} className={classes} onClick={onClick as any}>
                     {content}
                 </Link>
             );

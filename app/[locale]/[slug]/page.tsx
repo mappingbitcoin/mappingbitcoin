@@ -10,6 +10,7 @@ import {getLocalizedFromMessages, generateSeoDescription, generateSeoTitle} from
 import {Link} from '@/i18n/navigation';
 import {getLocalizedCitySlug, getLocalizedCountryCategorySlug, getLocalizedCountrySlug, getSubcategoryFromSlug} from "@/utils/SlugUtils";
 import {EnrichedVenue} from "@/models/Overpass";
+import {CategoryAndSubcategory} from "@/constants/PlaceOsmDictionary";
 import {getSubcategoryLabel, matchPlaceSubcategory, PlaceSubcategory} from "@/constants/PlaceCategories";
 import { CategoryChip } from "@/components/ui";
 import {getLocalizedCountryName, getCountryCodeFromSlug} from "@/utils/CountryUtils";
@@ -84,7 +85,7 @@ async function parseVenueSlug(slug: string): Promise<{ venueInformation: VenueSl
                     categoryAndSubcategory: {
                         category: 'other',
                         subcategory: subcategory
-                    }
+                    } as CategoryAndSubcategory
                 },
                 exactMatch: false,
                 noVenues: true
@@ -327,7 +328,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
     const data = await parseVenueSlug(slug)
 
     if (!data) return (
-        <PageSection padding="default" background="default" className="pt-12">
+        <PageSection background="none" className="pt-12">
             <div className="max-w-3xl mx-auto text-center">
                 <h1 className="text-[2rem] font-bold mb-4 text-white">
                     {t.countries.emptyState.invalidSlug}
@@ -393,7 +394,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
         const hasSuggestions = (availableCities && availableCities.length > 0) || (enrichedSubcategories && enrichedSubcategories.length > 0);
 
         return (
-            <PageSection padding="default" background="default" className="pt-12">
+            <PageSection background="none" className="pt-12">
                 <div className="max-w-3xl mx-auto">
                     <h1 className="text-[2rem] font-bold mb-4 text-white">
                         {categoryLabel

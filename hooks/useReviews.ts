@@ -147,6 +147,9 @@ export function useReviews({ osmId, venueSlug, geohash }: UseReviewsOptions): Us
                 eventCreatedAt: new Date(result.signedEvent.created_at * 1000),
                 indexedAt: new Date(),
                 trustScore: 0.02, // Default for new users, will be corrected on refetch
+                wotDistance: null,
+                wotPathCount: null,
+                wotComputedAt: null,
                 imageUrls: imageUrls || [],
                 thumbnailUrls: thumbnailUrls,
                 author: {

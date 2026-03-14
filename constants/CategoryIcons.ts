@@ -373,5 +373,6 @@ export const PLACE_SUBTYPE_ICON: Record<PlaceSubcategory, string> = {
     train_station: "rail",
     transit_depot: "bus",
     transit_station: "bus",
-    truck_stop: "car"
+    truck_stop: "car",
+    other: "marker"
 };

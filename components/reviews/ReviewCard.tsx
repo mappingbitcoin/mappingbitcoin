@@ -49,7 +49,7 @@ export default function ReviewCard({
     const MAX_CONTENT_LENGTH = 300;
     const shouldTruncate = review.content && review.content.length > MAX_CONTENT_LENGTH;
     const displayContent = shouldTruncate && !isExpanded
-        ? review.content.slice(0, MAX_CONTENT_LENGTH) + "..."
+        ? review.content!.slice(0, MAX_CONTENT_LENGTH) + "..."
         : review.content;
 
     const authorName = review.author.name || shortenPubkey(review.authorPubkey);

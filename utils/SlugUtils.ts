@@ -422,6 +422,9 @@ const SUBCATEGORY_ES_SLUG_MAP: Record<PlaceSubcategory, string> = {
     gas_station: "estaciones-de-servicio",
     parking: "estacionamientos",
     rest_stop: "areas-de-descanso",
+
+    // other
+    other: "otros",
 };
 
 const SUBCATEGORY_EN_SLUG_MAP: Record<PlaceSubcategory, string> = {
@@ -795,6 +798,9 @@ const SUBCATEGORY_EN_SLUG_MAP: Record<PlaceSubcategory, string> = {
     gas_station: "gas-stations",
     parking: "parking-lots",
     rest_stop: "rest-stops",
+
+    // other
+    other: "other",
 };
 
 const SUBCATEGORY_PT_SLUG_MAP: Record<PlaceSubcategory, string> = {
@@ -1169,6 +1175,9 @@ const SUBCATEGORY_PT_SLUG_MAP: Record<PlaceSubcategory, string> = {
     gas_station: 'postos-de-combustivel',
     parking: 'estacionamentos',
     rest_stop: 'areas-de-descanso',
+
+    // outro
+    other: 'outros',
 };
 
 export const SUBCATEGORY_SLUGS_BY_LOCALE: Partial<Record<Locale, Record<PlaceSubcategory, string>>> & { en: Record<PlaceSubcategory, string> } = {

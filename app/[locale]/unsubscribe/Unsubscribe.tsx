@@ -173,7 +173,7 @@ const Unsubscribe: React.FC = () => {
                 <div className="text-center mb-8">
                     <h1 className="text-2xl font-bold text-white mb-2">{t("title")}</h1>
                     <p className="text-text-light">
-                        {t("description", { email: subscriber?.email })}
+                        {t("description", { email: subscriber?.email ?? "" })}
                     </p>
                 </div>
 

@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
 import { getLocalizedCountryCategorySlug, getLocalizedCityCategorySlug } from "@/utils/SlugUtils";
 import { CategoryAndSubcategory } from "@/constants/PlaceOsmDictionary";
+import { PlaceSubcategory } from "@/constants/PlaceCategories";
 import { CategoryChip } from "@/components/ui";
 import Button from "@/components/ui/Button";
 
@@ -99,15 +100,15 @@ export default function CategoriesSidebar({
                 {visibleCategories.map((cat) => {
                     // Generate the correct slug based on whether we have a city
                     const slugKey = city
-                        ? getLocalizedCityCategorySlug(country, city, cat.rawSubcategory, locale)
-                        : getLocalizedCountryCategorySlug(country, cat.rawSubcategory, locale);
+                        ? getLocalizedCityCategorySlug(country, city, cat.rawSubcategory as PlaceSubcategory, locale)
+                        : getLocalizedCountryCategorySlug(country, cat.rawSubcategory as PlaceSubcategory, locale);
 
                     return slugKey && (
                         <CategoryChip
                             as="div"
                             category={cat.category ?? "other"}
                             key={cat.slugKey}
-                            className="text-xs"
+                            size="sm"
                         >
                             <Link
                                 href={`/${slugKey}`}

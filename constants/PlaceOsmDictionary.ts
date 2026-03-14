@@ -379,7 +379,8 @@ export const PLACE_TO_OSM_TAG_KEY: Record<PlaceSubcategory, "amenity" | "shop"> 
     train_station: "amenity",
     transit_depot: "amenity",
     transit_station: "amenity",
-    truck_stop: "amenity"
+    truck_stop: "amenity",
+    other: "amenity"
 };
 
 export type CommonTagCustomization = {

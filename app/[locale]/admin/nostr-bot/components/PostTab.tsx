@@ -477,11 +477,7 @@ export default function PostTab() {
                     {(!isPlaceBasedPost || !useTemplate) && (
                         <FormField
                             label="Content"
-                            helpText={
-                                <span className={characterCount > maxChars * 0.9 ? "text-amber-400" : ""}>
-                                    {characterCount}/{maxChars}
-                                </span>
-                            }
+                            helpText={`${characterCount}/${maxChars}`}
                         >
                             <Textarea
                                 value={content}

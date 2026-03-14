@@ -95,7 +95,8 @@ export const PLACE_SUBTYPE_MAP = {
         "airport", "airstrip", "bus_station", "bus_stop", "ferry_terminal", "heliport",
         "international_airport", "light_rail_station", "park_and_ride", "subway_station",
         "taxi_stand", "train_station", "transit_depot", "transit_station", "truck_stop"
-    ]
+    ],
+    other: ["other"]
 } as const;
 
 export type PlaceCategory = keyof typeof PLACE_SUBTYPE_MAP;
@@ -575,6 +576,12 @@ export const PLACE_CATEGORIES: Partial<Record<Locale, PlaceCategoryInfo>> & { en
                 "transit_station": "Transit station",
                 "truck_stop": "Truck stop"
             }
+        },
+        "other": {
+            "label": "Other",
+            "types": {
+                "other": "Other"
+            }
         }
     },
     es: {
@@ -1005,6 +1012,12 @@ export const PLACE_CATEGORIES: Partial<Record<Locale, PlaceCategoryInfo>> & { en
                 "transit_depot": "Depósito de transporte",
                 "transit_station": "Estación de transporte",
                 "truck_stop": "Parada de camiones"
+            }
+        },
+        "other": {
+            "label": "Otro",
+            "types": {
+                "other": "Otro"
             }
         }
     }
