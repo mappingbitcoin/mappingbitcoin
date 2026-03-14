@@ -133,6 +133,18 @@ export async function getWoTDistanceBatch(
 }
 
 /**
+ * Convert WoT distance (hops) to a trust score (0-1)
+ */
+export function wotDistanceToTrustScore(distance: number | null): number {
+    if (distance === null) return 0.02;
+    if (distance === 0) return 1.0;
+    if (distance === 1) return 0.5;
+    if (distance === 2) return 0.25;
+    if (distance === 3) return 0.1;
+    return 0.05;
+}
+
+/**
  * Get bot pubkey for frontend use
  */
 export function getMappingBitcoinBotPubkey(): string {

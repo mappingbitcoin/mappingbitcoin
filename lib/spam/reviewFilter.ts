@@ -1,5 +1,5 @@
 import prisma from "../db/prisma";
-import { getTrustScore } from "../trust/graphBuilder";
+import { getWoTDistance, wotDistanceToTrustScore } from "../wot/oracleClient";
 
 /**
  * Spam filtering for reviews
@@ -284,8 +284,9 @@ export async function checkReviewSpam(
     totalScore += duplicateCheck.score * 0.3; // 30% weight
     allReasons.push(...duplicateCheck.reasons);
 
-    // 4. Get trust score and adjust
-    const trustScore = await getTrustScore(authorPubkey);
+    // 4. Get trust score from WoT oracle and adjust
+    const wotResult = await getWoTDistance(authorPubkey);
+    const trustScore = wotDistanceToTrustScore(wotResult.hops);
 
     // High trust users get benefit of doubt
     if (trustScore >= SPAM_CONFIG.minTrustScoreForAutoApprove) {

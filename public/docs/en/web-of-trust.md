@@ -15,28 +15,7 @@ The fewer hops between you and another person, the closer they are in your trust
 
 ## How MappingBitcoin Uses WoT
 
-MappingBitcoin uses the **Mapping Bitcoin Bot** as the root of trust for the community. The bot follows trusted community members (seeders), and trust flows outward from there.
-
-### Trust Network Structure
-
-```
-           Mapping Bitcoin Bot
-                   │
-                   │ follows
-                   ▼
-           Community Seeders
-         (Distance: 1 hop)
-                   │
-                   │ follows
-                   ▼
-        Active Community Members
-         (Distance: 2 hops)
-                   │
-                   │ follows
-                   ▼
-           Extended Network
-         (Distance: 3+ hops)
-```
+MappingBitcoin uses the **Mapping Bitcoin Bot** as the root of trust for the community. Trust distances are computed by an external **WoT Oracle** service at `wot-oracle.mappingbitcoin.com`, which analyzes the Nostr social graph to determine how closely connected any user is to the bot.
 
 ## WoT Distance Levels
 
@@ -64,15 +43,7 @@ When viewing reviews, you'll see WoT badges next to reviewers:
 
 ### Trust-Weighted Ratings
 
-Reviews from high-trust users have more impact on venue ratings:
-
-| Reviewer | Trust Score | Rating Impact |
-|----------|-------------|---------------|
-| Seeder (1 hop) | 1.0 | Full weight |
-| Trusted (2 hops) | ~0.5 | Medium weight |
-| New Account | ~0.02 | Minimal weight |
-
-This makes ratings resistant to spam and fake reviews.
+Reviews from high-trust users have more impact on venue ratings. The closer a reviewer is to the trust network, the more weight their review carries. This makes ratings resistant to spam and fake reviews.
 
 ### Filtering Reviews
 
@@ -102,16 +73,16 @@ This doesn't mean the review is fake - it just means we couldn't verify a trust 
 
 To increase your WoT standing:
 
-1. **Get followed by seeders** - Community seeders are followed by the bot
-2. **Build your Nostr presence** - Post, engage, build connections
-3. **Be active in the community** - Attend meetups, contribute to projects
-4. **Use your identity consistently** - Same pubkey across platforms
+1. **Build your Nostr presence** - Post, engage, build connections
+2. **Be active in the community** - Attend meetups, contribute to projects
+3. **Use your identity consistently** - Same pubkey across platforms
+4. **Connect with trusted members** - Follow and interact with active community members
 
 ## Technical Details
 
 ### WoT Oracle
 
-MappingBitcoin uses a WoT Oracle service to compute trust distances:
+MappingBitcoin uses an external WoT Oracle service at `wot-oracle.mappingbitcoin.com` to compute trust distances. The oracle maintains an up-to-date view of the Nostr social graph and responds to distance queries:
 
 ```
 GET /distance?from={bot_pubkey}&to={reviewer_pubkey}
@@ -144,23 +115,18 @@ WoT data can be refreshed to reflect changes in the social graph:
 
 - New followers can decrease distance
 - Unfollows can increase distance
-- Seeders being added affects many users
 
 ## FAQ
 
 ### Why is my WoT distance high?
 
 - You may be new to Nostr
-- Your followers aren't connected to the seeders
+- Your followers aren't well-connected to active community members
 - Build connections with active community members
 
 ### Does WoT affect my ability to review?
 
 No. Anyone can submit reviews. WoT only affects how much weight your review has on the venue's aggregate rating.
-
-### How are seeders chosen?
-
-Seeders are trusted Bitcoin community members followed by the Mapping Bitcoin bot. This is currently managed by the project maintainers.
 
 ### Can I see my own WoT distance?
 

@@ -11,8 +11,6 @@ import { LoginModal } from "@/components/auth";
 import {
     HomeIcon,
     UsersIcon,
-    BoltIcon,
-    ChartBarIcon,
     MegaphoneIcon,
     StarOutlineIcon,
     PinIcon,
@@ -40,21 +38,6 @@ const navSections: NavSection[] = [
                 label: "Dashboard",
                 exact: true,
                 icon: <HomeIcon className="w-5 h-5" />,
-            },
-            {
-                href: "/admin/seeders",
-                label: "Seeders",
-                icon: <UsersIcon className="w-5 h-5" />,
-            },
-            {
-                href: "/admin/graph",
-                label: "Trust Graph",
-                icon: <BoltIcon className="w-5 h-5" />,
-            },
-            {
-                href: "/admin/graph/analytics",
-                label: "Analytics",
-                icon: <ChartBarIcon className="w-5 h-5" />,
             },
             {
                 href: "/admin/marketing",
