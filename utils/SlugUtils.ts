@@ -44,6 +44,7 @@ export function getLocalizedCountrySlug(countryName: string, locale: string = 'e
     const slug = getSimplifiedCountrySlug(countryName)
     switch (locale) {
         case 'es': return `lugares-bitcoin-en-${slug}`;
+        case 'pt': return `locais-bitcoin-em-${slug}`;
         default: return `bitcoin-shops-in-${slug}`;
     }
 }
@@ -796,9 +797,384 @@ const SUBCATEGORY_EN_SLUG_MAP: Record<PlaceSubcategory, string> = {
     rest_stop: "rest-stops",
 };
 
+const SUBCATEGORY_PT_SLUG_MAP: Record<PlaceSubcategory, string> = {
+    // transporte
+    airport: 'aeroportos',
+    airstrip: 'pistas-de-pouso',
+    bus_station: 'estacoes-de-onibus',
+    bus_stop: 'paradas-de-onibus',
+    ferry_terminal: 'terminais-de-ferry',
+    heliport: 'heliportos',
+    international_airport: 'aeroportos-internacionais',
+    light_rail_station: 'estacoes-de-trem-leve',
+    park_and_ride: 'estacionamentos-com-transporte',
+    subway_station: 'estacoes-de-metro',
+    taxi_stand: 'pontos-de-taxi',
+    train_station: 'estacoes-de-trem',
+    transit_depot: 'depositos-de-transporte',
+    transit_station: 'estacoes-de-transporte',
+    truck_stop: 'paradas-de-caminhoes',
+
+    // esportes
+    dojo: 'dojos',
+    water_sports: 'esportes-aquaticos',
+    surf_school: 'escolas-de-surf',
+    arena: 'arenas-cobertas',
+    athletic_field: 'campos-de-atletismo',
+    fishing_charter: 'excursoes-de-pesca',
+    fishing_pond: 'lagos-de-pesca',
+    fitness_center: 'centros-de-fitness',
+    golf_course: 'campos-de-golfe',
+    gym: 'academias',
+    ice_skating_rink: 'pistas-de-patinacao-no-gelo',
+    playground: 'parquinhos',
+    ski_resort: 'estacoes-de-esqui',
+    sports_activity_location: 'locais-de-atividade-esportiva',
+    sports_club: 'clubes-esportivos',
+    sports_coaching: 'treinamentos-esportivos',
+    sports_complex: 'complexos-esportivos',
+    stadium: 'estadios',
+    swimming_pool: 'piscinas',
+
+    // compras
+    tobacco: 'tabacarias',
+    second_hand: 'brechos',
+    seafood_shop: 'peixarias',
+    stationery_store: 'papelarias',
+    cannabis: 'lojas-de-cannabis',
+    craft_store: 'lojas-de-artesanato',
+    copyshop: 'copiadoras',
+    gardening_store: 'lojas-de-jardinagem',
+    asian_grocery_store: 'mercearias-asiaticas',
+    auto_parts_store: 'lojas-de-autopecas',
+    bicycle_store: 'lojas-de-bicicletas',
+    book_store: 'livrarias',
+    butcher_shop: 'acougues',
+    cell_phone_store: 'lojas-de-celulares',
+    clothing_store: 'lojas-de-roupas',
+    convenience_store: 'lojas-de-conveniencia',
+    department_store: 'lojas-de-departamento',
+    discount_store: 'lojas-de-desconto',
+    electronics_store: 'lojas-de-eletronica',
+    food_store: 'lojas-de-alimentos',
+    furniture_store: 'lojas-de-moveis',
+    gift_shop: 'lojas-de-presentes',
+    grocery_store: 'supermercados',
+    hardware_store: 'lojas-de-ferragens',
+    home_goods_store: 'lojas-de-artigos-para-casa',
+    home_improvement_store: 'lojas-de-materiais-de-construcao',
+    jewelry_store: 'joalherias',
+    liquor_store: 'lojas-de-bebidas',
+    market: 'mercados',
+    music_store: 'lojas-de-musica',
+    pet_store: 'pet-shops',
+    optician: 'oticas',
+    shoe_store: 'lojas-de-calcados',
+    shopping_mall: 'shopping-centers',
+    sporting_goods_store: 'lojas-de-artigos-esportivos',
+    store: 'lojas',
+    supermarket: 'supermercados',
+    warehouse_store: 'atacadistas',
+    wholesaler: 'distribuidores',
+
+    // servicos
+    "3d-printing": 'servicos-de-impressao-3d',
+    advertising: 'servicos-de-publicidade',
+    architect: 'arquitetos',
+    cleaning: 'servicos-de-limpeza',
+    graphic_design: 'servicos-de-design-grafico',
+    gardener: 'jardineiros',
+    photographer: 'fotografos',
+    beekeeper: 'apicultores',
+    carpenter: 'carpinteiros',
+    astrologer: 'astrologos',
+    barber_shop: 'barbearias',
+    beautician: 'esteticistas',
+    beauty_salon: 'saloes-de-beleza',
+    body_art_service: 'servicos-de-arte-corporal',
+    catering_service: 'servicos-de-buffet',
+    cemetery: 'cemiterios',
+    child_care_agency: 'agencias-de-cuidado-infantil',
+    consultant: 'consultores',
+    contractor: 'empreiteiros',
+    courier_service: 'servicos-de-entrega',
+    electrician: 'eletricistas',
+    florist: 'floriculturas',
+    food_delivery: 'servicos-de-delivery-de-comida',
+    foot_care: 'servicos-de-podologia',
+    funeral_home: 'funerarias',
+    hair_care: 'servicos-de-cuidados-capilares',
+    hair_salon: 'saloes-de-cabelo',
+    insurance_agency: 'agencias-de-seguros',
+    laundry: 'lavanderias',
+    lawyer: 'advogados',
+    locksmith: 'chaveiros',
+    makeup_artist: 'maquiadores',
+    moving_company: 'empresas-de-mudanca',
+    nail_salon: 'saloes-de-unhas',
+    painter: 'pintores',
+    plumber: 'encanadores',
+    psychic: 'videntes',
+    real_estate_agency: 'imobiliarias',
+    roofing_contractor: 'empreiteiros-de-telhados',
+    storage: 'depositos',
+    summer_camp_organizer: 'organizadores-de-acampamento-de-verao',
+    tailor: 'alfaiates',
+    telecommunications_service_provider: 'provedores-de-telecomunicacoes',
+    tour_agency: 'agencias-de-turismo',
+    tourist_information_center: 'centros-de-informacao-turistica',
+    travel_agency: 'agencias-de-viagens',
+    veterinary_care: 'clinicas-veterinarias',
+
+    // hospedagem
+    bed_and_breakfast: 'pousadas-com-cafe',
+    budget_japanese_inn: 'pousadas-japonesas-economicas',
+    chalet: 'chales',
+    campground: 'campings',
+    camping_cabin: 'cabanas-de-camping',
+    cottage: 'chalezinhos',
+    extended_stay_hotel: 'hoteis-de-longa-estadia',
+    farmstay: 'hospedagens-em-fazenda',
+    guest_house: 'casas-de-hospedes',
+    hostel: 'hostels',
+    hotel: 'hoteis',
+    inn: 'pousadas',
+    japanese_inn: 'pousadas-japonesas',
+    lodging: 'hospedagens',
+    mobile_home_park: 'parques-de-trailers',
+    motel: 'moteis',
+    private_guest_room: 'quartos-privados-para-hospedes',
+    resort_hotel: 'hoteis-resort',
+    rv_park: 'parques-para-motorhomes',
+
+    // recursos naturais
+    beach: 'praias',
+
+    // locais de culto
+    church: 'igrejas',
+    hindu_temple: 'templos-hindus',
+    mosque: 'mesquitas',
+    synagogue: 'sinagogas',
+
+    // areas geograficas
+    administrative_area_level_1: 'areas-administrativas-nivel-1',
+    administrative_area_level_2: 'areas-administrativas-nivel-2',
+    country: 'paises',
+    locality: 'localidades',
+    postal_code: 'codigos-postais',
+    school_district: 'distritos-escolares',
+
+    // governo
+    city_hall: 'prefeituras',
+    courthouse: 'tribunais',
+    embassy: 'embaixadas',
+    fire_station: 'quarteis-de-bombeiros',
+    government_office: 'reparticoes-publicas',
+    local_government_office: 'reparticoes-do-governo-local',
+    neighborhood_police_station: 'delegacias-de-bairro',
+    police: 'delegacias',
+    post_office: 'correios',
+
+    // saude e bem-estar
+    alternative_medicine: 'centros-de-medicina-alternativa',
+    psychotherapist: 'psicoterapeutas',
+    chiropractor: 'quiropatas',
+    clinic: 'clinicas',
+    dental_clinic: 'clinicas-dentarias',
+    dentist: 'dentistas',
+    doctor: 'medicos',
+    drugstore: 'drogarias',
+    hospital: 'hospitais',
+    massage: 'centros-de-massagem',
+    medical_lab: 'laboratorios-medicos',
+    pharmacy: 'farmacias',
+    physiotherapist: 'fisioterapeutas',
+    sauna: 'saunas',
+    skin_care_clinic: 'clinicas-de-dermatologia',
+    spa: 'spas',
+    tanning_studio: 'centros-de-bronzeamento',
+    wellness_center: 'centros-de-bem-estar',
+    yoga_studio: 'estudios-de-yoga',
+
+    // moradia
+    apartment_building: 'edificios-residenciais',
+    apartment_complex: 'complexos-de-apartamentos',
+    condominium_complex: 'condominios',
+    housing_complex: 'conjuntos-habitacionais',
+
+    // gastronomia
+    acai_shop: 'lojas-de-acai',
+    afghani_restaurant: 'restaurantes-afegaos',
+    african_restaurant: 'restaurantes-africanos',
+    american_restaurant: 'restaurantes-americanos',
+    asian_restaurant: 'restaurantes-asiaticos',
+    bagel_shop: 'lojas-de-bagels',
+    bakery: 'padarias',
+    bar: 'bares',
+    bar_and_grill: 'bares-e-churrasquerias',
+    barbecue_restaurant: 'churrascarias',
+    brazilian_restaurant: 'restaurantes-brasileiros',
+    breakfast_restaurant: 'restaurantes-de-cafe-da-manha',
+    brunch_restaurant: 'restaurantes-de-brunch',
+    buffet_restaurant: 'restaurantes-buffet',
+    cafe: 'cafes',
+    cafeteria: 'cafeterias',
+    candy_store: 'lojas-de-doces',
+    cat_cafe: 'cat-cafes',
+    chinese_restaurant: 'restaurantes-chineses',
+    chocolate_factory: 'fabricas-de-chocolate',
+    chocolate_shop: 'lojas-de-chocolate',
+    coffee_shop: 'cafeterias',
+    confectionery: 'confeitarias',
+    deli: 'delicatessens',
+    dessert_restaurant: 'restaurantes-de-sobremesas',
+    dessert_shop: 'lojas-de-sobremesas',
+    diner: 'lanchonetes',
+    dog_cafe: 'dog-cafes',
+    donut_shop: 'lojas-de-donuts',
+    fast_food_restaurant: 'restaurantes-de-fast-food',
+    fine_dining_restaurant: 'restaurantes-de-alta-gastronomia',
+    food_court: 'pracas-de-alimentacao',
+    french_restaurant: 'restaurantes-franceses',
+    greek_restaurant: 'restaurantes-gregos',
+    hamburger_restaurant: 'hamburguerias',
+    ice_cream_shop: 'sorveterias',
+    indian_restaurant: 'restaurantes-indianos',
+    indonesian_restaurant: 'restaurantes-indonesios',
+    italian_restaurant: 'restaurantes-italianos',
+    japanese_restaurant: 'restaurantes-japoneses',
+    juice_shop: 'lojas-de-sucos',
+    korean_restaurant: 'restaurantes-coreanos',
+    lebanese_restaurant: 'restaurantes-libaneses',
+    meal_delivery: 'servicos-de-delivery-de-refeicoes',
+    meal_takeaway: 'locais-de-comida-para-viagem',
+    mediterranean_restaurant: 'restaurantes-mediterraneos',
+    mexican_restaurant: 'restaurantes-mexicanos',
+    middle_eastern_restaurant: 'restaurantes-do-oriente-medio',
+    pizza_restaurant: 'pizzarias',
+    pub: 'pubs',
+    ramen_restaurant: 'restaurantes-de-ramen',
+    restaurant: 'restaurantes',
+    sandwich_shop: 'lojas-de-sanduiches',
+    seafood_restaurant: 'restaurantes-de-frutos-do-mar',
+    spanish_restaurant: 'restaurantes-espanhois',
+    steak_house: 'churrascarias',
+    sushi_restaurant: 'restaurantes-de-sushi',
+    tea_house: 'casas-de-cha',
+    thai_restaurant: 'restaurantes-tailandeses',
+    turkish_restaurant: 'restaurantes-turcos',
+    vegan_restaurant: 'restaurantes-veganos',
+    vegetarian_restaurant: 'restaurantes-vegetarianos',
+    vietnamese_restaurant: 'restaurantes-vietnamitas',
+    wine_bar: 'bares-de-vinho',
+
+    // === Instalacoes ===
+    public_bath: 'banhos-publicos',
+    public_bathroom: 'banheiros-publicos',
+    stable: 'estabulos',
+
+    // === Financas ===
+    accounting: 'servicos-de-contabilidade',
+    atm: 'caixas-eletronicos',
+    bank: 'bancos',
+    currency_exchange: 'casas-de-cambio',
+
+    // === Entretenimento e Recreacao ===
+    adventure_sports_center: 'centros-de-esportes-de-aventura',
+    amphitheatre: 'anfiteatros',
+    amusement_center: 'centros-de-diversao',
+    amusement_park: 'parques-de-diversoes',
+    aquarium: 'aquarios',
+    banquet_hall: 'saloes-de-festas',
+    barbecue_area: 'areas-de-churrasco',
+    botanical_garden: 'jardins-botanicos',
+    bowling_alley: 'pistas-de-boliche',
+    casino: 'cassinos',
+    childrens_camp: 'acampamentos-infantis',
+    comedy_club: 'clubes-de-comedia',
+    community_center: 'centros-comunitarios',
+    concert_hall: 'salas-de-concerto',
+    convention_center: 'centros-de-convencoes',
+    cultural_center: 'centros-culturais',
+    cycling_park: 'parques-para-ciclismo',
+    dance_hall: 'saloes-de-danca',
+    dog_park: 'parques-para-caes',
+    event_venue: 'espacos-para-eventos',
+    ferris_wheel: 'rodas-gigantes',
+    garden: 'jardins',
+    hiking_area: 'areas-de-trilha',
+    historical_landmark: 'marcos-historicos',
+    internet_cafe: 'lan-houses',
+    karaoke: 'karaokes',
+    marina: 'marinas',
+    movie_rental: 'locadoras-de-filmes',
+    movie_theater: 'cinemas',
+    national_park: 'parques-nacionais',
+    night_club: 'casas-noturnas',
+    observation_deck: 'mirantes',
+    off_roading_area: 'areas-de-off-road',
+    opera_house: 'casas-de-opera',
+    park: 'parques',
+    philharmonic_hall: 'salas-filarmonicas',
+    picnic_ground: 'areas-de-piquenique',
+    planetarium: 'planetarios',
+    plaza: 'pracas',
+    roller_coaster: 'montanhas-russas',
+    skateboard_park: 'pistas-de-skate',
+    state_park: 'parques-estaduais',
+    tourist_attraction: 'atracoes-turisticas',
+    video_arcade: 'fliperama',
+    visitor_center: 'centros-de-visitantes',
+    water_park: 'parques-aquaticos',
+    wedding_venue: 'espacos-para-casamentos',
+    wildlife_park: 'parques-de-vida-selvagem',
+    wildlife_refuge: 'refugios-de-vida-selvagem',
+    zoo: 'zoologicos',
+
+    // === Negocios ===
+    corporate_office: 'escritorios-corporativos',
+    farm: 'fazendas',
+    ranch: 'ranchos',
+    coworking_space: 'espacos-de-coworking',
+
+    // === Cultura ===
+    art_gallery: 'galerias-de-arte',
+    art_studio: 'atelieres',
+    auditorium: 'auditorios',
+    cultural_landmark: 'marcos-culturais',
+    historical_place: 'lugares-historicos',
+    monument: 'monumentos',
+    museum: 'museus',
+    performing_arts_theater: 'teatros-de-artes-cenicas',
+    sculpture: 'esculturas',
+
+    // === Educacao ===
+    library: 'bibliotecas',
+    preschool: 'pre-escolas',
+    primary_school: 'escolas-primarias',
+    school: 'escolas',
+    secondary_school: 'escolas-secundarias',
+    university: 'universidades',
+    music_school: 'escolas-de-musica',
+    driving_school: 'autoescolas',
+    cooking_school: 'escolas-de-culinaria',
+
+    // === Automotivo ===
+    bicycle_rental: 'aluguel-de-bicicletas',
+    car_dealer: 'concessionarias',
+    car_rental: 'locadoras-de-veiculos',
+    car_repair: 'oficinas-mecanicas',
+    car_wash: 'lava-rapidos',
+    electric_vehicle_charging_station: 'estacoes-de-recarga-de-veiculos-eletricos',
+    gas_station: 'postos-de-combustivel',
+    parking: 'estacionamentos',
+    rest_stop: 'areas-de-descanso',
+};
+
 export const SUBCATEGORY_SLUGS_BY_LOCALE: Partial<Record<Locale, Record<PlaceSubcategory, string>>> & { en: Record<PlaceSubcategory, string> } = {
     'en': SUBCATEGORY_EN_SLUG_MAP,
     'es': SUBCATEGORY_ES_SLUG_MAP,
+    'pt': SUBCATEGORY_PT_SLUG_MAP,
 }
 
 // Reverse lookup: from slug to subcategory
@@ -810,11 +1186,20 @@ const ES_SLUG_TO_SUBCATEGORY: Record<string, PlaceSubcategory> = Object.fromEntr
     Object.entries(SUBCATEGORY_ES_SLUG_MAP).map(([key, value]) => [value, key as PlaceSubcategory])
 );
 
+const PT_SLUG_TO_SUBCATEGORY: Record<string, PlaceSubcategory> = Object.fromEntries(
+    Object.entries(SUBCATEGORY_PT_SLUG_MAP).map(([key, value]) => [value, key as PlaceSubcategory])
+);
+
 /**
  * Get the subcategory from a plural slug (e.g., "atms" -> "atm", "restaurants" -> "restaurant")
  */
 export function getSubcategoryFromSlug(slug: string, locale: string = 'en'): PlaceSubcategory | null {
-    const map = locale === 'es' ? ES_SLUG_TO_SUBCATEGORY : EN_SLUG_TO_SUBCATEGORY;
+    let map: Record<string, PlaceSubcategory>;
+    switch (locale) {
+        case 'es': map = ES_SLUG_TO_SUBCATEGORY; break;
+        case 'pt': map = PT_SLUG_TO_SUBCATEGORY; break;
+        default: map = EN_SLUG_TO_SUBCATEGORY; break;
+    }
     return map[slug] || null;
 }
 
@@ -822,6 +1207,7 @@ export function getLocalizedCountryCategorySlug(countryName: string, subcategory
     const slug = getSimplifiedCountrySlug(countryName)
     switch (locale) {
         case 'es': return `${SUBCATEGORY_ES_SLUG_MAP[subcategory]}-bitcoin-en-${slug}`;
+        case 'pt': return `${SUBCATEGORY_PT_SLUG_MAP[subcategory]}-bitcoin-em-${slug}`;
         default: return `bitcoin-${SUBCATEGORY_EN_SLUG_MAP[subcategory]}-in-${slug}`;
     }
 }
@@ -831,6 +1217,7 @@ export function getLocalizedCitySlug(countryName: string, cityName: string, loca
     const slug = getSimplifiedCitySlug(countryName, cityName)
     switch (locale) {
         case 'es': return `comercios-bitcoin-en-${slug}`;
+        case 'pt': return `comercios-bitcoin-em-${slug}`;
         default: return `bitcoin-shops-in-${slug}`;
     }
 }
@@ -839,6 +1226,7 @@ export function getLocalizedCityCategorySlug(countryName: string, cityName: stri
     const citySlug = getSimplifiedCitySlug(countryName, cityName);
     switch (locale) {
         case 'es': return `${SUBCATEGORY_ES_SLUG_MAP[subcategory]}-bitcoin-en-${citySlug}`;
+        case 'pt': return `${SUBCATEGORY_PT_SLUG_MAP[subcategory]}-bitcoin-em-${citySlug}`;
         default: return `bitcoin-${SUBCATEGORY_EN_SLUG_MAP[subcategory]}-in-${citySlug}`;
     }
 }
