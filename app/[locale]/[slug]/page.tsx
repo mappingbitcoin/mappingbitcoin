@@ -639,6 +639,26 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
                 )}
                 <h2>{t.countries.seo.supportAdoptionTitle}</h2>
                 <p>{t.countries.seo.supportAdoptionDescription.replace('{location}', locationName)}</p>
+                {venues.length > 0 && (
+                    <>
+                        <h2>{subcategoryLabel
+                            ? `${subcategoryLabel} accepting Bitcoin in ${locationName}`
+                            : `Bitcoin-friendly businesses in ${locationName}`}</h2>
+                        <ul>
+                            {venues.map((v: EnrichedVenue) => {
+                                const { name, address } = parseTags(v.tags);
+                                const parts = [name, address?.city, address?.state].filter(Boolean);
+                                return (
+                                    <li key={v.id}>
+                                        {parts.join(', ')}
+                                        {v.tags?.['payment:lightning'] === 'yes' && ' - Accepts Lightning'}
+                                        {v.tags?.['payment:onchain'] === 'yes' && ' - Accepts Bitcoin on-chain'}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </>
+                )}
             </div>
             {alternates && (
                 <SetLocaleAlternates alternates={
