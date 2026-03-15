@@ -86,6 +86,18 @@ export default async function CategoriesPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
             />
+            {/* Hero Section */}
+            <section className="bg-primary pt-12 pb-6 mt-16">
+                <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        {t("title")}
+                    </h1>
+                    <p className="text-text-light text-lg max-w-2xl mx-auto">
+                        {t("subtitle", { count: categoryList.length, subcategoryCount: availableSubcategories.size })}
+                    </p>
+                </div>
+            </section>
+
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
                 <p>
@@ -104,18 +116,6 @@ export default async function CategoriesPage() {
                 <h2>{t("seo.findingTitle")}</h2>
                 <p>{t("seo.findingDescription")}</p>
             </div>
-
-            {/* Hero Section */}
-            <section className="bg-primary pt-12 pb-6 mt-16">
-                <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        {t("title")}
-                    </h1>
-                    <p className="text-text-light text-lg max-w-2xl mx-auto">
-                        {t("subtitle", { count: categoryList.length, subcategoryCount: availableSubcategories.size })}
-                    </p>
-                </div>
-            </section>
 
             {/* Client Component */}
             <section className="bg-primary min-h-[60vh]">

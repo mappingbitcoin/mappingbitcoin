@@ -56,6 +56,7 @@ export default async function DocsPage({ params }: Localized) {
                     })
                 }}
             />
+            <h1 className="sr-only">{metadata.title as string}</h1>
             <DocArticle slug="overview" locale={locale} />
         </>
     );

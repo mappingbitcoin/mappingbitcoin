@@ -157,6 +157,10 @@ export function detectCannibalization(
     }
   }
 
+  // Pattern matching directory-style pages that are intentionally similar
+  // (e.g., /bitcoin-shops-in-germany, /bitcoin-shops-in-france)
+  const directoryPattern = /\/bitcoin-[\w-]+-in-[\w-]+/;
+
   // Compare each pair of pages
   for (let i = 0; i < pageKeywords.length; i++) {
     for (let j = i + 1; j < pageKeywords.length; j++) {
@@ -165,6 +169,10 @@ export function detectCannibalization(
 
       // Skip if same URL
       if (a.url === b.url) continue;
+
+      // Skip pairs where both URLs are country/city directory pages —
+      // these are intentionally similar pages differentiated by location
+      if (directoryPattern.test(a.url) && directoryPattern.test(b.url)) continue;
 
       // Compute shared keywords
       let sharedCount = 0;

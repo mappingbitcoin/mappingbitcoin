@@ -53,7 +53,7 @@ export default function DocArticle({ slug, locale }: DocArticleProps) {
         <div>
             {doc && (
                 <>
-                    <h1 className="text-3xl font-bold mb-4 text-white leading-tight">{doc.title}</h1>
+                    <h2 className="text-3xl font-bold mb-4 text-white leading-tight">{doc.title}</h2>
                     <p className="text-gray-400 text-sm mb-6">{doc.description}</p>
                 </>
             )}

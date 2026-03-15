@@ -620,6 +620,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             />
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
+                <h1>{translatedTitle}</h1>
                 <p>{translatedDescription}</p>
                 <h2>{t.countries.seo.aboutBitcoin.replace('{location}', locationName)}</h2>
                 <p>

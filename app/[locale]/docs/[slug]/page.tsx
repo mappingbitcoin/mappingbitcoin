@@ -119,6 +119,7 @@ export default async function DocsSlugPage({ params }: DocsSlugParams) {
                     })
                 }}
             />
+            <h1 className="sr-only">{doc.title}</h1>
             <DocArticle slug={slug} locale={locale} />
         </>
     );

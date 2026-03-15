@@ -45,7 +45,7 @@ function extractHeadings(html: string): Heading[] {
   cleaned = cleaned.replace(/<noscript[\s>][\s\S]*?<\/noscript>/gi, '');
 
   const headings: Heading[] = [];
-  const pattern = /<h([1-6])[\s>][^>]*>([\s\S]*?)<\/h\1>/gi;
+  const pattern = /<h([1-6])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi;
 
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(cleaned)) !== null) {
