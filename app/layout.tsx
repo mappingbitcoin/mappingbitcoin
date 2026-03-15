@@ -4,6 +4,7 @@ import React from "react";
 
 import { routing } from "@/i18n/routing";
 import { publicEnv } from "@/lib/Environment";
+import { getLocale } from "next-intl/server";
 
 import "@/app/globals.css";
 
@@ -24,16 +25,18 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<Record<string, string>>;
 }) {
-  const resolvedParams = await params;
-  const locale = resolvedParams?.locale;
-  const lang = locale && routing.locales.includes(locale as (typeof routing.locales)[number])
-    ? locale
-    : routing.defaultLocale;
+  let lang: string = routing.defaultLocale;
+  try {
+    const locale = await getLocale();
+    if (routing.locales.includes(locale as (typeof routing.locales)[number])) {
+      lang = locale;
+    }
+  } catch {
+    // Fallback to default locale for non-locale pages (404, sitemap, etc.)
+  }
 
   return (
     <html lang={lang} suppressHydrationWarning>
