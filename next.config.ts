@@ -75,6 +75,17 @@ const nextConfig: NextConfig = {
                 destination: '/:locale/bitcoin-shops-in-czechia',
                 permanent: true,
             },
+            // Redirect old comercios (wrong prefix) city/state slugs to correct locais/lugares
+            {
+                source: '/es/comercios-bitcoin-en-:slug(.*)',
+                destination: '/es/lugares-bitcoin-en-:slug',
+                permanent: true,
+            },
+            {
+                source: '/pt/comercios-bitcoin-em-:slug(.*)',
+                destination: '/pt/locais-bitcoin-em-:slug',
+                permanent: true,
+            },
         ];
     },
     async headers() {
