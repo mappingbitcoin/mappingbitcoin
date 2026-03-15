@@ -3,7 +3,7 @@ import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
 import { generateCanonical } from "@/i18n/seo";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
+
 import MapClient from "./MapClient";
 
 export const generateMetadata = buildGeneratePageMetadata('map');
@@ -16,7 +16,7 @@ const MapPage = async ({ params }: Localized) => {
 
     return (
         <>
-            <Script
+            <script
                 id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -41,7 +41,7 @@ const MapPage = async ({ params }: Localized) => {
                     })
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

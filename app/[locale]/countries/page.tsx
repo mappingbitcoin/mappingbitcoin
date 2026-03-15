@@ -1,7 +1,7 @@
 import CountriesPage from "@/app/[locale]/countries/CountriesPage";
 import {getLocationCache} from "@/app/api/cache/LocationCache";
 import {buildGeneratePageMetadata} from "@/utils/SEOUtils";
-import Script from "next/script";
+
 import {env} from "@/lib/Environment";
 
 export const generateMetadata = buildGeneratePageMetadata('countries')
@@ -50,12 +50,12 @@ export default async function CountriesRoute() {
 
     return (
         <>
-            <Script
+            <script
                 id="itemlist-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

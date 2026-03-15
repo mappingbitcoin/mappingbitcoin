@@ -1,6 +1,6 @@
 import DocArticle from "../DocArticle";
 import { Locale } from "@/i18n/types";
-import Script from "next/script";
+
 import { generateCanonical } from "@/i18n/seo";
 import { Metadata } from "next";
 import { allDocs, getDocBySlug } from "../docsConfig";
@@ -71,7 +71,7 @@ export default async function DocsSlugPage({ params }: DocsSlugParams) {
 
     return (
         <>
-            <Script
+            <script
                 id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -89,7 +89,7 @@ export default async function DocsSlugPage({ params }: DocsSlugParams) {
                     })
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

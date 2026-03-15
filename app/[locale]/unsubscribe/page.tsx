@@ -3,7 +3,7 @@ import Unsubscribe from "./Unsubscribe";
 import { Localized } from "@/i18n/types";
 import { generateCanonical } from "@/i18n/seo";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
+
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: Localized): Promise<Metadata> {
@@ -23,7 +23,7 @@ const UnsubscribePage = async ({ params }: Localized) => {
 
     return (
         <>
-            <Script
+            <script
                 id="unsubscribepage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

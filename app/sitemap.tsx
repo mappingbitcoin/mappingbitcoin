@@ -16,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Homepage
         entries.push({
             url: generateCanonical('', locale),
-            lastModified: new Date().toISOString(),
+            lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
             changeFrequency: "weekly",
             priority: 1.0,
         });
@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Map
         entries.push({
             url: generateCanonical('map', locale),
-            lastModified: new Date().toISOString(),
+            lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
             changeFrequency: "daily",
             priority: 1.0,
         });
@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const page of staticPages) {
             entries.push({
                 url: generateCanonical(page, locale),
-                lastModified: new Date().toISOString(),
+                lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
                 changeFrequency: "monthly",
                 priority: 0.9,
             });
@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Docs index
         entries.push({
             url: generateCanonical('docs', locale),
-            lastModified: new Date().toISOString(),
+            lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
             changeFrequency: "weekly",
             priority: 0.9,
         });
@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const doc of allDocs) {
             entries.push({
                 url: generateCanonical(`docs/${doc.slug}`, locale),
-                lastModified: new Date().toISOString(),
+                lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
                 changeFrequency: "weekly",
                 priority: 0.8,
             });
@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Blog index
         entries.push({
             url: generateCanonical('blog', locale),
-            lastModified: new Date().toISOString(),
+            lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
             changeFrequency: "weekly",
             priority: 0.9,
         });
@@ -70,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const post of blogPosts) {
             entries.push({
                 url: generateCanonical(`blog/${post.slug}`, locale),
-                lastModified: new Date(post.date).toISOString(),
+                lastModified: new Date(post.date).toISOString().replace(/\.\d{3}Z$/, '+00:00'),
                 changeFrequency: "monthly",
                 priority: 0.8,
             });

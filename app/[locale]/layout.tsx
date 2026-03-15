@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
-import Script from "next/script";
 
 import { Footer, NavBar, PageTransition, BodyLockManager } from "@/components/layout";
 import { ClientOnlyAnalytics, CookieNotice } from "@/components/common";
@@ -61,7 +60,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider locale={locale} messages={allMessages}>
             <LocaleAlternatesProvider>
             <NostrAuthProvider>
-              <Script
+              <script
                 id="organization-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

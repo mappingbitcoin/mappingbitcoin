@@ -1,6 +1,6 @@
 import BlogArticle from "../BlogArticle";
 import { Locale } from "@/i18n/types";
-import Script from "next/script";
+
 import { generateCanonical } from "@/i18n/seo";
 import { getBlogPost, getBlogPostMeta, getPostAvailableLocales, getBlogSlugs } from "@/lib/blog/parser";
 import { notFound } from "next/navigation";
@@ -177,14 +177,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
     return (
         <>
-            <Script
+            <script
                 id="blogpost-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify(blogPostingSchema),
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

@@ -4,6 +4,7 @@ import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import { EnrichedVenue } from '@/models/Overpass';
 import { prisma } from '@/lib/db/prisma';
+import { getSimplifiedCountrySlug } from '@/utils/SlugUtils';
 
 countries.registerLocale(enLocale);
 
@@ -117,11 +118,6 @@ function getFlagEmoji(countryCode: string): string {
     return String.fromCodePoint(...codePoints);
 }
 
-// Country code to slug
-function getCountrySlug(name: string): string {
-    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
-
 export async function generateStats() {
     const raw = await fs.readFile(VENUES_FILE, 'utf8');
     const venues = JSON.parse(raw) as EnrichedVenue[];
@@ -161,7 +157,7 @@ export async function generateStats() {
                 name,
                 flag: getFlagEmoji(code),
                 count,
-                slug: getCountrySlug(name),
+                slug: getSimplifiedCountrySlug(name),
             };
         });
 

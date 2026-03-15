@@ -53,6 +53,30 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    async redirects() {
+        return [
+            {
+                source: '/bitcoin-shops-in-united-states-of-america',
+                destination: '/bitcoin-shops-in-united-states',
+                permanent: true,
+            },
+            {
+                source: '/bitcoin-shops-in-czech-republic',
+                destination: '/bitcoin-shops-in-czechia',
+                permanent: true,
+            },
+            {
+                source: '/:locale/bitcoin-shops-in-united-states-of-america',
+                destination: '/:locale/bitcoin-shops-in-united-states',
+                permanent: true,
+            },
+            {
+                source: '/:locale/bitcoin-shops-in-czech-republic',
+                destination: '/:locale/bitcoin-shops-in-czechia',
+                permanent: true,
+            },
+        ];
+    },
     async headers() {
         return [
             {

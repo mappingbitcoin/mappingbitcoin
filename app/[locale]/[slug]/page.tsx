@@ -17,7 +17,7 @@ import {getLocalizedCountryName, getCountryCodeFromSlug} from "@/utils/CountryUt
 import {RegionQuery, VenueSlugEntrySEO} from "@/models/VenueSlug";
 import {getSlugsCache} from "@/app/api/cache/SlugsCache";
 import {parseTags} from "@/utils/OsmHelpers";
-import Script from "next/script";
+
 import React from "react";
 import { distance } from 'fastest-levenshtein';
 import { PageSection } from "@/components/layout";
@@ -608,12 +608,12 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
 
     return (
         <>
-            <Script
+            <script
               id="json-ld"
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <Script
+            <script
               id="breadcrumbs-json-ld"
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}

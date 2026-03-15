@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
+
 import { env } from "@/lib/Environment";
 import { getSubcategoryData } from "@/app/api/cache/CategoryCache";
 import { PLACE_CATEGORIES, matchPlaceSubcategory } from "@/constants/PlaceCategories";
@@ -136,12 +136,12 @@ export default async function SubcategoryPage({ params }: PageProps) {
 
     return (
         <>
-            <Script
+            <script
                 id="itemlist-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

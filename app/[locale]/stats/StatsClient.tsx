@@ -227,9 +227,9 @@ export default function StatsClient() {
                         <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
                             <ChartBarIcon className="w-6 h-6 text-accent" />
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white">
                             Bitcoin Merchant Statistics
-                        </h1>
+                        </h2>
                     </div>
                     <p className="text-lg text-text-light max-w-2xl">
                         Explore the growth of Bitcoin adoption worldwide. Track merchants,

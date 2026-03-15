@@ -1,4 +1,4 @@
-import Script from "next/script";
+
 import { env } from "@/lib/Environment";
 import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
 import { getTranslations } from "next-intl/server";
@@ -31,7 +31,7 @@ export default async function StatsPage() {
 
     return (
         <>
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

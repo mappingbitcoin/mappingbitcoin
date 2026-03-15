@@ -1,4 +1,4 @@
-import Script from "next/script";
+
 import { env } from "@/lib/Environment";
 import { PLACE_CATEGORIES, PLACE_SUBTYPE_MAP, PlaceCategory } from "@/constants/PlaceCategories";
 import { getCategoryCache } from "@/app/api/cache/CategoryCache";
@@ -76,12 +76,12 @@ export default async function CategoriesPage() {
 
     return (
         <>
-            <Script
+            <script
                 id="itemlist-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

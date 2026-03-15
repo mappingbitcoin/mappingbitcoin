@@ -61,7 +61,7 @@ const Footer = () => {
 
                         {/* Explore Column */}
                         <div className="flex-[0_0_auto] min-w-37.5">
-                            <h3 className="text-base font-semibold mb-5 text-white">Explore</h3>
+                            <span className="text-base font-semibold mb-5 text-white block">Explore</span>
                             <ul className="list-none flex flex-col gap-3">
                                 {[
                                     { href: "/map", key: "menu.map" },
@@ -87,7 +87,7 @@ const Footer = () => {
 
                         {/* Company Column */}
                         <div className="flex-[0_0_auto] min-w-37.5">
-                            <h3 className="text-base font-semibold mb-5 text-white">Company</h3>
+                            <span className="text-base font-semibold mb-5 text-white block">Company</span>
                             <ul className="list-none flex flex-col gap-3">
                                 {[
                                     { href: "/blog", key: "menu.blog" },
@@ -112,7 +112,7 @@ const Footer = () => {
 
                         {/* Socials Column */}
                         <div className="flex-[0_0_auto] min-w-37.5">
-                            <h3 className="text-base font-semibold mb-5 text-white">Follow Us</h3>
+                            <span className="text-base font-semibold mb-5 text-white block">Follow Us</span>
                             <div className="flex gap-4">
                                 {socialLinks.map((social, index) => (
                                     <motion.a

@@ -7,14 +7,14 @@ export type BlogPageKey = 'blog';
 const blogSeo: SEOModule<BlogPageKey> = {
     "blog": {
         en: {
-            title: "Blog | Mapping Bitcoin",
+            title: "Bitcoin Merchant News & Guides | Mapping Bitcoin",
             description: "Updates, insights, and announcements from the MappingBitcoin team. Learn about our mission to build better Bitcoin merchant discovery.",
             keywords: [
                 "mapping bitcoin blog",
                 "bitcoin adoption"
             ],
             openGraph: {
-                title: "Blog | Mapping Bitcoin",
+                title: "Bitcoin Merchant News & Guides | Mapping Bitcoin",
                 description: "Updates, insights, and announcements from the MappingBitcoin team.",
                 url: generateCanonical("blog", "en"),
                 type: "website",
@@ -29,20 +29,20 @@ const blogSeo: SEOModule<BlogPageKey> = {
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Blog | Mapping Bitcoin",
+                title: "Bitcoin Merchant News & Guides | Mapping Bitcoin",
                 description: "Updates, insights, and announcements from the MappingBitcoin team.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
         es: {
-            title: "Blog | Mapping Bitcoin",
+            title: "Noticias y Guias sobre Comercios Bitcoin | Mapping Bitcoin",
             description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin. Conoce nuestra mision de mejorar el descubrimiento de comercios Bitcoin.",
             keywords: [
                 "blog bitcoin",
                 "adopcion bitcoin"
             ],
             openGraph: {
-                title: "Blog | Mapping Bitcoin",
+                title: "Noticias y Guias sobre Comercios Bitcoin | Mapping Bitcoin",
                 description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin.",
                 url: generateCanonical("blog", "es"),
                 type: "website",
@@ -57,20 +57,20 @@ const blogSeo: SEOModule<BlogPageKey> = {
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Blog | Mapping Bitcoin",
+                title: "Noticias y Guias sobre Comercios Bitcoin | Mapping Bitcoin",
                 description: "Actualizaciones, analisis y novedades del equipo de MappingBitcoin.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }
         },
         pt: {
-            title: "Blog | Mapping Bitcoin",
+            title: "Noticias e Guias sobre Comercios Bitcoin | Mapping Bitcoin",
             description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin. Conheca nossa missao de melhorar a descoberta de comercios Bitcoin.",
             keywords: [
                 "blog bitcoin",
                 "adocao bitcoin"
             ],
             openGraph: {
-                title: "Blog | Mapping Bitcoin",
+                title: "Noticias e Guias sobre Comercios Bitcoin | Mapping Bitcoin",
                 description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin.",
                 url: generateCanonical("blog", "pt"),
                 type: "website",
@@ -85,7 +85,7 @@ const blogSeo: SEOModule<BlogPageKey> = {
             },
             twitter: {
                 card: "summary_large_image",
-                title: "Blog | Mapping Bitcoin",
+                title: "Noticias e Guias sobre Comercios Bitcoin | Mapping Bitcoin",
                 description: "Atualizacoes, analises e novidades da equipe do MappingBitcoin.",
                 images: [`${env.siteUrl}/assets/opengraph/mapping-bitcoin-preview.webp`]
             }

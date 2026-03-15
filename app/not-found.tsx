@@ -1,5 +1,5 @@
 import { env } from "@/lib/Environment";
-import Script from "next/script";
+
 import { Localized } from "@/i18n/types";
 import { NotFoundPage } from "@/components/common";
 import {buildGeneratePageMetadata, getPageSeo} from "@/utils/SEOUtils";
@@ -46,12 +46,12 @@ export default async function NotFound({ params }: Localized) {
 
     return (
         <>
-            <Script
+            <script
                 id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}

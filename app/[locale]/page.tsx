@@ -2,7 +2,7 @@ import React from "react";
 import { buildGeneratePageMetadata } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
+
 import fs from "fs/promises";
 import path from "path";
 import TopographicPattern from "@/components/ui/TopographicPattern";
@@ -51,11 +51,11 @@ async function getStats(): Promise<StatsData> {
                 { name: "Oceania", count: 320 },
             ],
             topCountries: [
-                { code: "US", name: "United States", flag: "🇺🇸", count: 3215, slug: "united-states-of-america" },
+                { code: "US", name: "United States", flag: "🇺🇸", count: 3215, slug: "united-states" },
                 { code: "BR", name: "Brazil", flag: "🇧🇷", count: 2284, slug: "brazil" },
                 { code: "ZA", name: "South Africa", flag: "🇿🇦", count: 1588, slug: "south-africa" },
                 { code: "SV", name: "El Salvador", flag: "🇸🇻", count: 1515, slug: "el-salvador" },
-                { code: "CZ", name: "Czech Republic", flag: "🇨🇿", count: 1133, slug: "czech-republic" },
+                { code: "CZ", name: "Czech Republic", flag: "🇨🇿", count: 1133, slug: "czechia" },
                 { code: "IT", name: "Italy", flag: "🇮🇹", count: 1111, slug: "italy" },
             ],
         };
@@ -93,7 +93,7 @@ const HomePage = async ({ params }: Localized) => {
 
     return (
         <>
-            <Script
+            <script
                 id="website-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -120,7 +120,7 @@ const HomePage = async ({ params }: Localized) => {
                     })
                 }}
             />
-            <Script
+            <script
                 id="search-results-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -183,7 +183,7 @@ const HomePage = async ({ params }: Localized) => {
                     })
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Categories index page (always include)
     const categoriesIndex = {
         url: `${env.siteUrl}/categories`,
-        lastModified: new Date().toISOString(),
+        lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
         changeFrequency: "weekly" as const,
         priority: 0.9,
     };
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Individual subcategory pages
         const subcategoryPages = subcategories.map((subcategory) => ({
             url: `${env.siteUrl}/categories/${subcategory}`,
-            lastModified: new Date().toISOString(),
+            lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
             changeFrequency: "weekly" as const,
             priority: 0.7,
         }));

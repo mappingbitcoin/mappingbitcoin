@@ -3,7 +3,7 @@ import Contact from "@/app/[locale]/contact/Contact";
 import {buildGeneratePageMetadata, getPageSeo} from "@/utils/SEOUtils";
 import {Localized} from "@/i18n/types";
 import {generateCanonical} from "@/i18n/seo";
-import Script from "next/script";
+
 
 export const generateMetadata = buildGeneratePageMetadata('contact')
 
@@ -13,7 +13,7 @@ const ContactPage = async ({params}: Localized) => {
 
     return (
         <>
-            <Script
+            <script
               id="contactpage-jsonld"
               type="application/ld+json"
               dangerouslySetInnerHTML={{
@@ -48,7 +48,7 @@ const ContactPage = async ({params}: Localized) => {
                 }),
               }}
             />
-            <Script
+            <script
               id="breadcrumb-jsonld"
               type="application/ld+json"
               dangerouslySetInnerHTML={{

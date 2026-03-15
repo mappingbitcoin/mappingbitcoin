@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { generateCanonical } from "@/i18n/seo";
-import Script from "next/script";
+
 
 import {env} from "@/lib/Environment";
 import PlacePageWrapper from "./PlacePageWrapper";
@@ -330,12 +330,12 @@ export default async function PlaceServerPage({ params, searchParams }: PageProp
 
     return (
         <>
-            <Script
+            <script
                 id="local-business-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

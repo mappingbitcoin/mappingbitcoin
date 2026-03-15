@@ -828,7 +828,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
     return (
         <div className="h-[calc(var(--vh)-4rem)] mt-16 bg-primary">
             <div className="absolute w-px h-px -m-px p-0 overflow-hidden whitespace-nowrap border-0" style={{clip: 'rect(0 0 0 0)'}} aria-hidden="true">
-                <h1 className="text-[0.01rem] text-transparent m-0 p-0 text-center">{String(metadata.title)}</h1>
+                <h2 className="text-[0.01rem] text-transparent m-0 p-0 text-center">{String(metadata.title)}</h2>
                 <p>{String(metadata.description)}</p>
                 <p>Currently displaying venues, merchants, shops accepting Bitcoin around the world.</p>
             </div>
@@ -1076,7 +1076,7 @@ const MapPage = ({metadata}: {metadata: Metadata}) => {
                         </button>
 
                         <div>
-                            <h1 className="m-0 mb-1 text-lg font-semibold leading-tight text-white">{t('helpPopup.title')}</h1>
+                            <h2 className="m-0 mb-1 text-lg font-semibold leading-tight text-white">{t('helpPopup.title')}</h2>
                             <h2 className="m-0 mb-3 text-[0.95rem] font-medium text-text-light leading-snug">{t('helpPopup.subtitle')}</h2>
                             <p className="mt-2 text-[0.95rem] leading-snug text-text-light">{t('helpPopup.description')}</p>
                         </div>

@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     return countrySlugs.map((slug) => ({
         url: `${env.siteUrl}/${slug}`,
-        lastModified: new Date().toISOString(),
+        lastModified: new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00'),
         changeFrequency: "weekly",
         priority: 0.8,
     }));

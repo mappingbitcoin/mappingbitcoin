@@ -1,7 +1,7 @@
 import DocArticle from "./DocArticle";
 import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
-import Script from "next/script";
+
 import { generateCanonical } from "@/i18n/seo";
 import React from "react";
 
@@ -14,7 +14,7 @@ export default async function DocsPage({ params }: Localized) {
 
     return (
         <>
-            <Script
+            <script
                 id="webpage-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -32,7 +32,7 @@ export default async function DocsPage({ params }: Localized) {
                     })
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

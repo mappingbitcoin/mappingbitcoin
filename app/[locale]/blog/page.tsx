@@ -1,6 +1,6 @@
 import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
-import Script from "next/script";
+
 import { generateCanonical } from "@/i18n/seo";
 import React from "react";
 import { Link } from "@/i18n/navigation";
@@ -127,21 +127,21 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
 
     return (
         <>
-            <Script
+            <script
                 id="blog-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify(blogSchema),
                 }}
             />
-            <Script
+            <script
                 id="collection-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify(collectionSchema),
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

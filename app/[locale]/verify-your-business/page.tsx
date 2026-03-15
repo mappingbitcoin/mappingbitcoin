@@ -2,7 +2,7 @@ import React from "react";
 import { buildGeneratePageMetadata, getPageSeo } from "@/utils/SEOUtils";
 import { Localized } from "@/i18n/types";
 import { generateCanonical } from "@/i18n/seo";
-import Script from "next/script";
+
 import VerifyYourBusinessContent from "./VerifyYourBusinessContent";
 
 export const generateMetadata = buildGeneratePageMetadata('verify-your-business');
@@ -13,7 +13,7 @@ const VerifyYourBusinessPage = async ({ params }: Localized) => {
 
     return (
         <>
-            <Script
+            <script
                 id="verify-business-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -31,7 +31,7 @@ const VerifyYourBusinessPage = async ({ params }: Localized) => {
                     }),
                 }}
             />
-            <Script
+            <script
                 id="breadcrumb-jsonld"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
