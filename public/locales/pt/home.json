@@ -83,6 +83,12 @@
     "cta": {
       "explore": "Explorar mapa",
       "docs": "Saiba mais"
+    },
+    "gettingStarted": {
+      "title": "Começar é Fácil",
+      "step1": "Faça login com sua identidade Nostr (extensão, chave ou bunker)",
+      "step2": "Encontre um local no mapa ou navegue pelo diretório",
+      "step3": "Deixe uma avaliação, classifique sua experiência e envie fotos"
     }
   },
   "regions": {

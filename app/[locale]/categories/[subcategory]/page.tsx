@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { env } from "@/lib/Environment";
 import { getSubcategoryData } from "@/app/api/cache/CategoryCache";
-import { PLACE_CATEGORIES, matchPlaceSubcategory } from "@/constants/PlaceCategories";
+import { PLACE_CATEGORIES, matchPlaceSubcategory, PlaceSubcategory } from "@/constants/PlaceCategories";
 import { getTranslations } from "next-intl/server";
+import { getLocalizedCountryCategorySlug, getLocalizedCityCategorySlug, SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
+import { Locale } from "@/i18n/types";
 import SubcategoryClient from "./SubcategoryClient";
 
 type PageProps = {
@@ -89,8 +91,24 @@ export default async function SubcategoryPage({ params }: PageProps) {
         ? categoryInfo[match.category]?.types?.[subcategory as keyof typeof categoryInfo[typeof match.category]["types"]] || subcategory.replace(/_/g, " ")
         : subcategory.replace(/_/g, " ");
 
-    // Get the plural label from the slug (e.g., "cafes", "restaurants")
-    const pluralLabel = slugToLabel(data.pluralSlug);
+    // Get the plural label — use locale-specific slug map for display
+    const localePluralSlug = SUBCATEGORY_SLUGS_BY_LOCALE[locale as Locale]?.[subcategory as PlaceSubcategory]
+        || SUBCATEGORY_SLUGS_BY_LOCALE['en'][subcategory as PlaceSubcategory]
+        || subcategory.replace(/_/g, '-');
+    const pluralLabel = slugToLabel(localePluralSlug);
+
+    // Re-map country/city slugs to current locale
+    const localizedData = {
+        ...data,
+        countries: data.countries.map(country => ({
+            ...country,
+            slug: getLocalizedCountryCategorySlug(country.name, subcategory as PlaceSubcategory, locale),
+            cities: country.cities.map(city => ({
+                ...city,
+                slug: getLocalizedCityCategorySlug(country.name, city.name, subcategory as PlaceSubcategory, locale),
+            })),
+        })),
+    };
 
     // JSON-LD: ItemList schema for countries in this subcategory
     const itemListSchema = {
@@ -98,8 +116,8 @@ export default async function SubcategoryPage({ params }: PageProps) {
         "@type": "ItemList",
         "name": t("jsonLd.subcategoryName", { category: pluralLabel }),
         "description": t("jsonLd.subcategoryDescription", { category: pluralLabel.toLowerCase() }),
-        "numberOfItems": data.countries.length,
-        "itemListElement": data.countries.slice(0, 50).map((country, index) => ({
+        "numberOfItems": localizedData.countries.length,
+        "itemListElement": localizedData.countries.slice(0, 50).map((country, index) => ({
             "@type": "ListItem",
             "position": index + 1,
             "name": country.name,
@@ -183,7 +201,7 @@ export default async function SubcategoryPage({ params }: PageProps) {
                     subcategory={subcategory}
                     label={label}
                     pluralLabel={pluralLabel}
-                    data={data}
+                    data={localizedData}
                 />
             </section>
         </>

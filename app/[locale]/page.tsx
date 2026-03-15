@@ -273,6 +273,12 @@ const HomePage = async ({ params }: Localized) => {
                         explore: t("community.cta.explore"),
                         docs: t("community.cta.docs"),
                     }}
+                    gettingStarted={{
+                        title: t("community.gettingStarted.title"),
+                        step1: t("community.gettingStarted.step1"),
+                        step2: t("community.gettingStarted.step2"),
+                        step3: t("community.gettingStarted.step3"),
+                    }}
                 />
 
                 {/* Section 5: How It Works */}

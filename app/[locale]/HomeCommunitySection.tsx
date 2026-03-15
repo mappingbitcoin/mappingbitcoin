@@ -21,9 +21,15 @@ interface CommunitySectionProps {
         explore: string;
         docs: string;
     };
+    gettingStarted: {
+        title: string;
+        step1: string;
+        step2: string;
+        step3: string;
+    };
 }
 
-export function CommunitySection({ title, description, features, cta }: CommunitySectionProps) {
+export function CommunitySection({ title, description, features, cta, gettingStarted }: CommunitySectionProps) {
     const featureList = [
         {
             icon: (
@@ -114,20 +120,20 @@ export function CommunitySection({ title, description, features, cta }: Communit
                     <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                         <div className="flex-1">
                             <h3 className="text-xl font-semibold text-white mb-4">
-                                Getting Started is Easy
+                                {gettingStarted.title}
                             </h3>
                             <ol className="space-y-3 text-gray-300">
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent text-sm font-medium flex items-center justify-center">1</span>
-                                    <span>Log in with your Nostr identity (extension, key, or bunker)</span>
+                                    <span>{gettingStarted.step1}</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent text-sm font-medium flex items-center justify-center">2</span>
-                                    <span>Find a venue on the map or browse the directory</span>
+                                    <span>{gettingStarted.step2}</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent text-sm font-medium flex items-center justify-center">3</span>
-                                    <span>Leave a review, rate your experience, and upload photos</span>
+                                    <span>{gettingStarted.step3}</span>
                                 </li>
                             </ol>
                         </div>

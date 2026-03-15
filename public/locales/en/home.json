@@ -83,6 +83,12 @@
     "cta": {
       "explore": "Explore Map",
       "docs": "Learn More"
+    },
+    "gettingStarted": {
+      "title": "Getting Started is Easy",
+      "step1": "Log in with your Nostr identity (extension, key, or bunker)",
+      "step2": "Find a venue on the map or browse the directory",
+      "step3": "Leave a review, rate your experience, and upload photos"
     }
   },
   "regions": {

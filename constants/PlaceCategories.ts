@@ -1020,5 +1020,442 @@ export const PLACE_CATEGORIES: Partial<Record<Locale, PlaceCategoryInfo>> & { en
                 "other": "Otro"
             }
         }
+    },
+    pt: {
+        automotive: {
+            "label": "Automotivo",
+            "types": {
+                "bicycle_rental": "Aluguel de bicicletas",
+                "car_dealer": "Concessionaria",
+                "car_rental": "Locadora de veiculos",
+                "car_repair": "Oficina mecanica",
+                "car_wash": "Lava rapido",
+                "electric_vehicle_charging_station": "Estacao de recarga de veiculos eletricos",
+                "gas_station": "Posto de combustivel",
+                "parking": "Estacionamento",
+                "rest_stop": "Area de descanso"
+            }
+        },
+        business: {
+            "label": "Negocios",
+            "types": {
+                "corporate_office": "Escritorio corporativo",
+                "farm": "Fazenda",
+                "ranch": "Rancho",
+                coworking_space: "Espaco de coworking"
+            }
+        },
+        culture: {
+            "label": "Cultura",
+            "types": {
+                "art_gallery": "Galeria de arte",
+                "art_studio": "Atelie",
+                "auditorium": "Auditorio",
+                "cultural_landmark": "Marco cultural",
+                "historical_place": "Lugar historico",
+                "monument": "Monumento",
+                "museum": "Museu",
+                "performing_arts_theater": "Teatro de artes cenicas",
+                "sculpture": "Escultura"
+            }
+        },
+        education: {
+            "label": "Educacao",
+            "types": {
+                "library": "Biblioteca",
+                "preschool": "Pre-escola",
+                "primary_school": "Escola primaria",
+                "school": "Escola",
+                "secondary_school": "Escola secundaria",
+                "university": "Universidade",
+                music_school: "Escola de musica",
+                driving_school: "Autoescola",
+                "cooking_school": "Escola de culinaria"
+            }
+        },
+        "entertainment-and-recreation": {
+            "label": "Entretenimento e Recreacao",
+            "types": {
+                "adventure_sports_center": "Centro de esportes de aventura",
+                "amphitheatre": "Anfiteatro",
+                "amusement_center": "Centro de diversao",
+                "amusement_park": "Parque de diversoes",
+                "aquarium": "Aquario",
+                "banquet_hall": "Salao de festas",
+                "barbecue_area": "Area de churrasco",
+                "botanical_garden": "Jardim botanico",
+                "bowling_alley": "Pista de boliche",
+                "casino": "Cassino",
+                "childrens_camp": "Acampamento infantil",
+                "comedy_club": "Clube de comedia",
+                "community_center": "Centro comunitario",
+                "concert_hall": "Sala de concerto",
+                "convention_center": "Centro de convencoes",
+                "cultural_center": "Centro cultural",
+                "cycling_park": "Parque para ciclismo",
+                "dance_hall": "Salao de danca",
+                "dog_park": "Parque para caes",
+                "event_venue": "Espaco para eventos",
+                "ferris_wheel": "Roda gigante",
+                "garden": "Jardim",
+                "hiking_area": "Area de trilha",
+                "historical_landmark": "Marco historico",
+                "internet_cafe": "Lan house",
+                "karaoke": "Karaoke",
+                "marina": "Marina",
+                "movie_rental": "Locadora de filmes",
+                "movie_theater": "Cinema",
+                "national_park": "Parque nacional",
+                "night_club": "Casa noturna",
+                "observation_deck": "Mirante",
+                "off_roading_area": "Area de off-road",
+                "opera_house": "Casa de opera",
+                "park": "Parque",
+                "philharmonic_hall": "Sala filarmonica",
+                "picnic_ground": "Area de piquenique",
+                "planetarium": "Planetario",
+                "plaza": "Praca",
+                "roller_coaster": "Montanha russa",
+                "skateboard_park": "Pista de skate",
+                "state_park": "Parque estadual",
+                "tourist_attraction": "Atracao turistica",
+                "video_arcade": "Fliperama",
+                "visitor_center": "Centro de visitantes",
+                "water_park": "Parque aquatico",
+                "wedding_venue": "Espaco para casamentos",
+                "wildlife_park": "Parque de vida selvagem",
+                "wildlife_refuge": "Refugio de vida selvagem",
+                "zoo": "Zoologico"
+            }
+        },
+        facilities: {
+            "label": "Instalacoes",
+            "types": {
+                "public_bath": "Banho publico",
+                "public_bathroom": "Banheiro publico",
+                "stable": "Estabulo"
+            }
+        },
+        "finance": {
+            "label": "Financas",
+            "types": {
+                "accounting": "Contabilidade",
+                "atm": "Caixa eletronico",
+                "bank": "Banco",
+                "currency_exchange": "Casa de cambio"
+            }
+        },
+        "food-and-drink": {
+            "label": "Comida e Bebida",
+            "types": {
+                "acai_shop": "Loja de acai",
+                "afghani_restaurant": "Restaurante afegao",
+                "african_restaurant": "Restaurante africano",
+                "american_restaurant": "Restaurante americano",
+                "asian_restaurant": "Restaurante asiatico",
+                "bagel_shop": "Loja de bagels",
+                "bakery": "Padaria",
+                "bar": "Bar",
+                "bar_and_grill": "Bar e churrasqueria",
+                "barbecue_restaurant": "Churrascaria",
+                "brazilian_restaurant": "Restaurante brasileiro",
+                "breakfast_restaurant": "Restaurante de cafe da manha",
+                "brunch_restaurant": "Restaurante de brunch",
+                "buffet_restaurant": "Restaurante buffet",
+                "cafe": "Cafe",
+                "cafeteria": "Cafeteria",
+                "candy_store": "Loja de doces",
+                "cat_cafe": "Cat cafe",
+                "chinese_restaurant": "Restaurante chines",
+                "chocolate_factory": "Fabrica de chocolate",
+                "chocolate_shop": "Loja de chocolate",
+                "coffee_shop": "Cafeteria",
+                "confectionery": "Confeitaria",
+                "deli": "Delicatessen",
+                "dessert_restaurant": "Restaurante de sobremesas",
+                "dessert_shop": "Loja de sobremesas",
+                "diner": "Lanchonete",
+                "dog_cafe": "Dog cafe",
+                "donut_shop": "Loja de donuts",
+                "fast_food_restaurant": "Restaurante de fast food",
+                "fine_dining_restaurant": "Restaurante de alta gastronomia",
+                "food_court": "Praca de alimentacao",
+                "french_restaurant": "Restaurante frances",
+                "greek_restaurant": "Restaurante grego",
+                "hamburger_restaurant": "Hamburgueria",
+                "ice_cream_shop": "Sorveteria",
+                "indian_restaurant": "Restaurante indiano",
+                "indonesian_restaurant": "Restaurante indonesio",
+                "italian_restaurant": "Restaurante italiano",
+                "japanese_restaurant": "Restaurante japones",
+                "juice_shop": "Loja de sucos",
+                "korean_restaurant": "Restaurante coreano",
+                "lebanese_restaurant": "Restaurante libanes",
+                "meal_delivery": "Delivery de refeicoes",
+                "meal_takeaway": "Comida para viagem",
+                "mediterranean_restaurant": "Restaurante mediterraneo",
+                "mexican_restaurant": "Restaurante mexicano",
+                "middle_eastern_restaurant": "Restaurante do Oriente Medio",
+                "pizza_restaurant": "Pizzaria",
+                "pub": "Pub",
+                "ramen_restaurant": "Restaurante de ramen",
+                "restaurant": "Restaurante",
+                "sandwich_shop": "Loja de sanduiches",
+                "seafood_restaurant": "Restaurante de frutos do mar",
+                "spanish_restaurant": "Restaurante espanhol",
+                "steak_house": "Churrascaria",
+                "sushi_restaurant": "Restaurante de sushi",
+                "tea_house": "Casa de cha",
+                "thai_restaurant": "Restaurante tailandes",
+                "turkish_restaurant": "Restaurante turco",
+                "vegan_restaurant": "Restaurante vegano",
+                "vegetarian_restaurant": "Restaurante vegetariano",
+                "vietnamese_restaurant": "Restaurante vietnamita",
+                "wine_bar": "Bar de vinho"
+            }
+        },
+        "geographical-areas": {
+            "label": "Areas geograficas",
+            "types": {
+                "administrative_area_level_1": "Area administrativa nivel 1",
+                "administrative_area_level_2": "Area administrativa nivel 2",
+                "country": "Pais",
+                "locality": "Localidade",
+                "postal_code": "Codigo postal",
+                "school_district": "Distrito escolar"
+            }
+        },
+        "government": {
+            "label": "Governo",
+            "types": {
+                "city_hall": "Prefeitura",
+                "courthouse": "Tribunal",
+                "embassy": "Embaixada",
+                "fire_station": "Quartel de bombeiros",
+                "government_office": "Reparticao publica",
+                "local_government_office": "Reparticao do governo local",
+                "neighborhood_police_station": "Delegacia de bairro",
+                "police": "Delegacia",
+                "post_office": "Correios"
+            }
+        },
+        "health-and-wellness": {
+            "label": "Saude e Bem-estar",
+            "types": {
+                alternative_medicine: "Medicina alternativa",
+                "psychotherapist": "Psicoterapeuta",
+                "chiropractor": "Quiropata",
+                "clinic": "Clinica",
+                "dental_clinic": "Clinica dentaria",
+                "dentist": "Dentista",
+                "doctor": "Medico",
+                "drugstore": "Drogaria",
+                "hospital": "Hospital",
+                "massage": "Massagem",
+                "medical_lab": "Laboratorio medico",
+                "pharmacy": "Farmacia",
+                "physiotherapist": "Fisioterapeuta",
+                "sauna": "Sauna",
+                "skin_care_clinic": "Clinica de dermatologia",
+                "spa": "Spa",
+                "tanning_studio": "Centro de bronzeamento",
+                "wellness_center": "Centro de bem-estar",
+                "yoga_studio": "Estudio de yoga"
+            }
+        },
+        "housing": {
+            "label": "Moradia",
+            "types": {
+                "apartment_building": "Edificio residencial",
+                "apartment_complex": "Complexo de apartamentos",
+                "condominium_complex": "Condominio",
+                "housing_complex": "Conjunto habitacional"
+            }
+        },
+        "lodging": {
+            "label": "Hospedagem",
+            "types": {
+                "bed_and_breakfast": "Pousada com cafe",
+                "budget_japanese_inn": "Pousada japonesa economica",
+                'chalet': "Chale",
+                "campground": "Camping",
+                "camping_cabin": "Cabana de camping",
+                "cottage": "Chalezinho",
+                "extended_stay_hotel": "Hotel de longa estadia",
+                "farmstay": "Hospedagem em fazenda",
+                "guest_house": "Casa de hospedes",
+                "hostel": "Hostel",
+                "hotel": "Hotel",
+                "inn": "Pousada",
+                "japanese_inn": "Pousada japonesa",
+                "lodging": "Hospedagem",
+                "mobile_home_park": "Parque de trailers",
+                "motel": "Motel",
+                "private_guest_room": "Quarto privado para hospedes",
+                "resort_hotel": "Hotel resort",
+                "rv_park": "Parque para motorhomes"
+            }
+        },
+        "natural-features": {
+            "label": "Recursos naturais",
+            "types": {
+                "beach": "Praia"
+            }
+        },
+        "places-of-worship": {
+            "label": "Locais de culto",
+            "types": {
+                "church": "Igreja",
+                "hindu_temple": "Templo hindu",
+                "mosque": "Mesquita",
+                "synagogue": "Sinagoga"
+            }
+        },
+        "services": {
+            "label": "Servicos",
+            "types": {
+                "3d-printing": "Impressao 3D",
+                "advertising": "Publicidade",
+                "architect": "Arquiteto",
+                "cleaning": "Servico de limpeza",
+                "graphic_design": "Design grafico",
+                "gardener": "Jardineiro",
+                "photographer": "Fotografo",
+                "beekeeper": "Apicultor",
+                "carpenter": "Carpinteiro",
+                "astrologer": "Astrologo",
+                "barber_shop": "Barbearia",
+                "beautician": "Esteticista",
+                "beauty_salon": "Salao de beleza",
+                "body_art_service": "Servico de arte corporal",
+                "catering_service": "Servico de buffet",
+                "cemetery": "Cemiterio",
+                "child_care_agency": "Agencia de cuidado infantil",
+                "consultant": "Consultor",
+                "contractor": "Empreiteiro",
+                "courier_service": "Servico de entrega",
+                "electrician": "Eletricista",
+                "florist": "Floricultura",
+                "food_delivery": "Delivery de comida",
+                "foot_care": "Podologia",
+                "funeral_home": "Funeraria",
+                "hair_care": "Cuidados capilares",
+                "hair_salon": "Salao de cabelo",
+                "insurance_agency": "Agencia de seguros",
+                "laundry": "Lavanderia",
+                "lawyer": "Advogado",
+                "locksmith": "Chaveiro",
+                "makeup_artist": "Maquiador(a)",
+                "moving_company": "Empresa de mudanca",
+                "nail_salon": "Salao de unhas",
+                "painter": "Pintor",
+                "plumber": "Encanador",
+                "psychic": "Vidente",
+                "real_estate_agency": "Imobiliaria",
+                "roofing_contractor": "Empreiteiro de telhados",
+                "storage": "Deposito",
+                "summer_camp_organizer": "Organizador de acampamento de verao",
+                "tailor": "Alfaiate",
+                "telecommunications_service_provider": "Provedor de telecomunicacoes",
+                "tour_agency": "Agencia de turismo",
+                "tourist_information_center": "Centro de informacao turistica",
+                "travel_agency": "Agencia de viagens",
+                "veterinary_care": "Clinica veterinaria"
+            }
+        },
+        "shopping": {
+            "label": "Compras",
+            "types": {
+                second_hand: "Brecho",
+                tobacco: "Tabacaria",
+                seafood_shop: "Peixaria",
+                stationery_store: "Papelaria",
+                cannabis: "Loja de cannabis",
+                craft_store: "Loja de artesanato",
+                copyshop: "Copiadora",
+                gardening_store: "Loja de jardinagem",
+                "asian_grocery_store": "Mercearia asiatica",
+                "auto_parts_store": "Loja de autopecas",
+                "bicycle_store": "Loja de bicicletas",
+                "book_store": "Livraria",
+                "butcher_shop": "Acougue",
+                "cell_phone_store": "Loja de celulares",
+                "clothing_store": "Loja de roupas",
+                "convenience_store": "Loja de conveniencia",
+                "department_store": "Loja de departamento",
+                "discount_store": "Loja de desconto",
+                "electronics_store": "Loja de eletronica",
+                "food_store": "Loja de alimentos",
+                "furniture_store": "Loja de moveis",
+                "gift_shop": "Loja de presentes",
+                "grocery_store": "Supermercado",
+                "hardware_store": "Loja de ferragens",
+                "home_goods_store": "Loja de artigos para casa",
+                "home_improvement_store": "Loja de materiais de construcao",
+                "jewelry_store": "Joalheria",
+                "liquor_store": "Loja de bebidas",
+                "market": "Mercado",
+                "music_store": "Loja de musica",
+                "pet_store": "Pet shop",
+                "optician": "Otica",
+                "shoe_store": "Loja de calcados",
+                "shopping_mall": "Shopping center",
+                "sporting_goods_store": "Loja de artigos esportivos",
+                "store": "Loja",
+                "supermarket": "Supermercado",
+                "warehouse_store": "Atacadista",
+                "wholesaler": "Distribuidor"
+            }
+        },
+        "sports": {
+            "label": "Esportes",
+            "types": {
+                dojo: "Dojo",
+                water_sports: "Esportes aquaticos",
+                surf_school: "Escola de surf",
+                "arena": "Arena coberta",
+                "athletic_field": "Campo de atletismo",
+                "fishing_charter": "Excursao de pesca",
+                "fishing_pond": "Lago de pesca",
+                "fitness_center": "Centro de fitness",
+                "golf_course": "Campo de golfe",
+                "gym": "Academia",
+                "ice_skating_rink": "Pista de patinacao no gelo",
+                "playground": "Parquinho",
+                "ski_resort": "Estacao de esqui",
+                "sports_activity_location": "Local de atividade esportiva",
+                "sports_club": "Clube esportivo",
+                "sports_coaching": "Treinamento esportivo",
+                "sports_complex": "Complexo esportivo",
+                "stadium": "Estadio",
+                "swimming_pool": "Piscina"
+            }
+        },
+        "transportation": {
+            "label": "Transporte",
+            "types": {
+                "airport": "Aeroporto",
+                "airstrip": "Pista de pouso",
+                "bus_station": "Estacao de onibus",
+                "bus_stop": "Parada de onibus",
+                "ferry_terminal": "Terminal de ferry",
+                "heliport": "Heliporto",
+                "international_airport": "Aeroporto internacional",
+                "light_rail_station": "Estacao de trem leve",
+                "park_and_ride": "Estacionamento com transporte",
+                "subway_station": "Estacao de metro",
+                "taxi_stand": "Ponto de taxi",
+                "train_station": "Estacao de trem",
+                "transit_depot": "Deposito de transporte",
+                "transit_station": "Estacao de transporte",
+                "truck_stop": "Parada de caminhoes"
+            }
+        },
+        "other": {
+            "label": "Outro",
+            "types": {
+                "other": "Outro"
+            }
+        }
     }
 }

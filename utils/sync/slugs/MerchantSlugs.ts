@@ -4,6 +4,7 @@ import slugify from 'slugify';
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import esLocale from 'i18n-iso-countries/langs/es.json';
+import ptLocale from 'i18n-iso-countries/langs/pt.json';
 import { getSimplifiedCountrySlug, SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
 import { PlaceSubcategory } from "@/constants/PlaceCategories";
 import { EnrichedVenue } from "@/models/Overpass";
@@ -12,6 +13,7 @@ import { VenueSlugEntrySEO } from "@/models/VenueSlug";
 
 countries.registerLocale(enLocale);
 countries.registerLocale(esLocale);
+countries.registerLocale(ptLocale);
 
 const VENUES_FILE = path.resolve('data', 'EnrichedVenues.json');
 const MERCHANT_OUTPUT_FILE = path.resolve('data', 'merchant-slugs.json');
@@ -54,10 +56,12 @@ export async function generateMerchantSlugs() {
 
         const countryEnglish = countries.getName(countryCode, 'en', { select: 'official' });
         const countrySpanish = countries.getName(countryCode, 'es', { select: 'official' });
-        if (!countryEnglish || !countrySpanish) return;
+        const countryPortuguese = countries.getName(countryCode, 'pt', { select: 'official' });
+        if (!countryEnglish || !countrySpanish || !countryPortuguese) return;
 
         const simplifiedSlugEnglish = getSimplifiedCountrySlug(countryEnglish);
         const simplifiedSlugSpanish = getSimplifiedCountrySlug(countrySpanish);
+        const simplifiedSlugPortuguese = getSimplifiedCountrySlug(countryPortuguese);
 
         const citySlug = city ? slugify(city, { lower: true, strict: true }) : null;
         const stateSlug = state ? slugify(state, { lower: true, strict: true }) : null;
@@ -68,7 +72,8 @@ export async function generateMerchantSlugs() {
             createEntry(keyCountryOnly, {
                 canonical: `bitcoin-shops-in-${simplifiedSlugEnglish}`,
                 alternates_i18n: {
-                    es: [`lugares-bitcoin-en-${simplifiedSlugSpanish}`]
+                    es: [`lugares-bitcoin-en-${simplifiedSlugSpanish}`],
+                    pt: [`locais-bitcoin-em-${simplifiedSlugPortuguese}`]
                 }
             }, countryCode);
         }
@@ -77,13 +82,15 @@ export async function generateMerchantSlugs() {
             const subcatSlugKey = slugify(subcategory, { lower: true, strict: true });
             const categorySlugEn = SUBCATEGORY_SLUGS_BY_LOCALE['en'][subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
             const categorySlugEs = SUBCATEGORY_SLUGS_BY_LOCALE['es']![subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
+            const categorySlugPt = SUBCATEGORY_SLUGS_BY_LOCALE['pt']![subcategory as PlaceSubcategory] || `${subcatSlugKey}s`;
 
             const keyCountryCat = `c:${countryCode}|cat:${subcategory}`;
             if (!combinations.has(keyCountryCat)) {
                 createEntry(keyCountryCat, {
                     canonical: `bitcoin-${categorySlugEn}-in-${simplifiedSlugEnglish}`,
                     alternates_i18n: {
-                        es: [`${categorySlugEs}-bitcoin-en-${simplifiedSlugSpanish}`]
+                        es: [`${categorySlugEs}-bitcoin-en-${simplifiedSlugSpanish}`],
+                        pt: [`${categorySlugPt}-bitcoin-em-${simplifiedSlugPortuguese}`]
                     }
                 }, countryCode, category, subcategory);
             }
@@ -95,7 +102,8 @@ export async function generateMerchantSlugs() {
                         location: citySlug,
                         canonical: `bitcoin-${categorySlugEn}-in-${citySlug}-${simplifiedSlugEnglish}`,
                         alternates_i18n: {
-                            es: [`${categorySlugEs}-bitcoin-en-${citySlug}-${simplifiedSlugSpanish}`]
+                            es: [`${categorySlugEs}-bitcoin-en-${citySlug}-${simplifiedSlugSpanish}`],
+                            pt: [`${categorySlugPt}-bitcoin-em-${citySlug}-${simplifiedSlugPortuguese}`]
                         }
                     }, countryCode, category, subcategory);
                 }
@@ -108,7 +116,8 @@ export async function generateMerchantSlugs() {
                         location: stateSlug,
                         canonical: `bitcoin-${categorySlugEn}-in-${stateSlug}-${simplifiedSlugEnglish}`,
                         alternates_i18n: {
-                            es: [`${categorySlugEs}-bitcoin-en-${stateSlug}-${simplifiedSlugSpanish}`]
+                            es: [`${categorySlugEs}-bitcoin-en-${stateSlug}-${simplifiedSlugSpanish}`],
+                            pt: [`${categorySlugPt}-bitcoin-em-${stateSlug}-${simplifiedSlugPortuguese}`]
                         }
                     }, countryCode, category, subcategory);
                 }
@@ -122,7 +131,8 @@ export async function generateMerchantSlugs() {
                     location: citySlug,
                     canonical: `bitcoin-shops-in-${citySlug}-${simplifiedSlugEnglish}`,
                     alternates_i18n: {
-                        es: [`lugares-bitcoin-en-${citySlug}-${simplifiedSlugSpanish}`]
+                        es: [`lugares-bitcoin-en-${citySlug}-${simplifiedSlugSpanish}`],
+                        pt: [`locais-bitcoin-em-${citySlug}-${simplifiedSlugPortuguese}`]
                     }
                 }, countryCode);
             }
@@ -135,7 +145,8 @@ export async function generateMerchantSlugs() {
                     location: stateSlug,
                     canonical: `bitcoin-shops-in-${stateSlug}-${simplifiedSlugEnglish}`,
                     alternates_i18n: {
-                        es: [`lugares-bitcoin-en-${stateSlug}-${simplifiedSlugSpanish}`]
+                        es: [`lugares-bitcoin-en-${stateSlug}-${simplifiedSlugSpanish}`],
+                        pt: [`locais-bitcoin-em-${stateSlug}-${simplifiedSlugPortuguese}`]
                     }
                 }, countryCode);
             }

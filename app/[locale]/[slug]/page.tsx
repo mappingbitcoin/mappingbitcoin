@@ -663,7 +663,14 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             {alternates && (
                 <SetLocaleAlternates alternates={
                     Object.fromEntries(
-                        Object.entries(alternates).map(([loc, slugPath]) => [loc, `/${slugPath}`])
+                        Object.entries(alternates).map(([loc, slugPath]) => {
+                            // Strip locale prefix if present (e.g., "es/slug" -> "slug")
+                            // The [locale] in the route handles the prefix automatically
+                            const stripped = loc !== 'en' && slugPath.startsWith(`${loc}/`)
+                                ? slugPath.slice(loc.length + 1)
+                                : slugPath;
+                            return [loc, `/${stripped}`];
+                        })
                     )
                 } />
             )}
