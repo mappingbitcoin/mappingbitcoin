@@ -183,6 +183,18 @@ export default async function SubcategoryPage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
             />
+            {/* Hero Section */}
+            <section className="bg-primary pt-12 pb-6 mt-16">
+                <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        {t("subcategory.title", { category: pluralLabel })}
+                    </h1>
+                    <p className="text-text-light text-lg max-w-2xl mx-auto">
+                        {t("subcategory.subtitle", { count: data.totalCount, countries: data.countries.length })}
+                    </p>
+                </div>
+            </section>
+
             {/* Server-rendered SEO content for crawlers */}
             <div className="sr-only">
                 <p>
@@ -201,18 +213,6 @@ export default async function SubcategoryPage({ params }: PageProps) {
                     ))}
                 </ul>
             </div>
-
-            {/* Hero Section */}
-            <section className="bg-primary pt-12 pb-6 mt-16">
-                <div className="max-w-container mx-auto px-8 max-md:px-4 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        {t("subcategory.title", { category: pluralLabel })}
-                    </h1>
-                    <p className="text-text-light text-lg max-w-2xl mx-auto">
-                        {t("subcategory.subtitle", { count: data.totalCount, countries: data.countries.length })}
-                    </p>
-                </div>
-            </section>
 
             {/* Client Component */}
             <section className="bg-primary min-h-[60vh]">

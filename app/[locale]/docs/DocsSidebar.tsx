@@ -71,9 +71,9 @@ export default function DocsSidebar() {
 
                     {docsConfig.map((section) => (
                         <div key={section.title} className="mb-6">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 block">
                                 {section.title}
-                            </h3>
+                            </span>
                             <ul className="space-y-1">
                                 {section.items.map((item) => {
                                     const isActive = currentSlug === item.slug || (isDocsRoot && item.slug === 'overview');
