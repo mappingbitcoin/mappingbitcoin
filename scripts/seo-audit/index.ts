@@ -571,6 +571,45 @@ function detectSiteWideIssues(
     }
   }
 
+  // --- Broken internal links ---
+  // Check if internal links on crawled pages point to pages that returned errors
+  const crawledStatusMap = new Map<string, number>();
+  for (const page of pages) {
+    crawledStatusMap.set(normalizeUrlForComparison(page.url), page.statusCode);
+  }
+
+  // Collect all internal link targets with their source pages
+  const brokenLinkSources = new Map<string, string[]>(); // target -> source pages
+  for (const page of pages) {
+    if (page.statusCode < 200 || page.statusCode >= 400) continue;
+    for (const link of page.meta.internalLinks) {
+      try {
+        const resolved = new URL(link.href, page.url).toString();
+        const normalizedTarget = normalizeUrlForComparison(resolved);
+        const status = crawledStatusMap.get(normalizedTarget);
+        // If the target was crawled and returned 4xx/5xx, it's a broken link
+        if (status !== undefined && status >= 400) {
+          if (!brokenLinkSources.has(normalizedTarget)) {
+            brokenLinkSources.set(normalizedTarget, []);
+          }
+          brokenLinkSources.get(normalizedTarget)!.push(page.url);
+        }
+      } catch {
+        // Skip malformed URLs
+      }
+    }
+  }
+
+  for (const [target, sources] of Array.from(brokenLinkSources.entries())) {
+    const status = crawledStatusMap.get(target) ?? 0;
+    issues.push({
+      check: 'broken-internal-link',
+      severity: 'error',
+      message: `Broken internal link (HTTP ${status}): ${target}`,
+      details: `Found on ${sources.length} page(s): ${sources.slice(0, 5).join(', ')}${sources.length > 5 ? ` ...and ${sources.length - 5} more` : ''}`,
+    });
+  }
+
   // --- Redirect chains ---
   for (const [url, chain] of Array.from(redirectChains.entries())) {
     if (chain.length > 1) {
@@ -585,11 +624,6 @@ function detectSiteWideIssues(
   }
 
   // --- Pages in sitemap but not crawlable (4xx/5xx) ---
-  const crawledStatusMap = new Map<string, number>();
-  for (const page of pages) {
-    crawledStatusMap.set(normalizeUrlForComparison(page.url), page.statusCode);
-  }
-
   for (const sitemapUrl of sitemapUrls) {
     const normalizedSitemapUrl = normalizeUrlForComparison(sitemapUrl);
     const statusCode = crawledStatusMap.get(normalizedSitemapUrl);
@@ -638,6 +672,124 @@ function normalizeUrlForComparison(urlStr: string): string {
 // ---------------------------------------------------------------------------
 // Health score calculation
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Broken internal link validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Validate internal links by checking if uncrawled link targets are reachable.
+ * For link targets that were crawled, check is done in detectSiteWideIssues.
+ * This function checks links pointing to pages NOT visited during crawl.
+ */
+async function validateInternalLinks(
+  pages: PageAudit[],
+  crawledUrls: Set<string>,
+  origin: string,
+  config: AuditConfig,
+): Promise<Issue[]> {
+  const issues: Issue[] = [];
+
+  // Collect all internal link targets that were NOT crawled
+  const uncrawledTargets = new Map<string, string[]>(); // normalized URL -> source pages
+
+  for (const page of pages) {
+    if (page.statusCode < 200 || page.statusCode >= 400) continue;
+
+    for (const link of page.meta.internalLinks) {
+      try {
+        // Resolve relative URLs
+        let href = link.href;
+        if (!/^https?:\/\//i.test(href)) {
+          href = new URL(href, page.url).toString();
+        }
+        // Only check links to the same origin
+        if (!href.startsWith(origin)) continue;
+
+        const normalized = normalizeUrlForComparison(href);
+
+        // Skip if already crawled (handled by detectSiteWideIssues)
+        if (crawledUrls.has(normalized)) continue;
+
+        // Skip common non-page paths
+        if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|pdf|xml)(\?|$)/i.test(href)) continue;
+
+        if (!uncrawledTargets.has(normalized)) {
+          uncrawledTargets.set(normalized, []);
+        }
+        uncrawledTargets.get(normalized)!.push(page.url);
+      } catch {
+        // Skip malformed URLs
+      }
+    }
+  }
+
+  if (uncrawledTargets.size === 0) {
+    logStep('Internal link validation', 'no uncrawled link targets found');
+    return issues;
+  }
+
+  logStep('Internal link validation', `checking ${uncrawledTargets.size} uncrawled link targets...`);
+
+  // Check uncrawled targets with HEAD requests (rate limited)
+  const CONCURRENCY = 5;
+  const targets = Array.from(uncrawledTargets.entries());
+  let checked = 0;
+
+  for (let i = 0; i < targets.length; i += CONCURRENCY) {
+    const batch = targets.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(
+      batch.map(async ([normalizedUrl, sources]) => {
+        // Reconstruct the actual URL from normalized version
+        const url = normalizedUrl.startsWith('http') ? normalizedUrl : `https://${normalizedUrl}`;
+        try {
+          const response = await fetch(url, {
+            method: 'HEAD',
+            redirect: 'follow',
+            signal: AbortSignal.timeout(config.timeout),
+            headers: { 'User-Agent': config.userAgent },
+          });
+
+          if (response.status >= 400) {
+            return { url, status: response.status, sources, broken: true };
+          }
+
+          // Check for soft 404 — if redirected to /404 or not-found page
+          const finalUrl = response.url;
+          if (finalUrl.includes('/404') || finalUrl.includes('/not-found')) {
+            return { url, status: 404, sources, broken: true };
+          }
+
+          return { url, status: response.status, sources, broken: false };
+        } catch {
+          return { url, status: 0, sources, broken: true };
+        }
+      })
+    );
+
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value.broken) {
+        const { url, status, sources } = result.value;
+        issues.push({
+          check: 'broken-internal-link',
+          severity: 'error',
+          message: `Broken internal link (HTTP ${status}): ${url}`,
+          details: `Found on ${sources.length} page(s): ${sources.slice(0, 5).join(', ')}${sources.length > 5 ? ` ...and ${sources.length - 5} more` : ''}`,
+        });
+      }
+    }
+
+    checked += batch.length;
+    if (checked % 50 === 0 || checked === targets.length) {
+      logStep('Link validation progress', `${checked}/${targets.length}`);
+    }
+  }
+
+  const brokenCount = issues.length;
+  logStep('Internal link validation', `${brokenCount} broken link(s) found out of ${targets.length} checked`);
+
+  return issues;
+}
 
 function calculateHealthScore(pages: PageAudit[]): number {
   if (pages.length === 0) return 0;
@@ -783,9 +935,13 @@ async function runAudit(cliArgs: CliArgs): Promise<SiteAudit> {
     }
   }
 
-  // (f) Compile site-wide issues
-  logStep('Detecting site-wide issues...');
+  // (f) Validate internal links — check uncrawled link targets
+  logStep('Validating internal links...');
   const crawledUrlsSet = new Set(crawledPages.map((p) => normalizeUrlForComparison(p.url)));
+  const brokenLinkIssues = await validateInternalLinks(pageAudits, crawledUrlsSet, origin, config);
+
+  // (g) Compile site-wide issues
+  logStep('Detecting site-wide issues...');
   const siteWideIssues = detectSiteWideIssues(
     pageAudits,
     sitemapCheck.urls,
@@ -803,7 +959,7 @@ async function runAudit(cliArgs: CliArgs): Promise<SiteAudit> {
   const cannibalizationIssues = detectCannibalization(cannibalizationPages);
 
   // Combine robots and sitemap issues into site-wide
-  const allSiteWideIssues = [...robotsIssues, ...sitemapCheck.issues, ...siteWideIssues, ...cannibalizationIssues];
+  const allSiteWideIssues = [...robotsIssues, ...sitemapCheck.issues, ...siteWideIssues, ...brokenLinkIssues, ...cannibalizationIssues];
 
   logStep('Site-wide issues', `${allSiteWideIssues.length} found`);
 
