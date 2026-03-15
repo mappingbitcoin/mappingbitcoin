@@ -1229,8 +1229,8 @@ export function getLocalizedCountryCategorySlug(countryName: string, subcategory
 export function getLocalizedCitySlug(countryName: string, cityName: string, locale: string = 'en'): string {
     const slug = getSimplifiedCitySlug(countryName, cityName)
     switch (locale) {
-        case 'es': return `comercios-bitcoin-en-${slug}`;
-        case 'pt': return `comercios-bitcoin-em-${slug}`;
+        case 'es': return `lugares-bitcoin-en-${slug}`;
+        case 'pt': return `locais-bitcoin-em-${slug}`;
         default: return `bitcoin-shops-in-${slug}`;
     }
 }
