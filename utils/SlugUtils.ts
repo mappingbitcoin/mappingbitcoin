@@ -16,7 +16,11 @@ const simplifiedCountryNamesRaw = {
     'Tanzania, United Republic of': 'Tanzania',
     'Moldova, Republic of': 'Moldova',
     'Macedonia, the former Yugoslav Republic of': 'North Macedonia',
-    'Lao People’s Democratic Republic': 'Laos',
+    "Lao People's Democratic Republic": 'Laos',
+    "Lao People\u2019s Democratic Republic": 'Laos',
+    "C\u00f4te d'Ivoire": 'Ivory Coast',
+    "Cote d'Ivoire": 'Ivory Coast',
+    "People's Republic of China": 'China',
     'Palestine, State of': 'Palestine',
     'Brunei Darussalam': 'Brunei',
     'Czech Republic': 'Czechia',
@@ -31,8 +35,8 @@ const simplifiedCountryNames = Object.fromEntries(
 );
 
 export function getSimplifiedCountrySlug(countryName: string): string {
-    const simplified = simplifiedCountryNames[slugify(countryName).toLowerCase()];
-    return simplified || slugify(countryName).toLowerCase();
+    const simplified = simplifiedCountryNames[slugify(countryName, { lower: true, strict: true })];
+    return simplified || slugify(countryName, { lower: true, strict: true });
 }
 
 export function getSimplifiedCitySlug(countryName: string, cityName: string): string {

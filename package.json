@@ -27,6 +27,8 @@
     "seed:marketing": "npx tsx scripts/seed-marketing.ts",
     "listen:reviews": "tsx scripts/reviewListener.ts",
     "recompute:wot": "tsx scripts/recomputeWoT.ts",
+    "seo:audit": "tsx scripts/seo-audit/index.ts",
+    "seo:audit:json": "tsx scripts/seo-audit/index.ts --output json",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
