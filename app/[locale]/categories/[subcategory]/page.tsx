@@ -5,7 +5,7 @@ import { env } from "@/lib/Environment";
 import { getSubcategoryData } from "@/app/api/cache/CategoryCache";
 import { PLACE_CATEGORIES, matchPlaceSubcategory, PlaceSubcategory } from "@/constants/PlaceCategories";
 import { getTranslations } from "next-intl/server";
-import { getLocalizedCountryCategorySlug, getLocalizedCityCategorySlug, SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
+import { getLocalizedCountryCategorySlug, getLocalizedCityCategorySlug, getSubcategoryFromSlug, SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
 import { Locale } from "@/i18n/types";
 import SubcategoryClient from "./SubcategoryClient";
 
@@ -21,8 +21,26 @@ function slugToLabel(slug: string): string {
         .join(' ');
 }
 
+// Resolve a subcategory param to internal key — handles both raw keys (corporate_office)
+// and localized slugs (escritorios-corporativos)
+function resolveSubcategoryKey(param: string): string {
+    // Try as-is first (internal key like "corporate_office")
+    const asKey = param as PlaceSubcategory;
+    if (SUBCATEGORY_SLUGS_BY_LOCALE['en'][asKey]) return param;
+
+    // Try reverse lookup from localized slug across all locales
+    for (const loc of ['en', 'es', 'pt'] as const) {
+        const found = getSubcategoryFromSlug(param, loc);
+        if (found) return found;
+    }
+
+    // Fallback: return as-is
+    return param;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { subcategory } = await params;
+    const { subcategory: subcategoryParam } = await params;
+    const subcategory = resolveSubcategoryKey(subcategoryParam);
     const data = await getSubcategoryData(subcategory);
 
     if (!data) {
@@ -76,7 +94,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function SubcategoryPage({ params }: PageProps) {
-    const { subcategory, locale } = await params;
+    const { subcategory: subcategoryParam, locale } = await params;
+    const subcategory = resolveSubcategoryKey(subcategoryParam);
     const t = await getTranslations({ locale, namespace: "categories" });
     const data = await getSubcategoryData(subcategory);
 

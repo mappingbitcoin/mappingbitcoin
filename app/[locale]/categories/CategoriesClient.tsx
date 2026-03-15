@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Locale } from "@/i18n/types";
-import { PLACE_CATEGORIES, PLACE_SUBTYPE_MAP, PlaceCategory } from "@/constants/PlaceCategories";
+import { PLACE_CATEGORIES, PLACE_SUBTYPE_MAP, PlaceCategory, PlaceSubcategory } from "@/constants/PlaceCategories";
+import { SUBCATEGORY_SLUGS_BY_LOCALE } from "@/utils/SlugUtils";
 import { SearchIcon } from "@/assets/icons/ui";
 
 // Category icons mapping - using simple SVG icons
@@ -186,8 +187,11 @@ export default function CategoriesClient({ availableSubcategories }: CategoriesC
     };
 
     const getSubcategoryUrl = (subcategory: string) => {
-        // Link to the subcategory page showing countries
-        return `/categories/${subcategory}`;
+        // Use locale-specific slug for the URL
+        const localizedSlug = SUBCATEGORY_SLUGS_BY_LOCALE[locale]?.[subcategory as PlaceSubcategory]
+            || SUBCATEGORY_SLUGS_BY_LOCALE['en'][subcategory as PlaceSubcategory]
+            || subcategory;
+        return `/categories/${localizedSlug}`;
     };
 
     return (
