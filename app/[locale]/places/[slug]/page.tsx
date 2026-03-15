@@ -14,6 +14,7 @@ import {getFormattedAddress} from "@/utils/AddressUtils";
 import {getLocalizedCountryName} from "@/utils/CountryUtils";
 import {getSubcategoryLabel, matchPlaceSubcategory} from "@/constants/PlaceCategories";
 import {getVenueCache, getVenueSlugIndexMap, getVenueIndexMap} from "@/app/api/cache/VenueCache";
+import {getLocalizedCountrySlug, getLocalizedCitySlug} from "@/utils/SlugUtils";
 
 async function getVenueBySlug(slug: string, _preview = false): Promise<EnrichedVenue | null> {
     // Preview mode still needs the API for changeset lookups
@@ -272,7 +273,6 @@ function buildLocalBusinessSchema(venue: EnrichedVenue, locale: Locale) {
 function buildBreadcrumbSchema(venue: EnrichedVenue, locale: Locale) {
     const { name } = parseTags(venue.tags);
     const countryLabel = getLocalizedCountryName(locale, venue.country) || venue.country || '';
-    const countrySlug = (venue.country || '').toLowerCase().replace(/\s+/g, '-');
 
     const items = [
         {
@@ -288,17 +288,16 @@ function buildBreadcrumbSchema(venue: EnrichedVenue, locale: Locale) {
             "@type": "ListItem",
             "position": 2,
             "name": countryLabel,
-            "item": `${env.siteUrl}/bitcoin-shops-in-${countrySlug}`
+            "item": `${generateCanonical(getLocalizedCountrySlug(countryLabel, locale), locale)}`
         });
     }
 
     if (venue.city && venue.country) {
-        const citySlug = venue.city.toLowerCase().replace(/\s+/g, '-');
         items.push({
             "@type": "ListItem",
             "position": items.length + 1,
             "name": venue.city,
-            "item": `${env.siteUrl}/bitcoin-shops-in-${citySlug}-${countrySlug}`
+            "item": `${generateCanonical(getLocalizedCitySlug(countryLabel, venue.city, locale), locale)}`
         });
     }
 

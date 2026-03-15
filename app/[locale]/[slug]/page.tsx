@@ -564,14 +564,14 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
         {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "https://mappingbitcoin.com"
+            "name": t.countries?.breadcrumb?.home ?? "Home",
+            "item": env.siteUrl
         },
         {
             "@type": "ListItem",
             "position": 2,
-            "name": country,
-            "item": `${generateCanonical(getLocalizedCountrySlug(country, locale), locale)}`
+            "name": countryLabel,
+            "item": `${generateCanonical(getLocalizedCountrySlug(countryLabel, locale), locale)}`
         },
     ];
 
@@ -580,7 +580,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             "@type": "ListItem",
             "position": 3,
             "name": deslugify(location) ?? '',
-            "item": `${generateCanonical(getLocalizedCitySlug(country, location, locale), locale)}`
+            "item": `${generateCanonical(getLocalizedCitySlug(countryLabel, location, locale), locale)}`
         });
     }
 
@@ -589,7 +589,7 @@ export default async function PlacesDirectoryPage({ params }: PageProps) {
             "@type": "ListItem",
             "position": breadcrumbItems.length + 1,
             "name": getSubcategoryLabel(locale, categoryAndSubcategory.category, categoryAndSubcategory.subcategory) ?? '',
-            "item": `${generateCanonical(getLocalizedCountryCategorySlug(country, categoryAndSubcategory.subcategory, locale), locale)}`
+            "item": `${generateCanonical(getLocalizedCountryCategorySlug(countryLabel, categoryAndSubcategory.subcategory, locale), locale)}`
         });
     }
 
